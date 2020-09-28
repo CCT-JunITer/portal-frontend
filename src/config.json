@@ -1,0 +1,7 @@
+{
+    "env": "development",
+    "appDomainProd": "personal.cct-ev.de",
+    "appDomainStag": "stag.personal.cct-ev.de",
+    "appDomainDev": "127.0.0.1:8000",
+    "appName": "PV-Tool"
+}
