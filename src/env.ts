@@ -1,14 +1,16 @@
-import * as config from './config.json';
+import dotenv from 'dotenv';
+dotenv.config();
+const env = process.env.VUE_APP_ENV;
 
 let envApiUrl = '';
 
-if (config.env === 'production') {
-  envApiUrl = `https://${config.appDomainProd}`;
-} else if (config.env === 'staging') {
-  envApiUrl = `https://${config.appDomainStag}`;
+if (env === 'production') {
+  envApiUrl = `https://${process.env.VUE_APP_DOMAIN_PROD}`;
+} else if (env === 'staging') {
+  envApiUrl = `https://${process.env.VUE_APP_DOMAIN_STAG}`;
 } else {
-  envApiUrl = `http://${config.appDomainDev}`;
+  envApiUrl = `http://${process.env.VUE_APP_DOMAIN_DEV}`;
 }
 
 export const apiUrl = envApiUrl;
-export const appName = config.appName;
+export const appName = process.env.VUE_APP_NAME;
