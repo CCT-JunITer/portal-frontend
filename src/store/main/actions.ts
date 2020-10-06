@@ -114,7 +114,7 @@ export const actions = {
             router.push('/main');
         }
     },
-    async removeNotification(context: MainContext, payload: { notification: AppNotification, timeout: number }) {
+    async removeNotification(context: MainContext, payload: { notification: AppNotification; timeout: number }) {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
                 commitRemoveNotification(context, payload.notification);
@@ -138,7 +138,7 @@ export const actions = {
             commitAddNotification(context, { color: 'error', content: 'Incorrect username' });
         }
     },
-    async resetPassword(context: MainContext, payload: { password: string, token: string }) {
+    async resetPassword(context: MainContext, payload: { password: string; token: string }) {
         const loadingNotification = { content: 'Resetting password', showProgress: true };
         try {
             commitAddNotification(context, loadingNotification);
