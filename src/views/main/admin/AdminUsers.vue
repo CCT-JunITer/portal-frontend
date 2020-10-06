@@ -8,20 +8,21 @@
       <v-btn color="primary" to="/main/admin/users/create">Create User</v-btn>
     </v-toolbar>
     <v-data-table :headers="headers" :items="users">
-      <template slot="items" slot-scope="props">
-        <td>{{ props.item.name }}</td>
-        <td>{{ props.item.email }}</td>
-        <td>{{ props.item.full_name }}</td>
-        <td><v-icon v-if="props.item.is_active">checkmark</v-icon></td>
-        <td><v-icon v-if="props.item.is_superuser">checkmark</v-icon></td>
-        <td class="justify-center layout px-0">
-          <v-tooltip top>
-            <span>Edit</span>
-            <v-btn slot="activator" flat :to="{name: 'main-admin-users-edit', params: {id: props.item.id}}">
-              <v-icon>edit</v-icon>
+      <template v-slot:item.isActive="{ item }">
+        <v-icon v-if="item.is_active">checkmark</v-icon>
+      </template>
+      <template v-slot:item.isSuperuser="{ item }">
+        <v-icon v-if="item.is_superuser">checkmark</v-icon>
+      </template>
+      <template v-slot:item.actions="{ item }">
+        <v-tooltip top>
+          <span>Edit</span>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn v-bind="attrs" v-on="on" text :to="{name: 'main-admin-users-edit', params: {id: item.id}}">
+              <v-icon :to="{name: 'main-admin-users-edit', params: {id: item.id}}">edit</v-icon>
             </v-btn>
-          </v-tooltip>
-        </td>
+          </template>
+        </v-tooltip>
       </template>
     </v-data-table>
   </div>
@@ -69,7 +70,8 @@ export default class AdminUsers extends Vue {
     },
     {
       text: 'Actions',
-      value: 'id',
+      value: 'actions',
+      sortable: false,
     },
   ];
   get users() {

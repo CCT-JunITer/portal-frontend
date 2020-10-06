@@ -1,8 +1,8 @@
 <template>
     <div>
-        <v-snackbar auto-height :color="currentNotificationColor" v-model="show">
+        <v-snackbar :color="currentNotificationColor" v-model="show">
             <v-progress-circular class="ma-2" indeterminate v-show="showProgress"></v-progress-circular>{{ currentNotificationContent }}
-            <v-btn flat @click.native="close">Close</v-btn>
+            <v-btn text @click.native="close">Close</v-btn>
         </v-snackbar>
     </div>
 </template>
@@ -15,9 +15,9 @@ import { dispatchRemoveNotification } from '@/store/main/actions';
 
 @Component
 export default class NotificationsManager extends Vue {
-    public show: boolean = false;
-    public text: string = '';
-    public showProgress: boolean = false;
+    public show = false;
+    public text = '';
+    public showProgress = false;
     public currentNotification: AppNotification | false = false;
 
     public async hide() {
