@@ -79,7 +79,7 @@
         </v-list>
       </v-layout>
     </v-navigation-drawer>
-    <v-app-bar dark color="grey darken-4" flat class="flex-grow-0" app>
+    <v-app-bar dark color="cctBlue" flat class="flex-grow-0" app>
       <v-app-bar-nav-icon default @click.stop="switchShowDrawer"></v-app-bar-nav-icon>
       <v-toolbar-title v-text="appName"></v-toolbar-title>
       <v-spacer></v-spacer>
