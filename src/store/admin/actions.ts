@@ -4,23 +4,12 @@ import { IUserProfileCreate, IUserProfileUpdate } from '@/interfaces';
 import { State } from '../state';
 import { AdminState } from './state';
 import { getStoreAccessors } from 'typesafe-vuex';
-import { commitSetUsers, commitSetUser } from './mutations';
 import { dispatchCheckApiError } from '../main/actions';
-import { commitAddNotification, commitRemoveNotification } from '../main/mutations';
+import {commitAddNotification, commitRemoveNotification, commitSetUser} from '../main/mutations';
 
 type MainContext = ActionContext<AdminState, State>;
 
 export const actions = {
-    async actionGetUsers(context: MainContext) {
-        try {
-            const response = await api.getUsers(context.rootState.main.token);
-            if (response) {
-                commitSetUsers(context, response.data);
-            }
-        } catch (error) {
-            await dispatchCheckApiError(context, error);
-        }
-    },
     async actionUpdateUser(context: MainContext, payload: { id: number; user: IUserProfileUpdate }) {
         try {
             const loadingNotification = { content: 'saving', showProgress: true };
@@ -56,5 +45,4 @@ export const actions = {
 const { dispatch } = getStoreAccessors<AdminState, State>('');
 
 export const dispatchCreateUser = dispatch(actions.actionCreateUser);
-export const dispatchGetUsers = dispatch(actions.actionGetUsers);
 export const dispatchUpdateUser = dispatch(actions.actionUpdateUser);

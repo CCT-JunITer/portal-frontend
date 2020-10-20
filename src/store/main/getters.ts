@@ -3,6 +3,13 @@ import { getStoreAccessors } from 'typesafe-vuex';
 import { State } from '../state';
 
 export const getters = {
+    adminUsers: (state: MainState) => state.users,
+    adminOneUser: (state: MainState) => (userId: number) => {
+        const filteredUsers = state.users.filter((user) => user.id === userId);
+        if (filteredUsers.length > 0) {
+            return { ...filteredUsers[0] };
+        }
+    },
     hasAdminAccess: (state: MainState) => {
         return (
             state.userProfile &&
@@ -27,3 +34,5 @@ export const readLoginError = read(getters.loginError);
 export const readToken = read(getters.token);
 export const readUserProfile = read(getters.userProfile);
 export const readFirstNotification = read(getters.firstNotification);
+export const readAdminOneUser = read(getters.adminOneUser);
+export const readAdminUsers = read(getters.adminUsers);

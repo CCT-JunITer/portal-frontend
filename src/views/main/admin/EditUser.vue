@@ -80,6 +80,11 @@
                 </v-text-field>
               </v-flex>
             </v-layout>
+            <v-text-field
+                label="Ressort"
+                v-model="ressort"
+                required
+            ></v-text-field>
           </v-form>
         </template>
       </v-card-text>
@@ -100,9 +105,10 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { IUserProfile, IUserProfileUpdate } from '@/interfaces';
-import { dispatchGetUsers, dispatchUpdateUser } from '@/store/admin/actions';
-import { readAdminOneUser } from '@/store/admin/getters';
+import { IUserProfileUpdate } from '@/interfaces';
+import { dispatchUpdateUser } from '@/store/admin/actions';
+import {readAdminOneUser} from '@/store/main/getters';
+import {dispatchGetUsers} from '@/store/main/actions';
 
 @Component
 export default class EditUser extends Vue {
@@ -114,6 +120,7 @@ export default class EditUser extends Vue {
   public setPassword = false;
   public password1 = '';
   public password2 = '';
+  public ressort = '';
 
   public async mounted() {
     await dispatchGetUsers(this.$store);
@@ -130,6 +137,7 @@ export default class EditUser extends Vue {
       this.email = this.user.email;
       this.isActive = this.user.is_active;
       this.isSuperuser = this.user.is_superuser;
+      this.ressort = this.user.ressort;
     }
   }
 
@@ -148,6 +156,7 @@ export default class EditUser extends Vue {
       }
       updatedProfile.is_active = this.isActive;
       updatedProfile.is_superuser = this.isSuperuser;
+      updatedProfile.ressort = this.ressort;
       if (this.setPassword) {
         updatedProfile.password = this.password1;
       }

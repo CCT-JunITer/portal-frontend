@@ -43,7 +43,8 @@ import {
   IUserProfileUpdate,
   IUserProfileCreate,
 } from '@/interfaces';
-import { dispatchGetUsers, dispatchCreateUser } from '@/store/admin/actions';
+import { dispatchCreateUser } from '@/store/admin/actions';
+import {dispatchGetUsers} from '@/store/main/actions';
 
 @Component
 export default class CreateUser extends Vue {

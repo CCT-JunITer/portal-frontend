@@ -1,12 +1,14 @@
 import { mutations } from './mutations';
 import { getters } from './getters';
 import { actions } from './actions';
-import { AdminState } from './state';
+import {DashboardState} from './state';
 
-const defaultState: AdminState = {
+const defaultState: DashboardState = {
+  searchText: null,
+  filters: [],
 };
 
-export const adminModule = {
+export const dashboardModule = {
   state: defaultState,
   mutations,
   actions,
