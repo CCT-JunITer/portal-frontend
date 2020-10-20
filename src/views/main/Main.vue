@@ -79,36 +79,9 @@
         </v-list>
       </v-layout>
     </v-navigation-drawer>
-    <v-app-bar dark color="cctBlue" flat class="flex-grow-0" app>
-      <v-app-bar-nav-icon default @click.stop="switchShowDrawer"></v-app-bar-nav-icon>
-      <v-toolbar-title v-text="appName"></v-toolbar-title>
-      <v-spacer></v-spacer>
-      <v-menu bottom left offset-y>
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn v-bind="attrs" v-on="on" icon>
-            <v-icon>more_vert</v-icon>
-          </v-btn>
-        </template>
-        <v-list>
-          <v-list-item to="/main/profile">
-            <v-list-item-content>
-              <v-list-item-title>Profile</v-list-item-title>
-            </v-list-item-content>
-            <v-list-item-action>
-              <v-icon>person</v-icon>
-            </v-list-item-action>
-          </v-list-item>
-          <v-list-item @click="logout">
-            <v-list-item-content>
-              <v-list-item-title>Logout</v-list-item-title>
-            </v-list-item-content>
-            <v-list-item-action>
-              <v-icon>close</v-icon>
-            </v-list-item-action>
-          </v-list-item>
-        </v-list>
-      </v-menu>
-    </v-app-bar>
+    <default-app-bar v-if="!$route.meta.appBar"></default-app-bar>
+    <component v-bind:is="$route.meta.appBar" v-else></component>
+
     <v-main style="flex-basis: 0; overflow: hidden;">
       <div style="overflow-y: auto; height: 100%" class="flex-grow-1">
         <router-view></router-view>
@@ -124,6 +97,7 @@ import { appName } from '@/env';
 import { readDashboardMiniDrawer, readDashboardShowDrawer, readHasAdminAccess } from '@/store/main/getters';
 import { commitSetDashboardShowDrawer, commitSetDashboardMiniDrawer } from '@/store/main/mutations';
 import { dispatchUserLogOut } from '@/store/main/actions';
+import DefaultAppBar from '@/views/main/appbar/DefaultAppBar.vue';
 
 const routeGuardMain = async (to, from, next) => {
   if (to.path === '/main') {
@@ -132,8 +106,9 @@ const routeGuardMain = async (to, from, next) => {
     next();
   }
 };
-
-@Component
+@Component({
+  components: {DefaultAppBar}
+})
 export default class Main extends Vue {
   public appName = appName;
 
@@ -157,12 +132,6 @@ export default class Main extends Vue {
     commitSetDashboardShowDrawer(this.$store, value);
   }
 
-  public switchShowDrawer() {
-    commitSetDashboardShowDrawer(
-      this.$store,
-      !readDashboardShowDrawer(this.$store),
-    );
-  }
 
   public switchMiniDrawer() {
     commitSetDashboardMiniDrawer(

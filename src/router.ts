@@ -34,7 +34,11 @@ export default new Router({
           children: [
             {
               path: 'dashboard',
-              component: () => import(/* webpackChunkName: "main-dashboard" */ './views/main/dashboard/Dashboard.vue'),
+              component: () => import(/* webpackChunkName: "main-dashboard" */ './views/main/dashboard/EmployeesView.vue'),
+              meta: {
+                // Override default appBar
+                appBar: () => import(/* webpackChunkName: "main-dashboard-appbar" */ './views/main/dashboard/DashboardAppBar.vue')
+              }
             },
             {
               path: 'profile',
@@ -43,6 +47,10 @@ export default new Router({
               children: [
                 {
                   path: 'view',
+                  redirect: 'view/me'
+                },
+                {
+                  path: 'view/:id',
                   component: () => import(
                     /* webpackChunkName: "main-profile" */ './views/main/profile/UserProfile.vue'),
                 },

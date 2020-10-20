@@ -4,6 +4,17 @@ export interface IUserProfile {
     is_superuser: boolean;
     full_name: string;
     id: number;
+    birthdate: string;
+    district: string;
+    entrydate: string;
+    linkedin: string;
+    major: string;
+    memberstatus: string;
+    phonenumber: string;
+    ressort: string;
+    slackid: string;
+    studylevel: string;
+    university: string;
 }
 
 export interface IUserProfileUpdate {
@@ -12,12 +23,19 @@ export interface IUserProfileUpdate {
     password?: string;
     is_active?: boolean;
     is_superuser?: boolean;
+    birthdate?: string;
+    district?: string;
+    entrydate?: string;
+    linkedin?: string;
+    major?: string;
+    memberstatus?: string;
+    phonenumber?: string;
+    ressort?: string;
+    slackid?: string;
+    studylevel?: string;
+    university?: string;
 }
 
-export interface IUserProfileCreate {
+export interface IUserProfileCreate extends IUserProfileUpdate {
     email: string;
-    full_name?: string;
-    password?: string;
-    is_active?: boolean;
-    is_superuser?: boolean;
 }

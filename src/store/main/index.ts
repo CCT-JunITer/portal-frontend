@@ -9,8 +9,9 @@ const defaultState: MainState = {
   logInError: false,
   userProfile: null,
   dashboardMiniDrawer: false,
-  dashboardShowDrawer: true,
+  dashboardShowDrawer: false,
   notifications: [],
+  users: [],
 };
 
 export const mainModule = {

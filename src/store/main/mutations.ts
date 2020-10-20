@@ -29,6 +29,14 @@ export const mutations = {
     removeNotification(state: MainState, payload: AppNotification) {
         state.notifications = state.notifications.filter((notification) => notification !== payload);
     },
+    setUsers(state: MainState, payload: IUserProfile[]) {
+        state.users = payload;
+    },
+    setUser(state: MainState, payload: IUserProfile) {
+        const users = state.users.filter((user: IUserProfile) => user.id !== payload.id);
+        users.push(payload);
+        state.users = users;
+    },
 };
 
 const {commit} = getStoreAccessors<MainState | any, State>('');
@@ -41,3 +49,5 @@ export const commitSetToken = commit(mutations.setToken);
 export const commitSetUserProfile = commit(mutations.setUserProfile);
 export const commitAddNotification = commit(mutations.addNotification);
 export const commitRemoveNotification = commit(mutations.removeNotification);
+export const commitSetUser = commit(mutations.setUser);
+export const commitSetUsers = commit(mutations.setUsers);

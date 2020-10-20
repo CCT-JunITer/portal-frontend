@@ -1,6 +1,6 @@
 <template>
   <div class="root">
-    <div :class="color + ' backdrop'"></div>
+    <div :class="'backdrop'" :style="`background-color: ${backgroundColor};`"></div>
     <slot></slot>
   </div>
 </template>
@@ -9,7 +9,12 @@ import { Component, Vue, Prop } from 'vue-property-decorator';
 
 @Component
 export default class Backdrop extends Vue {
-  @Prop({default: 'grey darken-4', type: String}) public color: string | undefined;
+  @Prop({default: 'primary', type: String})
+  public color: string | undefined;
+
+  public get backgroundColor() {
+    return this.color && this.$vuetify.theme.currentTheme[this.color];
+  }
 }
 </script>
 
@@ -18,6 +23,7 @@ export default class Backdrop extends Vue {
   position: absolute !important;
   height: 200px;
   width: 100%;
+  top: 0;
 }
 .root {
   display: flex;
