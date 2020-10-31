@@ -1,7 +1,7 @@
 <template>
   <div>
-    <v-btn :color="color" @click="trigger"><slot>Choose File</slot></v-btn>
-    <input :multiple="multiple" class="visually-hidden" type="file" v-on:change="files" ref="fileInput">
+    <v-btn :color="color" @click="trigger" v-bind="$attrs"><slot>Choose File</slot></v-btn>
+    <input :multiple="multiple" class="visually-hidden" type="file" :accept="accept" v-on:change="files" ref="fileInput">
   </div>
 </template>
 
@@ -12,9 +12,13 @@ import { Component, Vue, Prop, Emit } from 'vue-property-decorator';
 export default class UploadButton extends Vue {
   @Prop(String) public color: string | undefined;
   @Prop({default: false}) public multiple!: boolean;
+  @Prop({default: '*'}) public accept!: string;
   @Emit()
-  public files(e): FileList {
-    return e.target.files;
+  public files(e): File[] {
+    const files = [...e.target.files];
+    // reset files
+    e.target.value = '';
+    return files;
   }
 
   public trigger() {

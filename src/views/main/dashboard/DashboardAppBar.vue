@@ -4,6 +4,39 @@
     <v-toolbar-title>Mitglieder</v-toolbar-title>
     <v-spacer></v-spacer>
     <v-btn icon @click.stop="searchText = ''"><v-icon>mdi-magnify</v-icon></v-btn>
+    <v-menu bottom left offset-y>
+      <template v-slot:activator="{ on, attrs }">
+        <v-btn v-bind="attrs" v-on="on" icon>
+          <v-icon>more_vert</v-icon>
+        </v-btn>
+      </template>
+      <v-list>
+        <v-list-item to="/main/dashboard">
+          <v-list-item-content>
+            <v-list-item-title>Dashboard</v-list-item-title>
+          </v-list-item-content>
+          <v-list-item-action>
+            <v-icon>web</v-icon>
+          </v-list-item-action>
+        </v-list-item>
+        <v-list-item to="/main/profile">
+          <v-list-item-content>
+            <v-list-item-title>Profile</v-list-item-title>
+          </v-list-item-content>
+          <v-list-item-action>
+            <v-icon>person</v-icon>
+          </v-list-item-action>
+        </v-list-item>
+        <v-list-item @click="logout">
+          <v-list-item-content>
+            <v-list-item-title>Logout</v-list-item-title>
+          </v-list-item-content>
+          <v-list-item-action>
+            <v-icon>close</v-icon>
+          </v-list-item-action>
+        </v-list-item>
+      </v-list>
+    </v-menu>
 
   </v-app-bar>
   <v-app-bar dark v-else color="cctBlue" class="flex-grow-0" app extended>

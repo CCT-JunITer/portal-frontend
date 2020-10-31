@@ -1,7 +1,7 @@
 <template>
   <v-app-bar dark color="cctBlue" class="flex-grow-0" app>
     <v-app-bar-nav-icon default @click.stop="switchShowDrawer"></v-app-bar-nav-icon>
-    <v-toolbar-title v-text="appName"></v-toolbar-title>
+    <v-toolbar-title >Profil</v-toolbar-title>
     <v-spacer></v-spacer>
     <v-menu bottom left offset-y>
       <template v-slot:activator="{ on, attrs }">
@@ -10,6 +10,14 @@
         </v-btn>
       </template>
       <v-list>
+        <v-list-item to="/main/dashboard">
+          <v-list-item-content>
+            <v-list-item-title>Dashboard</v-list-item-title>
+          </v-list-item-content>
+          <v-list-item-action>
+            <v-icon>web</v-icon>
+          </v-list-item-action>
+        </v-list-item>
         <v-list-item to="/main/profile">
           <v-list-item-content>
             <v-list-item-title>Profile</v-list-item-title>
