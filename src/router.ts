@@ -55,6 +55,11 @@ export default new Router({
                     /* webpackChunkName: "main-profile" */ './views/main/profile/UserProfile.vue'),
                   children: [
                     {
+                      // ensures ids are passed
+                      path: '',
+                      redirect: (to) => ({ name: 'skills', params: { id: to.params?.id || 'me' } })
+                    },
+                    {
                       path: 'skills',
                       name: 'skills',
                       component: () => import(
