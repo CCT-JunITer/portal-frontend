@@ -36,6 +36,22 @@
               :error-messages="errors.collect('email')"
               required
             ></v-text-field>
+            <v-text-field label="Geburtstag" type = "date" v-model = "birthdate" required ></v-text-field>
+            <v-text-field label="Handynummer" type = "number" v-model = "phonenumber" data-vv-name="mobile" required default-country-code="national_number" state="errors[0] ? false : (valid ? true : null)"   ></v-text-field>
+            <v-text-field label="Memberstatus" type = "string" v-model = "memberstatus" required ></v-text-field>
+            <v-text-field label="Eingangsdatum" type = "date" v-model = "entrydate" required ></v-text-field>
+            <v-text-field label="Studiengang" v-model="major" required ></v-text-field>
+            <v-text-field label="Universität" v-model="university"  required ></v-text-field>
+            <v-text-field label="Studienabschluss" v-model="studylevel" required ></v-text-field>
+            <v-text-field label="Bezirk" v-model="district" required  ></v-text-field>
+            <v-text-field label="LinkedIn" v-model="linkedin" required  ></v-text-field>
+            <v-combobox
+                v-model = "ressort"
+                :items="ressortSelection"
+                :search-input.sync="search"
+                hide-selected
+                label="Ressort"
+              ></v-combobox>
             <div class="subheading secondary--text text--lighten-2">User is superuser <span v-if="isSuperuser">(currently is a superuser)</span><span v-else>(currently is not a superuser)</span></div>
             <v-checkbox
               label="Is Superuser"
@@ -80,11 +96,6 @@
                 </v-text-field>
               </v-flex>
             </v-layout>
-            <v-text-field
-                label="Ressort"
-                v-model="ressort"
-                required
-            ></v-text-field>
           </v-form>
         </template>
       </v-card-text>

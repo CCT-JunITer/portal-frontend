@@ -64,6 +64,21 @@ export const actions = {
             await dispatchCheckApiError(context, error);
         }
     },
+    async actionUploadFile(context: MainContext, payload: { file: File | string; email: string | null }) {
+      try {
+          const loadingNotification = { content: 'Uploading', showProgress: true };
+          commitAddNotification(context, loadingNotification);
+          const response = (await Promise.all([
+              api.uploadProfilePicture(context.state.token, payload.file, payload.email),
+              await new Promise((resolve, reject) => setTimeout(() => resolve(), 500)),
+          ]))[0];
+          commitRemoveNotification(context, loadingNotification);
+          commitAddNotification(context, { content: 'Uploading completed', color: 'success' });
+          return response.data;
+      } catch (error) {
+          await dispatchCheckApiError(context, error);
+      }
+    },
     async actionCheckLoggedIn(context: MainContext) {
         if (!context.state.isLoggedIn) {
             let token = context.state.token;
@@ -179,6 +194,7 @@ export const dispatchRemoveLogIn = dispatch(actions.actionRemoveLogIn);
 export const dispatchRouteLoggedIn = dispatch(actions.actionRouteLoggedIn);
 export const dispatchRouteLogOut = dispatch(actions.actionRouteLogOut);
 export const dispatchUpdateUserProfile = dispatch(actions.actionUpdateUserProfile);
+export const dispatchUploadFile = dispatch(actions.actionUploadFile);
 export const dispatchRemoveNotification = dispatch(actions.removeNotification);
 export const dispatchPasswordRecovery = dispatch(actions.passwordRecovery);
 export const dispatchResetPassword = dispatch(actions.resetPassword);

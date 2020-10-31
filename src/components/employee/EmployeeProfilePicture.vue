@@ -1,5 +1,5 @@
 <template>
-  <v-avatar :size="$attrs.size || 96" color="cctOrange" v-bind="$attrs">
+  <v-avatar :size="$attrs.size || 96" :color="imageSrc ? '' : 'cctOrange'" v-bind="$attrs" class="avatar">
     <v-img :src="imageSrc" v-if="imageSrc"></v-img>
     <span v-else v-text="initials" class="white--text headline"></span>
   </v-avatar>
@@ -15,8 +15,11 @@ export default class EmployeeProfilePicture extends Vue {
   @Prop()
   private employee: IUserProfile | undefined;
 
+  @Prop()
+  private src: string | undefined;
+
   public get imageSrc() {
-    return null;
+    return this.src || this.employee?.profile_picture;
   }
 
   public get initials() {
@@ -32,3 +35,9 @@ export default class EmployeeProfilePicture extends Vue {
 }
 
 </script>
+
+<style lang="css">
+.avatar {
+  border: 1px solid rgba(0,0,0,0.1);
+}
+</style>
