@@ -1,126 +1,70 @@
 <template>
-  <v-container fluid>
-    <v-row>
-      <v-col cols="3">
-        <employee-profile-picture :employee="userProfile" tile size="256"></employee-profile-picture>
-        <div class="title primary--text text--darken-2" v-if="userProfile && userProfile.full_name">
-          {{ userProfile.full_name }}
+  <v-sheet color="grey lighten-4" class="fill-height">
+    <v-container>
+      <v-card tile outlined class="mb-5">
+        <div class="d-flex flex-column flex-sm-row">
+          <div class="d-flex align-center ma-5">
+            <div class="mx-3">
+              <employee-profile-picture size="128" :employee="userProfile"></employee-profile-picture>
+            </div>
+            <div>
+              <v-card-text>
+                <div class="text-h6">{{ userProfile.full_name || 'Kein Name' }}</div>
+                <div class="text-subtitle-1">{{ userProfile.ressort || 'Kein Ressort' }} - {{ userProfile.memberstatus }}</div>
+              </v-card-text>
+              <v-card-actions>
+                <v-btn to="/main/profile/edit" rounded color="cctGreen" small outlined v-if="isMe">
+                  <v-icon left small>
+                    mdi-pencil
+                  </v-icon>
+                  Profil bearbeiten
+                </v-btn>
+              </v-card-actions>
+            </div>
+          </div>
+
+          <v-divider :vertical="$vuetify.breakpoint.smAndUp" :class="$vuetify.breakpoint.smAndUp ? 'my-3': 'mx-3'"></v-divider>
+          <div class="d-flex flex flex-column ma-5 justify-space-between">
+            <div class="d-flex">
+              <v-icon class="mx-3">mdi-map-marker</v-icon>
+              <div class="subtitle-2 text--secondary">
+                {{ userProfile.university }} {{userProfile.district}}
+              </div>
+            </div>
+            <v-card-actions>
+              <v-btn :ripple="false" text icon>
+                <v-icon>mdi-email</v-icon>
+              </v-btn>
+              <v-btn :ripple="false" text icon>
+                <v-icon>mdi-phone</v-icon>
+              </v-btn>
+              <v-btn :ripple="false" text icon>
+                <v-icon>mdi-slack</v-icon>
+              </v-btn>
+              <v-btn :ripple="false" text icon>
+                <v-icon>mdi-linkedin</v-icon>
+              </v-btn>
+            </v-card-actions>
+          </div>
         </div>
-        <div class="title primary--text text--darken-2" v-else>-----</div>
-      </v-col>
-      <v-col cols="6">
-        <v-card class="ma-3 pa-3">
-          <v-card-title primary-title>
-            <div class="headline primary--text">User Profile</div>
-          </v-card-title>
-          <v-card-text>
-            <v-row>
-              <v-col>
-                <div class="my-4">
-                  <div class="subheading secondary--text text--lighten-3">Name</div>
-                  <div class="title primary--text text--darken-2" v-if="userProfile && userProfile.full_name">
-                    {{ userProfile.full_name }}
-                  </div>
-                  <div class="title primary--text text--darken-2" v-else>-----</div>
-                </div>
-                <div class="my-4">
-                  <div class="subheading secondary--text text--lighten-3">Geburtstag</div>
-                  <div class="title primary--text text--darken-2" v-if="userProfile && userProfile.birthdate">
-                    {{ userProfile.birthdate }}
-                  </div>
-                  <div class="title primary--text text--darken-2" v-else>-----</div>
-                </div>
-                <div class="my-3">
-                  <div class="subheading secondary--text text--lighten-3">Email</div>
-                  <div class="title primary--text text--darken-2" v-if="userProfile && userProfile.email">
-                    {{ userProfile.email }}
-                  </div>
-                  <div class="title primary--text text--darken-2" v-else>-----</div>
-                </div>
-                <div class="my-3">
-                  <div class="subheading secondary--text text--lighten-3">Handynummer</div>
-                  <div class="title primary--text text--darken-2" v-if="userProfile && userProfile.phonenumber">
-                    {{ userProfile.phonenumber }}
-                  </div>
-                  <div class="title primary--text text--darken-2" v-else>-----</div>
-                </div>
-                <div class="my-3">
-                  <div class="subheading secondary--text text--lighten-3">Rolle</div>
-                  <div class="title primary--text text--darken-2" v-if="userProfile && userProfile.memberstatus">
-                    {{ userProfile.memberstatus }}
-                  </div>
-                  <div class="title primary--text text--darken-2" v-else>-----</div>
-                </div>
-                <div class="my-3">
-                  <div class="subheading secondary--text text--lighten-3">Ressort</div>
-                  <div class="title primary--text text--darken-2" v-if="userProfile && userProfile.ressort">
-                    {{ userProfile.ressort }}
-                  </div>
-                  <div class="title primary--text text--darken-2" v-else>-----</div>
-                </div>
-                <div class="my-3">
-                  <div class="subheading secondary--text text--lighten-3">Studiengang</div>
-                  <div class="title primary--text text--darken-2"
-                       v-if="userProfile && userProfile.major && userProfile.studylevel">
-                    {{ userProfile.studylevel + userProfile.major }}
-                  </div>
-                  <div class="title primary--text text--darken-2" v-else>-----</div>
-                </div>
-                <div class="my-3">
-                  <div class="subheading secondary--text text--lighten-3">Universität</div>
-                  <div class="title primary--text text--darken-2" v-if="userProfile && userProfile.university">
-                    {{ userProfile.university }}
-                  </div>
-                  <div class="title primary--text text--darken-2" v-else>-----</div>
-                </div>
-                <div class="my-3">
-                  <div class="subheading secondary--text text--lighten-3">Stadtteil</div>
-                  <div class="title primary--text text--darken-2" v-if="userProfile && userProfile.district">
-                    {{ userProfile.district }}
-                  </div>
-                  <div class="title primary--text text--darken-2" v-else>-----</div>
-                </div>
-                <div class="my-3">
-                  <div class="subheading secondary--text text--lighten-3">LinkedIn</div>
-                  <div class="title primary--text text--darken-2" v-if="userProfile && userProfile.linkedin">
-                    {{ userProfile.linkedin }}
-                  </div>
-                  <div class="title primary--text text--darken-2" v-else>-----</div>
-                </div>
-                <div class="my-3">
-                  <div class="subheading secondary--text text--lighten-3">Slack</div>
-                  <div class="title primary--text text--darken-2" v-if="userProfile && userProfile.slackid">
-                    {{ userProfile.slackid }}
-                  </div>
-                  <div class="title primary--text text--darken-2" v-else>-----</div>
-                </div>
-                <div class="my-3">
-                  <div class="subheading secondary--text text--lighten-3">LinkedIn</div>
-                  <div class="title primary--text text--darken-2" v-if="userProfile && userProfile.linkedin">
-                    {{ userProfile.linkedin }}
-                  </div>
-                  <div class="title primary--text text--darken-2" v-else>-----</div>
-                </div>
-                <div class="my-3">
-                  <div class="subheading secondary--text text--lighten-3">Slack</div>
-                  <div class="title primary--text text--darken-2" v-if="userProfile && userProfile.slackid">
-                    {{ userProfile.slackid }}
-                  </div>
-                  <div class="title primary--text text--darken-2" v-else>-----</div>
-                </div>
-              </v-col>
-            </v-row>
-          </v-card-text>
+      </v-card>
 
+      <div>
+        <v-tabs background-color="transparent" slider-color="cctOrange" color="cctGrey">
+          <v-tab :ripple="false" :to="{name: 'skills'}">
+            Skills
+          </v-tab>
+          <v-tab :ripple="false" :to="{name: 'projects'}">
+            Projekte
+          </v-tab>
+        </v-tabs>
+        <v-divider></v-divider>
+      </div>
 
-          <v-card-actions v-if="isMe">
-            <v-btn to="/main/profile/edit">Edit</v-btn>
-            <v-btn to="/main/profile/password">Change password</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-container>
+      <router-view></router-view>
+
+    </v-container>
+  </v-sheet>
 </template>
 
 <script lang="ts">
@@ -128,8 +72,11 @@ import {Component, Vue} from 'vue-property-decorator';
 import {readAdminOneUser, readUserProfile} from '@/store/main/getters';
 import {dispatchGetUsers} from '@/store/main/actions';
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
+import EmployeeCard from '@/components/employee/EmployeeCard.vue';
+
+
 @Component({
-  components: {EmployeeProfilePicture}
+  components: {EmployeeCard, EmployeeProfilePicture}
 })
 export default class UserProfile extends Vue {
 
@@ -157,5 +104,6 @@ export default class UserProfile extends Vue {
   public async mounted() {
     await dispatchGetUsers(this.$store);
   }
+
 }
 </script>
