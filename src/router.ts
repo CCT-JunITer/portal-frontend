@@ -53,6 +53,20 @@ export default new Router({
                   path: 'view/:id',
                   component: () => import(
                     /* webpackChunkName: "main-profile" */ './views/main/profile/UserProfile.vue'),
+                  children: [
+                    {
+                      path: 'skills',
+                      name: 'skills',
+                      component: () => import(
+                        /* webpackChunkName: "main-profile-skills" */ './views/main/profile/UserProfileSkills.vue')
+                    },
+                    {
+                      path: 'projects',
+                      name: 'projects',
+                      component: () => import(
+                        /* webpackChunkName: "main-profile-projects" */  './views/main/profile/UserProfileProjects.vue'),
+                    }
+                  ]
                 },
                 {
                   path: 'edit',

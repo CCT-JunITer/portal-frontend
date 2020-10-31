@@ -4,7 +4,7 @@
       <employee-profile-picture :employee="employee"></employee-profile-picture>
     </v-row>
     <v-card-text>
-      <h3 class="heading-6">{{ employee.full_name || 'Kein Name' }}</h3>
+      <div class="text-h6 text--primary">{{ employee.full_name || 'Kein Name' }}</div>
       <div class="subtitle-1 mb-2">{{ employee.ressort || 'Kein Ressort' }}</div>
     </v-card-text>
     <v-divider ></v-divider>
