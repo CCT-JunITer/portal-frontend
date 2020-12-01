@@ -1,0 +1,64 @@
+variables:
+  DOCKER_TLS_CERTDIR: "/certs"
+  DOMAIN_STAG: stag.portal.cct-ev.de
+  API_DOMAIN: stag.api.cct-ev.de
+
+stages:
+  - lint
+  - build
+  - deploy
+
+lint:
+  image: node:10.23-alpine
+  stage: lint
+  needs: []
+  cache:
+    paths:
+      - node_modules
+  script:
+    - npm install --progress=false
+    - VUE_APP_ENV=dev VUE_APP_NAME=PV-Tool npm run lint
+
+build staging:
+  image: node:10.23-alpine
+  stage: build
+  needs: []
+  only:
+    refs:
+      - master
+  cache:
+    paths:
+      - node_modules
+  script:
+    - npm install --progress=false
+    - VUE_APP_DOMAIN_STAG=${API_DOMAIN} VUE_APP_ENV=staging VUE_APP_NAME=PV-Tool npm run build
+  artifacts:
+    expire_in: 1 week
+    paths:
+      - dist
+
+
+deploy staging:
+  image: alpine
+  stage: deploy
+  needs: 
+    - job: build staging
+      artifacts: true
+  only: 
+    refs: 
+      - master
+  environment:
+    name: stag
+    url: https://$DOMAIN_STAG
+  variables:
+    DEPLOY_USER: stag-frontend-gitlab-ci
+    DEPLOY_SERVER: $DOMAIN_STAG
+    DEPLOY_PATH: /var/www/$DOMAIN_STAG/
+  before_script:
+    - "which ssh-agent || ( apk update && apk add openssh-client )"
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+  script:
+    - scp -o 'StrictHostKeyChecking no' -prq ./dist/* ${DEPLOY_USER}@${DEPLOY_SERVER}:${DEPLOY_PATH}
