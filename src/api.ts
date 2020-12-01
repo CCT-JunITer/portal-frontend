@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {apiUrl} from '@/env';
-import {IUserProfile, IUserProfileCreate, IUserProfileUpdate} from './interfaces';
+import { IUserProfile, IUserProfileCreate, IUserProfileUpdate, UserType } from './interfaces';
 import {dataURItoBlob} from '@/utils';
 
 function authHeaders(token: string, headers = {}) {
@@ -11,6 +11,7 @@ function authHeaders(token: string, headers = {}) {
     },
   };
 }
+
 
 export const api = {
   async logInGetToken(username: string, password: string) {
@@ -26,8 +27,19 @@ export const api = {
   async updateMe(token: string, data: IUserProfileUpdate) {
     return axios.put<IUserProfile>(`${apiUrl}/api/v1/users/me`, data, authHeaders(token));
   },
-  async getUsers(token: string) {
-    return axios.get<IUserProfile[]>(`${apiUrl}/api/v1/users/`, authHeaders(token));
+  async getUsers(token: string, type: UserType) {
+
+    // https://gitlab.cct-ev.de/juniter/pv-tool3/backend/-/issues/4
+    const params: any = {};
+    switch(type) {
+    case 'alumni': params.onlyalumni = true; break;
+    case 'all': params.includealumni = true; break;
+    case 'members':
+    default:
+      break;
+    }
+
+    return axios.get<IUserProfile[]>(`${apiUrl}/api/v1/users/`, { ...authHeaders(token), params });
   },
 
   async uploadProfilePicture(token: string, file: File | string, userMail: string | null) {
@@ -44,8 +56,8 @@ export const api = {
     }
     return await axios.post<string>(`${apiUrl}/api/v1/utils/upload-user-image/`, formData,
       authHeaders(token, {
-          'Content-Type': 'multipart/form-data'
-        })
+        'Content-Type': 'multipart/form-data'
+      })
     );
   },
   async updateUser(token: string, userId: number, data: IUserProfileUpdate) {

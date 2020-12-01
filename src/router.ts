@@ -34,10 +34,13 @@ export default new Router({
           children: [
             {
               path: 'dashboard',
-              component: () => import(/* webpackChunkName: "main-dashboard" */ './views/main/dashboard/EmployeesView.vue'),
+              redirect: 'search'
+            },
+            {
+              path: 'search',
+              component: () => import(/* webpackChunkName: "main-search" */ './views/main/search/SearchView.vue'),
               meta: {
-                // Override default appBar
-                appBar: () => import(/* webpackChunkName: "main-dashboard-appbar" */ './views/main/dashboard/DashboardAppBar.vue')
+                disableSearchBar: true
               }
             },
             {
@@ -57,7 +60,7 @@ export default new Router({
                     {
                       // ensures ids are passed
                       path: '',
-                      redirect: (to) => ({ name: 'skills', params: { id: to.params?.id || 'me' } })
+                      redirect: (to) => ({ name: 'about', params: { id: to.params?.id || 'me' } })
                     },
                     {
                       path: 'skills',
@@ -70,6 +73,12 @@ export default new Router({
                       name: 'projects',
                       component: () => import(
                         /* webpackChunkName: "main-profile-projects" */  './views/main/profile/UserProfileProjects.vue'),
+                    },
+                    {
+                      path: 'about',
+                      name: 'about',
+                      component: () => import(
+                        /* webpackChunkName: "main-profile-about" */  './views/main/profile/UserProfileAbout.vue'),
                     }
                   ]
                 },
@@ -109,7 +118,7 @@ export default new Router({
                   path: 'users/create',
                   name: 'main-admin-users-create',
                   component: () => import(
-                    /* webpackChunkName: "main-admin-users-create" */ './views/main/admin/CreateUser.vue'),
+                    /* webpackChunkName: "main-admin-users-edit" */ './views/main/admin/EditUser.vue'),
                 },
               ],
             },

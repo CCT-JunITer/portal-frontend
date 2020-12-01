@@ -83,7 +83,7 @@
     <component v-bind:is="$route.meta.appBar" v-else></component>
 
     <v-main style="flex-basis: 0; overflow: hidden;">
-      <div style="overflow-y: auto; height: 100%" class="flex-grow-1">
+      <div style="overflow-y: auto; height: 100%" class="flex-grow-1 grey lighten-5">
         <router-view></router-view>
       </div>
     </v-main>

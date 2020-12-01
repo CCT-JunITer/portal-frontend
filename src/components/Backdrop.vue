@@ -1,6 +1,6 @@
 <template>
-  <div class="root">
-    <div :class="'backdrop'" :style="`background-color: ${backgroundColor};`"></div>
+  <div class="root" v-bind="this.$attrs">
+    <div :class="classes" :style="style"></div>
     <slot></slot>
   </div>
 </template>
@@ -12,8 +12,20 @@ export default class Backdrop extends Vue {
   @Prop({default: 'primary', type: String})
   public color: string | undefined;
 
-  public get backgroundColor() {
-    return this.color && this.$vuetify.theme.currentTheme[this.color];
+  @Prop()
+  public height: string | undefined;
+
+  public get classes() {
+    return [
+      this.color,
+      'backdrop'
+    ];
+  }
+
+  public get style() {
+    return {
+      height: this.height
+    }
   }
 }
 </script>
@@ -21,14 +33,13 @@ export default class Backdrop extends Vue {
 <style scoped>
 .backdrop {
   position: absolute !important;
-  height: 200px;
   width: 100%;
   top: 0;
+  z-index: -1;
 }
 .root {
-  display: flex;
-  flex-direction: column;
-  z-index: 1;
   position: relative;
+  z-index: 0;
 }
+
 </style>

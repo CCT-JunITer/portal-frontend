@@ -1,70 +1,53 @@
 <template>
-  <v-sheet color="grey lighten-4" class="fill-height">
-    <v-container>
-      <v-card tile outlined class="mb-5">
-        <div class="d-flex flex-column flex-sm-row">
-          <div class="d-flex align-center ma-5">
-            <div class="mx-3">
-              <employee-profile-picture size="128" :employee="userProfile"></employee-profile-picture>
-            </div>
-            <div>
-              <v-card-text>
-                <div class="text-h6">{{ userProfile.full_name || 'Kein Name' }}</div>
-                <div class="text-subtitle-1">{{ userProfile.ressort || 'Kein Ressort' }} - {{ userProfile.memberstatus }}</div>
-              </v-card-text>
-              <v-card-actions>
-                <v-btn to="/main/profile/edit" rounded color="cctGreen" small outlined v-if="isMe">
-                  <v-icon left small>
-                    mdi-pencil
-                  </v-icon>
-                  Profil bearbeiten
-                </v-btn>
-              </v-card-actions>
-            </div>
-          </div>
-
-          <v-divider :vertical="$vuetify.breakpoint.smAndUp" :class="$vuetify.breakpoint.smAndUp ? 'my-3': 'mx-3'"></v-divider>
-          <div class="d-flex flex flex-column ma-5 justify-space-between">
-            <div class="d-flex">
-              <v-icon class="mx-3">mdi-map-marker</v-icon>
-              <div class="subtitle-2 text--secondary">
-                {{ userProfile.university }} {{userProfile.district}}
-              </div>
-            </div>
-            <v-card-actions>
-              <v-btn :ripple="false" text icon>
-                <v-icon>mdi-email</v-icon>
-              </v-btn>
-              <v-btn :ripple="false" text icon>
-                <v-icon>mdi-phone</v-icon>
-              </v-btn>
-              <v-btn :ripple="false" text icon>
-                <v-icon>mdi-slack</v-icon>
-              </v-btn>
-              <v-btn :ripple="false" text icon>
-                <v-icon>mdi-linkedin</v-icon>
-              </v-btn>
-            </v-card-actions>
-          </div>
-        </div>
-      </v-card>
-
-      <div>
-        <v-tabs background-color="transparent" slider-color="cctOrange" color="cctGrey">
-          <v-tab :ripple="false" :to="{name: 'skills'}">
-            Skills
-          </v-tab>
-          <v-tab :ripple="false" :to="{name: 'projects'}">
-            Projekte
-          </v-tab>
-        </v-tabs>
-        <v-divider></v-divider>
+  <v-container>
+    <div class="d-flex flex-column flex-sm-row">
+      <div class="ma-3 text-center">
+        <employee-profile-picture size="112" :employee="userProfile"></employee-profile-picture>
       </div>
+      <div class="flex ma-3">
+        <div class="text-h5">{{ userProfile.full_name || 'Kein Name' }}</div>
+        <div class="text-subtitle-1">{{ userProfile.ressort || 'Kein Ressort' }} - {{ userProfile.memberstatus }}</div>
+        <div class="text-subtitle-2 text--secondary" >
+          <v-icon left small>
+            mdi-email
+          </v-icon>
+          <a class="text--secondary text-decoration-none" :href="`mailto:${userProfile.email}`">{{ userProfile.email }}</a>
+        </div>
+        <div class="text-subtitle-2 text--secondary">
+          <v-icon left small>
+            mdi-phone
+          </v-icon>
+          <a class="text--secondary text-decoration-none" :href="`tel:${userProfile.phonenumber}`">{{ userProfile.phonenumber }}</a>
+        </div>
 
+      </div>
+      <v-btn to="/main/profile/edit" rounded color="cctGreen" small outlined v-if="isMe" class="ma-3">
+        <v-icon left small>
+          mdi-pencil
+        </v-icon>
+        Profil bearbeiten
+      </v-btn>
+    </div>
+
+    <div>
+      <v-tabs background-color="transparent" slider-color="cctOrange" color="cctGrey">
+        <v-tab :ripple="false" :to="{name: 'about'}">
+          Über mich
+        </v-tab>
+        <v-tab :ripple="false" :to="{name: 'skills'}" disabled>
+          Skills
+        </v-tab>
+        <v-tab :ripple="false" :to="{name: 'projects'}" disabled>
+          Projekte
+        </v-tab>
+      </v-tabs>
+      <v-divider></v-divider>
+    </div>
+
+    <div class="mt-4">
       <router-view></router-view>
-
-    </v-container>
-  </v-sheet>
+    </div>
+  </v-container>
 </template>
 
 <script lang="ts">
