@@ -41,3 +41,5 @@ export interface IUserProfileUpdate {
 export interface IUserProfileCreate extends IUserProfileUpdate {
     email: string;
 }
+
+export type UserType = 'alumni' | 'all' | 'members';

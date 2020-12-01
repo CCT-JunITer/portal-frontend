@@ -2,10 +2,10 @@
   <v-container>
 
     <avatar-cropper-dialog
-        :input-avatar="inputAvatar"
-        :value="inputAvatar"
-        @avatar="onAvatarCropped"
-        @close="inputAvatar = null"
+      :input-avatar="inputAvatar"
+      :value="inputAvatar"
+      @avatar="onAvatarCropped"
+      @close="inputAvatar = null"
     >
     </avatar-cropper-dialog>
 
@@ -17,18 +17,18 @@
 
       <v-col cols="12" md="8">
         <employee-profile-picture
-            :src="avatar"
-            :employee="userProfile"
-            size="128"
-            class="mr-5 float-left">
+          :src="avatar"
+          :employee="userProfile"
+          size="128"
+          class="mr-5 float-left">
         </employee-profile-picture>
         <div class="text-subtitle-2 mb-2">Neues Avatar hochladen</div>
         <upload-button
-            outlined
-            class="my-1"
-            color="primary"
-            accept="image/jpeg,image/png"
-            @files="onFileChanged">
+          outlined
+          class="my-1"
+          color="primary"
+          accept="image/jpeg,image/png"
+          @files="onFileChanged">
           <v-icon left>
             cloud_upload
           </v-icon>
@@ -55,94 +55,99 @@
 
       <v-col cols="12" md="8">
         <v-form
-            v-model="valid"
-            ref="form"
-            lazy-validation
+          v-model="valid"
+          ref="form"
+          lazy-validation
         >
           <v-text-field
-              label="Full Name"
-              v-model="fullName"
-              required
+            label="Full Name"
+            v-model="fullName"
+            class="input-lg"
+            required
           ></v-text-field>
           <v-text-field
-              label="E-mail"
-              type="email"
-              class="input-lg"
-              v-model="email"
-              v-validate="'required|email'"
-              data-vv-name="email"
-              :error-messages="errors.collect('email')"
-              required
+            label="E-mail"
+            type="email"
+            class="input-lg"
+            v-model="email"
+            v-validate="'required|email'"
+            data-vv-name="email"
+            :error-messages="errors.collect('email')"
+            required
           ></v-text-field>
           <v-text-field
-              label="Geburtstag"
-              type = "date"
-              v-model = "birthdate"
-              class="input-lg"
-              required
+            label="Geburtstag"
+            type = "date"
+            v-model = "birthdate"
+            class="input-lg"
+            required
           ></v-text-field>
           <vue-tel-input-vuetify
-              label="Handynummer"
-              type = "number"
-              v-model = "phonenumber"
-              class="input-lg"
-              mode="international"
-              data-vv-name="mobile"
-              required
-              default-country="de"
-              :state="errors[0] ? false : (valid ? true : null)"
+            label="Handynummer"
+            type = "number"
+            v-model = "phonenumber"
+            class="input-lg"
+            mode="international"
+            data-vv-name="mobile"
+            required
+            default-country="de"
+            :state="errors[0] ? false : (valid ? true : null)"
           ></vue-tel-input-vuetify>
-
+          <v-combobox
+            label="Memberstatus"
+            v-model = "memberstatus"
+            class="input-lg"
+            required
+            :items="memberstatusSelection"
+            hide-selected
+          ></v-combobox>
           <v-text-field
-              label="Memberstatus"
-              type = "string"
-              v-model = "memberstatus"
-              class="input-lg"
-              required
+            label="Eingangsdatum"
+            type = "date"
+            v-model = "entrydate"
+            class="input-lg"
+            required
           ></v-text-field>
           <v-text-field
-              label="Eingangsdatum"
-              type = "date"
-              v-model = "entrydate"
-              class="input-lg"
-              required
+            label="Studiengang"
+            v-model="major"
+            class="input-lg"
+            required
           ></v-text-field>
           <v-text-field
-              label="Studiengang"
-              v-model="major"
-              class="input-lg"
-              required
-          ></v-text-field>
-          <v-text-field
-              label="Universität"
-              v-model="university"
-              class="input-lg"
-              required
-          ></v-text-field>
-          <v-text-field
-              label="Studienabschluss"
-              v-model="studylevel"
-              class="input-lg"
-              required
-          ></v-text-field>
-          <v-text-field
-              label="Bezirk"
-              v-model="district"
-              class="input-lg"
-              required
-          ></v-text-field>
-          <v-text-field
-              label="LinkedIn"
-              v-model="linkedin"
-              class="input-lg"
-              required
+            label="Universität"
+            v-model="university"
+            class="input-lg"
+            required
           ></v-text-field>
           <v-combobox
-              v-model = "ressort"
-              class="input-lg"
-              :items="ressortSelection"
-              hide-selected
-              label="Ressort"
+            label="Studienabschluss"
+            v-model="studylevel"
+            :items="studylevelSelection"
+            hide-selected
+            class="input-lg"
+            required
+          ></v-combobox>
+          <v-combobox
+            label="Bezirk"
+            v-model="district"
+            class="input-lg"
+            :items="districtSelection" 
+            hide-selected
+            required
+          ></v-combobox>
+          <v-text-field
+            label="LinkedIn"
+            v-model="linkedin"
+            class="input-lg"
+            required
+          ></v-text-field>
+          <v-combobox
+            v-model = "ressort"
+            class="input-lg"
+            :items="ressortSelection"
+            hide-selected
+            label="Ressort"
           ></v-combobox>
 
         </v-form>
@@ -150,10 +155,10 @@
           <v-spacer></v-spacer>
           <v-btn @click="cancel" raised>Abbrechen</v-btn>
           <v-btn
-              @click="submit"
-              color="primary"
-              raised
-              :disabled="!valid"
+            @click="submit"
+            color="primary"
+            raised
+            :disabled="!valid"
           >
             Profil speichern
           </v-btn>
@@ -173,7 +178,7 @@ import UploadButton from '@/components/UploadButton.vue';
 import VueTelInputVuetify from 'vue-tel-input-vuetify/lib/vue-tel-input-vuetify.vue';
 import AvatarCropperDialog from '@/components/AvatarCropperDialog.vue';
 import {commitAddNotification} from '@/store/main/mutations';
-import { RESSORTS } from '@/common';
+import { RESSORTS, STUDYLEVELS, MEMBERSTATUS, BEZIRKE } from '@/common';
 
 @Component({
   components: {AvatarCropperDialog, UploadButton, EmployeeProfilePicture,VueTelInputVuetify},
@@ -195,6 +200,9 @@ export default class UserProfileEdit extends Vue {
   public linkedin = '';
   public ressort = '';
   public ressortSelection = RESSORTS;
+  public studylevelSelection = STUDYLEVELS;
+  public memberstatusSelection = MEMBERSTATUS;
+  public districtSelection = BEZIRKE; 
 
   public async onFileChanged(files: File[]) {
     const file = files[0];

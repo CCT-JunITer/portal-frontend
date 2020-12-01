@@ -6,14 +6,14 @@
       </v-card-title>
       <v-card-text>
         <cropper
-            class="cropper"
-            :src="this.inputAvatar"
-            stencil-component="circle-stencil"
-            backgroundClass="background"
-            :stencil-props="{
-                aspectRatio: 1,
-              }"
-            @change="changeCropper"
+          class="cropper"
+          :src="this.inputAvatar"
+          stencil-component="circle-stencil"
+          backgroundClass="background"
+          :stencil-props="{
+            aspectRatio: 1,
+          }"
+          @change="changeCropper"
         ></cropper>
       </v-card-text>
       <v-card-actions>
