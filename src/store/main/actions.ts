@@ -64,16 +64,24 @@ export const actions = {
       await dispatchCheckApiError(context, error);
     }
   },
-  async actionUploadFile(context: MainContext, payload: { file: File | string; email: string | null }) {
+  async actionUploadFile(context: MainContext, payload: { file: File | string }) {
     try {
       const loadingNotification = { content: 'Uploading', showProgress: true };
       commitAddNotification(context, loadingNotification);
       const response = (await Promise.all([
-        api.uploadProfilePicture(context.state.token, payload.file, payload.email),
+        api.uploadFile(context.state.token, payload.file),
         await new Promise((resolve, reject) => setTimeout(() => resolve(), 500)),
       ]))[0];
       commitRemoveNotification(context, loadingNotification);
       commitAddNotification(context, { content: 'Uploading completed', color: 'success' });
+      return response.data;
+    } catch (error) {
+      await dispatchCheckApiError(context, error);
+    }
+  },
+  async actionDownloadFile(context: MainContext, payload: { filename: string }) {
+    try {
+      const response = await api.downloadFile(context.state.token, payload.filename);
       return response.data;
     } catch (error) {
       await dispatchCheckApiError(context, error);
@@ -172,7 +180,7 @@ export const actions = {
   },
   async actionGetUsers(context: MainContext) {
     try {
-      const response = await api.getUsers(context.rootState.main.token);
+      const response = await api.getUsers(context.rootState.main.token, 'all');
       if (response) {
         commitSetUsers(context, response.data);
       }
@@ -195,6 +203,7 @@ export const dispatchRouteLoggedIn = dispatch(actions.actionRouteLoggedIn);
 export const dispatchRouteLogOut = dispatch(actions.actionRouteLogOut);
 export const dispatchUpdateUserProfile = dispatch(actions.actionUpdateUserProfile);
 export const dispatchUploadFile = dispatch(actions.actionUploadFile);
+export const dispatchDownloadFile = dispatch(actions.actionDownloadFile);
 export const dispatchRemoveNotification = dispatch(actions.removeNotification);
 export const dispatchPasswordRecovery = dispatch(actions.passwordRecovery);
 export const dispatchResetPassword = dispatch(actions.resetPassword);

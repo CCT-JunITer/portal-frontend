@@ -372,10 +372,10 @@ export default class EditUser extends Vue {
         updatedProfile.ressort= this.ressort;
       }
       if(this.avatar) {
-        updatedProfile.profile_picture = await dispatchUploadFile(this.$store, {
+        const uploadObject = await dispatchUploadFile(this.$store, {
           file: this.avatar,
-          email: updatedProfile.email || this.userProfile!.email,
         })
+        updatedProfile.profile_picture = uploadObject?.filename;
       }
       updatedProfile.is_active = this.isActive;
       updatedProfile.is_superuser = this.isSuperuser;

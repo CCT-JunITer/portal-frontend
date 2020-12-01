@@ -124,9 +124,13 @@ import { UserType } from '@/interfaces';
 export default class EmployeesView extends Vue {
   private filtersOpen = false;
 
-  private filters = {};
+  private filters: { [key in keyof IUserProfile]?: string } = {};
 
-  private filterOptions = [
+  readonly filterOptions: {
+    value: keyof IUserProfile;
+    text: string;
+    values: string[];
+  }[] = [
     {
       value: 'ressort',
       text: 'Ressort',

@@ -185,7 +185,7 @@ import { RESSORTS, STUDYLEVELS, MEMBERSTATUS, BEZIRKE } from '@/common';
 })
 export default class UserProfileEdit extends Vue {
   public valid = true;
-  public avatar: string | null = null;
+  public avatar: string | null = '';
   public inputAvatar = null;
   public fullName = '';
   public email = '';
@@ -313,10 +313,15 @@ export default class UserProfileEdit extends Vue {
         updatedProfile.ressort= this.ressort;
       }
       if(this.avatar) {
-        updatedProfile.profile_picture = await dispatchUploadFile(this.$store, {
+        const upload = await dispatchUploadFile(this.$store, {
           file: this.avatar,
-          email: this.userProfile!.email,
-        })
+        });
+        updatedProfile.profile_picture = upload?.filename;
+      }
+      // explicitly set profile_picture to null
+      // to remove current avatar
+      if (this.avatar === null) {
+        updatedProfile.profile_picture = '';
       }
       await dispatchUpdateUserProfile(this.$store, updatedProfile);
       this.$router.push('/main/profile');
