@@ -48,7 +48,7 @@ export default class AvatarCropperDialog extends Vue {
   }
 
   private changeCropper(e) {
-    this.croppedAvatar = e.canvas.toDataURL();
+    this.croppedAvatar = e.canvas.toDataURL('image/png')
   }
 
 }

@@ -13,8 +13,9 @@
 
 <script lang="ts">
 
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { IUserProfile } from '@/interfaces';
+import { dispatchDownloadFile } from '@/store/main/actions';
 
 @Component({
   props: {
@@ -37,17 +38,46 @@ export default class EmployeeProfilePicture extends Vue {
   private employee: IUserProfile | undefined;
 
   @Prop()
-  private src: string | undefined;
+  private src: string | null | undefined;
+
+  public pictureUrl = '';
+
+  @Watch('employee', { immediate: true })
+  public onEmployeeChange(newVal: IUserProfile, oldVal: IUserProfile | undefined) {
+    if (newVal.profile_picture !== oldVal?.profile_picture) {
+      this.fetchProfilePicture();
+    }
+  }
+
+  private async fetchProfilePicture() {
+    if (this.employee?.profile_picture) {
+      const imageBlob = await dispatchDownloadFile(this.$store, { filename: this.employee.profile_picture });
+      if (imageBlob) {
+        this.pictureUrl = URL.createObjectURL(imageBlob);
+      }
+    } else {
+      if (this.pictureUrl) {
+        URL.revokeObjectURL(this.pictureUrl);
+        this.pictureUrl = '';
+      }
+    }
+  }
+
+  public destroyed() {
+    if (this.pictureUrl) {
+      URL.revokeObjectURL(this.pictureUrl);
+    }
+  }
 
   public get imageSrc() {
-    return this.src || this.employee?.profile_picture;
+    return (this.src === null || this.src) ? this.src : this.pictureUrl;
   }
 
   public get initials() {
     if (!this.employee?.full_name) {
       return '';
     }
-    if(this.$props.small) {
+    if (this.$props.small) {
       return this.employee.full_name.toUpperCase().charAt(0);
     }
     const split = this.employee.full_name.split(' ');

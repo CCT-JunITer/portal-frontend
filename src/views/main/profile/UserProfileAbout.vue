@@ -56,7 +56,7 @@ export default class UserProfileInformation extends Vue {
     return id === 'me';
   }
 
-  get userProfile(): IUserProfile {
+  get userProfile() {
     if (this.isMe) {
       return readUserProfile(this.$store);
     }

@@ -42,7 +42,7 @@ export const api = {
     return axios.get<IUserProfile[]>(`${apiUrl}/api/v1/users/`, { ...authHeaders(token), params });
   },
 
-  async uploadProfilePicture(token: string, file: File | string, userMail: string | null) {
+  async uploadFile(token: string, file: File | string) {
     const formData = new FormData();
     let image: File | Blob;
     if(typeof file === 'string') {
@@ -50,15 +50,16 @@ export const api = {
     } else {
       image = file;
     }
-    formData.append('image', image);
-    if (userMail) {
-      formData.append('user_email', userMail);
-    }
-    return await axios.post<string>(`${apiUrl}/api/v1/utils/upload-user-image/`, formData,
+    formData.append('file', image, 'image.png');
+    return await axios.post<{ filename: string }>(`${apiUrl}/api/v1/utils/upload-file/`, formData,
       authHeaders(token, {
         'Content-Type': 'multipart/form-data'
       })
     );
+  },
+  async downloadFile(token: string, filename: string) {
+    const params = { filename };
+    return axios.get(`${apiUrl}/api/v1/utils/download-file/`, { ...authHeaders(token), params, responseType: 'blob' });
   },
   async updateUser(token: string, userId: number, data: IUserProfileUpdate) {
     return axios.put(`${apiUrl}/api/v1/users/${userId}`, data, authHeaders(token));
