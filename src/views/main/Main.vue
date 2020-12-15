@@ -94,17 +94,27 @@
 import { Vue, Component } from 'vue-property-decorator';
 
 import { appName } from '@/env';
-import { readDashboardMiniDrawer, readDashboardShowDrawer, readHasAdminAccess } from '@/store/main/getters';
+import {
+  readDashboardMiniDrawer,
+  readDashboardShowDrawer,
+  readHasAdminAccess,
+  readUserProfile
+} from '@/store/main/getters';
 import { commitSetDashboardShowDrawer, commitSetDashboardMiniDrawer } from '@/store/main/mutations';
 import { dispatchUserLogOut } from '@/store/main/actions';
 import DefaultAppBar from '@/views/main/appbar/DefaultAppBar.vue';
+import { store } from '@/store';
 
 const routeGuardMain = async (to, from, next) => {
-  if (to.path === '/main') {
-    next('/main/dashboard');
-  } else {
-    next();
+  const user = readUserProfile(store);
+  // check if users full_name is valid
+  // and if not redirect to edit page
+  if (!user?.full_name && to.path !== '/main/profile/edit') {
+    next('/main/profile/edit');
+    return;
   }
+  next();
+
 };
 @Component({
   components: {DefaultAppBar}

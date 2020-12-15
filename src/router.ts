@@ -31,6 +31,7 @@ export default new Router({
         {
           path: 'main',
           component: () => import(/* webpackChunkName: "main" */ './views/main/Main.vue'),
+          redirect: 'main/dashboard',
           children: [
             {
               path: 'dashboard',
