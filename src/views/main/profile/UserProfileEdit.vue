@@ -9,6 +9,19 @@
     >
     </avatar-cropper-dialog>
 
+    <v-alert
+      v-if="!userProfile.full_name"
+      color="cctGreen"
+      border="left"
+      type="info"
+      text
+      class="mb-10"
+    >
+      <b>Herzlich Willkommen</b> im Personalverwaltungs Tool! <br>
+      Dein Account wurde soeben in unserem Benutzerverzeichnis angelegt.
+      <b>Bitte fülle deine Daten hier aus</b>, bevor du mit dem Entdecken des PV-Tools starten kannst.<br>
+    </v-alert>
+
     <v-row>
       <v-col cols="12" md="4" class="px-5">
         <h4 class="text-h4 text--primary mb-3">Avatar</h4>
@@ -46,6 +59,8 @@
     </v-row>
 
     <v-divider class="my-5"></v-divider>
+
+
 
     <v-row>
       <v-col cols="12" md="4" class="px-5">
