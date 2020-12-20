@@ -38,6 +38,26 @@ export default class UserProfileInformation extends Vue {
     text: string;
   }[] = [
     {
+      text: 'Mitgliedsstatus',
+      key: 'memberstatus'
+    },
+    {
+      text: 'Eintrittsdatum',
+      key: 'entrydate',
+    },
+    {
+      text: 'Studiengang',
+      key: 'major',
+    },
+    {
+      text: 'Universität',
+      key: 'university',
+    },
+    {
+      text: 'Hochschulgrad des Studiums',
+      key: 'studylevel',
+    },
+    {
       text: 'Bezirk',
       key: 'district'
     },
@@ -45,10 +65,7 @@ export default class UserProfileInformation extends Vue {
       text: 'Geburtstag',
       key: 'birthdate'
     },
-    {
-      text: 'Eintrittsdatum',
-      key: 'entrydate',
-    }
+    
   ];
 
   get isMe() {

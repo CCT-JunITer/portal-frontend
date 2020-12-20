@@ -78,6 +78,7 @@
             label="Full Name"
             v-model="fullName"
             class="input-lg"
+            :rules="[v => !!v || 'Bitte gib deinen Namen an']"
             required
           ></v-text-field>
           <v-text-field
@@ -85,85 +86,89 @@
             type="email"
             class="input-lg"
             v-model="email"
-            v-validate="'required|email'"
-            data-vv-name="email"
-            :error-messages="errors.collect('email')"
-            required
+            disabled
           ></v-text-field>
           <v-text-field
             label="Geburtstag"
-            type = "date"
-            v-model = "birthdate"
+            type="date"
+            v-model="birthdate"
             class="input-lg"
             required
+            :rules="[v => !!v || 'Bitte gib dein Geburtstag an']"
           ></v-text-field>
           <vue-tel-input-vuetify
             label="Handynummer"
-            type = "number"
-            v-model = "phonenumber"
+            v-model="phonenumber"
             class="input-lg"
             mode="international"
-            data-vv-name="mobile"
+            default-country="DE"
+            :preferred-countries="['DE', 'AT', 'CH', 'FR']"
             required
-            default-country="de"
-            :state="errors[0] ? false : (valid ? true : null)"
+            :rules="[
+              v => !!v || 'Bitte gib eine gültige Telefonnummer an',
+              v => /^([0-9\(\)\/\+ \-]*)$/.test(v) || 'Bitte gib eine gültige Telefonnummer an']"
           ></vue-tel-input-vuetify>
-          <v-combobox
-            label="Memberstatus"
+          <v-select
+            label="Mitgliedsstatus"
             v-model = "memberstatus"
             class="input-lg"
             required
             :items="memberstatusSelection"
-            hide-selected
-          ></v-combobox>
+            :rules="[v => !!v || 'Bitte gib deinen Mitgliedsstatus an']"
+          ></v-select>
           <v-text-field
             label="Eingangsdatum"
             type = "date"
             v-model = "entrydate"
             class="input-lg"
             required
+            :rules="[v => !!v || 'Bitte gib deinen Eintrittsdatum an']"
           ></v-text-field>
           <v-text-field
             label="Studiengang"
             v-model="major"
             class="input-lg"
             required
+            :rules="[v => !!v || 'Bitte gib deinen Studiengang an']"
           ></v-text-field>
-          <v-text-field
+          <v-select
             label="Universität"
             v-model="university"
+            :items="universitySelection"
             class="input-lg"
             required
-          ></v-text-field>
-          <v-combobox
-            label="Studienabschluss"
+            :rules="[v => !!v || 'Bitte gib deine Universität an']"
+          ></v-select>
+          <v-select
+            label="Hochschulgrad des Studiums"
             v-model="studylevel"
             :items="studylevelSelection"
-            hide-selected
             class="input-lg"
             required
-          ></v-combobox>
-          <v-combobox
+            :rules="[v => !!v || 'Bitte gib deinen Studienabschluss an']"
+          ></v-select>
+          <v-select
             label="Bezirk"
             v-model="district"
             class="input-lg"
             :items="districtSelection" 
-            hide-selected
             required
-          ></v-combobox>
+            :rules="[v => !!v || 'Bitte gib dein Bezirk an']"
+          ></v-select>
           <v-text-field
             label="LinkedIn"
             v-model="linkedin"
             class="input-lg"
             required
+            :rules="[v => !!v || 'Dies ist keine gültige URL']"
           ></v-text-field>
-          <v-combobox
+          <v-select
             v-model = "ressort"
             class="input-lg"
             :items="ressortSelection"
-            hide-selected
             label="Ressort"
-          ></v-combobox>
+            :rules="[v => !!v || 'Bitte gib dein Ressort an']"
+          ></v-select>
 
         </v-form>
         <v-card-actions>
@@ -193,7 +198,7 @@ import UploadButton from '@/components/UploadButton.vue';
 import VueTelInputVuetify from 'vue-tel-input-vuetify/lib/vue-tel-input-vuetify.vue';
 import AvatarCropperDialog from '@/components/AvatarCropperDialog.vue';
 import {commitAddNotification} from '@/store/main/mutations';
-import { RESSORTS, STUDYLEVELS, MEMBERSTATUS, BEZIRKE } from '@/common';
+import { RESSORTS, STUDYLEVELS, MEMBERSTATUS, BEZIRKE, UNIVERSITIES } from '@/common';
 
 @Component({
   components: {AvatarCropperDialog, UploadButton, EmployeeProfilePicture,VueTelInputVuetify},
@@ -217,7 +222,8 @@ export default class UserProfileEdit extends Vue {
   public ressortSelection = RESSORTS;
   public studylevelSelection = STUDYLEVELS;
   public memberstatusSelection = MEMBERSTATUS;
-  public districtSelection = BEZIRKE; 
+  public districtSelection = BEZIRKE;
+  public universitySelection = UNIVERSITIES;
 
   public async onFileChanged(files: File[]) {
     const file = files[0];
@@ -289,7 +295,7 @@ export default class UserProfileEdit extends Vue {
   }
 
   public async submit() {
-    if ((this.$refs.form as any).validate()) {
+    if ((this.$refs.form as HTMLFormElement).validate()) {
       const updatedProfile: IUserProfileUpdate = {};
       if (this.fullName) {
         updatedProfile.full_name = this.fullName;
