@@ -7,7 +7,7 @@ export const STUDYLEVELS = [
 ]
 
 export const MEMBERSTATUS = [
-  'Junior Consultant', 'Consultant', 'Senior Consultant'
+  'Trainee', 'Junior Consultant', 'Consultant', 'Senior Consultant'
 ]
 
 export const BEZIRKE = [
