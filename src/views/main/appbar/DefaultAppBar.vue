@@ -19,8 +19,10 @@
       item-value="full_name"
       label="Suche"
       solo-inverted
+      flat
       dense
-      prepend-icon="mdi-magnify"
+      dark
+      prepend-inner-icon="mdi-magnify"
     >
       <template v-slot:no-data>
         <v-list-item
@@ -100,7 +102,7 @@ import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture
 })
 export default class DefaultAppBar extends Vue {
   public appName = appName;
-  public model = null;
+  public model = {};
   public searchText = '';
 
   public get userProfile() {
@@ -123,7 +125,7 @@ export default class DefaultAppBar extends Vue {
   }
 
   public clearInput() {
-    this.searchText = '';
+    this.model = {};
     (this.$refs.autocomplete as HTMLElement).blur();
   }
 
