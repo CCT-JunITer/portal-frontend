@@ -1,6 +1,5 @@
-
 export const RESSORTS = [
-  'Juniter','Public Affairs','Human Resources', 'Quality Management', 'International Networks'
+  'Juniter','Public Affairs','Human Resources', 'Quality Management', 'International Networks','Board','Vorstand','Projektmanager'
 ]
 
 export const STUDYLEVELS = [
@@ -8,10 +7,14 @@ export const STUDYLEVELS = [
 ]
 
 export const MEMBERSTATUS = [
-  'Student Consultant', 'Junior Consultant', 'Consultant', 'Senior Consultant', 'Vorstand', 'Board', 'Ressortleiter', 'Stellvertretende*r Ressortleiter*in', 'Projektmanager'
+  'Junior Consultant', 'Consultant', 'Senior Consultant'
 ]
 
 export const BEZIRKE = [
-  'Charlottenburg-Wilmersdorf', 'Friedrichshain-Kreuzberg', 'Lichtenberg', 'Marzahn-Hellersdorf', 'Mitte', 'Neukölln', 'Pankow', 'Reinickendorf', 'Spandau', 'Steglitz-Zehlendorf','Tempelhof-Schöneberg', 'Treptow-Köpenick'
+  'Charlottenburg','Wilmersdorf', 'Friedrichshain','Kreuzberg', 'Lichtenberg', 'Marzahn-Hellersdorf','Moabit', 'Mitte','Wedding', 'Neukölln', 'Pankow','Prenzlauer-Berg', 'Reinickendorf', 'Spandau', 'Steglitz-Zehlendorf','Tempelhof','Schöneberg', 'Treptow','Köpenick','Brandenburg','Potsdam','Sonstige'
 
 ]
+
+export const UNIVERSITIES = [
+  'Technische Universität Berlin', 'Freie Universität Berlin', 'Humboldt-Universität zu Berlin', 'Beuth Hochschule für Technik Berlin', 'Charité', 'Hochschule für Wirtschaft und Recht Berlin', 'Sonstiges'
+];

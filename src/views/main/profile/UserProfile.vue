@@ -19,6 +19,12 @@
           </v-icon>
           <a class="text--secondary text-decoration-none" :href="`tel:${userProfile.phonenumber}`">{{ userProfile.phonenumber }}</a>
         </div>
+        <div class="text-subtitle-2 text--secondary">
+          <v-icon left small>
+            mdi-linkedin
+          </v-icon>
+          <a class="text--secondary text-decoration-none" :href="`${userProfile.linkedin}`">{{ userProfile.linkedin }}</a>
+        </div>
 
       </div>
       <v-btn to="/main/profile/edit" rounded color="cctGreen" small outlined v-if="isMe" class="ma-3">

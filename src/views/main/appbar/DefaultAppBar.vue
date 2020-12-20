@@ -1,6 +1,5 @@
 <template>
   <v-app-bar dark color="cctBlue" class="flex-grow-0" app>
-    <v-app-bar-nav-icon default @click.stop="switchShowDrawer"></v-app-bar-nav-icon>
     <v-toolbar-title>Profil</v-toolbar-title>
     <v-spacer></v-spacer>
 

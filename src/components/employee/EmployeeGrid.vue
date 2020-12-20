@@ -16,7 +16,7 @@
       v-model="page"
       class="my-4"
       :length="pages"
-      v-if="pages > 0"
+      v-if="pages > 1"
     ></v-pagination>
   </v-container>
 </template>
@@ -37,7 +37,7 @@ export default class EmployeesView extends Vue {
   private entriesPerPage = 8;
 
   get pages() {
-    return Math.floor(this.$props.employees.length / this.entriesPerPage);
+    return Math.floor(this.$props.employees.length / this.entriesPerPage) + 1;
   }
 
   get slicedEmployees() {
