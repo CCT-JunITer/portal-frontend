@@ -30,7 +30,7 @@ build staging:
       - node_modules
   script:
     - npm install --progress=false
-    - VUE_APP_DOMAIN_STAG="https://stag.api.cct-ev.de" VUE_APP_ENV=staging VUE_APP_NAME=PV-Tool npm run build
+    - VUE_APP_DOMAIN_STAG="stag.api.cct-ev.de" VUE_APP_ENV=staging VUE_APP_NAME=PV-Tool npm run build
   artifacts:
     expire_in: 1 week
     paths:
@@ -48,7 +48,7 @@ build production:
       - node_modules
   script:
     - npm install --progress=false
-    - VUE_APP_DOMAIN_PROD="https://api.cct-ev.de" VUE_APP_ENV=production VUE_APP_NAME=PV-Tool npm run build
+    - VUE_APP_DOMAIN_PROD="api.cct-ev.de" VUE_APP_ENV=production VUE_APP_NAME=PV-Tool npm run build
   artifacts:
     expire_in: 1 week
     paths:
