@@ -71,6 +71,7 @@ import { readAdminOneUser, readUserProfile } from '@/store/main/getters';
 import { dispatchGetUsers } from '@/store/main/actions';
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 import EmployeeCard from '@/components/employee/EmployeeCard.vue';
+import { IUserProfile } from '@/interfaces';
 
 
 @Component({
@@ -81,7 +82,7 @@ export default class UserProfile extends Vue {
   get isMe() {
     const id = this.$route.params.id;
     const me = readUserProfile(this.$store);
-    return id === 'me' || id == me?.id;
+    return id === 'me' || +id === me?.id;
   }
 
   get strippedLinkedIn() {
@@ -90,10 +91,10 @@ export default class UserProfile extends Vue {
 
   get userProfile() {
     if (this.isMe) {
-      return readUserProfile(this.$store) || {};
+      return readUserProfile(this.$store) || {} as IUserProfile;
     }
     const id = this.$route.params.id;
-    return readAdminOneUser(this.$store)(parseInt(id)) || {};
+    return readAdminOneUser(this.$store)(parseInt(id)) || {} as IUserProfile;
   }
 
   public goToEdit() {

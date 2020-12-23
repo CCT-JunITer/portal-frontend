@@ -238,7 +238,7 @@ export default class EditUser extends Vue {
 
   // profile fields
   public avatar: string | null = '';
-  public inputAvatar = null;
+  public inputAvatar: ArrayBuffer | string | null = null;
   public fullName = '';
   public email = '';
   public birthdate = '';
@@ -280,7 +280,7 @@ export default class EditUser extends Vue {
       commitAddNotification(this.$store, {content: 'Datei ist ungültig', color: 'red'});
       return;
     }
-    this.inputAvatar = (await readFile(file)).result;
+    this.inputAvatar = (await readFile(file))?.result || null;
   }
 
   public onAvatarCropped(avatar) {
@@ -326,7 +326,7 @@ export default class EditUser extends Vue {
   }
 
   public async submit() {
-    if (await this.$validator.validateAll()) {
+    if ((this.$refs.form as HTMLFormElement).validate()) {
       const updatedProfile: IUserProfileCreate = {
         email: this.email,
       };

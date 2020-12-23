@@ -210,7 +210,7 @@ import { readFile } from '@/common/file-utils';
 export default class UserProfileEdit extends Vue {
   public valid = true;
   public avatar: string | null = '';
-  public inputAvatar = null;
+  public inputAvatar: ArrayBuffer | string | null = null;
   public fullName = '';
   public email = '';
   public birthdate = '';
@@ -238,7 +238,7 @@ export default class UserProfileEdit extends Vue {
       commitAddNotification(this.$store, {content: 'Datei ist ungültig', color: 'red'});
       return;
     }
-    this.inputAvatar = (await readFile(file)).result;
+    this.inputAvatar = (await readFile(file))?.result || null;
   }
 
   public onAvatarCropped(avatar) {
