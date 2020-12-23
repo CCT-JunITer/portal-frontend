@@ -12,13 +12,15 @@
         :key="item.key"
       >
         <v-col cols="6">
-          <div class="ma-2 text--secondary text-body-2">
+          <div class="ma-2 text--secondary text-caption">
             {{ item.text }}
           </div>
         </v-col>
 
         <v-col cols="6">
-          {{ userProfile[item.key] }}
+          <div class="text--primary text-body-1">
+            {{ userProfile[item.key] }}
+          </div>
         </v-col>
       </v-row>
     </v-card-text>
@@ -31,7 +33,7 @@ import { readAdminOneUser, readUserProfile } from '@/store/main/getters';
 import { IUserProfile } from '@/interfaces';
 
 @Component({})
-export default class UserProfileInformation extends Vue {
+export default class UserProfileAbout extends Vue {
 
   private items: {
     key: keyof IUserProfile;
@@ -75,10 +77,10 @@ export default class UserProfileInformation extends Vue {
 
   get userProfile() {
     if (this.isMe) {
-      return readUserProfile(this.$store);
+      return readUserProfile(this.$store) || {};
     }
     const id = this.$route.params.id;
-    return readAdminOneUser(this.$store)(parseInt(id));
+    return readAdminOneUser(this.$store)(parseInt(id)) || {};
   }
 
 }

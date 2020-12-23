@@ -1,7 +1,6 @@
 <template>
   <div class="d-flex flex-column fill-height">
-    <default-app-bar v-if="!$route.meta.appBar"></default-app-bar>
-    <component v-bind:is="$route.meta.appBar" v-else></component>
+    <default-app-bar></default-app-bar>
 
     <v-main style="flex-basis: 0; overflow: hidden;">
       <div style="overflow-y: auto; height: 100%" class="flex-grow-1 grey lighten-5">
@@ -12,16 +11,11 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 
 import { appName } from '@/env';
-import {
-  readDashboardMiniDrawer,
-  readDashboardShowDrawer,
-  readHasAdminAccess,
-  readUserProfile
-} from '@/store/main/getters';
-import { commitSetDashboardShowDrawer, commitSetDashboardMiniDrawer } from '@/store/main/mutations';
+import { readDashboardShowDrawer, readHasAdminAccess, readUserProfile } from '@/store/main/getters';
+import { commitSetDashboardShowDrawer } from '@/store/main/mutations';
 import { dispatchUserLogOut } from '@/store/main/actions';
 import DefaultAppBar from '@/views/main/appbar/DefaultAppBar.vue';
 import { store } from '@/store';
@@ -51,9 +45,6 @@ export default class Main extends Vue {
     routeGuardMain(to, from, next);
   }
 
-  get miniDrawer() {
-    return readDashboardMiniDrawer(this.$store);
-  }
 
   get showDrawer() {
     return readDashboardShowDrawer(this.$store);
@@ -63,13 +54,6 @@ export default class Main extends Vue {
     commitSetDashboardShowDrawer(this.$store, value);
   }
 
-
-  public switchMiniDrawer() {
-    commitSetDashboardMiniDrawer(
-      this.$store,
-      !readDashboardMiniDrawer(this.$store),
-    );
-  }
 
   public get hasAdminAccess() {
     return readHasAdminAccess(this.$store);

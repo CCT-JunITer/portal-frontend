@@ -99,8 +99,21 @@
         </v-expand-transition>
       </v-container>
       <v-divider class="ma-3"></v-divider>
-      <employee-grid :employees="employees"></employee-grid>
-      <v-container v-if="!employees.length">
+      <v-container v-if="employees.length">
+        <v-row>
+          <v-col
+            v-for="employee in employees"
+            :key="employee.id"
+            cols="12"
+            md="3"
+            sm="6"
+            class="d-flex align-center flex-column pa-5"
+          >
+            <employee-card :employee="employee" outlined rounded elevation="0" class="full-width"></employee-card>
+          </v-col>
+        </v-row>
+      </v-container>
+      <v-container v-else>
         Keine Mitglieder gefunden
       </v-container>
     </v-container>
@@ -110,16 +123,14 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import Backdrop from '@/components/Backdrop.vue';
-import { IUserProfile } from '@/interfaces';
+import { IUserProfile, UserType } from '@/interfaces';
 import EmployeeCard from '@/components/employee/EmployeeCard.vue';
 import { readAdminUsers } from '@/store/main/getters';
 import { dispatchGetUsers } from '@/store/main/actions';
-import EmployeeGrid from '@/components/employee/EmployeeGrid.vue';
-import { MEMBERSTATUS, RESSORTS, STUDYLEVELS } from '@/common';
-import { UserType } from '@/interfaces';
+import { MEMBERSTATUS, RESSORTS } from '@/common';
 
 @Component({
-  components: { EmployeeGrid, EmployeeCard, Backdrop }
+  components: { EmployeeCard, Backdrop }
 })
 export default class EmployeesView extends Vue {
   private filtersOpen = false;
@@ -192,7 +203,7 @@ export default class EmployeesView extends Vue {
     await dispatchGetUsers(this.$store);
   }
 
-  public async onCategoryChange(e) {
+  public async onCategoryChange() {
     await dispatchGetUsers(this.$store);
   }
 }

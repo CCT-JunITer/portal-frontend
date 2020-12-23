@@ -1,12 +1,18 @@
 import Vue from 'vue';
 import Vuetify from 'vuetify';
 import { colors } from 'vuetify/lib';
+import CCTIcon from '@/common/icons/cctIcon.vue';
 
 Vue.use(Vuetify);
 
 export default new Vuetify({
   icons: {
     iconfont: 'mdi',
+    values: {
+      cct: {
+        component: CCTIcon
+      }
+    }
   },
   theme:{
     themes: {

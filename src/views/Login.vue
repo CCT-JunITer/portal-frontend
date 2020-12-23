@@ -18,7 +18,6 @@
                   Incorrect email or password
                 </v-alert>
               </div>
-              <v-flex class="caption text-right"><router-link to="/recover-password">Passwort vergessen?</router-link></v-flex>
             </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
@@ -33,7 +32,6 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { api } from '@/api';
 import { appName } from '@/env';
 import { readLoginError } from '@/store/main/getters';
 import { dispatchLogIn } from '@/store/main/actions';

@@ -1,13 +1,13 @@
 <template>
   <component
     :size="$props.small ? undefined : $props.size"
-    :color="imageSrc ? '' : 'cctOrange'"
+    :color="imageSrc || loadingPicture ? 'grey lighten-2' : 'cctOrange'"
     class="avatar"
     v-bind:is="component"
     v-bind="$attrs"
   >
     <v-img :src="imageSrc" v-if="imageSrc"></v-img>
-    <span v-else v-text="initials" class="white--text headline"></span>
+    <span v-else-if="!this.loadingPicture" v-text="initials" class="white--text headline"></span>
   </component>
 </template>
 
@@ -42,25 +42,33 @@ export default class EmployeeProfilePicture extends Vue {
 
   public pictureUrl = '';
 
+  public loadingPicture = true;
+
+
   @Watch('employee', { immediate: true })
   public onEmployeeChange(newVal: IUserProfile, oldVal: IUserProfile | undefined) {
-    if (newVal.profile_picture !== oldVal?.profile_picture) {
+    if (newVal?.profile_picture !== oldVal?.profile_picture) {
       this.fetchProfilePicture();
     }
   }
 
   private async fetchProfilePicture() {
-    if (this.employee?.profile_picture) {
-      const imageBlob = await dispatchDownloadFile(this.$store, { filename: this.employee.profile_picture });
-      if (imageBlob) {
-        this.pictureUrl = URL.createObjectURL(imageBlob);
-      }
-    } else {
+    if (!this.employee?.profile_picture) {
       if (this.pictureUrl) {
         URL.revokeObjectURL(this.pictureUrl);
-        this.pictureUrl = '';
       }
+      this.pictureUrl = '';
+      this.loadingPicture = false;
+      return;
     }
+    this.loadingPicture = true;
+    const imageBlob = await dispatchDownloadFile(this.$store, { filename: this.employee.profile_picture });
+    if (imageBlob) {
+      this.pictureUrl = URL.createObjectURL(imageBlob);
+    } else {
+      this.pictureUrl = '';
+    }
+    this.loadingPicture = false;
   }
 
   public destroyed() {

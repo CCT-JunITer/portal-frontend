@@ -61,23 +61,23 @@ export default new Router({
                     {
                       // ensures ids are passed
                       path: '',
-                      redirect: (to) => ({ name: 'about', params: { id: to.params?.id || 'me' } })
+                      redirect: (to) => ({ name: 'profile-about', params: { id: to.params?.id || 'me' } })
                     },
                     {
                       path: 'skills',
-                      name: 'skills',
+                      name: 'profile-skills',
                       component: () => import(
                         /* webpackChunkName: "main-profile-skills" */ './views/main/profile/UserProfileSkills.vue')
                     },
                     {
                       path: 'projects',
-                      name: 'projects',
+                      name: 'profile-projects',
                       component: () => import(
                         /* webpackChunkName: "main-profile-projects" */  './views/main/profile/UserProfileProjects.vue'),
                     },
                     {
                       path: 'about',
-                      name: 'about',
+                      name: 'profile-about',
                       component: () => import(
                         /* webpackChunkName: "main-profile-about" */  './views/main/profile/UserProfileAbout.vue'),
                     }
@@ -85,6 +85,7 @@ export default new Router({
                 },
                 {
                   path: 'edit',
+                  name: 'profile-edit',
                   component: () => import(
                     /* webpackChunkName: "main-profile-edit" */ './views/main/profile/UserProfileEdit.vue'),
                 },

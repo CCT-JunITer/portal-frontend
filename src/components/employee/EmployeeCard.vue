@@ -22,7 +22,7 @@
       <v-btn
         text
         small
-        :href="`https://cct-ev.slack.com/team/${employee.slackid}`"
+        :href="`mailto:${employee.email}`"
         color="grey"
         class="center-employee-text">
         <v-icon left small>mdi-message</v-icon>
