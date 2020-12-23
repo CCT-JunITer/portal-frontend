@@ -62,89 +62,100 @@
           <v-text-field
             label="Full Name"
             v-model="fullName"
-            required
             class="input-lg"
+            :rules="[required]"
+            required
           ></v-text-field>
           <v-text-field
             label="E-mail"
             type="email"
             class="input-lg"
             v-model="email"
-            v-validate="'required|email'"
-            data-vv-name="email"
-            :error-messages="errors.collect('email')"
-            required
+            disabled
+            :rules="[required]"
           ></v-text-field>
           <v-text-field
             label="Geburtstag"
-            type = "date"
-            v-model = "birthdate"
+            type="date"
+            v-model="birthdate"
             class="input-lg"
             required
+            :rules="[required]"
           ></v-text-field>
           <vue-tel-input-vuetify
             label="Handynummer"
-            type = "number"
-            v-model = "phonenumber"
+            v-model="phonenumber"
             class="input-lg"
             mode="international"
-            data-vv-name="mobile"
+            default-country="DE"
+            :preferred-countries="['DE', 'AT', 'CH', 'FR']"
             required
-            default-country="de"
-            :state="errors[0] ? false : (valid ? true : null)"
+            :rules="[
+              required,
+              v => /^([0-9\(\)\/\+ \-]*)$/.test(v) || 'Dies ist keine gültige Telefonnummer']"
           ></vue-tel-input-vuetify>
-          <v-combobox
-            label="Memberstatus"
+          <v-select
+            label="Mitgliedsstatus"
             v-model = "memberstatus"
             class="input-lg"
             required
             :items="memberstatusSelection"
-          ></v-combobox>
+            :rules="[required]"
+          ></v-select>
           <v-text-field
             label="Eingangsdatum"
             type = "date"
             v-model = "entrydate"
             class="input-lg"
             required
+            :rules="[required]"
           ></v-text-field>
           <v-text-field
             label="Studiengang"
             v-model="major"
             class="input-lg"
             required
+            :rules="[required]"
           ></v-text-field>
-          <v-text-field
+          <v-select
             label="Universität"
             v-model="university"
+            :items="universitySelection"
             class="input-lg"
             required
-          ></v-text-field>
-          <v-combobox
-            label="Studienabschluss"
+            :rules="[required]"
+          ></v-select>
+          <v-select
+            label="Hochschulgrad des Studiums"
             v-model="studylevel"
             :items="studylevelSelection"
             class="input-lg"
             required
-          ></v-combobox>
-          <v-combobox
+            :rules="[required]"
+          ></v-select>
+          <v-select
             label="Bezirk"
             v-model="district"
             class="input-lg"
-            :items="districtSelection" 
+            :items="districtSelection"
             required
-          ></v-combobox>
+            :rules="[required]"
+          ></v-select>
           <v-text-field
             label="LinkedIn"
             v-model="linkedin"
             class="input-lg"
             required
+            hint="(Format: https://www.linkedin.com/in/name)"
+            :rules="[v => !v || /^https:\/\/[a-z]{2,3}\.linkedin\.com\/.*$/.test(v) || 'Dies ist keine gültige LinkedIn-URL']"
           ></v-text-field>
-          <v-combobox
+          <v-select
             v-model = "ressort"
             class="input-lg"
             :items="ressortSelection"
             label="Ressort"
-          ></v-combobox>
+            :rules="[required]"
+          ></v-select>
           <div class="subheading secondary--text text--lighten-2">User is superuser <span v-if="isSuperuser">(currently is a superuser)</span><span v-else>(currently is not a superuser)</span></div>
           <v-checkbox
             label="Is Superuser"
@@ -168,25 +179,18 @@
                 type="password"
                 ref="password"
                 label="Set Password"
-                data-vv-name="password"
                 class="input-lg"
-                data-vv-delay="100"
-                v-validate="{required: setPassword}"
                 v-model="password1"
-                :error-messages="errors.first('password')"
+                :rules="[v => v && v.length > 8 || 'Das Passwort muss mindestens 8 Zeichen lang sein']"
               >
               </v-text-field>
               <v-text-field
                 v-show="setPassword"
                 type="password"
                 label="Confirm Password"
-                data-vv-name="password_confirmation"
                 class="input-lg"
-                data-vv-delay="100"
-                data-vv-as="password"
-                v-validate="{required: setPassword, confirmed: 'password'}"
                 v-model="password2"
-                :error-messages="errors.first('password_confirmation')"
+                :rules="[v => v === password1 || 'Die Passwörter stimmen nicht überein']"
               >
               </v-text-field>
             </v-flex>
@@ -211,22 +215,18 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-import { IUserProfileCreate, IUserProfileUpdate } from '@/interfaces';
-import { readUserProfile } from '@/store/main/getters';
-import {dispatchUpdateUserProfile, dispatchUploadFile} from '@/store/main/actions';
+import { Component, Vue } from 'vue-property-decorator';
+import { IUserProfileCreate } from '@/interfaces';
+import { readAdminOneUser } from '@/store/main/getters';
+import { dispatchGetUsers, dispatchUploadFile } from '@/store/main/actions';
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 import UploadButton from '@/components/UploadButton.vue';
 import VueTelInputVuetify from 'vue-tel-input-vuetify/lib/vue-tel-input-vuetify.vue';
 import AvatarCropperDialog from '@/components/AvatarCropperDialog.vue';
-import {commitAddNotification} from '@/store/main/mutations';
+import { commitAddNotification } from '@/store/main/mutations';
 import { dispatchCreateUser, dispatchUpdateUser } from '@/store/admin/actions';
-import {readAdminOneUser} from '@/store/main/getters';
-import {dispatchGetUsers} from '@/store/main/actions';
-import { RESSORTS } from '@/common';
-import {STUDYLEVELS} from '@/common';
-import { MEMBERSTATUS } from '@/common';
-import { BEZIRKE } from '@/common';
+import { BEZIRKE, MEMBERSTATUS, RESSORTS, STUDYLEVELS, UNIVERSITIES } from '@/common';
+import { readFile } from '@/common/file-utils';
 
 @Component({
   components: {AvatarCropperDialog, UploadButton, EmployeeProfilePicture,VueTelInputVuetify},
@@ -234,8 +234,10 @@ import { BEZIRKE } from '@/common';
 export default class EditUser extends Vue {
   public valid = true;
 
+  public required = (v) => !!v || 'Dieses Feld wird benötigt.';
+
   // profile fields
-  public avatar: string | null = null;
+  public avatar: string | null = '';
   public inputAvatar = null;
   public fullName = '';
   public email = '';
@@ -268,7 +270,9 @@ export default class EditUser extends Vue {
   public ressortSelection = RESSORTS;
   public studylevelSelection = STUDYLEVELS;
   public memberstatusSelection = MEMBERSTATUS;
-  public districtSelection = BEZIRKE; 
+  public districtSelection = BEZIRKE;
+  public universitySelection = UNIVERSITIES;
+
 
   public async onFileChanged(files: File[]) {
     const file = files[0];
@@ -276,18 +280,7 @@ export default class EditUser extends Vue {
       commitAddNotification(this.$store, {content: 'Datei ist ungültig', color: 'red'});
       return;
     }
-    const result: any = await new Promise(function(resolve, reject) {
-      const reader = new FileReader();
-      reader.onloadend = function(e) {
-        resolve({
-          fileName: file.name,
-          result: e.target?.result,
-          error: e.target?.error
-        });
-      };
-      reader.readAsDataURL(file);
-    });
-    this.inputAvatar = result.result;
+    this.inputAvatar = (await readFile(file)).result;
   }
 
   public onAvatarCropped(avatar) {
@@ -312,7 +305,6 @@ export default class EditUser extends Vue {
     this.setPassword = false;
     this.password1 = '';
     this.password2 = '';
-    this.$validator.reset();
     if (this.userProfile) {
       this.fullName = this.userProfile.full_name;
       this.email = this.userProfile.email;
@@ -384,7 +376,7 @@ export default class EditUser extends Vue {
         updatedProfile.password = this.password1;
       }
       if(this.userProfile?.id){
-        await dispatchUpdateUser(this.$store, { id: this.userProfile!.id, user: updatedProfile });
+        await dispatchUpdateUser(this.$store, { id: this.userProfile?.id, user: updatedProfile });
       } else {
         await dispatchCreateUser(this.$store, updatedProfile);
       }

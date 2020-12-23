@@ -1,6 +1,8 @@
 <template>
   <v-app-bar dark color="cctBlue" class="flex-grow-0" app>
-    <v-toolbar-title>Profil</v-toolbar-title>
+    <v-app-bar-nav-icon to="/main">
+      <v-icon>home</v-icon>
+    </v-app-bar-nav-icon>
     <v-spacer></v-spacer>
 
     <v-autocomplete
@@ -16,7 +18,7 @@
       clearable
       hide-details
       item-text="full_name"
-      item-value="full_name"
+      item-value="id"
       label="Suche"
       solo-inverted
       flat
@@ -42,9 +44,6 @@
           <v-list-item-title v-text="item.full_name"></v-list-item-title>
           <v-list-item-subtitle v-text="item.ressort"></v-list-item-subtitle>
         </v-list-item-content>
-        <v-list-item-action>
-          <v-icon>mdi-face</v-icon>
-        </v-list-item-action>
       </template>
     </v-autocomplete>
 
@@ -110,7 +109,8 @@ export default class DefaultAppBar extends Vue {
   }
 
   get employees(): IUserProfile[] {
-    return readAdminUsers(this.$store);
+    return readAdminUsers(this.$store)
+      .filter(user => user.full_name);
   }
 
   public switchShowDrawer() {
@@ -136,7 +136,7 @@ export default class DefaultAppBar extends Vue {
     }
   }
 
-  public goToSearch(e) {
+  public goToSearch() {
     if (this.searchText) {
       this.$router.push({ path: '/main/search', query: { value: this.searchText } })
     }

@@ -1,6 +1,7 @@
 <template>
   <v-container>
 
+
     <avatar-cropper-dialog
       :input-avatar="inputAvatar"
       :value="inputAvatar"
@@ -78,7 +79,7 @@
             label="Full Name"
             v-model="fullName"
             class="input-lg"
-            :rules="[v => !!v || 'Bitte gib deinen Namen an']"
+            :rules="[required]"
             required
           ></v-text-field>
           <v-text-field
@@ -87,6 +88,7 @@
             class="input-lg"
             v-model="email"
             disabled
+            :rules="[required]"
           ></v-text-field>
           <v-text-field
             label="Geburtstag"
@@ -94,7 +96,7 @@
             v-model="birthdate"
             class="input-lg"
             required
-            :rules="[v => !!v || 'Bitte gib dein Geburtstag an']"
+            :rules="[required]"
           ></v-text-field>
           <vue-tel-input-vuetify
             label="Handynummer"
@@ -105,8 +107,8 @@
             :preferred-countries="['DE', 'AT', 'CH', 'FR']"
             required
             :rules="[
-              v => !!v || 'Bitte gib eine gültige Telefonnummer an',
-              v => /^([0-9\(\)\/\+ \-]*)$/.test(v) || 'Bitte gib eine gültige Telefonnummer an']"
+              required,
+              v => /^([0-9\(\)\/\+ \-]*)$/.test(v) || 'Dies ist keine gültige Telefonnummer']"
           ></vue-tel-input-vuetify>
           <v-select
             label="Mitgliedsstatus"
@@ -114,7 +116,7 @@
             class="input-lg"
             required
             :items="memberstatusSelection"
-            :rules="[v => !!v || 'Bitte gib deinen Mitgliedsstatus an']"
+            :rules="[required]"
           ></v-select>
           <v-text-field
             label="Eingangsdatum"
@@ -122,14 +124,14 @@
             v-model = "entrydate"
             class="input-lg"
             required
-            :rules="[v => !!v || 'Bitte gib deinen Eintrittsdatum an']"
+            :rules="[required]"
           ></v-text-field>
           <v-text-field
             label="Studiengang"
             v-model="major"
             class="input-lg"
             required
-            :rules="[v => !!v || 'Bitte gib deinen Studiengang an']"
+            :rules="[required]"
           ></v-text-field>
           <v-select
             label="Universität"
@@ -137,7 +139,7 @@
             :items="universitySelection"
             class="input-lg"
             required
-            :rules="[v => !!v || 'Bitte gib deine Universität an']"
+            :rules="[required]"
           ></v-select>
           <v-select
             label="Hochschulgrad des Studiums"
@@ -145,29 +147,30 @@
             :items="studylevelSelection"
             class="input-lg"
             required
-            :rules="[v => !!v || 'Bitte gib deinen Studienabschluss an']"
+            :rules="[required]"
           ></v-select>
           <v-select
             label="Bezirk"
             v-model="district"
             class="input-lg"
-            :items="districtSelection" 
+            :items="districtSelection"
             required
-            :rules="[v => !!v || 'Bitte gib dein Bezirk an']"
+            :rules="[required]"
           ></v-select>
           <v-text-field
             label="LinkedIn"
             v-model="linkedin"
             class="input-lg"
             required
-            :rules="[v => !!v || 'Dies ist keine gültige URL']"
+            hint="(Format: https://www.linkedin.com/in/name)"
+            :rules="[v => !v || /^https:\/\/[a-z]{2,3}\.linkedin\.com\/.*$/.test(v) || 'Dies ist keine gültige LinkedIn-URL']"
           ></v-text-field>
           <v-select
             v-model = "ressort"
             class="input-lg"
             :items="ressortSelection"
             label="Ressort"
-            :rules="[v => !!v || 'Bitte gib dein Ressort an']"
+            :rules="[required]"
           ></v-select>
 
         </v-form>
@@ -199,6 +202,7 @@ import VueTelInputVuetify from 'vue-tel-input-vuetify/lib/vue-tel-input-vuetify.
 import AvatarCropperDialog from '@/components/AvatarCropperDialog.vue';
 import {commitAddNotification} from '@/store/main/mutations';
 import { RESSORTS, STUDYLEVELS, MEMBERSTATUS, BEZIRKE, UNIVERSITIES } from '@/common';
+import { readFile } from '@/common/file-utils';
 
 @Component({
   components: {AvatarCropperDialog, UploadButton, EmployeeProfilePicture,VueTelInputVuetify},
@@ -225,24 +229,16 @@ export default class UserProfileEdit extends Vue {
   public districtSelection = BEZIRKE;
   public universitySelection = UNIVERSITIES;
 
+
+  public required = (v) => !!v || 'Dieses Feld wird benötigt.';
+
   public async onFileChanged(files: File[]) {
     const file = files[0];
     if (!file || file.size > 2 * 1024 * 1024) {
       commitAddNotification(this.$store, {content: 'Datei ist ungültig', color: 'red'});
       return;
     }
-    const result: any = await new Promise(function(resolve, reject) {
-      const reader = new FileReader();
-      reader.onloadend = function(e) {
-        resolve({
-          fileName: file.name,
-          result: e.target?.result,
-          error: e.target?.error
-        });
-      };
-      reader.readAsDataURL(file);
-    });
-    this.inputAvatar = result.result;
+    this.inputAvatar = (await readFile(file)).result;
   }
 
   public onAvatarCropped(avatar) {
