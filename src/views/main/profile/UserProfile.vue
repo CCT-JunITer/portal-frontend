@@ -111,11 +111,3 @@ export default class UserProfile extends Vue {
 
 }
 </script>
-
-<style lang="scss">
-
-.container {
-  max-width: 1000px;
-}
-
-</style>

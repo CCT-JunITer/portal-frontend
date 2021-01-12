@@ -1,51 +1,53 @@
 <template>
   <v-app-bar dark color="cctBlue" class="flex-grow-0" app>
-    <v-app-bar-nav-icon to="/main">
-      <v-icon>home</v-icon>
-    </v-app-bar-nav-icon>
-    <v-spacer></v-spacer>
+    <v-btn to="/main" exact text>
+      <v-icon left>$cct</v-icon>
+      Portal
+    </v-btn>
 
-    <v-autocomplete
-      v-if="!this.$route.meta.disableSearchBar"
-      class="mx-4"
-      v-model="model"
-      ref="autocomplete"
-      :items="employees"
-      @change="goToProfile"
-      @keydown.enter="goToSearch"
-      :search-input.sync="searchText"
-      return-object
-      clearable
-      hide-details
-      item-text="full_name"
-      item-value="id"
-      label="Suche"
-      solo-inverted
-      flat
-      dense
-      dark
-      prepend-inner-icon="mdi-magnify"
-    >
-      <template v-slot:no-data>
-        <v-list-item
-          @click="goToSearch"
-          color="primary"
-          ripple>
-          <v-list-item-title>
-            Weitere Benutzer finden
-          </v-list-item-title>
-        </v-list-item>
-      </template>
+    <v-container>
+      <v-autocomplete
+        v-if="!this.$route.meta.disableSearchBar"
+        class="mx-4"
+        v-model="model"
+        ref="autocomplete"
+        :items="employees"
+        @change="goToProfile"
+        @keydown.enter="goToSearch"
+        :search-input.sync="searchText"
+        return-object
+        clearable
+        hide-details
+        item-text="full_name"
+        item-value="id"
+        label="Suche"
+        solo-inverted
+        flat
+        dense
+        dark
+        prepend-inner-icon="mdi-magnify"
+      >
+        <template v-slot:no-data>
+          <v-list-item
+            @click="goToSearch"
+            color="primary"
+            ripple>
+            <v-list-item-title>
+              Weitere Benutzer finden
+            </v-list-item-title>
+          </v-list-item>
+        </template>
 
-      <template v-slot:item="{ item }">
+        <template v-slot:item="{ item }">
 
-        <employee-profile-picture :employee="item" component="v-list-item-avatar" small></employee-profile-picture>
-        <v-list-item-content>
-          <v-list-item-title v-text="item.full_name"></v-list-item-title>
-          <v-list-item-subtitle v-text="item.ressort"></v-list-item-subtitle>
-        </v-list-item-content>
-      </template>
-    </v-autocomplete>
+          <employee-profile-picture :employee="item" component="v-list-item-avatar" small></employee-profile-picture>
+          <v-list-item-content>
+            <v-list-item-title v-text="item.full_name"></v-list-item-title>
+            <v-list-item-subtitle v-text="item.ressort"></v-list-item-subtitle>
+          </v-list-item-content>
+        </template>
+      </v-autocomplete>
+    </v-container>
 
     <v-menu bottom left offset-y>
       <template v-slot:activator="{ on, attrs }">
@@ -57,31 +59,56 @@
         </v-btn>
       </template>
       <v-list>
-        <v-list-item to="/main/dashboard">
+        <v-list-item>
+          <v-list-item-avatar>
+            <employee-profile-picture
+              :employee="userProfile"
+              size="48"
+            ></employee-profile-picture>
+          </v-list-item-avatar>
+
           <v-list-item-content>
-            <v-list-item-title>Dashboard</v-list-item-title>
+            <v-list-item-title class="title">
+              {{ userProfile.full_name }}
+            </v-list-item-title>
+            <v-list-item-subtitle>{{ userProfile.email }}</v-list-item-subtitle>
           </v-list-item-content>
-          <v-list-item-action>
-            <v-icon>web</v-icon>
-          </v-list-item-action>
-        </v-list-item>
-        <v-list-item to="/main/profile">
-          <v-list-item-content>
-            <v-list-item-title>Profile</v-list-item-title>
-          </v-list-item-content>
-          <v-list-item-action>
-            <v-icon>person</v-icon>
-          </v-list-item-action>
-        </v-list-item>
-        <v-list-item @click="logout">
-          <v-list-item-content>
-            <v-list-item-title>Logout</v-list-item-title>
-          </v-list-item-content>
-          <v-list-item-action>
-            <v-icon>close</v-icon>
-          </v-list-item-action>
         </v-list-item>
       </v-list>
+      <v-divider></v-divider>
+
+      <v-list>
+        <v-list-item to="/main/profile" exact>
+          <v-list-item-icon>
+            <v-icon>account_box</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Mein Profil</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item @click="logout">
+          <v-list-item-icon>
+            <v-icon>exit_to_app</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Abmelden</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+
+      <div v-if="userProfile.is_superuser">
+        <v-divider></v-divider>
+        <v-list>
+          <v-list-item to="/main/admin/users" exact>
+            <v-list-item-icon>
+              <v-icon>people</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>Mitglieder verwalten</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list>
+      </div>
     </v-menu>
   </v-app-bar>
 </template>

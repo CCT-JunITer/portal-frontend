@@ -1,0 +1,10 @@
+@import '~vuetify/src/styles/styles.sass';
+
+$container-max-widths: map-deep-merge(
+  $container-max-widths,
+  (
+    'lg': map-get($grid-breakpoints, 'lg') * 0.9375,
+    'xl': map-get($grid-breakpoints, 'xl') * 0.8375
+  )
+);
+

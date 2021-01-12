@@ -118,34 +118,38 @@
             :items="memberstatusSelection"
             :rules="[required]"
           ></v-select>
-          <v-tooltip left>
-            <template v-slot:activator="{ on, attrs }">
-              <v-text-field
-                label="Eingangsdatum"
-                type = "date"
-                v-model = "entrydate"
-                class="input-lg"
-                required
-                v-bind="attrs"
-                v-on="on"
-                :rules="[required]"
-              ></v-text-field>
+
+          <v-text-field
+            label="Eingangsdatum"
+            type = "date"
+            v-model = "entrydate"
+            class="input-lg"
+            required
+            :rules="[required]"
+          >
+            <template v-slot:append="">
+              <v-tooltip right>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-icon v-bind="attrs" v-on="on">mdi-help-circle</v-icon>
+                </template>
+                <span>
+                  <ul>Das Eintrittsdatum ist der Tag des Onboarding Days. <br>(Bei JunITer der Tag der entgültigen Zusage.)
+                    <li>SS16 - 25.05.2016</li>
+                    <li>WS16/17 - 22.11.2016</li>
+                    <li>SS17 - 10.05.2017</li>
+                    <li>WS17/18 - 15.11.2017</li>
+                    <li>SS18 - 08.05.2018</li>
+                    <li>WS18/19 - 18.11.2018</li>
+                    <li>SS19 - 18.05.2019</li>
+                    <li>WS19/20 - 23.11.2019</li>
+                    <li>SS20 - 6.6.2020</li>
+                    <li>S20/21 - 28.11.2020</li>
+                  </ul>
+                </span>
+              </v-tooltip>
             </template>
-            <span>
-              <ul>Das Eintrittsdatum ist der Tag des Onboarding Days. <br>(Bei JunITer der Tag der entgültigen Zusage.)
-                <li>SS16 - 25.05.2016</li>
-                <li>WS16/17 - 22.11.2016</li>
-                <li>SS17 - 10.05.2017</li>
-                <li>WS17/18 - 15.11.2017</li>
-                <li>SS18 - 08.05.2018</li>
-                <li>WS18/19 - 18.11.2018</li>
-                <li>SS19 - 18.05.2019</li>
-                <li>WS19/20 - 23.11.2019</li>
-                <li>SS20 - 6.6.2020</li>
-                <li>S20/21 - 28.11.2020</li>
-              </ul>
-            </span>
-          </v-tooltip>
+          </v-text-field>
+           
           <v-text-field
             label="Studiengang"
             v-model="major"
@@ -215,22 +219,20 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { IUserProfileUpdate } from '@/interfaces';
 import { readUserProfile } from '@/store/main/getters';
-import {dispatchUpdateUserProfile, dispatchUploadFile} from '@/store/main/actions';
+import { dispatchUpdateUserProfile, dispatchUploadFile } from '@/store/main/actions';
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 import UploadButton from '@/components/UploadButton.vue';
 import VueTelInputVuetify from 'vue-tel-input-vuetify/lib/vue-tel-input-vuetify.vue';
 import AvatarCropperDialog from '@/components/AvatarCropperDialog.vue';
-import {commitAddNotification} from '@/store/main/mutations';
-import { RESSORTS, STUDYLEVELS, MEMBERSTATUS, BEZIRKE, UNIVERSITIES } from '@/common';
-import { readFile } from '@/common/file-utils';
+import { BEZIRKE, MEMBERSTATUS, RESSORTS, STUDYLEVELS, UNIVERSITIES } from '@/common';
 
 @Component({
   components: {AvatarCropperDialog, UploadButton, EmployeeProfilePicture,VueTelInputVuetify},
 })
 export default class UserProfileEdit extends Vue {
   public valid = true;
-  public avatar: string | null = '';
-  public inputAvatar: ArrayBuffer | string | null = null;
+  public avatar: string | Blob | null = '';
+  public inputAvatar: Blob | null = null;
   public fullName = '';
   public email = '';
   public birthdate = '';
@@ -253,12 +255,7 @@ export default class UserProfileEdit extends Vue {
   public required = (v) => !!v || 'Dieses Feld wird benötigt.';
 
   public async onFileChanged(files: File[]) {
-    const file = files[0];
-    if (!file || file.size > 2 * 1024 * 1024) {
-      commitAddNotification(this.$store, {content: 'Datei ist ungültig', color: 'red'});
-      return;
-    }
-    this.inputAvatar = (await readFile(file))?.result || null;
+    this.inputAvatar = files[0];
   }
 
   public onAvatarCropped(avatar) {

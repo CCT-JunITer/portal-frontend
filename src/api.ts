@@ -42,15 +42,18 @@ export const api = {
     return axios.get<IUserProfile[]>(`${apiUrl}/api/v1/users/`, { ...authHeaders(token), params });
   },
 
-  async uploadFile(token: string, file: File | string) {
+  async uploadFile(token: string, file: File | string | Blob, fileName?: string) {
     const formData = new FormData();
     let image: File | Blob;
     if(typeof file === 'string') {
       image = dataURItoBlob(file);
     } else {
+      // replace type from 'image/jpeg' to 'image.jpeg' for proper
+      // detection in backend
+      fileName = fileName || file.type.replace('/', '.');
       image = file;
     }
-    formData.append('file', image, 'image.png');
+    formData.append('file', image, fileName || 'image.png');
     return await axios.post<{ filename: string }>(`${apiUrl}/api/v1/utils/upload-file/`, formData,
       authHeaders(token, {
         'Content-Type': 'multipart/form-data'

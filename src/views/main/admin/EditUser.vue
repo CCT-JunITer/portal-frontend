@@ -223,10 +223,8 @@ import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture
 import UploadButton from '@/components/UploadButton.vue';
 import VueTelInputVuetify from 'vue-tel-input-vuetify/lib/vue-tel-input-vuetify.vue';
 import AvatarCropperDialog from '@/components/AvatarCropperDialog.vue';
-import { commitAddNotification } from '@/store/main/mutations';
 import { dispatchCreateUser, dispatchUpdateUser } from '@/store/admin/actions';
 import { BEZIRKE, MEMBERSTATUS, RESSORTS, STUDYLEVELS, UNIVERSITIES } from '@/common';
-import { readFile } from '@/common/file-utils';
 
 @Component({
   components: {AvatarCropperDialog, UploadButton, EmployeeProfilePicture,VueTelInputVuetify},
@@ -238,7 +236,7 @@ export default class EditUser extends Vue {
 
   // profile fields
   public avatar: string | null = '';
-  public inputAvatar: ArrayBuffer | string | null = null;
+  public inputAvatar: Blob | null = null;
   public fullName = '';
   public email = '';
   public birthdate = '';
@@ -275,12 +273,7 @@ export default class EditUser extends Vue {
 
 
   public async onFileChanged(files: File[]) {
-    const file = files[0];
-    if (!file || file.size > 2 * 1024 * 1024) {
-      commitAddNotification(this.$store, {content: 'Datei ist ungültig', color: 'red'});
-      return;
-    }
-    this.inputAvatar = (await readFile(file))?.result || null;
+    this.inputAvatar = files[0];
   }
 
   public onAvatarCropped(avatar) {

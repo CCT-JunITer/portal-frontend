@@ -35,34 +35,49 @@ import { dispatchDownloadFile } from '@/store/main/actions';
 })
 export default class EmployeeProfilePicture extends Vue {
   @Prop()
-  private employee: IUserProfile | undefined;
+  private employee!: IUserProfile;
 
   @Prop()
-  private src: string | null | undefined;
+  private src!: string | Blob | null;
 
   public pictureUrl = '';
 
   public loadingPicture = true;
 
+  @Watch('src', {immediate: true})
+  public onSrcChange(newSrc?: Blob, oldSrc?: Blob) {
+    if (typeof newSrc?.arrayBuffer === 'function' && newSrc !== oldSrc) {
+      this.fetchImage(newSrc);
+    }
+  }
 
   @Watch('employee', { immediate: true })
   public onEmployeeChange(newVal: IUserProfile, oldVal: IUserProfile | undefined) {
     if (newVal?.profile_picture !== oldVal?.profile_picture) {
-      this.fetchProfilePicture();
+      if (this.src) {
+        return;
+      }
+      this.fetchImage(newVal.profile_picture);
     }
   }
 
-  private async fetchProfilePicture() {
-    if (!this.employee?.profile_picture) {
-      if (this.pictureUrl) {
-        URL.revokeObjectURL(this.pictureUrl);
-      }
-      this.pictureUrl = '';
+  private async fetchImage(input: string | Blob) {
+    if (this.pictureUrl) {
+      URL.revokeObjectURL(this.pictureUrl);
+    }
+    this.pictureUrl = '';
+    if (!input) {
       this.loadingPicture = false;
       return;
     }
     this.loadingPicture = true;
-    const imageBlob = await dispatchDownloadFile(this.$store, { filename: this.employee.profile_picture });
+
+    let imageBlob: Blob;
+    if (typeof input === 'string') {
+      imageBlob = await dispatchDownloadFile(this.$store, { filename: input });
+    } else {
+      imageBlob = input;
+    }
     if (imageBlob) {
       this.pictureUrl = URL.createObjectURL(imageBlob);
     } else {
@@ -78,7 +93,10 @@ export default class EmployeeProfilePicture extends Vue {
   }
 
   public get imageSrc() {
-    return (this.src === null || this.src) ? this.src : this.pictureUrl;
+    if (this.src === null || (this.src && typeof this.src === 'string')) {
+      return this.src;
+    }
+    return this.pictureUrl;
   }
 
   public get initials() {

@@ -64,12 +64,12 @@ export const actions = {
       await dispatchCheckApiError(context, error);
     }
   },
-  async actionUploadFile(context: MainContext, payload: { file: File | string }) {
+  async actionUploadFile(context: MainContext, payload: { file: File | string | Blob; fileName?: string }) {
     try {
       const loadingNotification = { content: 'Uploading', showProgress: true };
       commitAddNotification(context, loadingNotification);
       const response = (await Promise.all([
-        api.uploadFile(context.state.token, payload.file),
+        api.uploadFile(context.state.token, payload.file, payload.fileName),
         await new Promise((resolve, reject) => setTimeout(() => resolve(), 500)),
       ]))[0];
       commitRemoveNotification(context, loadingNotification);

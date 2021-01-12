@@ -1,6 +1,6 @@
 <template>
   <backdrop :height="this.$vuetify.breakpoint.mdAndUp ? '100px' : '50px'" color="grey lighten-4">
-    <v-container fluid>
+    <v-container>
       <div class="d-flex align-center justify-center flex-column mb-5">
         <v-toolbar
           class="mt-md-15 mx-5"
