@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`EmployeeCard.vue should match snapshot 1`] = `
+<div class="text-center v-card v-sheet theme--light" style="width: 100%;">
+  <div>
+    <div class="root d-flex align-center justify-center">
+      <div class="grey lighten-4 backdrop" style="height: 84%;"></div>
+      <div class="v-avatar avatar mt-5 grey lighten-2" style="height: 72px; min-width: 72px; width: 72px;"></div>
+    </div>
+    <div class="pa-2">
+      <div class="text-subtitle-1 text--primary">
+        Test
+        <!---->
+      </div>
+      <div class="subtitle-2 mb-2">Juniter</div>
+    </div>
+  </div>
+  <hr role="separator" aria-orientation="horizontal" class="v-divider theme--light">
+  <div class="v-card__actions d-flex justify-space-between py-2 px-2 flex-wrap"><a href="mailto:test@cct-ev.de" class="center-employee-text v-btn v-btn--flat v-btn--text theme--light v-size--small grey--text"><span class="v-btn__content"><i aria-hidden="true" class="v-icon notranslate v-icon--left mdi mdi-message theme--light" style="font-size: 16px;"></i>
+      Nachricht
+    </span></a> <a href="tel:+49 1231234123" class="center-employee-text v-btn v-btn--flat v-btn--text theme--light v-size--small grey--text"><span class="v-btn__content"><i aria-hidden="true" class="v-icon notranslate v-icon--left mdi mdi-phone theme--light" style="font-size: 16px;"></i>
+      Anrufen
+    </span></a></div>
+</div>
+`;

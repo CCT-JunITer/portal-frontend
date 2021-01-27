@@ -63,7 +63,7 @@
             label="Full Name"
             v-model="fullName"
             class="input-lg"
-            :rules="[required]"
+            :rules="[$common.required]"
             required
           ></v-text-field>
           <v-text-field
@@ -72,7 +72,7 @@
             class="input-lg"
             v-model="email"
             disabled
-            :rules="[required]"
+            :rules="[$common.required]"
           ></v-text-field>
           <v-text-field
             label="Geburtstag"
@@ -80,7 +80,7 @@
             v-model="birthdate"
             class="input-lg"
             required
-            :rules="[required]"
+            :rules="[$common.required]"
           ></v-text-field>
           <vue-tel-input-vuetify
             label="Handynummer"
@@ -91,7 +91,7 @@
             :preferred-countries="['DE', 'AT', 'CH', 'FR']"
             required
             :rules="[
-              required,
+              $common.required,
               v => /^([0-9\(\)\/\+ \-]*)$/.test(v) || 'Dies ist keine gültige Telefonnummer']"
           ></vue-tel-input-vuetify>
           <v-select
@@ -99,8 +99,8 @@
             v-model = "memberstatus"
             class="input-lg"
             required
-            :items="memberstatusSelection"
-            :rules="[required]"
+            :items="$common.MEMBERSTATUS"
+            :rules="[$common.required]"
           ></v-select>
           <v-text-field
             label="Eingangsdatum"
@@ -108,38 +108,38 @@
             v-model = "entrydate"
             class="input-lg"
             required
-            :rules="[required]"
+            :rules="[$common.required]"
           ></v-text-field>
           <v-text-field
             label="Studiengang"
             v-model="major"
             class="input-lg"
             required
-            :rules="[required]"
+            :rules="[$common.required]"
           ></v-text-field>
           <v-select
             label="Universität"
             v-model="university"
-            :items="universitySelection"
+            :items="$common.UNIVERSITIES"
             class="input-lg"
             required
-            :rules="[required]"
+            :rules="[$common.required]"
           ></v-select>
           <v-select
             label="Hochschulgrad des Studiums"
             v-model="studylevel"
-            :items="studylevelSelection"
+            :items="$common.STUDYLEVELS"
             class="input-lg"
             required
-            :rules="[required]"
+            :rules="[$common.required]"
           ></v-select>
           <v-select
             label="Bezirk"
             v-model="district"
             class="input-lg"
-            :items="districtSelection"
+            :items="$common.BEZIRKE"
             required
-            :rules="[required]"
+            :rules="[$common.required]"
           ></v-select>
           <v-text-field
             label="LinkedIn"
@@ -147,14 +147,14 @@
             class="input-lg"
             required
             hint="(Format: https://www.linkedin.com/in/name)"
-            :rules="[v => !v || /^https:\/\/[a-z]{2,3}\.linkedin\.com\/.*$/.test(v) || 'Dies ist keine gültige LinkedIn-URL']"
+            :rules="[v => !v || $common.isLinkedIn(v) || 'Dies ist keine gültige LinkedIn-URL']"
           ></v-text-field>
           <v-select
             v-model = "ressort"
             class="input-lg"
-            :items="ressortSelection"
+            :items="$common.RESSORTS"
             label="Ressort"
-            :rules="[required]"
+            :rules="[$common.required]"
           ></v-select>
           <div class="subheading secondary--text text--lighten-2">User is superuser <span v-if="isSuperuser">(currently is a superuser)</span><span v-else>(currently is not a superuser)</span></div>
           <v-checkbox
@@ -224,7 +224,6 @@ import UploadButton from '@/components/UploadButton.vue';
 import VueTelInputVuetify from 'vue-tel-input-vuetify/lib/vue-tel-input-vuetify.vue';
 import AvatarCropperDialog from '@/components/AvatarCropperDialog.vue';
 import { dispatchCreateUser, dispatchUpdateUser } from '@/store/admin/actions';
-import { BEZIRKE, MEMBERSTATUS, RESSORTS, STUDYLEVELS, UNIVERSITIES } from '@/common';
 
 @Component({
   components: {AvatarCropperDialog, UploadButton, EmployeeProfilePicture,VueTelInputVuetify},
@@ -232,10 +231,8 @@ import { BEZIRKE, MEMBERSTATUS, RESSORTS, STUDYLEVELS, UNIVERSITIES } from '@/co
 export default class EditUser extends Vue {
   public valid = true;
 
-  public required = (v) => !!v || 'Dieses Feld wird benötigt.';
-
   // profile fields
-  public avatar: string | null = '';
+  public avatar: string | Blob | null = '';
   public inputAvatar: Blob | null = null;
   public fullName = '';
   public email = '';
@@ -265,18 +262,11 @@ export default class EditUser extends Vue {
   }
 
 
-  public ressortSelection = RESSORTS;
-  public studylevelSelection = STUDYLEVELS;
-  public memberstatusSelection = MEMBERSTATUS;
-  public districtSelection = BEZIRKE;
-  public universitySelection = UNIVERSITIES;
-
-
   public async onFileChanged(files: File[]) {
     this.inputAvatar = files[0];
   }
 
-  public onAvatarCropped(avatar) {
+  public onAvatarCropped(avatar: Blob | null) {
     this.avatar = avatar;
     this.inputAvatar = null;
   }
@@ -368,7 +358,7 @@ export default class EditUser extends Vue {
       if (this.setPassword) {
         updatedProfile.password = this.password1;
       }
-      if(this.userProfile?.id){
+      if (this.userProfile?.id) {
         await dispatchUpdateUser(this.$store, { id: this.userProfile?.id, user: updatedProfile });
       } else {
         await dispatchCreateUser(this.$store, updatedProfile);

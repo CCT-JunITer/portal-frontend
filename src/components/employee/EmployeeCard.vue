@@ -5,14 +5,17 @@
     v-bind="$attrs">
     <router-link
       :to="{ path: `/main/profile/view/${employee.id}`}"
-      v-slot="{ href, route, navigate, isActive }"
+      v-slot="{ navigate, isActive }"
     >
       <div v-ripple :active="isActive" @click="navigate">
         <backdrop class="d-flex align-center justify-center" color="grey lighten-4" height="84%">
           <employee-profile-picture :employee="employee" class="mt-5" size="72"></employee-profile-picture>
         </backdrop>
         <div class="pa-2">
-          <div class="text-subtitle-1 text--primary" >{{ employee.full_name || 'Kein Name' }}</div>
+          <div class="text-subtitle-1 text--primary">
+            {{ employee.full_name || 'Kein Name' }}
+            <v-icon v-if="hasBirthday" color="cctOrange">mdi-cake-variant</v-icon>
+          </div>
           <div class="subtitle-2 mb-2">{{ employee.ressort || 'Kein Ressort' }}</div>
         </div>
       </div>
@@ -49,11 +52,18 @@ import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture
 import Backdrop from '@/components/Backdrop.vue';
 
 @Component({
-  components: { Backdrop, EmployeeProfilePicture}
+  components: { Backdrop, EmployeeProfilePicture }
 })
 export default class EmployeeCard extends Vue {
   @Prop()
-  private employee: IUserProfile | undefined;
+  private employee!: IUserProfile;
+
+  get hasBirthday() {
+    if(!this.employee) {
+      return false;
+    }
+    return this.$common.isTodayBirthday(this.employee.birthdate);
+  }
 }
 </script>
 

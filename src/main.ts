@@ -2,6 +2,7 @@
 import './component-hooks';
 import Vue from 'vue';
 import vuetify from './plugins/vuetify';
+import './plugins/common-plugin';
 import App from './App.vue';
 import router from './router';
 import store from '@/store';

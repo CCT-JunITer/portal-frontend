@@ -31,5 +31,16 @@ module.exports = {
     '@typescript-eslint/no-use-before-define': 'warn',
     '@typescript-eslint/interface-name-prefix': 'warn',
     'vuetify/no-deprecated-classes': 'error'
-  }
+  },
+  overrides: [
+    {
+      files: [
+        '**/__tests__/*.{j,t}s?(x)',
+        '**/tests/unit/**/*.spec.{j,t}s?(x)'
+      ],
+      env: {
+        jest: true
+      }
+    }    
+  ]
 }
