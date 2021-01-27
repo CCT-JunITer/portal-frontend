@@ -3,9 +3,12 @@
     <v-container fluid fill-height>
       <v-layout align-center justify-center>
         <v-flex xs12 sm8 md4>
-          <v-card class="elevation-12">
-            <v-toolbar dark color="primary">
-              <v-toolbar-title>{{appName}}</v-toolbar-title>
+          <v-card elevation="10">
+            <v-toolbar dark color="cctBlue">
+              <v-btn text :ripple="false">
+                <v-icon left>$cct</v-icon>
+                Portal
+              </v-btn>
               <v-spacer></v-spacer>
             </v-toolbar>
             <v-card-text>
@@ -21,7 +24,7 @@
             </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn @click.prevent="submit">Login</v-btn>
+              <v-btn @click.prevent="submit" depressed>Login</v-btn>
             </v-card-actions>
           </v-card>
         </v-flex>
@@ -32,7 +35,6 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { appName } from '@/env';
 import { readLoginError } from '@/store/main/getters';
 import { dispatchLogIn } from '@/store/main/actions';
 
@@ -40,7 +42,6 @@ import { dispatchLogIn } from '@/store/main/actions';
 export default class Login extends Vue {
   public email = '';
   public password = '';
-  public appName = appName;
 
   public get loginError() {
     return readLoginError(this.$store);

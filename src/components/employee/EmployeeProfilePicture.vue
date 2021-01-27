@@ -1,10 +1,9 @@
 <template>
   <component
-    :size="$props.small ? undefined : $props.size"
+    :size="small ? undefined : size"
     :color="imageSrc || loadingPicture ? 'grey lighten-2' : 'cctOrange'"
     class="avatar"
     v-bind:is="component"
-    v-bind="$attrs"
   >
     <v-img :src="imageSrc" v-if="imageSrc"></v-img>
     <span v-else-if="!this.loadingPicture" v-text="initials" class="white--text headline"></span>
@@ -17,28 +16,22 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { IUserProfile } from '@/interfaces';
 import { dispatchDownloadFile } from '@/store/main/actions';
 
-@Component({
-  props: {
-    component: {
-      default: 'v-avatar',
-      type: String,
-    },
-    size: {
-      type: [Number, String],
-      default: 96,
-    },
-    small: {
-      type: Boolean,
-      default: false,
-    }
-  }
-})
+@Component({})
 export default class EmployeeProfilePicture extends Vue {
   @Prop()
-  private employee!: IUserProfile;
+  readonly employee!: IUserProfile;
 
-  @Prop()
-  private src!: string | Blob | null;
+  @Prop({ required: false })
+  readonly src?: string | Blob | null;
+
+  @Prop({default: 'v-avatar'})
+  readonly component!: string;
+
+  @Prop({default: 96})
+  readonly size!: number | string;
+
+  @Prop({default: false, type: Boolean})
+  readonly small!: boolean;
 
   public pictureUrl = '';
 

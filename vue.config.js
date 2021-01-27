@@ -1,4 +1,7 @@
 module.exports = {
+  'transpileDependencies': [
+    'vuetify'
+  ],
   // Fix Vuex-typescript in prod: https://github.com/istrib/vuex-typescript/issues/13#issuecomment-409869231
   configureWebpack: (config) => {
     if (process.env.NODE_ENV === 'production') {

@@ -1,11 +1,17 @@
 <template>
-  <v-container class="container">
+  <v-container v-if="userProfile">
     <div class="d-flex flex-column flex-sm-row align-stretch align-sm-start">
       <div class="ma-3 text-center">
-        <employee-profile-picture size="112" :employee="userProfile"></employee-profile-picture>
+        <employee-profile-picture 
+          size="112" 
+          :employee="userProfile">
+        </employee-profile-picture>
       </div>
       <div class="flex flex-shrink-0 mx-3 mt-3">
-        <div class="text-h5">{{ userProfile.full_name || 'Kein Name' }}</div>
+        <div class="text-h5">
+          {{ userProfile.full_name || 'Kein Name' }}
+          <v-icon v-if="hasBirthday" color="cctOrange">mdi-cake-variant</v-icon>  
+        </div>
         <div class="text-subtitle-1 text--secondary mb-1">{{ userProfile.ressort || 'Kein Ressort' }} - {{ userProfile.memberstatus }}</div>
 
         <div class="text-body-2 text--secondary mb-1">
@@ -67,11 +73,10 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { readAdminOneUser, readUserProfile } from '@/store/main/getters';
+import { readIsMe, readRouteUser } from '@/store/main/getters';
 import { dispatchGetUsers } from '@/store/main/actions';
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 import EmployeeCard from '@/components/employee/EmployeeCard.vue';
-import { IUserProfile } from '@/interfaces';
 
 
 @Component({
@@ -80,21 +85,22 @@ import { IUserProfile } from '@/interfaces';
 export default class UserProfile extends Vue {
 
   get isMe() {
-    const id = this.$route.params.id;
-    const me = readUserProfile(this.$store);
-    return id === 'me' || +id === me?.id;
+    return readIsMe(this.$store)(this.$route);
+  }
+
+  get hasBirthday() {
+    if (!this.userProfile) {
+      return false;
+    }
+    return this.$common.isTodayBirthday(this.userProfile.birthdate);
   }
 
   get strippedLinkedIn() {
-    return decodeURI(this.userProfile.linkedin?.replace(/https:\/\/[a-z]{2,3}\.linkedin\.com/, ''));
+    return decodeURI(`/in/${this.userProfile?.linkedin?.replace(this.$common.linkedInRegex, '')}`);
   }
 
   get userProfile() {
-    if (this.isMe) {
-      return readUserProfile(this.$store) || {} as IUserProfile;
-    }
-    const id = this.$route.params.id;
-    return readAdminOneUser(this.$store)(parseInt(id)) || {} as IUserProfile;
+    return readRouteUser(this.$store)(this.$route);
   }
 
   public goToEdit() {

@@ -1,8 +1,27 @@
+import { Route } from 'vue-router';
 import { MainState } from './state';
 import { getStoreAccessors } from 'typesafe-vuex';
 import { State } from '../state';
 
 export const getters = {
+  routeUser: (state: MainState) => (route: Route) => {
+    const id = route.params.id;
+    const numberId = parseInt(id);
+    const me = state.userProfile;
+    const isMe = id === 'me' || numberId === me?.id;
+
+    if (isMe) {
+      return me;
+    }
+    return state.users.find(user => user.id === numberId);
+  },
+  isMe: (state: MainState) => (route: Route) => {
+    const id = route.params.id;
+    const numberId = parseInt(id);
+    const me = state.userProfile;
+    const isMe = id === 'me' || numberId === me?.id;
+    return isMe;
+  },
   adminUsers: (state: MainState) => state.users,
   adminOneUser: (state: MainState) => (userId: number) => {
     const filteredUsers = state.users.filter((user) => user.id === userId);
@@ -36,3 +55,5 @@ export const readUserProfile = read(getters.userProfile);
 export const readFirstNotification = read(getters.firstNotification);
 export const readAdminOneUser = read(getters.adminOneUser);
 export const readAdminUsers = read(getters.adminUsers);
+export const readIsMe = read(getters.isMe);
+export const readRouteUser = read(getters.routeUser);

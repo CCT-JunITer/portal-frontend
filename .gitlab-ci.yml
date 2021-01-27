@@ -3,6 +3,7 @@ variables:
 
 stages:
   - lint
+  - test
   - build
   - build image
   - deploy
@@ -16,7 +17,19 @@ lint:
       - node_modules
   script:
     - npm install --progress=false
-    - VUE_APP_ENV=dev VUE_APP_NAME=PV-Tool npm run lint
+    - VUE_APP_ENV=dev npm run lint
+
+
+test:
+  image: node:10.23-alpine
+  stage: test
+  needs: []
+  cache:
+    paths:
+      - node_modules
+  script:
+    - npm install --progress=false
+    - VUE_APP_ENV=dev npm run test:unit
 
 build staging:
   image: node:10.23-alpine
@@ -30,7 +43,7 @@ build staging:
       - node_modules
   script:
     - npm install --progress=false
-    - VUE_APP_DOMAIN_STAG="stag.api.cct-ev.de" VUE_APP_ENV=staging VUE_APP_NAME=PV-Tool npm run build
+    - VUE_APP_DOMAIN_STAG="stag.api.cct-ev.de" VUE_APP_ENV=staging npm run build
   artifacts:
     expire_in: 1 week
     paths:
@@ -48,7 +61,7 @@ build production:
       - node_modules
   script:
     - npm install --progress=false
-    - VUE_APP_DOMAIN_PROD="api.cct-ev.de" VUE_APP_ENV=production VUE_APP_NAME=PV-Tool npm run build
+    - VUE_APP_DOMAIN_PROD="api.cct-ev.de" VUE_APP_ENV=production npm run build
   artifacts:
     expire_in: 1 week
     paths:

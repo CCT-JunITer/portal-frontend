@@ -6,23 +6,14 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { readAdminOneUser, readUserProfile } from '@/store/main/getters';
+import { readRouteUser } from '@/store/main/getters';
 
 @Component({})
 export default class UserProfileSkills extends Vue {
   public skills = ['Web Development', 'Market Research', 'Business Plan Development', 'Process Optimization', 'SCRUM', 'Backend Development', 'Frontend Development']
 
-  get isMe() {
-    const id = this.$route.params.id;
-    return id === 'me';
-  }
-
   get userProfile() {
-    if (this.isMe) {
-      return readUserProfile(this.$store);
-    }
-    const id = this.$route.params.id;
-    return readAdminOneUser(this.$store)(parseInt(id));
+    return readRouteUser(this.$store)(this.$route);
   }
 
 }

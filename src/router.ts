@@ -1,7 +1,10 @@
+import { readRouteUser } from './store/main/getters';
 import Vue from 'vue';
-import Router from 'vue-router';
+import Router, { Route } from 'vue-router';
 
 import RouterComponent from './components/RouterComponent.vue';
+import { State } from './store/state';
+import { Store } from 'vuex';
 
 Vue.use(Router);
 
@@ -24,6 +27,9 @@ export default new Router({
           path: 'main',
           component: () => import(/* webpackChunkName: "main" */ './views/main/Main.vue'),
           redirect: 'main/dashboard',
+          meta: {
+            title: 'Dashboard' 
+          },
           children: [
             {
               path: 'dashboard',
@@ -49,6 +55,12 @@ export default new Router({
                   path: 'view/:id',
                   component: () => import(
                     /* webpackChunkName: "main-profile" */ './views/main/profile/UserProfile.vue'),
+                  meta: {
+                    title: (route: Route, $store: Store<State>) => {
+                      const user = readRouteUser($store)(route);
+                      return user?.full_name;
+                    }
+                  },
                   children: [
                     {
                       // ensures ids are passed
@@ -78,6 +90,9 @@ export default new Router({
                 {
                   path: 'edit',
                   name: 'profile-edit',
+                  meta: {
+                    title: 'Profil bearbeiten',
+                  },
                   component: () => import(
                     /* webpackChunkName: "main-profile-edit" */ './views/main/profile/UserProfileEdit.vue'),
                 }

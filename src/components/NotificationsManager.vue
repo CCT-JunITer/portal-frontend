@@ -1,8 +1,11 @@
 <template>
   <div>
     <v-snackbar :color="currentNotificationColor" v-model="show">
-      <v-progress-circular class="ma-2" indeterminate v-show="showProgress"></v-progress-circular>{{ currentNotificationContent }}
-      <v-btn text @click.native="close">Close</v-btn>
+      <v-progress-circular class="ma-2" indeterminate v-show="showProgress"></v-progress-circular>
+      {{ currentNotificationContent }}
+      <template v-slot:action="{ attrs }">
+        <v-btn text @click.native="close" v-bind="attrs">Close</v-btn>
+      </template>
     </v-snackbar>
   </div>
 </template>
