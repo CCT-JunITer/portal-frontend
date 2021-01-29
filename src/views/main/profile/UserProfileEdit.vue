@@ -90,14 +90,27 @@
             disabled
             :rules="[$common.required]"
           ></v-text-field>
-          <v-text-field
-            label="Geburtstag"
-            type="date"
+          <date-picker-menu
             v-model="birthdate"
-            class="input-lg"
-            required
-            :rules="[$common.required]"
-          ></v-text-field>
+            defaultPicker="YEAR"
+            :pickerProps="{
+              min: '1950-01-01',
+              max: new Date().toISOString().substr(0, 10),
+              'no-title': true
+            }"
+          >
+            <template v-slot:activator="{ on, attrs, }">
+              <v-text-field
+                label="Geburtstag"
+                class="input-lg"
+                v-bind="attrs"
+                v-on="on"
+                required
+                :rules="[$common.required]"
+              ></v-text-field>
+            </template>
+          </date-picker-menu>
+
           <vue-tel-input-vuetify
             label="Handynummer"
             v-model="phonenumber"
@@ -119,36 +132,47 @@
             :rules="[$common.required]"
           ></v-select>
 
-          <v-text-field
-            label="Eingangsdatum"
-            type = "date"
-            v-model = "entrydate"
-            class="input-lg"
-            required
-            :rules="[$common.required]"
+          <date-picker-menu
+            v-model="entrydate"
+            defaultPicker="MONTH"
+            :pickerProps="{
+              min: '1950-01-01',
+              max: new Date().toISOString().substr(0, 10),
+            }"
           >
-            <template v-slot:append="">
-              <v-tooltip right>
-                <template v-slot:activator="{ on, attrs }">
-                  <v-icon v-bind="attrs" v-on="on">mdi-help-circle</v-icon>
+            <template v-slot:activator="{on, attrs}">
+              <v-text-field
+                label="Eintrittsdatum"
+                class="input-lg"
+                required
+                v-bind="attrs"
+                v-on="on"
+                :rules="[$common.required]"
+              >
+                <template v-slot:append="">
+                  <v-tooltip right>
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-icon v-bind="attrs" v-on="on">mdi-help-circle</v-icon>
+                    </template>
+                    <span>
+                      <ul>Das Eintrittsdatum ist der Tag des Onboarding Days. <br>(Bei JunITer der Tag der entgültigen Zusage.)
+                        <li>SS16 - 25.05.2016</li>
+                        <li>WS16/17 - 22.11.2016</li>
+                        <li>SS17 - 10.05.2017</li>
+                        <li>WS17/18 - 15.11.2017</li>
+                        <li>SS18 - 08.05.2018</li>
+                        <li>WS18/19 - 18.11.2018</li>
+                        <li>SS19 - 18.05.2019</li>
+                        <li>WS19/20 - 23.11.2019</li>
+                        <li>SS20 - 6.6.2020</li>
+                        <li>S20/21 - 28.11.2020</li>
+                      </ul>
+                    </span>
+                  </v-tooltip>
                 </template>
-                <span>
-                  <ul>Das Eintrittsdatum ist der Tag des Onboarding Days. <br>(Bei JunITer der Tag der entgültigen Zusage.)
-                    <li>SS16 - 25.05.2016</li>
-                    <li>WS16/17 - 22.11.2016</li>
-                    <li>SS17 - 10.05.2017</li>
-                    <li>WS17/18 - 15.11.2017</li>
-                    <li>SS18 - 08.05.2018</li>
-                    <li>WS18/19 - 18.11.2018</li>
-                    <li>SS19 - 18.05.2019</li>
-                    <li>WS19/20 - 23.11.2019</li>
-                    <li>SS20 - 6.6.2020</li>
-                    <li>S20/21 - 28.11.2020</li>
-                  </ul>
-                </span>
-              </v-tooltip>
+              </v-text-field>
             </template>
-          </v-text-field>
+          </date-picker-menu>
            
           <v-text-field
             label="Studiengang"
@@ -224,9 +248,11 @@ import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture
 import UploadButton from '@/components/UploadButton.vue';
 import VueTelInputVuetify from 'vue-tel-input-vuetify/lib/vue-tel-input-vuetify.vue';
 import AvatarCropperDialog from '@/components/AvatarCropperDialog.vue';
+import DatePickerMenu from '@/components/DatePickerMenu.vue';
+
 
 @Component({
-  components: {AvatarCropperDialog, UploadButton, EmployeeProfilePicture,VueTelInputVuetify},
+  components: {AvatarCropperDialog, UploadButton, EmployeeProfilePicture,VueTelInputVuetify, DatePickerMenu},
 })
 export default class UserProfileEdit extends Vue {
   public valid = true;
