@@ -29,7 +29,6 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import { format, parse } from 'date-fns'
-import { de } from 'date-fns/locale';
 
 @Component({})
 export default class DatePickerMenu extends Vue {
@@ -66,7 +65,7 @@ export default class DatePickerMenu extends Vue {
 
   onInputChange(value: string) {
     try {
-      const date = parse(value, 'dd.MM.yyyy', new Date(), {locale: de});
+      const date = parse(value, 'dd.MM.yyyy', new Date());
       this.date = format(date, 'yyyy-MM-dd');
     } catch(e) {
       this.date = null;
@@ -77,7 +76,7 @@ export default class DatePickerMenu extends Vue {
     if(!this.date) {
       return '';
     }
-    return format(new Date(this.date), 'dd.MM.yyyy', {locale: de});
+    return format(new Date(this.date), 'dd.MM.yyyy');
   }
 }
 </script>
