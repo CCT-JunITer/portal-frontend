@@ -4,7 +4,7 @@
     width="100%"
     v-bind="$attrs">
     <router-link
-      :to="{ path: `/main/profile/view/${employee.id}`}"
+      :to="{ path: `/main/people/profile/view/${employee.id}`}"
       v-slot="{ navigate, isActive }"
     >
       <div v-ripple :active="isActive" @click="navigate">

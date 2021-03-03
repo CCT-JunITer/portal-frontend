@@ -22,12 +22,20 @@
     <v-divider></v-divider>
     <v-list dense nav>
       <v-subheader>Apps</v-subheader>
-      <v-list-item to="/main/" color="cctBlue">
+      <v-list-item to="/main/people" color="cctBlue">
         <v-list-item-icon>
           <v-icon>people</v-icon>
         </v-list-item-icon>
         <v-list-item-content>
           <v-list-item-title>Mitglieder</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+      <v-list-item to="/main/guide" color="purple">
+        <v-list-item-icon>
+          <v-icon>mdi-file-document</v-icon>
+        </v-list-item-icon>
+        <v-list-item-content>
+          <v-list-item-title>CCT-Guide</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
     </v-list>

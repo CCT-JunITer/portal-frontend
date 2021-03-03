@@ -375,7 +375,7 @@ export default class UserProfileEdit extends Vue {
         updatedProfile.profile_picture = '';
       }
       await dispatchUpdateUserProfile(this.$store, updatedProfile);
-      this.$router.push('/main/profile');
+      this.$router.push('/main/people/profile');
     }
   }
 }
