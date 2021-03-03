@@ -104,11 +104,11 @@ export default class UserProfile extends Vue {
   }
 
   public goToEdit() {
-    this.$router.push('/main/profile/edit');
+    this.$router.push('/main/people/profile/edit');
   }
 
   public goToPassword() {
-    this.$router.push('/main/profile/password');
+    this.$router.push('/main/people/profile/password');
   }
 
   public async mounted() {

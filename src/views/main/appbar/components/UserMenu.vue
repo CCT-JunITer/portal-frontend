@@ -33,7 +33,7 @@
       <v-divider></v-divider>
 
       <v-list dense nav>
-        <v-list-item to="/main/profile/view/me" color="cctBlue">
+        <v-list-item to="/main/people/profile/view/me" color="cctBlue">
           <v-list-item-icon>
             <v-icon>account_box</v-icon>
           </v-list-item-icon>
@@ -41,7 +41,7 @@
             <v-list-item-title>Mein Profil</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item to="/main/profile/edit" color="cctGreen">
+        <v-list-item to="/main/people/profile/edit" color="cctGreen">
           <v-list-item-icon>
             <v-icon>edit</v-icon>
           </v-list-item-icon>
@@ -62,7 +62,7 @@
       <div v-if="userProfile.is_superuser">
         <v-divider></v-divider>
         <v-list dense nav>
-          <v-list-item to="/main/admin/users/all" color="cctOrange">
+          <v-list-item to="/main/people/admin/users/all" color="cctOrange">
             <v-list-item-icon>
               <v-icon>people</v-icon>
             </v-list-item-icon>
