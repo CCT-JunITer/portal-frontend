@@ -18,7 +18,7 @@
           <v-list-item-avatar>
             <employee-profile-picture
               :employee="userProfile"
-              size="48"
+              size="40"
             ></employee-profile-picture>
           </v-list-item-avatar>
 

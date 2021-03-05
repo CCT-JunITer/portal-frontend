@@ -8,7 +8,7 @@
       <v-list dense nav>
         <v-list-item two-line v-if="userProfile">
           <v-list-item-avatar>
-            <employee-profile-picture :employee="userProfile"></employee-profile-picture>
+            <employee-profile-picture :employee="userProfile" :size="40"></employee-profile-picture>
           </v-list-item-avatar>
 
           <v-list-item-content>

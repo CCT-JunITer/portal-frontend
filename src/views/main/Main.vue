@@ -25,8 +25,8 @@ const routeGuardMain = async (to, from, next) => {
   const user = readUserProfile(store);
   // check if users full_name is valid
   // and if not redirect to edit page
-  if (!user?.full_name && to.path !== '/main/profile/edit') {
-    next('/main/profile/edit');
+  if (!user?.full_name && to.path !== '/main/people/profile/edit') {
+    next('/main/people/profile/edit');
     return;
   }
   next();
