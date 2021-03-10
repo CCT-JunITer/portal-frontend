@@ -40,7 +40,7 @@
           Anrufen
         </v-btn>
 
-        <v-btn to="/main/profile/edit" color="cctGreen" small outlined v-if="isMe" class="ma-2 flex-grow-1">
+        <v-btn to="/main/people/profile/edit" color="cctGreen" small outlined v-if="isMe" class="ma-2 flex-grow-1">
           <v-icon left small>
             mdi-pencil
           </v-icon>

@@ -70,13 +70,13 @@ export default class SearchBar extends Vue {
   public goToProfile(e) {
     this.clearInput();
     if (e?.id) {
-      this.$router.push({ path: '/main/profile/view/' + e.id })
+      this.$router.push({ path: '/main/people/profile/view/' + e.id })
     }
   }
 
   public goToSearch() {
     if (this.searchText) {
-      this.$router.push({ path: '/main/search', query: { value: this.searchText } })
+      this.$router.push({ path: '/main/people/search', query: { value: this.searchText } })
     }
     this.clearInput();
   }

@@ -5,7 +5,7 @@
         Manage Users
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn color="primary" to="/main/admin/users/create">Create User</v-btn>
+      <v-btn color="primary" to="/main/people/admin/users/create">Create User</v-btn>
     </v-toolbar>
     <v-data-table :headers="headers" :items="users">
       <template v-slot:item.isActive="{ item }">
