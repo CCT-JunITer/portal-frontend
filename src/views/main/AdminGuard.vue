@@ -16,7 +16,7 @@ const routeGuardAdmin = async (to, from, next) => {
 };
 
 @Component
-export default class Admin extends Vue {
+export default class AdminGuard extends Vue {
   public beforeRouteEnter(to, from, next) {
     routeGuardAdmin(to, from, next);
   }

@@ -32,6 +32,21 @@ export default new Router({
           },
           children: [
             {
+              path: 'admin',
+              redirect: 'admin/dashboard',
+              component: () => import(/* webpackChunkName: "main-admin" */ './views/main/AdminGuard.vue'),
+              children: [
+                {
+                  path: 'dashboard',
+                  component: () => import(/* webpackChunkName: "admin-dashboard" */ './views/main/admin/AdminDashboard.vue')
+                },
+                {
+                  path: 'training',
+                  component: () => import(/* webpackChunkName: "admin-training" */ './views/main/training/AdminViewTraining.vue')
+                }
+              ]
+            },
+            {
               path: 'people',
               redirect: 'people/dashboard',
               component: RouterComponent,
@@ -105,7 +120,7 @@ export default new Router({
                 },
                 {
                   path: 'admin',
-                  component: () => import(/* webpackChunkName: "main-admin" */ './views/main/people/admin/Admin.vue'),
+                  component: () => import(/* webpackChunkName: "main-admin" */ './views/main/AdminGuard.vue'),
                   redirect: 'admin/users/all',
                   children: [
                     {
