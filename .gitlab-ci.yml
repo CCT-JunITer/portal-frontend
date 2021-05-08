@@ -97,6 +97,7 @@ deploy staging:
     url: https://stag.portal.cct-ev.de
   variables:
     DOCKER_HOST: 'ssh://gitlab-ci@stag.api.cct-ev.de'
+    DOMAIN: stag.api.cct-ev.de
   before_script:
     - "which ssh-agent || ( apk update && apk add openssh-client )"
     - eval $(ssh-agent -s)
@@ -106,8 +107,8 @@ deploy staging:
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - docker-compose -p frontend pull
-    - docker-compose -p frontend up -d
+    - COMPOSE_PROJECT_NAME=$CI_ENVIRONMENT_SLUG docker-compose -f docker-compose.stag.yml pull
+    - COMPOSE_PROJECT_NAME=$CI_ENVIRONMENT_SLUG docker-compose -f docker-compose.stag.yml up -d
 
 
 deploy production:
@@ -124,6 +125,7 @@ deploy production:
     url: https://portal.cct-ev.de
   variables:
     DOCKER_HOST: 'ssh://gitlab-ci@portal.cct-ev.de'
+    DOMAIN: portal.cct-ev.de
   before_script:
     - "which ssh-agent || ( apk update && apk add openssh-client )"
     - eval $(ssh-agent -s)
@@ -133,5 +135,6 @@ deploy production:
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - docker-compose -p frontend pull
-    - docker-compose -p frontend up -d
+    - COMPOSE_PROJECT_NAME=$CI_ENVIRONMENT_SLUG docker-compose pull
+    - COMPOSE_PROJECT_NAME=$CI_ENVIRONMENT_SLUG docker-compose up -d
+
