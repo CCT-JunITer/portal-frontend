@@ -217,7 +217,8 @@
                             <li>SS19 - 18.05.2019</li>
                             <li>WS19/20 - 23.11.2019</li>
                             <li>SS20 - 6.6.2020</li>
-                            <li>S20/21 - 28.11.2020</li>
+                            <li>WS20/21 - 28.11.2020</li>
+                            <li>SS21 - 10.5.2021</li>
                           </ul>
                         </span>
                       </v-tooltip>
@@ -275,6 +276,7 @@
                 :items="$common.RESSORTS"
                 v-model="ressort"
                 label="Ressort"
+                :rules="[$common.required]"
               ></v-select>
               <v-card-actions>
                 <v-spacer></v-spacer>

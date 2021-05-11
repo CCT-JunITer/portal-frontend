@@ -1,7 +1,7 @@
 import { getDayOfYear, getMonth } from 'date-fns';
 
 export const RESSORTS = [
-  'Juniter','Public Affairs','Human Resources', 'Quality Management', 'International Networks','Board','Vorstand','Projektmanager'
+  'Kein Ressort', 'Juniter','Public Affairs','Human Resources', 'Quality Management', 'International Networks','Board','Vorstand','Projektmanager'
 ]
 
 export const STUDYLEVELS = [

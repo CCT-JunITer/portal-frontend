@@ -16,9 +16,6 @@
       <div class="text-center slide-y-after">
         <h2 class="text-h2 mb-1" v-if="userProfile">Hallo, {{ userProfile.full_name }}</h2>
         <h4 class="text-overline mb-4">Willkommen im Company Consulting Team e.V.</h4>
-        <p class="mx-auto text-body-1">
-          Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
-        </p>
         <div class="container">
           <v-btn x-large color="cctGreen" dark to="/main">
             <v-icon left>people</v-icon>
