@@ -5,7 +5,7 @@ export const RESSORTS = [
 ]
 
 export const STUDYLEVELS = [
-  'Bachelor', 'Master'
+  'Bachelor', 'Master', 'Promotion', 'Staatsexamen'
 ]
 
 export const MEMBERSTATUS = [

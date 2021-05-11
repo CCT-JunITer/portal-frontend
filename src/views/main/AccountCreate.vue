@@ -108,7 +108,7 @@
                 label="Passwort"
                 class="input-lg"
                 v-model="password1"
-                :rules="[v => v && v.length > 8 || 'Das Passwort muss mindestens 8 Zeichen lang sein']"
+                :rules="[v => v && v.length >= 8 || 'Das Passwort muss mindestens 8 Zeichen lang sein']"
               >
               </v-text-field>
               <v-text-field

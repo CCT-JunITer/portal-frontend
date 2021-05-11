@@ -99,6 +99,7 @@ export default class Welcome extends Vue {
   align-items: center;
   position: relative;
   overflow: visible;
+  width: 300px;
 }
 
 .cct-rect {
