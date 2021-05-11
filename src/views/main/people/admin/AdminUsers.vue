@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="users">
     <v-toolbar light>
       <v-toolbar-title>
         Manage Users

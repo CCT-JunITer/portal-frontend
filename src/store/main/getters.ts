@@ -39,6 +39,7 @@ export const getters = {
   dashboardMiniDrawer: (state: MainState) => state.dashboardMiniDrawer,
   userProfile: (state: MainState) => state.userProfile,
   token: (state: MainState) => state.token,
+  userStatus: (state: MainState) => state.userStatus,
   isLoggedIn: (state: MainState) => state.isLoggedIn,
   firstNotification: (state: MainState) => state.notifications.length > 0 && state.notifications[0],
 };
@@ -51,6 +52,7 @@ export const readHasAdminAccess = read(getters.hasAdminAccess);
 export const readIsLoggedIn = read(getters.isLoggedIn);
 export const readLoginError = read(getters.loginError);
 export const readToken = read(getters.token);
+export const readUserStatus = read(getters.userStatus);
 export const readUserProfile = read(getters.userProfile);
 export const readFirstNotification = read(getters.firstNotification);
 export const readAdminOneUser = read(getters.adminOneUser);
