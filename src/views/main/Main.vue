@@ -4,9 +4,9 @@
     <default-app-bar></default-app-bar>
     <route-title></route-title>
 
-    <v-main style="flex-basis: 0; overflow: hidden;">
-      <div style="overflow-y: auto; height: 100%" class="flex-grow-1 grey lighten-5">
-        <router-view></router-view>
+    <v-main class="flex-grow-1 grey lighten-5">
+      <div :is="transitionDirection">
+        <router-view class="child-view"></router-view>
       </div>
     </v-main>
   </div>
@@ -20,6 +20,7 @@ import { dispatchUserLogOut } from '@/store/main/actions';
 import DefaultAppBar from '@/views/main/appbar/DefaultAppBar.vue';
 import RouteTitle from '@/views/main/RouteTitle.vue';
 import { store } from '@/store';
+import { Route } from 'vue-router';
 
 const routeGuardMain = async (to, from, next) => {
   const user = readUserProfile(store);
@@ -37,11 +38,16 @@ const routeGuardMain = async (to, from, next) => {
 })
 export default class Main extends Vue {
 
+  public transitionDirection = 'v-slide-x-reverse-transition';
+
   public beforeRouteEnter(to, from, next) {
     routeGuardMain(to, from, next);
   }
 
-  public beforeRouteUpdate(to, from, next) {
+  public beforeRouteUpdate(to: Route, from: Route, next) {
+    const toDepth = to.path.split('/').length
+    const fromDepth = from.path.split('/').length
+    this.transitionDirection = toDepth < fromDepth ? 'v-slide-x-transition' : 'v-slide-x-reverse-transition'
     routeGuardMain(to, from, next);
   }
 
@@ -51,3 +57,9 @@ export default class Main extends Vue {
   }
 }
 </script>
+
+<style lang="css">
+.child-view {
+  height: 100%;
+}
+</style>

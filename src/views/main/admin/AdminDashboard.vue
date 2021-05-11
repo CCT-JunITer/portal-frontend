@@ -34,7 +34,7 @@
             <v-card-text>Lade zum Semesterstart neue Interessenten zum Assessment Center ein.</v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn text to="/main/people/admin" color="cctGreen">Einladen</v-btn>
+              <v-btn text to="/main/admin/user-invite" color="cctGreen">Einladen</v-btn>
             </v-card-actions>
           </v-card>
         </v-col>
@@ -90,8 +90,5 @@ export default class AdminDashboard extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.root {
-  height: 100%;
-}
 
 </style>
