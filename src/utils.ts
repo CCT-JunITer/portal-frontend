@@ -1,8 +1,14 @@
-export const getLocalToken = () => localStorage.getItem('token');
+const getLocal = (key: string) => () => localStorage.getItem(key);
+const saveLocal = (key: string) => (value: string) => localStorage.setItem(key, value);
+const removeLocal = (key: string) => () => localStorage.removeItem(key);
 
-export const saveLocalToken = (token: string) => localStorage.setItem('token', token);
+export const getLocalToken = getLocal('token');
+export const saveLocalToken = saveLocal('token');
+export const removeLocalToken = removeLocal('token');
 
-export const removeLocalToken = () => localStorage.removeItem('token');
+export const getLocalUserStatus = getLocal('userstate');
+export const saveLocalUserStatus = saveLocal('userstate');
+export const removeLocalUserStatus = removeLocal('userstate');
 
 export function dataURItoBlob(dataURI) {
   // convert base64/URLEncoded data component to raw binary data held in a string

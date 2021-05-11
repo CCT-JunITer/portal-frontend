@@ -8,6 +8,9 @@ export const mutations = {
   setToken(state: MainState, payload: string) {
     state.token = payload;
   },
+  setUserStatus(state: MainState, payload: string) {
+    state.userStatus = payload;
+  },
   setLoggedIn(state: MainState, payload: boolean) {
     state.isLoggedIn = payload;
   },
@@ -46,6 +49,7 @@ export const commitSetDashboardShowDrawer = commit(mutations.setDashboardShowDra
 export const commitSetLoggedIn = commit(mutations.setLoggedIn);
 export const commitSetLogInError = commit(mutations.setLogInError);
 export const commitSetToken = commit(mutations.setToken);
+export const commitSetUserStatus = commit(mutations.setUserStatus);
 export const commitSetUserProfile = commit(mutations.setUserProfile);
 export const commitAddNotification = commit(mutations.addNotification);
 export const commitRemoveNotification = commit(mutations.removeNotification);

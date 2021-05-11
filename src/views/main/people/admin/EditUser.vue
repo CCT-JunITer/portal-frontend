@@ -363,7 +363,7 @@ export default class EditUser extends Vue {
       } else {
         await dispatchCreateUser(this.$store, updatedProfile);
       }
-      this.$router.push('/main/admin/users');
+      this.$router.push('/main/people/admin/users');
     }
   }
 

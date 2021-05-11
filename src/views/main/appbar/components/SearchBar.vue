@@ -48,6 +48,7 @@ import { IUserProfile } from '@/interfaces';
 import { readAdminUsers } from '@/store/main/getters';
 import { Vue, Component } from 'vue-property-decorator'
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
+import { dispatchGetUsers } from '@/store/main/actions';
 
 @Component({
   components: { EmployeeProfilePicture }
@@ -56,6 +57,10 @@ export default class SearchBar extends Vue {
 
   public model = {};
   public searchText = '';
+
+  public async created() {
+    await dispatchGetUsers(this.$store);
+  }
 
   get employees(): IUserProfile[] {
     return readAdminUsers(this.$store)
@@ -70,13 +75,13 @@ export default class SearchBar extends Vue {
   public goToProfile(e) {
     this.clearInput();
     if (e?.id) {
-      this.$router.push({ path: '/main/profile/view/' + e.id })
+      this.$router.push({ path: '/main/people/profile/view/' + e.id })
     }
   }
 
   public goToSearch() {
     if (this.searchText) {
-      this.$router.push({ path: '/main/search', query: { value: this.searchText } })
+      this.$router.push({ path: '/main/people/search', query: { value: this.searchText } })
     }
     this.clearInput();
   }

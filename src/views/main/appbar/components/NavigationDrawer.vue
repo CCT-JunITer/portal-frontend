@@ -30,6 +30,14 @@
           <v-list-item-title>Mitglieder</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
+      <v-list-item to="/main/admin/dashboard" color="cctBlue" v-if="userProfile && userProfile.is_superuser">
+        <v-list-item-icon>
+          <v-icon>people</v-icon>
+        </v-list-item-icon>
+        <v-list-item-content>
+          <v-list-item-title>Admin Dashboard</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
       <v-list-item to="/main/guide" color="purple">
         <v-list-item-icon>
           <v-icon>mdi-file-document</v-icon>

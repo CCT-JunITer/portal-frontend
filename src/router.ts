@@ -24,6 +24,10 @@ export default new Router({
           component: () => import(/* webpackChunkName: "login" */ './views/Login.vue'),
         },
         {
+          path: 'account-create',
+          component: () => import(/* webpackChunkName: "account-create" */ './views/main/AccountCreate.vue')
+        },
+        {
           path: 'main',
           component: () => import(/* webpackChunkName: "main" */ './views/main/Main.vue'),
           redirect: 'main/people',
@@ -31,6 +35,29 @@ export default new Router({
             title: 'Dashboard' 
           },
           children: [
+            {
+              path: 'welcome',
+              component: () => import('./views/main/Welcome.vue'),
+            },
+            {
+              path: 'admin',
+              redirect: 'admin/dashboard',
+              component: () => import(/* webpackChunkName: "main-admin" */ './views/main/AdminGuard.vue'),
+              children: [
+                {
+                  path: 'dashboard',
+                  component: () => import(/* webpackChunkName: "admin-dashboard" */ './views/main/admin/AdminDashboard.vue')
+                },  
+                {
+                  path: 'user-invite',
+                  component: () => import(/* webpackChunkName: "admin-user-invite" */ './views/main/admin/UserInvitation.vue')
+                },
+                {
+                  path: 'training',
+                  component: () => import(/* webpackChunkName: "admin-training" */ './views/main/training/AdminViewTraining.vue')
+                },
+              ]
+            },
             {
               path: 'people',
               redirect: 'people/dashboard',
@@ -100,12 +127,21 @@ export default new Router({
                       },
                       component: () => import(
                       /* webpackChunkName: "main-profile-edit" */ './views/main/people/profile/UserProfileEdit.vue'),
+                    }, 
+                    {
+                      path: 'edit-password',
+                      name: 'profile-edit-password',
+                      meta: {
+                        title: 'Passwort ändern',
+                      },
+                      component: () => import(
+                      /* webpackChunkName: "main-profile-edit-password" */ './views/main/people/profile/UserProfileEditPassword.vue'),
                     }
                   ],
                 },
                 {
                   path: 'admin',
-                  component: () => import(/* webpackChunkName: "main-admin" */ './views/main/people/admin/Admin.vue'),
+                  component: () => import(/* webpackChunkName: "main-admin" */ './views/main/AdminGuard.vue'),
                   redirect: 'admin/users/all',
                   children: [
                     {

@@ -1,4 +1,6 @@
+import { removeLocalUserStatus, saveLocalUserStatus, getLocalUserStatus } from './../../utils';
 import { api } from '@/api';
+import { IUserProfileCreate } from '@/interfaces';
 import router from '@/router';
 import { getLocalToken, removeLocalToken, saveLocalToken } from '@/utils';
 import { AxiosError } from 'axios';
@@ -13,6 +15,7 @@ import {
   commitSetToken,
   commitSetUserProfile,
   commitSetUsers,
+  commitSetUserStatus
 } from './mutations';
 import { AppNotification, MainState } from './state';
 
@@ -23,9 +26,12 @@ export const actions = {
     try {
       const response = await api.logInGetToken(payload.username, payload.password);
       const token = response.data.access_token;
+      const user_status = response.data.user_status;
       if (token) {
         saveLocalToken(token);
         commitSetToken(context, token);
+        saveLocalUserStatus(user_status);
+        commitSetUserStatus(context, user_status);
         commitSetLoggedIn(context, true);
         commitSetLogInError(context, false);
         await dispatchGetUserProfile(context);
@@ -90,6 +96,9 @@ export const actions = {
   async actionCheckLoggedIn(context: MainContext) {
     if (!context.state.isLoggedIn) {
       let token = context.state.token;
+      if (!context.state.userStatus) {
+        commitSetUserStatus(context, getLocalUserStatus() || '');
+      }
       if (!token) {
         const localToken = getLocalToken();
         if (localToken) {
@@ -112,6 +121,7 @@ export const actions = {
   },
   async actionRemoveLogIn(context: MainContext) {
     removeLocalToken();
+    removeLocalUserStatus();
     commitSetToken(context, '');
     commitSetLoggedIn(context, false);
   },
@@ -134,7 +144,11 @@ export const actions = {
     }
   },
   actionRouteLoggedIn(context: MainContext) {
-    if (router.currentRoute.path === '/login' || router.currentRoute.path === '/') {
+    if (router.currentRoute.path !== '/main') {
+      if (context.state.userStatus === 'created') {
+        router.push('/main/welcome')
+        return;
+      }
       router.push('/main');
     }
   },
@@ -188,6 +202,28 @@ export const actions = {
       await dispatchCheckApiError(context, error);
     }
   },
+  async actionCreateUserOpen(context: MainContext, payload: {user: IUserProfileCreate; token: string}) {
+    try {
+      const response = await api.createUserOpen(payload.token, payload.user);
+      const token = response.data.access_token;
+      const user_status = response.data.user_status;
+      if (token) {
+        saveLocalToken(token);
+        commitSetToken(context, token);
+        saveLocalUserStatus(user_status);
+        commitSetUserStatus(context, user_status);
+        commitSetLoggedIn(context, true);
+        commitSetLogInError(context, false);
+        await dispatchGetUserProfile(context);
+        await dispatchRouteLoggedIn(context);
+        commitAddNotification(context, { content: 'Account erstellt', color: 'success' });
+      } else {
+        await dispatchLogOut(context);
+      }
+    } catch (error) {
+      commitAddNotification(context, { content: `Error: ${error.response.data?.detail}`, color: 'error' });
+    }
+  },
 };
 
 const { dispatch } = getStoreAccessors<MainState | any, State>('');
@@ -208,3 +244,4 @@ export const dispatchRemoveNotification = dispatch(actions.removeNotification);
 export const dispatchPasswordRecovery = dispatch(actions.passwordRecovery);
 export const dispatchResetPassword = dispatch(actions.resetPassword);
 export const dispatchGetUsers = dispatch(actions.actionGetUsers);
+export const dispatchCreateUserOpen = dispatch(actions.actionCreateUserOpen); 

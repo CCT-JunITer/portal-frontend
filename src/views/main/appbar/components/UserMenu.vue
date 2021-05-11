@@ -49,6 +49,14 @@
             <v-list-item-title>Profil bearbeiten</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
+        <v-list-item to="/main/people/profile/edit-password" color="cctOrange">
+          <v-list-item-icon>
+            <v-icon>vpn_key</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Passwort ändern</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
         <v-list-item @click="logout">
           <v-list-item-icon>
             <v-icon>exit_to_app</v-icon>
@@ -58,20 +66,6 @@
           </v-list-item-content>
         </v-list-item>
       </v-list>
-
-      <div v-if="userProfile.is_superuser">
-        <v-divider></v-divider>
-        <v-list dense nav>
-          <v-list-item to="/main/people/admin/users/all" color="cctOrange">
-            <v-list-item-icon>
-              <v-icon>people</v-icon>
-            </v-list-item-icon>
-            <v-list-item-content>
-              <v-list-item-title>Mitglieder verwalten</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        </v-list>
-      </div>
     </v-card>
   </v-menu>
 </template>

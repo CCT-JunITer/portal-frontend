@@ -6,6 +6,7 @@ import { MainState } from './state';
 const defaultState: MainState = {
   isLoggedIn: null,
   token: '',
+  userStatus: '',
   logInError: false,
   userProfile: null,
   dashboardMiniDrawer: false,

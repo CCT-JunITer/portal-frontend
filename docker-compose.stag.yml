@@ -1,0 +1,16 @@
+version: "3.3"
+services:
+  frontend:
+    image: registry.gitlab.cct-ev.de/juniter/pv-tool3/frontend:$CI_COMMIT_REF_NAME
+    restart: unless-stopped
+    networks: 
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-frontend.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-frontend.entrypoints=websecure"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-frontend.tls.certresolver=letsencrypt"
+
+networks: 
+  traefik:
+    external: true

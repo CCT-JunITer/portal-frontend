@@ -1,95 +1,114 @@
 <template>
   <v-container>
-
-
-    <avatar-cropper-dialog
-      :input-avatar="inputAvatar"
-      :value="inputAvatar"
-      @avatar="onAvatarCropped"
-      @close="inputAvatar = null"
+    <v-form
+      v-model="valid"
+      ref="form"
+      lazy-validation
     >
-    </avatar-cropper-dialog>
-
-    <v-alert
-      v-if="userProfile && !userProfile.full_name"
-      color="cctGreen"
-      border="left"
-      type="info"
-      text
-      class="mb-10"
-    >
-      <b>Herzlich Willkommen</b> im Personalverwaltungs Tool! <br>
-      Dein Account wurde soeben in unserem Benutzerverzeichnis angelegt.
-      <b>Bitte fülle deine Daten hier aus</b>, bevor du mit dem Entdecken des PV-Tools starten kannst.<br>
-    </v-alert>
-
-    <v-row>
-      <v-col cols="12" md="4" class="px-5">
-        <h4 class="text-h4 text--primary mb-3">Avatar</h4>
-        <p class="text-body-2 text--secondary">Ändere dein Avatar</p>
-      </v-col>
-
-      <v-col cols="12" md="8">
-        <employee-profile-picture
-          :src="avatar"
-          :employee="userProfile"
-          size="128"
-          class="mr-5 float-left">
-        </employee-profile-picture>
-        <div class="text-subtitle-2 mb-2">Neues Avatar hochladen</div>
-        <upload-button
-          outlined
-          class="my-1"
-          color="primary"
-          accept="image/jpeg,image/png"
-          @files="onFileChanged">
-          <v-icon left>
-            cloud_upload
-          </v-icon>
-          Avatar setzen
-        </upload-button>
-        <div class="text-caption">
-          Die Datei darf nicht über 2 MB groß sein
-        </div>
-        <v-btn color="error" outlined icon @click="avatar = null">
-          <v-icon>
-            mdi-delete
-          </v-icon>
-        </v-btn>
-      </v-col>
-    </v-row>
-
-    <v-divider class="my-5"></v-divider>
 
 
+      <avatar-cropper-dialog
+        :input-avatar="inputAvatar"
+        :value="inputAvatar"
+        @avatar="onAvatarCropped"
+        @close="inputAvatar = null"
+      >
+      </avatar-cropper-dialog>
 
-    <v-row>
-      <v-col cols="12" md="4" class="px-5">
-        <h4 class="text-h4 text--primary mb-3">Profil</h4>
-        <p class="text-body-2 text--secondary">Diese Informationen sind in deinem Profil sichtbar</p>
-      </v-col>
+      <v-alert
+        v-if="userProfile && !userProfile.full_name"
+        color="cctGreen"
+        border="left"
+        type="info"
+        text
+        class="mb-10"
+      >
+        <b>Herzlich Willkommen</b> im Portal! <br>
+        Dein Account wurde soeben in unserem Benutzerverzeichnis angelegt.
+        <b>Bitte fülle deine Daten hier aus</b>, bevor du mit dem Entdecken des Portals starten kannst.<br>
+      </v-alert>
 
-      <v-col cols="12" md="8">
-        <v-form
-          v-model="valid"
-          ref="form"
-          lazy-validation
-        >
+      <v-row>
+        <v-col cols="12" md="4" class="px-5">
+          <h4 class="text-h4 text--primary mb-3">Avatar</h4>
+          <p class="text-body-2 text--secondary">Ändere dein Avatar</p>
+        </v-col>
+
+        <v-col cols="12" md="8">
+          <employee-profile-picture
+            :src="avatar"
+            :employee="userProfile"
+            size="128"
+            class="mr-5 float-left">
+          </employee-profile-picture>
+          <div class="text-subtitle-2 mb-2">Neues Avatar hochladen</div>
+          <upload-button
+            outlined
+            class="my-1"
+            color="primary"
+            accept="image/jpeg,image/png"
+            @files="onFileChanged">
+            <v-icon left>
+              cloud_upload
+            </v-icon>
+            Avatar setzen
+          </upload-button>
+          <div class="text-caption">
+            Die Datei darf nicht über 2 MB groß sein
+          </div>
+          <v-btn color="error" outlined icon @click="avatar = null">
+            <v-icon>
+              mdi-delete
+            </v-icon>
+          </v-btn>
+        </v-col>
+      </v-row>
+
+      <v-divider class="my-5"></v-divider>
+
+      <v-row>
+        <v-col cols="12" md="4" class="px-5">
+          <h4 class="text-h4 text--primary mb-3">Account</h4>
+          <p class="text-body-2 text--secondary">
+            Diese Informationen sind für das Accountmanagement notwendig
+          </p>
+        </v-col>
+
+        <v-col cols="12" md="8">  
           <v-text-field
-            label="Full Name"
-            v-model="fullName"
+            label="Vor- und Nachname"
             class="input-lg"
             :rules="[$common.required]"
+            v-model="fullName"
             required
           ></v-text-field>
           <v-text-field
+            disabled
             label="E-mail"
             type="email"
-            class="input-lg"
             v-model="email"
-            disabled
+            class="input-lg"
             :rules="[$common.required]"
           ></v-text-field>
+          <v-text-field
+            disabled
+            label="Private E-mail"
+            type="email"
+            v-model="privateEmail"
+            class="input-lg"
+          ></v-text-field>
+        </v-col>
+      </v-row>
+
+      <v-divider class="my-5"></v-divider>
+
+      <v-row>
+        <v-col cols="12" md="4" class="px-5">
+          <h4 class="text-h4 text--primary mb-3">Profil</h4>
+          <p class="text-body-2 text--secondary">Diese Informationen sind in deinem Profil sichtbar</p>
+        </v-col>
+
+        <v-col cols="12" md="8">
           <date-picker-menu
             v-model="birthdate"
             defaultPicker="YEAR"
@@ -221,21 +240,21 @@
             :rules="[$common.required]"
           ></v-select>
 
-        </v-form>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn @click="cancel" raised>Abbrechen</v-btn>
-          <v-btn
-            @click="submit"
-            color="primary"
-            raised
-            :disabled="!valid"
-          >
-            Profil speichern
-          </v-btn>
-        </v-card-actions>
-      </v-col>
-    </v-row>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn @click="cancel" raised>Abbrechen</v-btn>
+            <v-btn
+              @click="submit"
+              color="primary"
+              raised
+              :disabled="!valid"
+            >
+              Profil speichern
+            </v-btn>
+          </v-card-actions>
+        </v-col>
+      </v-row>
+    </v-form>
   </v-container>
 </template>
 
@@ -243,7 +262,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { IUserProfileUpdate } from '@/interfaces';
 import { readUserProfile } from '@/store/main/getters';
-import { dispatchUpdateUserProfile, dispatchUploadFile } from '@/store/main/actions';
+import { dispatchRouteLoggedIn, dispatchUpdateUserProfile, dispatchUploadFile } from '@/store/main/actions';
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 import UploadButton from '@/components/UploadButton.vue';
 import VueTelInputVuetify from 'vue-tel-input-vuetify/lib/vue-tel-input-vuetify.vue';
@@ -270,6 +289,7 @@ export default class UserProfileEdit extends Vue {
   public district = '';
   public linkedin = '';
   public ressort = '';
+  public privateEmail = '';
 
   public async onFileChanged(files: File[]) {
     this.inputAvatar = files[0];
@@ -375,7 +395,7 @@ export default class UserProfileEdit extends Vue {
         updatedProfile.profile_picture = '';
       }
       await dispatchUpdateUserProfile(this.$store, updatedProfile);
-      this.$router.push('/main/people/profile');
+      await dispatchRouteLoggedIn(this.$store);
     }
   }
 }

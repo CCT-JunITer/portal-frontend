@@ -8,6 +8,7 @@ export interface AppNotification {
 
 export interface MainState {
     token: string;
+    userStatus: string;
     isLoggedIn: boolean | null;
     logInError: boolean;
     userProfile: IUserProfile | null;
