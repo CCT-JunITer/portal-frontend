@@ -121,7 +121,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import Backdrop from '@/components/Backdrop.vue';
 import { IUserProfile, UserType } from '@/interfaces';
 import EmployeeCard from '@/components/employee/EmployeeCard.vue';
@@ -149,7 +149,7 @@ export default class EmployeesView extends Vue {
     },
     {
       value: 'memberstatus',
-      text: 'Member status',
+      text: 'Mitgliedsstatus',
       values: MEMBERSTATUS,
     }
   ];
@@ -181,6 +181,24 @@ export default class EmployeesView extends Vue {
 
   public set category(category) {
     this.$router.replace({ query: { ...this.$route.query, category: category }});
+  }
+
+  @Watch('$route', { immediate: true })
+  public onRouteChange() {
+    try {
+      this.filters = JSON.parse((this.$route.query.filters as string));
+    } catch(e) {
+      this.filters = {};
+    }
+  }
+
+  @Watch('filters', { deep: true })
+  setFilters(value: { [key in keyof IUserProfile]?: string }, prev?: { [key in keyof IUserProfile]?: string }) {
+    const newString = JSON.stringify(value);
+    if (newString === JSON.stringify(prev)) {
+      return;
+    }
+    this.$router.replace({ query: { ...this.$route.query, filters: JSON.stringify(value) } });
   }
 
   get searchText() {

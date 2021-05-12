@@ -45,3 +45,8 @@ export interface IUserProfileCreate extends IUserProfileUpdate {
 }
 
 export type UserType = 'alumni' | 'all' | 'members';
+
+export interface UserInvite {
+    name: string;
+    email: string;
+}
