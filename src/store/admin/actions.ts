@@ -1,6 +1,6 @@
 import { api } from '@/api';
 import { ActionContext } from 'vuex';
-import { IUserProfileCreate, IUserProfileUpdate } from '@/interfaces';
+import { IUserProfileCreate, IUserProfileUpdate, UserInvite } from '@/interfaces';
 import { State } from '../state';
 import { AdminState } from './state';
 import { getStoreAccessors } from 'typesafe-vuex';
@@ -40,9 +40,26 @@ export const actions = {
       await dispatchCheckApiError(context, error);
     }
   },
+  async actionSendInvites(context: MainContext, payload: UserInvite[]) {
+    try {
+      const loadingNotification = { content: 'saving', showProgress: true };
+      commitAddNotification(context, loadingNotification);
+      const response = (await Promise.all([
+        api.sendInvites(context.rootState.main.token, payload),
+        await new Promise((resolve, reject) => setTimeout(() => resolve(), 500)),
+      ]))[0];
+      commitRemoveNotification(context, loadingNotification);
+      commitAddNotification(context, { content: 'Einladungen wurden versendet', color: 'success' });
+
+      return response.data;
+    } catch (error) {
+      await dispatchCheckApiError(context, error);
+    }
+  },
 };
 
 const { dispatch } = getStoreAccessors<AdminState, State>('');
 
 export const dispatchCreateUser = dispatch(actions.actionCreateUser);
 export const dispatchUpdateUser = dispatch(actions.actionUpdateUser);
+export const dispatchSendInvites = dispatch(actions.actionSendInvites);
