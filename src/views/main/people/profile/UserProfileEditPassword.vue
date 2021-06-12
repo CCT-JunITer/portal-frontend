@@ -8,7 +8,7 @@
       outlined
       text
     >
-      Dein Passwort wird geändert!
+      Dein Passwort wird bei allen IT-Diensten zurückgesetzt, außer bei Slack.
     </v-alert>
     <v-row>
       <v-col cols="12" md="4" class="px-5">

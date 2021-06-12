@@ -278,6 +278,13 @@
                 label="Ressort"
                 :rules="[$common.required]"
               ></v-select>
+              <v-select
+                v-model = "gender"
+                class="input-lg"
+                :items="$common.GENDER"
+                label="Gender"
+                :rules="[$common.required]"
+              ></v-select>
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn @click="cancel" raised>Abbrechen</v-btn>

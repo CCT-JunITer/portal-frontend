@@ -240,6 +240,14 @@
             :rules="[$common.required]"
           ></v-select>
 
+          <v-select
+            v-model = "gender"
+            class="input-lg"
+            :items="$common.GENDER"
+            label="Gender"
+            :rules="[$common.required]"
+          ></v-select>
+
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn @click="cancel" raised>Abbrechen</v-btn>
@@ -252,6 +260,8 @@
               Profil speichern
             </v-btn>
           </v-card-actions>
+
+          
         </v-col>
       </v-row>
     </v-form>
@@ -289,6 +299,7 @@ export default class UserProfileEdit extends Vue {
   public district = '';
   public linkedin = '';
   public ressort = '';
+  public gender = '';
   public privateEmail = '';
 
   public async onFileChanged(files: File[]) {
@@ -315,6 +326,7 @@ export default class UserProfileEdit extends Vue {
       this.district = userProfile.district;
       this.linkedin = userProfile.linkedin;
       this.ressort = userProfile.ressort;
+      this.gender = userProfile.gender;
     }
   }
 
@@ -337,6 +349,7 @@ export default class UserProfileEdit extends Vue {
       this.district = userProfile.district;
       this.linkedin = userProfile.linkedin;
       this.ressort = userProfile.ressort;
+      this.gender = userProfile.gender;
     }
   }
 
@@ -383,6 +396,11 @@ export default class UserProfileEdit extends Vue {
       if(this.ressort) {
         updatedProfile.ressort= this.ressort;
       }
+      if(this.gender) {
+        updatedProfile.gender= this.gender;
+      }
+
+
       if(this.avatar) {
         const upload = await dispatchUploadFile(this.$store, {
           file: this.avatar,
