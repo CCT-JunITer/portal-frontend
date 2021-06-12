@@ -40,7 +40,36 @@
           Anrufen
         </v-btn>
 
-        <v-btn to="/main/people/profile/edit" color="cctGreen" small outlined v-if="isMe" class="ma-2 flex-grow-1">
+        <v-btn id="btn-show-signature" color="cctGreen" small outlined v-if="isMe" class="ma-2 flex-grow-1">
+          <v-icon left small>
+            mdi-fingerprint
+          </v-icon>
+          Signatur erstellen
+        </v-btn>
+        <v-dialog activator="#btn-show-signature" width="700px" transition="dialog-bottom-transition">
+          <v-card>
+            <v-card-title>
+              Deine persönliche Signatur
+            </v-card-title>
+            <v-divider></v-divider>
+            <v-card-text>
+              <div>
+                <p style="margin-top: 15px;">
+                  <a target="_blank" href="https://wiki.cct-ev.de/index.php/Signatur_erstellen">Hier</a> findest du den Wiki-Eintrag zur Einrichtung der Signatur im Email Programm.<br/>
+                </p>
+                <p style="background-color: #F5F5F5; padding: 10px; border-radius: 5px; font-style: italic;" id="code-to-copy">
+                  {{ userSignature }}
+                </p>
+                <p>
+                  Vorschau der Signatur:
+                </p>
+                <div id="preview" v-html="`${userSignature}`"/>
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-dialog>
+
+        <v-btn to="/main/people/profile/edit" color="cctOrange" small outlined v-if="isMe" class="ma-2 flex-grow-1">
           <v-icon left small>
             mdi-pencil
           </v-icon>
@@ -48,8 +77,6 @@
         </v-btn>
       </div>
     </div>
-
-
     <div>
       <v-tabs background-color="transparent" slider-color="cctOrange" color="cctGrey">
         <v-tab :ripple="false" :to="{name: 'profile-about'}">
@@ -83,6 +110,39 @@ import EmployeeCard from '@/components/employee/EmployeeCard.vue';
   components: {EmployeeCard, EmployeeProfilePicture}
 })
 export default class UserProfile extends Vue {
+
+  get userSignature() {
+    const name = this.userProfile?.full_name;
+    const email = this.userProfile?.email;
+    const ressort = this.userProfile?.ressort;
+    const tel = this.userProfile?.phonenumber;
+
+    return `<table cellpadding="0" cellspacing="0" border="0" id="backgroundTable"><tr>
+    <td valign="top">
+    <table border="0" cellspacing="0" cellpadding="0" align="left">
+    <tr>
+    <td style="border-bottom: 1px dotted; border-top: 1px solid #757070; color: #44546a; margin-top: 10px; font-family: Calibri, sans-serif; font-size: 12.5px;" valign="top" width="460">
+    <p style="margin: 8px 0;"><span><strong id="name">`+ name + `</strong></span>
+    <br /><span id="ressort">`+ ressort +`</span>
+    </p><p style="margin: 8px 0;"><span>Mobil: <span id="mobil">`+ tel + `</span></span>
+    <br /><span>E-Mail: <a id="maillink" style="color: #44546a; font-family: Calibri, sans-serif; text-decoration: underline;" href="mailto:`+ email + `">
+    <span id="mail">`+ email + `</span>
+    </a></span></p></td></tr><tr>
+    <td style="color: #757070; border-bottom: 1px solid #757070; font-family: Calibri, sans-serif; font-size: 12.5px;" valign="top" width="460">
+    <p style="margin: 8px 0;">Company Consulting Team e.V.
+    <br /> Berlins studentische Unternehmensberatung<br /> c/o TU Berlin EB 512 | Stra&szlig;e des 17. Juni 145 | 10623 Berlin
+    <br /><a style="font-family: Calibri, sans-serif; color: #757070; text-decoration: underline;" href="https://www.cct-ev.de/">www.cct-ev.de</a>
+    | <a style="font-family: Calibri, sans-serif; color: #757070; text-decoration: underline;" href="https://www.facebook.com/CompanyConsultingTeam">facebook</a>
+    | <a style="font-family: Calibri, sans-serif; color: #757070; text-decoration: underline;" href="https://www.instagram.com/cct_ev">Instagram</a>
+    | <a style="font-family: Calibri, sans-serif; color: #757070; text-decoration: underline;" href="https://www.linkedin.com/company/company-consulting-team">LinkedIn</a>
+    </p><p style="margin: 1em 0; font-size: 11px;">Registergericht: Amtsgericht Berlin Charlottenburg
+    <br /> Registernummer: VR 14304 B<br /> Vertretungsberechtigter Vorstand gemäß § 26 BGB:
+    <br />Laura Messingfeld, Nils Müller, Kieu-Long Huynh, Leander Ollendorff, Matthias Baasch
+    <p style="margin: 8px 0; font-size: 11px;">Das Company Consulting Team ist Mitglied
+    <br /> des Bundesverband Deutscher Studentischer Unternehmensberatungen e.V. <a style="color: #757070; font-family: Calibri, sans-serif; text-decoration: none;" href="http://www.bdsu.de">(www.bdsu.de)</a>
+    <br /> und des Junior Enterprise Europe Netzwerks <a style="color: #757070; font-family: Calibri, sans-serif; text-decoration: none;" href="https://juniorenterprises.eu/">(www.juniorenterprises.eu)</a>
+    </p> </td> </tr></table></td></tr></table>`
+  }
 
   get isMe() {
     return readIsMe(this.$store)(this.$route);
