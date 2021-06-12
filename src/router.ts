@@ -172,6 +172,18 @@ export default new Router({
             {
               path: 'guide',
               component: () => import('./views/main/guide/Guide.vue')
+            },
+            {
+              path: 'calendar',
+              component: () => import('./views/main/calendar/Calendar.vue')
+            },
+            {
+              path: 'tower',
+              component: () => import('./views/main/tower/Tower.vue')
+            },
+            {
+              path: 'shop',
+              component: () => import('./views/main/shop/Shop.vue')
             }
           ],
         },

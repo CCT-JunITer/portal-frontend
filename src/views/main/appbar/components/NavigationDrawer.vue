@@ -30,15 +30,15 @@
           <v-list-item-title>Mitglieder</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
-      <v-list-item to="/main/admin/dashboard" color="cctBlue" v-if="userProfile && userProfile.is_superuser">
+      <v-list-item to="/main/admin/dashboard" color="cctOrange" v-if="userProfile && userProfile.is_superuser">
         <v-list-item-icon>
-          <v-icon>people</v-icon>
+          <v-icon>mdi-wizard-hat</v-icon>
         </v-list-item-icon>
         <v-list-item-content>
           <v-list-item-title>Admin Dashboard</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
-      <v-list-item to="/main/guide" color="purple">
+      <v-list-item to="/main/guide" color="lime darken-3">
         <v-list-item-icon>
           <v-icon>mdi-file-document</v-icon>
         </v-list-item-icon>
@@ -46,6 +46,91 @@
           <v-list-item-title>CCT-Guide</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
+      <v-list-item to="/main/calendar" color="purple">
+        <v-list-item-icon>
+          <v-icon>mdi-calendar</v-icon>
+        </v-list-item-icon>
+        <v-list-item-content>
+          <v-list-item-title>Kalender</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+      <v-list-item to="/main/tower" color="cctGreen">
+        <v-list-item-icon>
+          <v-icon>mdi-chess-rook</v-icon>
+        </v-list-item-icon>
+        <v-list-item-content>
+          <v-list-item-title>Towernutzung</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+      <v-list-item to="/main/shop" color="#00B8D4">
+        <v-list-item-icon>
+          <v-icon>mdi-tshirt-crew</v-icon>
+        </v-list-item-icon>
+        <v-list-item-content>
+          <v-list-item-title>CCT-Shop</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+    </v-list>
+
+    <v-divider></v-divider>
+    <v-list dense nav>
+      <v-subheader>Dienste</v-subheader>
+
+
+      <v-list-item href="https://webmail.all-inkl.com/" color="cctBlue" target="_blank">
+        <v-list-item-icon>
+          <v-icon>mail</v-icon>
+        </v-list-item-icon>
+        <v-list-item-content>
+          <v-list-item-title>Mail</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+
+      <v-list-item href="https://wms.cct-ev.de/" color="cctBlue" target="_blank">
+        <v-list-item-icon>
+          <v-icon>mdi-folder-open</v-icon>
+        </v-list-item-icon>
+        <v-list-item-content>
+          <v-list-item-title>WMS</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+
+      <v-list-item href="https://cloud.cct-ev.de/apps/files/" color="purple"  target="_blank">
+        <v-list-item-icon>
+          <v-icon>cloud</v-icon>
+        </v-list-item-icon>
+        <v-list-item-content>
+          <v-list-item-title>Nextcloud</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+
+      <v-list-item href="https://www.umfrage.cct-ev.de/index.php/admin/authentication/sa/login" color="cctBlue"  target="_blank">
+        <v-list-item-icon>
+          <v-icon>mdi-file-document-edit</v-icon>
+        </v-list-item-icon>
+        <v-list-item-content>
+          <v-list-item-title>LimeSurvey</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+
+      <v-list-item href="https://wiki.cct-ev.de/" color="cctBlue"  target="_blank">
+        <v-list-item-icon>
+          <v-icon>mdi-wikipedia</v-icon>
+        </v-list-item-icon>
+        <v-list-item-content>
+          <v-list-item-title>Wiki</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+
+      <v-list-item href="https://app.slack.com/client/" color="cctBlue"  target="_blank">
+        <v-list-item-icon>
+          <v-icon>mdi-slack</v-icon>
+        </v-list-item-icon>
+        <v-list-item-content>
+          <v-list-item-title>Slack</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>      
+
     </v-list>
   </v-navigation-drawer>
 </template>

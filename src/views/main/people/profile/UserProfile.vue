@@ -23,7 +23,7 @@
           <v-icon left class="mt-n2">
             mdi-linkedin
           </v-icon>
-          <a class="text--secondary text-decoration-none" :href="`${userProfile.linkedin}`">{{ strippedLinkedIn }}</a>
+          <a class="text--secondary text-decoration-none" :href="`${userProfile.linkedin}`" target="_blank">{{ strippedLinkedIn }}</a>
         </div>
       </div>
       <div class="d-flex flex-wrap justify-end align-content-end my-1">
