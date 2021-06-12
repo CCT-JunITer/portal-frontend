@@ -21,6 +21,10 @@ export const UNIVERSITIES = [
   'Technische Universität Berlin', 'Freie Universität Berlin', 'Humboldt-Universität zu Berlin', 'Beuth Hochschule für Technik Berlin', 'Charité', 'Hochschule für Wirtschaft und Recht Berlin', 'Sonstiges'
 ];
 
+export const GENDER = [
+  'männlich', 'weiblich', 'nicht binär', 'keine Angabe'
+]
+
 const LINKED_IN_REGEX = /^(https:\/\/)?([a-z]{2,3}\.)?linkedin\.com\/in\//;
 
 export const linkedInRegex = LINKED_IN_REGEX;

@@ -16,7 +16,8 @@ export interface IUserProfile {
     slackid: string;
     studylevel: string;
     university: string;
-    profile_picture: string;
+    profile_picture: string;   
+    gender: string;
 }
 
 export interface IUserProfileUpdate {
@@ -35,6 +36,7 @@ export interface IUserProfileUpdate {
     studylevel?: string;
     university?: string;
     profile_picture?: string;
+    gender?: string;
 }
 
 export interface IUserProfileCreate extends IUserProfileUpdate {
