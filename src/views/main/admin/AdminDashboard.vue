@@ -52,7 +52,7 @@
             <v-card-text>Hier können Anfragen zur Alumnisierung oder Passivierung verwaltet werden.</v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn text to="/main/people/admin" color="cctBlue">Bearbeiten</v-btn>
+              <v-btn text to="/main/people/admin/requests" color="cctBlue">Bearbeiten</v-btn>
             </v-card-actions>
           </v-card>
         </v-col>

@@ -91,6 +91,12 @@
           </v-icon>
           Profil bearbeiten
         </v-btn>
+        <v-btn :to="`/main/people/admin/users/edit/${userProfile.id}`" color="red" small outlined v-if="isSuperuser" class="ma-2 flex-grow-1">
+          <v-icon left small>
+            mdi-wrench
+          </v-icon>
+          Account verwalten
+        </v-btn>
       </div>
     </div>
     <div>
@@ -116,7 +122,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { readIsMe, readRouteUser } from '@/store/main/getters';
+import { readIsMe, readRouteUser, readUserProfile } from '@/store/main/getters';
 import { dispatchGetUsers } from '@/store/main/actions';
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 import EmployeeCard from '@/components/employee/EmployeeCard.vue';
@@ -180,6 +186,10 @@ export default class UserProfile extends Vue {
 
   get userProfile() {
     return readRouteUser(this.$store)(this.$route);
+  }
+
+  get isSuperuser() {
+    return readUserProfile(this.$store)?.is_superuser;
   }
 
   public goToEdit() {

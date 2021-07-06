@@ -8,11 +8,11 @@ exports[`EmployeeCard.vue should match snapshot 1`] = `
       <div class="v-avatar avatar mt-5 grey lighten-2" style="height: 72px; min-width: 72px; width: 72px;"></div>
     </div>
     <div class="pa-2">
-      <div class="text-subtitle-1 text--primary">
+      <div class="text-subtitle-1 text--primary d-flex align-content-start justify-center">
         Test
         <!---->
       </div>
-      <div class="subtitle-2 mb-2">Juniter</div>
+      <div class="text-subtitle-2 mb-2">Juniter</div> <span class="v-chip v-chip--label v-chip--outlined theme--dark v-size--small cctBlue cctBlue--text"><span class="v-chip__content">Consultant</span></span>
     </div>
   </div>
   <hr role="separator" aria-orientation="horizontal" class="v-divider theme--light">

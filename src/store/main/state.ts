@@ -1,4 +1,4 @@
-import { IUserProfile } from '@/interfaces';
+import { Group, IUserProfile, Request } from '@/interfaces';
 
 export interface AppNotification {
     content: string;
@@ -16,4 +16,6 @@ export interface MainState {
     dashboardShowDrawer: boolean;
     notifications: AppNotification[];
     users: IUserProfile[];
+    myRequests: Request[];
+    groups: Group[];
 }

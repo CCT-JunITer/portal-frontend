@@ -12,11 +12,12 @@
           <employee-profile-picture :employee="employee" class="mt-5" size="72"></employee-profile-picture>
         </backdrop>
         <div class="pa-2">
-          <div class="text-subtitle-1 text--primary">
+          <div class="text-subtitle-1 text--primary d-flex align-content-start justify-center">
             {{ employee.full_name || 'Kein Name' }}
-            <v-icon v-if="hasBirthday" color="cctOrange">mdi-cake-variant</v-icon>
+            <v-icon v-if="hasBirthday" color="cctOrange" size="20">mdi-cake-variant</v-icon>
           </div>
-          <div class="subtitle-2 mb-2">{{ employee.ressort || 'Kein Ressort' }}</div>
+          <div class="text-subtitle-2 mb-2">{{ employee.ressort || 'Kein Ressort' }}</div>
+          <v-chip small color="cctBlue" outlined dark label>{{ employee.memberstatus }}</v-chip>
         </div>
       </div>
     </router-link>

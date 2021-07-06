@@ -13,6 +13,8 @@ const defaultState: MainState = {
   dashboardShowDrawer: false,
   notifications: [],
   users: [],
+  myRequests: [],
+  groups: [],
 };
 
 export const mainModule = {

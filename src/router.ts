@@ -129,6 +129,47 @@ export default new Router({
                       /* webpackChunkName: "main-profile-edit" */ './views/main/people/profile/UserProfileEdit.vue'),
                     }, 
                     {
+                      path: 'requests',
+                      name: 'profile-requests',
+                      meta: {
+                        title: 'Anträge',
+                      },
+                      component: () => import(
+                      /* webpackChunkName: "main-profile-requests" */ './views/main/people/profile/requests/UserProfileRequests.vue'),
+                    }, 
+                    {
+                      path: 'request-create',
+                      name: 'profile-request-create',
+                      meta: {
+                        title: 'Antrag erstellen',
+                      },
+                      component: () => import(
+                      /* webpackChunkName: "main-profile-request-create" */ './views/main/people/profile/requests/UserProfileRequestCreate.vue'),
+                      redirect: 'request-create/ressort-change',
+                      children: [
+                        {
+                          path: 'ressort-change',
+                          name: 'profile-request-ressort-change',
+                          component: () => import('./views/main/people/profile/requests/RequestRessortChange.vue'),
+                        },
+                        {
+                          path: 'alumni',
+                          name: 'profile-request-alumni',
+                          component: () => import('./views/main/people/profile/requests/RequestAlumni.vue'),
+                        },
+                        {
+                          path: 'passive',
+                          name: 'profile-request-passive',
+                          component: () => import('./views/main/people/profile/requests/RequestPassive.vue'),
+                        }, 
+                        {
+                          path: 'memberstatus',
+                          name: 'profile-request-memberstatus',
+                          component: () => import('./views/main/people/profile/requests/RequestMemberstatus.vue'),
+                        } 
+                      ]
+                    }, 
+                    {
                       path: 'edit-password',
                       name: 'profile-edit-password',
                       meta: {
@@ -164,6 +205,12 @@ export default new Router({
                       name: 'main-admin-users-create',
                       component: () => import(
                       /* webpackChunkName: "main-admin-users-edit" */ './views/main/people/admin/EditUser.vue'),
+                    },
+                    {
+                      path: 'requests',
+                      name: 'main-admin-requests',
+                      component: () => import(
+                      /* webpackChunkName: "main-admin-requests" */ './views/main/people/admin/AdminRequests.vue'),
                     },
                   ],
                 }

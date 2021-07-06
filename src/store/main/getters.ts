@@ -42,6 +42,8 @@ export const getters = {
   userStatus: (state: MainState) => state.userStatus,
   isLoggedIn: (state: MainState) => state.isLoggedIn,
   firstNotification: (state: MainState) => state.notifications.length > 0 && state.notifications[0],
+  myRequests: (state: MainState) => state.myRequests,
+  groups: (state: MainState) => state.groups,
 };
 
 const {read} = getStoreAccessors<MainState, State>('');
@@ -59,3 +61,5 @@ export const readAdminOneUser = read(getters.adminOneUser);
 export const readAdminUsers = read(getters.adminUsers);
 export const readIsMe = read(getters.isMe);
 export const readRouteUser = read(getters.routeUser);
+export const readMyRequests = read(getters.myRequests);
+export const readGroups = read(getters.groups);

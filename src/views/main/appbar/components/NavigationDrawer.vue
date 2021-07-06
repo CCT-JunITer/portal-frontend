@@ -12,7 +12,7 @@
           </v-list-item-avatar>
 
           <v-list-item-content>
-            <v-list-item-title class="title">{{ userProfile.full_name }}</v-list-item-title>
+            <v-list-item-title class="text-h6">{{ userProfile.full_name }}</v-list-item-title>
             <v-list-item-subtitle>{{ userProfile.email }}</v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
