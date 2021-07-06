@@ -31,7 +31,14 @@
           <v-list-item-title>Mitglieder</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
-
+      <v-list-item to="/main/trainings" color="cctOrange">
+        <v-list-item-icon>
+          <v-icon>mdi-school</v-icon>
+        </v-list-item-icon>
+        <v-list-item-content>
+          <v-list-item-title>Schulungen</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
       <v-list-item to="/main/admin/dashboard" color="cctOrange" v-if="userProfile && userProfile.is_superuser">
         <v-list-item-icon>
           <v-icon>mdi-wizard-hat</v-icon>

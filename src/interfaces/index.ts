@@ -50,6 +50,34 @@ export interface IUserProfileCreate extends IUserProfileUpdate {
     is_alumni?: boolean;
 }
 
+
+export interface ITraining {
+    title: string;
+    type: string;
+    is_membership_progression: boolean;
+    topic: string;
+    description: string;
+    date: string;
+    wms_link: string;
+    external_trainers: string;
+    id: number;
+    author: IUserProfile[];
+    trainers: IUserProfile[];
+    participants: IUserProfile[];
+}
+export interface ITrainingCreate {
+    title: string;
+    type: string;
+    is_membership_progression: boolean;
+    topic: string;
+    description: string;
+    date: string;
+    wms_link: string;
+    external_trainers: string;
+    trainer_ids: number[];
+    participant_ids: number[];
+}
+
 export type UserType = 'alumni' | 'all' | 'members';
 
 export interface UserInvite {

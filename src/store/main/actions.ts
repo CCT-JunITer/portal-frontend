@@ -1,6 +1,6 @@
 import { removeLocalUserStatus, saveLocalUserStatus, getLocalUserStatus } from './../../utils';
 import { api } from '@/api';
-import { IUserProfileCreate, Request, RequestCreate } from '@/interfaces';
+import { IUserProfileCreate, RequestCreate } from '@/interfaces';
 import router from '@/router';
 import { getLocalToken, removeLocalToken, saveLocalToken } from '@/utils';
 import { AxiosError } from 'axios';
@@ -15,6 +15,7 @@ import {
   commitSetLogInError,
   commitSetMyRequests,
   commitSetToken,
+  commitSetTrainings,
   commitSetUserProfile,
   commitSetUsers,
   commitSetUserStatus
@@ -204,6 +205,16 @@ export const actions = {
       await dispatchCheckApiError(context, error);
     }
   },
+  async actionGetTrainings(context: MainContext) {
+    try {
+      const response = await api.getTrainings(context.rootState.main.token);
+      if (response) {
+        commitSetTrainings(context, response.data);
+      }
+    } catch (error) {
+      await dispatchCheckApiError(context, error);
+    }
+  },
   async actionCreateUserOpen(context: MainContext, payload: {user: IUserProfileCreate; token: string}) {
     try {
       const response = await api.createUserOpen(payload.token, payload.user);
@@ -275,6 +286,7 @@ export const dispatchRemoveNotification = dispatch(actions.removeNotification);
 export const dispatchPasswordRecovery = dispatch(actions.passwordRecovery);
 export const dispatchResetPassword = dispatch(actions.resetPassword);
 export const dispatchGetUsers = dispatch(actions.actionGetUsers);
+export const dispatchGetTrainings = dispatch(actions.actionGetTrainings);
 export const dispatchCreateUserOpen = dispatch(actions.actionCreateUserOpen); 
 export const dispatchGetMyRequests = dispatch(actions.actionGetMyRequests); 
 export const dispatchAddRequestMe = dispatch(actions.actionAddRequestMe); 

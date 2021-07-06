@@ -5,6 +5,7 @@ import Router, { Route } from 'vue-router';
 import RouterComponent from './components/RouterComponent.vue';
 import { State } from './store/state';
 import { Store } from 'vuex';
+import { component } from 'vue/types/umd';
 
 Vue.use(Router);
 
@@ -54,7 +55,24 @@ export default new Router({
                 },
                 {
                   path: 'training',
-                  component: () => import(/* webpackChunkName: "admin-training" */ './views/main/training/AdminViewTraining.vue')
+                  name: 'admin-training',
+                  component: RouterComponent,                  
+                  children: [
+                    {
+                      path: '',
+                      component: () => import(/* webpackChunkName: "admin-training" */ './views/main/training/AdminViewTraining.vue'),
+                    },
+                    {
+                      path: 'create',
+                      name: 'admin-training-create',
+                      component: () => import(/* webpackChunkName: "admin-training-create" */ './views/main/training/AdminCreateTraining.vue'),
+                    },
+                    {
+                      path: 'edit/:id',
+                      name: 'admin-training-edit',
+                      component: () => import(/* webpackChunkName: "admin-training-edit" */ './views/main/training/AdminCreateTraining.vue'),
+                    }
+                  ]
                 },
               ]
             },
@@ -116,6 +134,12 @@ export default new Router({
                           name: 'profile-about',
                           component: () => import(
                           /* webpackChunkName: "main-profile-about" */  './views/main/people/profile/UserProfileAbout.vue'),
+                        },
+                        {
+                          path: 'trainings',
+                          name: 'profile-trainings',
+                          component: () => import(
+                          /* webpackChunkName: "main-profile-trainings" */  './views/main/people/profile/UserProfileTrainings.vue'),
                         }
                       ]
                     },
@@ -219,6 +243,10 @@ export default new Router({
             {
               path: 'guide',
               component: () => import('./views/main/guide/Guide.vue')
+            },
+            {
+              path: 'trainings',
+              component: () => import(/* webpackChunkName: "admin-training" */ './views/main/training/TrainingMain.vue'),
             },
             {
               path: 'calendar',

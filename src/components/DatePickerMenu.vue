@@ -17,6 +17,7 @@
       </slot>
     </template>
     <v-date-picker
+      color="cctBlue"
       ref="picker"
       v-model="date"
       locale="de-de"
@@ -76,7 +77,11 @@ export default class DatePickerMenu extends Vue {
     if(!this.date) {
       return '';
     }
-    return format(new Date(this.date), 'dd.MM.yyyy');
+    try {
+      return format(new Date(this.date), 'dd.MM.yyyy');
+    } catch(e) {
+      return '';
+    }
   }
 }
 </script>
