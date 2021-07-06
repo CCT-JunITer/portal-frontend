@@ -1,4 +1,5 @@
-import { getDayOfYear, getMonth } from 'date-fns';
+import { getDayOfYear } from 'date-fns';
+
 
 export const RESSORTS = [
   'Kein Ressort', 'Juniter','Public Affairs','Human Resources', 'Quality Management', 'International Networks','Board','Vorstand','Projektmanager'
@@ -33,12 +34,14 @@ export const isLinkedIn = (url: string) => {
   return LINKED_IN_REGEX.test(url);
 }
 
-export const required = (v) => !!v || 'Dieses Feld wird benötigt.';
+export const required = (v: string) => !!v || 'Dieses Feld wird benötigt.';
+
+export const isNumber = (v: string) => (v && !!v.match(/[0-9]+/)) || 'Dies ist keine Zahl.';
 
 export const isTodayBirthday = (date: Date | string) => {
   if (typeof date === 'string') {
     date = new Date(date);
   }
   const now = new Date();
-  return getMonth(date) === getMonth(now) && getDayOfYear(date) === getDayOfYear(now);
+  return getDayOfYear(date) === getDayOfYear(now);
 }

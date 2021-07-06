@@ -142,14 +142,6 @@
               $common.required,
               v => /^([0-9\(\)\/\+ \-]*)$/.test(v) || 'Dies ist keine gültige Telefonnummer']"
           ></vue-tel-input-vuetify>
-          <v-select
-            label="Mitgliedsstatus"
-            v-model = "memberstatus"
-            class="input-lg"
-            required
-            :items="$common.MEMBERSTATUS"
-            :rules="[$common.required]"
-          ></v-select>
 
           <date-picker-menu
             v-model="entrydate"
@@ -232,13 +224,6 @@
             hint="(Format: https://www.linkedin.com/in/name)"
             :rules="[v => !v || $common.isLinkedIn(v) || 'Dies ist keine gültige LinkedIn-URL']"
           ></v-text-field>
-          <v-select
-            v-model = "ressort"
-            class="input-lg"
-            :items="$common.RESSORTS"
-            label="Ressort"
-            :rules="[$common.required]"
-          ></v-select>
 
           <v-select
             v-model = "gender"
@@ -291,14 +276,12 @@ export default class UserProfileEdit extends Vue {
   public email = '';
   public birthdate = '';
   public phonenumber = '';
-  public memberstatus = '';
   public entrydate = '';
   public major = '';
   public university = '';
   public studylevel = '';
   public district = '';
   public linkedin = '';
-  public ressort = '';
   public gender = '';
   public privateEmail = '';
 
@@ -318,14 +301,12 @@ export default class UserProfileEdit extends Vue {
       this.email = userProfile.email;
       this.birthdate = userProfile.birthdate;
       this.phonenumber = userProfile.phonenumber;
-      this.memberstatus = userProfile.memberstatus;
       this.entrydate = userProfile.entrydate;
       this.major = userProfile.major;
       this.university = userProfile.university;
       this.studylevel = userProfile.studylevel;
       this.district = userProfile.district;
       this.linkedin = userProfile.linkedin;
-      this.ressort = userProfile.ressort;
       this.gender = userProfile.gender;
     }
   }
@@ -341,14 +322,12 @@ export default class UserProfileEdit extends Vue {
       this.email = userProfile.email;
       this.birthdate = userProfile.birthdate;
       this.phonenumber = userProfile.phonenumber;
-      this.memberstatus = userProfile.memberstatus;
       this.entrydate = userProfile.entrydate;
       this.major = userProfile.major;
       this.university = userProfile.university;
       this.studylevel = userProfile.studylevel;
       this.district = userProfile.district;
       this.linkedin = userProfile.linkedin;
-      this.ressort = userProfile.ressort;
       this.gender = userProfile.gender;
     }
   }
@@ -372,9 +351,6 @@ export default class UserProfileEdit extends Vue {
       if (this.phonenumber) {
         updatedProfile.phonenumber = this.phonenumber;
       }
-      if(this.memberstatus) {
-        updatedProfile.memberstatus = this.memberstatus;
-      }
       if(this.entrydate) {
         updatedProfile.entrydate = this.entrydate;
       }
@@ -392,9 +368,6 @@ export default class UserProfileEdit extends Vue {
       }
       if(this.linkedin) {
         updatedProfile.linkedin= this.linkedin;
-      }
-      if(this.ressort) {
-        updatedProfile.ressort= this.ressort;
       }
       if(this.gender) {
         updatedProfile.gender= this.gender;

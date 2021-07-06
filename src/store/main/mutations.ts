@@ -1,4 +1,4 @@
-import { IUserProfile } from '@/interfaces';
+import { Group, IUserProfile, Request } from '@/interfaces';
 import { MainState, AppNotification } from './state';
 import { getStoreAccessors } from 'typesafe-vuex';
 import { State } from '../state';
@@ -40,6 +40,12 @@ export const mutations = {
     users.push(payload);
     state.users = users;
   },
+  setMyRequests(state: MainState, payload: Request[]) {
+    state.myRequests = payload;
+  },
+  setGroups(state: MainState, payload: Group[]) {
+    state.groups = payload;
+  },
 };
 
 const {commit} = getStoreAccessors<MainState | any, State>('');
@@ -55,3 +61,5 @@ export const commitAddNotification = commit(mutations.addNotification);
 export const commitRemoveNotification = commit(mutations.removeNotification);
 export const commitSetUser = commit(mutations.setUser);
 export const commitSetUsers = commit(mutations.setUsers);
+export const commitSetMyRequests = commit(mutations.setMyRequests);
+export const commitSetGroups = commit(mutations.setGroups);

@@ -170,14 +170,6 @@
                     'Dies ist keine gültige Telefonnummer',
                 ]"
               ></vue-tel-input-vuetify>
-              <v-select
-                label="Mitgliedsstatus"
-                class="input-lg"
-                v-model="memberstatus"
-                required
-                :items="$common.MEMBERSTATUS"
-                :rules="[$common.required]"
-              ></v-select>
 
               <date-picker-menu
                 defaultPicker="MONTH"
@@ -271,13 +263,6 @@
                     'Dies ist keine gültige LinkedIn-URL',
                 ]"
               ></v-text-field>
-              <v-select
-                class="input-lg"
-                :items="$common.RESSORTS"
-                v-model="ressort"
-                label="Ressort"
-                :rules="[$common.required]"
-              ></v-select>
               <v-select
                 v-model = "gender"
                 class="input-lg"

@@ -2,7 +2,7 @@
   <v-dialog v-bind="$attrs" max-width="380">
     <v-card>
       <v-card-title>
-        <span class="headline">Avatar ändern</span>
+        <span class="text-h5">Avatar ändern</span>
       </v-card-title>
       <v-card-text>
         <cropper

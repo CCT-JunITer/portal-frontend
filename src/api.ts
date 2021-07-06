@@ -1,4 +1,4 @@
-import { UserInvite } from './interfaces/index';
+import { Request, RequestCreate, UserInvite } from './interfaces/index';
 import axios from 'axios';
 import {apiUrl} from '@/env';
 import { IUserProfile, IUserProfileCreate, IUserProfileUpdate, UserType } from './interfaces';
@@ -63,7 +63,7 @@ export const api = {
   },
   async downloadFile(token: string, filename: string) {
     const params = { filename };
-    return axios.get(`${apiUrl}/api/v1/utils/download-file/`, { ...authHeaders(token), params, responseType: 'blob' });
+    return axios.get(`${apiUrl}/api/v1/utils/download-file`, { ...authHeaders(token), params, responseType: 'blob' });
   },
   async updateUser(token: string, userId: number, data: IUserProfileUpdate) {
     return axios.put(`${apiUrl}/api/v1/users/${userId}`, data, authHeaders(token));
@@ -85,5 +85,27 @@ export const api = {
       new_password: password,
       token,
     });
+  },
+  // requests
+  async getMyRequests(token: string) {
+    return axios.get(`${apiUrl}/api/v1/groups/requests/me`, authHeaders(token));
+  },
+  async addUserToGroup(token: string, userId: number, groupId: number) {
+    return axios.post(`${apiUrl}/api/v1/groups/${userId}/add`, { group_id: groupId }, authHeaders(token));
+  },
+  async removeUserFromGroup(token: string, userId: number, groupId: number) {
+    return axios.post(`${apiUrl}/api/v1/groups/${userId}/remove`, { group_id: groupId }, authHeaders(token));
+  },
+  async addMeRequest(token: string, request: RequestCreate) {
+    return axios.post(`${apiUrl}/api/v1/groups/requests/me`, request, authHeaders(token));
+  },
+  async getRequests(token: string, userId?: number) {
+    return axios.get(`${apiUrl}/api/v1/groups/requests${userId ? '/' + userId : ''}`, authHeaders(token));
+  },
+  async applyRequest(token: string, requestId: number, accepted: boolean) {
+    return axios.put(`${apiUrl}/api/v1/groups/requests/${requestId}`, { accepted }, authHeaders(token));
+  },
+  async getGroups(token: string) {
+    return axios.get(`${apiUrl}/api/v1/groups`, authHeaders(token));
   },
 };

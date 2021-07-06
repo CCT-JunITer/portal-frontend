@@ -6,7 +6,7 @@
     v-bind:is="component"
   >
     <v-img :src="imageSrc" v-if="imageSrc"></v-img>
-    <span v-else-if="!this.loadingPicture" v-text="initials" class="white--text headline"></span>
+    <span v-else-if="!this.loadingPicture" v-text="initials" class="white--text text-h5"></span>
   </component>
 </template>
 
@@ -109,7 +109,7 @@ export default class EmployeeProfilePicture extends Vue {
 
 </script>
 
-<style lang="css">
+<style lang="scss" scoped>
 .avatar {
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
