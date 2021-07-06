@@ -100,12 +100,12 @@ export const api = {
     return axios.post(`${apiUrl}/api/v1/groups/requests/me`, request, authHeaders(token));
   },
   async getRequests(token: string, userId?: number) {
-    return axios.get(`${apiUrl}/api/v1/groups/requests${userId ? '/' + userId : ''}`, authHeaders(token));
+    return axios.get(`${apiUrl}/api/v1/groups/requests${userId ? '/' + userId : ''}/`, authHeaders(token));
   },
   async applyRequest(token: string, requestId: number, accepted: boolean) {
     return axios.put(`${apiUrl}/api/v1/groups/requests/${requestId}`, { accepted }, authHeaders(token));
   },
   async getGroups(token: string) {
-    return axios.get(`${apiUrl}/api/v1/groups`, authHeaders(token));
+    return axios.get(`${apiUrl}/api/v1/groups/`, authHeaders(token));
   },
 };
