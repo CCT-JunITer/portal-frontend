@@ -184,6 +184,10 @@ export default new Router({
             {
               path: 'shop',
               component: () => import('./views/main/shop/Shop.vue')
+            },
+            {
+              path: 'hochladen',
+              component: () => import('./views/main/hochladen/Hochladen.vue')
             }
           ],
         },

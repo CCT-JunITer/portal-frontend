@@ -422,6 +422,7 @@ export default class AccountCreate extends Vue {
   }
 }
 </script>
+
 <style lang="sass">
 @import '~vuetify/src/styles/styles.sass'
 
