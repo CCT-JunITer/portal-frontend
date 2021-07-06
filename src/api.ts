@@ -1,7 +1,6 @@
-import { RequestCreate, UserInvite } from './interfaces/index';
 import axios from 'axios';
 import {apiUrl} from '@/env';
-import { ITraining, ITrainingCreate, IUserProfile, IUserProfileCreate, IUserProfileUpdate, UserType } from './interfaces';
+import { ITraining, ITrainingCreate, IUserProfile, IUserProfileCreate, IUserProfileUpdate, UserType, RequestCreate, UserInvite } from './interfaces';
 import {dataURItoBlob} from '@/utils';
 
 function authHeaders(token: string, headers = {}) {
@@ -42,6 +41,11 @@ export const api = {
 
     return axios.get<IUserProfile[]>(`${apiUrl}/api/v1/users/`, { ...authHeaders(token), params });
   },
+
+  async getPersonalTrainings(token: string, userId: number) {
+    return axios.get<ITraining[]>(`${apiUrl}/api/v1/training/participants/${userId}`, { ...authHeaders(token)});
+  },
+
 
   async uploadFile(token: string, file: File | string | Blob, fileName?: string) {
     const formData = new FormData();

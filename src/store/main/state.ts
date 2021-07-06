@@ -16,6 +16,7 @@ export interface MainState {
     dashboardShowDrawer: boolean;
     notifications: AppNotification[];
     users: IUserProfile[];
+    personalTrainings: ITraining[];
     trainings: ITraining[];
     myRequests: Request[];
     groups: Group[];

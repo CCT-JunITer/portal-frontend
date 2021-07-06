@@ -35,6 +35,9 @@ export const mutations = {
   setUsers(state: MainState, payload: IUserProfile[]) {
     state.users = payload;
   },
+  setPersonalTrainings(state: MainState, payload: ITraining[]) {
+    state.personalTrainings = payload;
+  },
   setTrainings(state: MainState, payload: ITraining[]) {
     state.trainings = payload;
   },
@@ -69,6 +72,7 @@ export const commitAddNotification = commit(mutations.addNotification);
 export const commitRemoveNotification = commit(mutations.removeNotification);
 export const commitSetUser = commit(mutations.setUser);
 export const commitSetUsers = commit(mutations.setUsers);
+export const commitSetPersonalTrainings = commit(mutations.setPersonalTrainings);
 export const commitSetTraining = commit(mutations.setTraining);
 export const commitSetTrainings = commit(mutations.setTrainings);
 export const commitSetMyRequests = commit(mutations.setMyRequests);

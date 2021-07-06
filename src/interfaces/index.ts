@@ -85,6 +85,20 @@ export interface UserInvite {
     email: string;
 }
 
+export interface ITraining {
+    title: string;
+    type: string;
+    is_membership_progression: boolean;
+    topic: string;
+    description: string;
+    date: string;
+    wms_link: string;
+    external_trainers: string;
+    id: number;
+    author: IUserProfile[];
+    trainers: IUserProfile[];
+    participants: IUserProfile[];
+}
 export interface UserGroup {
     id: number;
     group: Group;
