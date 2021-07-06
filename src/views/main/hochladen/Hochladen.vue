@@ -1,12 +1,12 @@
 <template>
   <div class="root">
-    <iframe src="https://cloud.cct-ev.de/index.php/s/K4xoQcAqKpaQ4GA" width="50%" height="450">
-      
-    </iframe>
-    
-    <iframe src="https://cloud.cct-ev.de/index.php/s/6iHKJAzWwpxY5dW" width="50%" height="450">
 
-    </iframe>
+    <iframe src="https://cloud.cct-ev.de/index.php/s/K4xoQcAqKpaQ4GA" width="50%" height="450" frameBorder="0"></iframe>
+    <v-divider
+      vertical
+    ></v-divider>
+    <iframe src="https://cloud.cct-ev.de/index.php/s/6iHKJAzWwpxY5dW" width="50%" height="450" frameBorder="0"></iframe>
+
     
   </div>
 </template>
@@ -20,12 +20,11 @@ export default class Hochladen extends Vue {
 }
 </script>
 
-<style lang="sass">
-@import '~vuetify/src/styles/styles.sass'
-
-@media #{map-get($display-breakpoints, 'md-and-up')}
-  .input-lg
-    max-width: 340px!important
-
+<style scoped lang="scss">
+.root {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+}
 
 </style>

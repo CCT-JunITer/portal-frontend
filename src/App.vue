@@ -45,5 +45,7 @@ export default class App extends Vue {
 <style>
 html {
   overflow-y: auto!important;
+
 }
+
 </style>
