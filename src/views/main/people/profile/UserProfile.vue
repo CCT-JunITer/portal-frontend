@@ -23,7 +23,7 @@
           <v-icon left class="mt-n2">
             mdi-linkedin
           </v-icon>
-          <a class="text--secondary text-decoration-none" :href="`${userProfile.linkedin}`" target="_blank">{{ strippedLinkedIn }}</a>
+          <a class="text--secondary text-decoration-none" :href="`${userProfile.linkedin}`"  target="_blank">{{ strippedLinkedIn }}</a>
         </div>
       </div>
       <div class="d-flex flex-wrap justify-end align-content-end my-1">
@@ -40,13 +40,18 @@
           Anrufen
         </v-btn>
 
-        <v-btn id="btn-show-signature" color="cctGreen" small outlined v-if="isMe" class="ma-2 flex-grow-1">
-          <v-icon left small>
-            mdi-fingerprint
-          </v-icon>
-          Signatur erstellen
-        </v-btn>
-        <v-dialog activator="#btn-show-signature" width="700px" transition="dialog-bottom-transition">
+
+        <v-dialog width="700px" transition="dialog-bottom-transition" v-model="showSignatureDialog">
+          
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn  v-bind="attrs" v-on="on" color="cctGreen" small outlined v-if="isMe" class="ma-2 flex-grow-1">
+              <v-icon left small>
+                mdi-fingerprint
+              </v-icon>
+              Signatur erstellen
+            </v-btn>
+          </template>
+          
           <v-card>
             <v-card-title>
               Deine persönliche Signatur
@@ -58,16 +63,27 @@
                   <a target="_blank" href="https://wiki.cct-ev.de/index.php/Signatur_erstellen">Hier</a> findest du den Wiki-Eintrag zur Einrichtung der Signatur im Email Programm.<br/>
                 </p>
                 <p style="background-color: #F5F5F5; padding: 10px; border-radius: 5px; font-style: italic;" id="code-to-copy">
-                  {{ userSignature }}
+                  <span id="signature-html-code">{{ userSignature }}</span>
                 </p>
-                <p>
-                  Vorschau der Signatur:
-                </p>
+              </div>
+            </v-card-text>
+            <v-card-subtitle>
+              Vorschau der Signatur:
+            </v-card-subtitle>
+            <v-card-text>
+              <div>
                 <div id="preview" v-html="`${userSignature}`"/>
               </div>
             </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="cctBlue" text @click="showSignatureDialog = false">
+                Fenster schließen
+              </v-btn>
+            </v-card-actions>
           </v-card>
         </v-dialog>
+
 
         <v-btn to="/main/people/profile/edit" color="cctOrange" small outlined v-if="isMe" class="ma-2 flex-grow-1">
           <v-icon left small>
@@ -111,6 +127,8 @@ import EmployeeCard from '@/components/employee/EmployeeCard.vue';
 })
 export default class UserProfile extends Vue {
 
+  showSignatureDialog = false;
+
   get userSignature() {
     const name = this.userProfile?.full_name;
     const email = this.userProfile?.email;
@@ -137,7 +155,8 @@ export default class UserProfile extends Vue {
     | <a style="font-family: Calibri, sans-serif; color: #757070; text-decoration: underline;" href="https://www.linkedin.com/company/company-consulting-team">LinkedIn</a>
     </p><p style="margin: 1em 0; font-size: 11px;">Registergericht: Amtsgericht Berlin Charlottenburg
     <br /> Registernummer: VR 14304 B<br /> Vertretungsberechtigter Vorstand gemäß § 26 BGB:
-    <br />Laura Messingfeld, Nils Müller, Kieu-Long Huynh, Leander Ollendorff, Matthias Baasch
+    <br />Dominik Schultze-Wolters, Marlene Warstat, Linus Pfoch, Robin Pose
+    <br />Beisitzerin: Luisa Scharff
     <p style="margin: 8px 0; font-size: 11px;">Das Company Consulting Team ist Mitglied
     <br /> des Bundesverband Deutscher Studentischer Unternehmensberatungen e.V. <a style="color: #757070; font-family: Calibri, sans-serif; text-decoration: none;" href="http://www.bdsu.de">(www.bdsu.de)</a>
     <br /> und des Junior Enterprise Europe Netzwerks <a style="color: #757070; font-family: Calibri, sans-serif; text-decoration: none;" href="https://juniorenterprises.eu/">(www.juniorenterprises.eu)</a>
@@ -175,5 +194,20 @@ export default class UserProfile extends Vue {
     await dispatchGetUsers(this.$store);
   }
 
+  public copySignatureToClipboard() {
+    const text = document.querySelector('#signature-html-code');
+    const content = String(text?.innerHTML);
+    const el = document.createElement('textarea');
+    el.value = content;
+    document.body.appendChild(el);
+    el.select();
+    try {
+      document.execCommand('copy');
+      alert('Success')
+    } catch(err) {
+      alert(err);
+    }
+    document.body.removeChild(el);
+  }
 }
 </script>
