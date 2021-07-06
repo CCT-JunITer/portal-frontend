@@ -22,6 +22,13 @@ export const UNIVERSITIES = [
   'Technische Universität Berlin', 'Freie Universität Berlin', 'Humboldt-Universität zu Berlin', 'Beuth Hochschule für Technik Berlin', 'Charité', 'Hochschule für Wirtschaft und Recht Berlin', 'Sonstiges'
 ];
 
+export const SCHULUNGSART = [
+  'Pflichtschulung', 'Zusatzschulung', 'Allgemeine Schulung'
+];
+
+export const SCHULUNGSTHEMA = [
+  'Angebotsschulung', 'BDSU Schulung', 'Corporate Design', 'Externe Schulungs', 'Finanzen und Recht', 'Internes', 'Präsentationstechniken', 'Projektmanagement', 'Quilatitätsmanagement', 'MP-Projektcontroller','ZVG','Zusatzschulung','Sonstiges'   
+];
 export const GENDER = [
   'männlich', 'weiblich', 'nicht binär', 'keine Angabe'
 ]

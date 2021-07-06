@@ -110,6 +110,9 @@
         <v-tab :ripple="false" :to="{name: 'profile-projects'}" disabled>
           Projekte
         </v-tab>
+        <v-tab :ripple="false" :to="{name: 'profile-trainings'}" >
+          Schulungen
+        </v-tab>
       </v-tabs>
       <v-divider></v-divider>
     </div>
