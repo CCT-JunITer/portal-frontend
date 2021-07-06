@@ -1,6 +1,6 @@
 <template>
   <div class="root">
-    <iframe src="https://shop.spreadshirt.de/CCT-Berlin-Shop/" width="100%" height="100%">
+    <iframe src="https://shop.spreadshirt.de/CCT-Berlin-Shop/" width="100%" height="100%" frameBorder="0">
 
     </iframe>
   </div>
@@ -15,7 +15,7 @@ export default class Shop extends Vue {
 }
 </script>
 
-<style lang="scss">
+<style scoped lang="scss">
 .root {
   display: flex;
   flex-direction: column;
