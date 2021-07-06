@@ -53,7 +53,7 @@ export default class AdminRequests extends Vue {
   }
 
   async created() {
-    await dispatchAdminRequests(this.$store);
+    await dispatchAdminRequests(this.$store, undefined);
   }
 
   async applyRequest(requestId: number, accepted: boolean) {

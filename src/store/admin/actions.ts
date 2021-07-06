@@ -58,7 +58,7 @@ export const actions = {
     }
   },
   // requests
-  async actionGetRequests(context: MainContext, payload?: { userId?: number }) {
+  async actionGetRequests(context: MainContext, payload: { userId?: number } | undefined) {
     try {
       const response = await api.getRequests(context.rootState.main.token, payload?.userId);
       if (response) {
@@ -100,7 +100,7 @@ export const actions = {
       const response = await api.applyRequest(context.rootState.main.token, payload.requestId, payload.accepted);
       commitRemoveNotification(context, loadingNotification);
       commitAddNotification(context, { content: 'Antrag erfolgreich bearbeitet', color: 'success' });
-      await dispatchAdminRequests(context);
+      await dispatchAdminRequests(context, undefined);
     } catch (error) {
       await dispatchCheckApiError(context, error);
     }
