@@ -23,6 +23,7 @@ export const getters = {
     return isMe;
   },
   adminUsers: (state: MainState) => state.users,
+  personalTrainings: (state: MainState) => state.personalTrainings,
   adminOneUser: (state: MainState) => (userId: number) => {
     const filteredUsers = state.users.filter((user) => user.id === userId);
     if (filteredUsers.length > 0) {
@@ -69,6 +70,7 @@ export const readAdminOneTraining = read(getters.adminOneTraining);
 export const readAdminUsers = read(getters.adminUsers);
 export const readIsMe = read(getters.isMe);
 export const readRouteUser = read(getters.routeUser);
+export const readPersonalTrainings = read(getters.personalTrainings)
 export const readTrainings = read(getters.trainings);
 export const readMyRequests = read(getters.myRequests);
 export const readGroups = read(getters.groups);

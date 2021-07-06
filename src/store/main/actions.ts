@@ -15,6 +15,7 @@ import {
   commitSetLogInError,
   commitSetMyRequests,
   commitSetToken,
+  commitSetPersonalTrainings,
   commitSetTrainings,
   commitSetUserProfile,
   commitSetUsers,
@@ -205,6 +206,16 @@ export const actions = {
       await dispatchCheckApiError(context, error);
     }
   },
+  async actionGetPersonalTrainings(context: MainContext, userId: number) {
+    try {
+      const response = await api.getPersonalTrainings(context.rootState.main.token, userId);
+      if (response) {
+        commitSetPersonalTrainings(context, response.data);
+      }
+    } catch (error) {
+      await dispatchCheckApiError(context, error);
+    }
+  },
   async actionGetTrainings(context: MainContext) {
     try {
       const response = await api.getTrainings(context.rootState.main.token);
@@ -288,6 +299,7 @@ export const dispatchResetPassword = dispatch(actions.resetPassword);
 export const dispatchGetUsers = dispatch(actions.actionGetUsers);
 export const dispatchGetTrainings = dispatch(actions.actionGetTrainings);
 export const dispatchCreateUserOpen = dispatch(actions.actionCreateUserOpen); 
+export const dispatchGetPersonalTrainings = dispatch(actions.actionGetPersonalTrainings); 
 export const dispatchGetMyRequests = dispatch(actions.actionGetMyRequests); 
 export const dispatchAddRequestMe = dispatch(actions.actionAddRequestMe); 
 export const dispatchGetGroups = dispatch(actions.actionGetGroups); 

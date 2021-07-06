@@ -118,6 +118,12 @@ export default new Router({
                           redirect: (to) => ({ name: 'profile-about', params: { id: to.params?.id || 'me' } })
                         },
                         {
+                          path: 'trainings',
+                          name: 'profile-trainings',
+                          component: () => import(
+                          /* webpackChunkName: "main-profile-trainings" */ './views/main/people/profile/UserProfileTrainings.vue')
+                        },
+                        {
                           path: 'skills',
                           name: 'profile-skills',
                           component: () => import(

@@ -104,6 +104,9 @@
         <v-tab :ripple="false" :to="{name: 'profile-about'}">
           Über mich
         </v-tab>
+        <v-tab :ripple="false" :to="{name: 'profile-trainings'}">
+          Schulungen
+        </v-tab>
         <v-tab :ripple="false" :to="{name: 'profile-skills'}" disabled>
           Skills
         </v-tab>
