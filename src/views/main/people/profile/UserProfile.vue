@@ -121,9 +121,15 @@
     <div>
       <v-tabs background-color="transparent" slider-color="cctOrange" color="cctGrey">
         <v-tab :ripple="false" :to="{name: 'profile-about'}">
+          <v-icon left>
+            mdi-account
+          </v-icon>
           Über mich
         </v-tab>
         <v-tab :ripple="false" :to="{name: 'profile-trainings'}">
+          <v-icon left>
+            mdi-school
+          </v-icon>
           Schulungen
         </v-tab>
       </v-tabs>
