@@ -13,7 +13,7 @@ const defaultState: MainState = {
   dashboardShowDrawer: false,
   notifications: [],
   users: [],
-  personalTrainings: [],
+  trainingsParticipants: {},
   trainings: [],
   myRequests: [],
   groups: [],

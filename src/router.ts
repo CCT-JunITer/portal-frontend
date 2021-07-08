@@ -55,11 +55,11 @@ export default new Router({
                 },
                 {
                   path: 'training',
-                  name: 'admin-training',
                   component: RouterComponent,                  
                   children: [
                     {
                       path: '',
+                      name: 'admin-training',
                       component: () => import(/* webpackChunkName: "admin-training" */ './views/main/training/AdminViewTraining.vue'),
                     },
                     {
@@ -141,12 +141,6 @@ export default new Router({
                           component: () => import(
                           /* webpackChunkName: "main-profile-about" */  './views/main/people/profile/UserProfileAbout.vue'),
                         },
-                        {
-                          path: 'trainings',
-                          name: 'profile-trainings',
-                          component: () => import(
-                          /* webpackChunkName: "main-profile-trainings" */  './views/main/people/profile/UserProfileTrainings.vue'),
-                        }
                       ]
                     },
                     {

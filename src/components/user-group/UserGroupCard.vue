@@ -5,13 +5,13 @@
       {{ group.group.name }} {{ !group.is_primary ? '(sekundär)' : '' }}
     </v-card-title>
     <v-card-subtitle>
-      <div class="overline purple--text">
+      <div class="text-overline purple--text">
         {{ group.group.type }}
         {{ group.is_active ? 'aktiv' : 'inaktiv' }}
       </div>
     </v-card-subtitle>
     <v-card-text>
-      {{ group.date_from }} - {{ group.date_to }}
+      {{ fromDate }} - {{ toDate }}
     </v-card-text>
     <v-card-actions>
       <slot name="actions"></slot>
@@ -22,12 +22,28 @@
 <script lang="ts">
 import { UserGroup } from '@/interfaces';
 import { Component, Prop, Vue } from 'vue-property-decorator';
+import { format, parse, isAfter } from 'date-fns'
+
 
 @Component({})
 export default class UserGroupCard extends Vue {
 
   @Prop()
   public group!: UserGroup;
+
+  get fromDate() {
+    return format(new Date(this.group.date_from), 'dd.MM.yyyy')
+  }
+  
+  get toDate() {
+    const date = new Date(this.group.date_to)
+
+    if (isAfter(date, new Date())) {
+      return 'heute';
+    }
+
+    return format(date, 'dd.MM.yyyy')
+  }
 
 }
 </script>

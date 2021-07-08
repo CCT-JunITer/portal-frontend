@@ -58,14 +58,33 @@
             </v-card-title>
             <v-divider></v-divider>
             <v-card-text>
-              <div>
-                <p style="margin-top: 15px;">
-                  <a target="_blank" href="https://wiki.cct-ev.de/index.php/Signatur_erstellen">Hier</a> findest du den Wiki-Eintrag zur Einrichtung der Signatur im Email Programm.<br/>
-                </p>
-                <p style="background-color: #F5F5F5; padding: 10px; border-radius: 5px; font-style: italic;" id="code-to-copy">
-                  <span id="signature-html-code">{{ userSignature }}</span>
-                </p>
+              <div class="mt-2">
+                <a target="_blank" href="https://wiki.cct-ev.de/index.php/Signatur_erstellen">Hier</a> findest du den Wiki-Eintrag zur Einrichtung der Signatur im Email Programm.
               </div>
+            </v-card-text>
+            <v-card-actions>
+              <v-btn color="cctOrange" dark @click="codeSignatureOpen = !codeSignatureOpen" outlined small>
+                <v-icon left>
+                  mdi-filter-variant
+                </v-icon>
+                Code anzeigen
+              </v-btn>
+              <v-btn color="cctBlue" dark @click="copySignatureToClipboard" outlined small>
+                <v-icon left small>
+                  mdi-content-copy
+                </v-icon>
+                In Zwischenablage kopieren
+              </v-btn>
+
+            </v-card-actions>
+            <v-card-text>
+              <v-expand-transition>
+                <div v-show="codeSignatureOpen">
+                  <p style="background-color: #F5F5F5; padding: 10px; border-radius: 5px; font-style: italic;" id="code-to-copy">
+                    {{ this.userSignature }}
+                  </p>
+                </div>
+              </v-expand-transition>
             </v-card-text>
             <v-card-subtitle>
               Vorschau der Signatur:
@@ -107,15 +126,6 @@
         <v-tab :ripple="false" :to="{name: 'profile-trainings'}">
           Schulungen
         </v-tab>
-        <v-tab :ripple="false" :to="{name: 'profile-skills'}" disabled>
-          Skills
-        </v-tab>
-        <v-tab :ripple="false" :to="{name: 'profile-projects'}" disabled>
-          Projekte
-        </v-tab>
-        <v-tab :ripple="false" :to="{name: 'profile-trainings'}" >
-          Schulungen
-        </v-tab>
       </v-tabs>
       <v-divider></v-divider>
     </div>
@@ -132,6 +142,7 @@ import { readIsMe, readRouteUser, readUserProfile } from '@/store/main/getters';
 import { dispatchGetUsers } from '@/store/main/actions';
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 import EmployeeCard from '@/components/employee/EmployeeCard.vue';
+import { copyTextToClipboard } from '@/utils';
 
 
 @Component({
@@ -140,6 +151,7 @@ import EmployeeCard from '@/components/employee/EmployeeCard.vue';
 export default class UserProfile extends Vue {
 
   showSignatureDialog = false;
+  codeSignatureOpen = false;
 
   get userSignature() {
     const name = this.userProfile?.full_name;
@@ -211,19 +223,7 @@ export default class UserProfile extends Vue {
   }
 
   public copySignatureToClipboard() {
-    const text = document.querySelector('#signature-html-code');
-    const content = String(text?.innerHTML);
-    const el = document.createElement('textarea');
-    el.value = content;
-    document.body.appendChild(el);
-    el.select();
-    try {
-      document.execCommand('copy');
-      alert('Success')
-    } catch(err) {
-      alert(err);
-    }
-    document.body.removeChild(el);
+    copyTextToClipboard(this.userSignature);
   }
 }
 </script>

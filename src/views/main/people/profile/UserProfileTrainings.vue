@@ -10,7 +10,7 @@
           :key="training.id"
         >
           <v-expansion-panel-header>
-            {{ training.title }} - {{ formatDate(training.date) }} {{ formatTime(training.date) }}
+            {{ training.title }} - {{ formatDate(training.date) }}
             <template v-slot:actions>
               <v-icon v-if="(trainingIsDone(training.date))" color="green">
                 mdi-check
@@ -32,7 +32,7 @@
             </v-icon>
             Trainer:innen:
             <span>
-              {{ training.trainers.map(trainer => trainer.full_name).join(',') }}
+              {{ training.trainers.map(trainer => trainer.full_name).join(', ') }}
             </span> 
             <br />
             <v-icon>
@@ -41,7 +41,7 @@
             
             Teilnehmer:innen: 
             <span>
-              {{ training.participants.map(participant => participant.full_name).join(',') }}
+              {{ training.participants.map(participant => participant.full_name).join(', ') }}
             </span>  
             <br/>
             <br/>
@@ -63,7 +63,7 @@
           :key="training.id"
         >
           <v-expansion-panel-header>
-            {{ training.title }} - {{ formatDate(training.date) }} {{ formatTime(training.date) }}
+            {{ training.title }} - {{ formatDate(training.date) }}
             <template v-slot:actions>
               <v-icon v-if="(trainingIsDone(training.date))" color="green">
                 mdi-check
@@ -85,7 +85,7 @@
             </v-icon>
             Trainer:innen:
             <span>
-              {{ training.trainers.map(trainer => trainer.full_name).join(',') }}
+              {{ training.trainers.map(trainer => trainer.full_name).join(', ') }}
             </span> 
             <br />
             <v-icon>
@@ -94,7 +94,7 @@
             
             Teilnehmer:innen: 
             <span>
-              {{ training.participants.map(participant => participant.full_name).join(',') }}
+              {{ training.participants.map(participant => participant.full_name).join(', ') }}
             </span>  
             <br/>
             <br/>
@@ -112,16 +112,16 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { readPersonalTrainings, readRouteUser } from '@/store/main/getters';
-import { dispatchGetPersonalTrainings } from '@/store/main/actions';
+import { readRouteUser, readTrainingsForRoute } from '@/store/main/getters';
+import { dispatchGetTrainingsFor } from '@/store/main/actions';
+import { format, isAfter } from 'date-fns';
 
 @Component({})
 export default class UserProfileTrainings extends Vue {
 
-  public trainingIsDone(dateTimeStr) {
+  public trainingIsDone(dateTimeStr: string) {
     const training_date = new Date(dateTimeStr);
-    const today = new Date();
-    return training_date <= today;
+    return isAfter(training_date, new Date());
   }
 
   get mandatoryTrainings() {
@@ -133,22 +133,17 @@ export default class UserProfileTrainings extends Vue {
   }
 
   get trainings() {
-    return readPersonalTrainings(this.$store);
+    return readTrainingsForRoute(this.$store)(this.$route);
   }
 
-  mounted() {
-    dispatchGetPersonalTrainings(this.$store, Number(this.userProfile?.id));
+  async mounted() {
+    await dispatchGetTrainingsFor(this.$store, Number(this.userProfile?.id));
   }
 
-  public formatDate(dateTimeStr) {
-    const date = new Date(dateTimeStr);
-    return date.toLocaleDateString('de-DE');
+  public formatDate(date: string) {
+    return format(new Date(date), 'dd.MM.yyyy HH:mm')
   }
 
-  public formatTime(dateTimeStr) {
-    const date = new Date(dateTimeStr);
-    return date.toLocaleTimeString('de-DE').slice(0,5);
-  }
 
   get userProfile() {
     return readRouteUser(this.$store)(this.$route);

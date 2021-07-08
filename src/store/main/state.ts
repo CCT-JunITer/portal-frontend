@@ -16,7 +16,7 @@ export interface MainState {
     dashboardShowDrawer: boolean;
     notifications: AppNotification[];
     users: IUserProfile[];
-    personalTrainings: ITraining[];
+    trainingsParticipants: { [key: number]: ITraining[] };
     trainings: ITraining[];
     myRequests: Request[];
     groups: Group[];

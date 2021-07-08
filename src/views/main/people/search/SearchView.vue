@@ -23,7 +23,7 @@
             prepend-icon="mdi-magnify"
           >
           </v-text-field>
-          <v-divider vertical inset></v-divider>
+          <v-divider vertical inset class="mx-0"></v-divider>
           <div class="select-wrapper px-2">
             <v-select
               v-model="category"

@@ -4,7 +4,7 @@
       {{ { add: 'Hinzufügen zu', remove: 'Entfernen von' }[request.mode] }} {{ request.group.name }}
     </v-card-title>
     <v-card-subtitle>
-      <div class="overline purple--text">
+      <div class="text-overline purple--text">
         {{ {'in progress': 'In Bearbeitung', accepted: 'Angenommen', denied: 'Abgelehnt' }[request.status] }}
       </div>
     </v-card-subtitle>
