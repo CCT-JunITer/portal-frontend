@@ -170,14 +170,6 @@
                     'Dies ist keine gültige Telefonnummer',
                 ]"
               ></vue-tel-input-vuetify>
-              <v-select
-                label="Mitgliedsstatus"
-                class="input-lg"
-                v-model="memberstatus"
-                required
-                :items="$common.MEMBERSTATUS"
-                :rules="[$common.required]"
-              ></v-select>
 
               <date-picker-menu
                 defaultPicker="MONTH"
@@ -272,13 +264,6 @@
                 ]"
               ></v-text-field>
               <v-select
-                class="input-lg"
-                :items="$common.RESSORTS"
-                v-model="ressort"
-                label="Ressort"
-                :rules="[$common.required]"
-              ></v-select>
-              <v-select
                 v-model = "gender"
                 class="input-lg"
                 :items="$common.GENDER"
@@ -341,6 +326,7 @@ export default class AccountCreate extends Vue {
   public district = '';
   public linkedin = '';
   public ressort = '';
+  public gender = '';
 
   public async onFileChanged(files: File[]) {
     this.inputAvatar = files[0];
@@ -401,6 +387,7 @@ export default class AccountCreate extends Vue {
         district: this.district,
         linkedin: this.linkedin,
         ressort: this.ressort,
+        gender: this.gender,
       };
       if (this.avatar) {
         const upload = await dispatchUploadFile(this.$store, {
@@ -421,17 +408,12 @@ export default class AccountCreate extends Vue {
 }
 </script>
 
-<style>
-/* .welcome {
-  z-index: 2;
-  font-weight: 600;
-  position: absolute;
-  padding-top: 130px;
-  color: white !important;
-} */
+<style lang="sass">
+@import '~vuetify/src/styles/styles.sass'
 
-.v-sheet--offset {
-  top: -24px;
-  position: relative;
-}
+@media #{map-get($display-breakpoints, 'md-and-up')}
+  .input-lg
+    max-width: 340px!important
+
+
 </style>

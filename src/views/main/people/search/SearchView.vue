@@ -23,7 +23,7 @@
             prepend-icon="mdi-magnify"
           >
           </v-text-field>
-          <v-divider vertical inset></v-divider>
+          <v-divider vertical inset class="mx-0"></v-divider>
           <div class="select-wrapper px-2">
             <v-select
               v-model="category"
@@ -67,6 +67,25 @@
               Filter löschen
             </v-btn>
           </v-fade-transition>
+          <v-spacer></v-spacer>
+          <v-select
+            v-model="sortBy"
+            :items="sortBys"
+            filled
+            color="cctGreen"
+            class="sort-by"
+            menu-props="auto"
+            dense
+            label="Select"
+            hide-details
+            single-line
+          >
+            <template v-slot:prepend>
+              <v-btn icon small @click="ascending = !ascending">
+                <v-icon>{{ ascending ? 'mdi-sort-ascending' : 'mdi-sort-descending' }}</v-icon>
+              </v-btn>
+            </template>
+          </v-select>
         </v-card-actions>
         <v-expand-transition>
           <div v-show="filtersOpen">
@@ -74,8 +93,10 @@
               <v-col
                 v-for="filter in filterOptions"
                 :key="filter.value"
+                cols="12"
+                md="6"
               >
-                <h2 class="title mb-2">
+                <h2 class="title-h6 mb-2">
                   {{ filter.text }}
                 </h2>
                 <v-chip-group
@@ -127,7 +148,7 @@ import { IUserProfile, UserType } from '@/interfaces';
 import EmployeeCard from '@/components/employee/EmployeeCard.vue';
 import { readAdminUsers } from '@/store/main/getters';
 import { dispatchGetUsers } from '@/store/main/actions';
-import { MEMBERSTATUS, RESSORTS } from '@/common';
+import { MEMBERSTATUS, RESSORTS, UNIVERSITIES } from '@/common';
 
 @Component({
   components: { EmployeeCard, Backdrop }
@@ -136,6 +157,7 @@ export default class EmployeesView extends Vue {
   private filtersOpen = false;
 
   private filters: { [key in keyof IUserProfile]?: string } = {};
+
 
   readonly filterOptions: {
     value: keyof IUserProfile;
@@ -148,9 +170,32 @@ export default class EmployeesView extends Vue {
       values: RESSORTS,
     },
     {
+      value: 'university',
+      text: 'Universität',
+      values: UNIVERSITIES,
+    },
+    {
       value: 'memberstatus',
       text: 'Mitgliedsstatus',
       values: MEMBERSTATUS,
+    },
+  ];
+
+  readonly sortBys: {
+    value: keyof IUserProfile;
+    text: string;
+  }[] = [
+    {
+      value: 'full_name',
+      text: 'Name',
+    },
+    {
+      value: 'ressort',
+      text: 'Ressort',
+    },
+    {
+      value: 'memberstatus',
+      text: 'Mitgliedsstatus',
     }
   ];
 
@@ -183,6 +228,28 @@ export default class EmployeesView extends Vue {
     this.$router.replace({ query: { ...this.$route.query, category: category }});
   }
 
+  public get ascending() {
+    const ascending = (this.$route.query.ascending as string);
+    return ascending !== 'false';
+  }
+
+  public set ascending(ascending) {
+    this.$router.replace({ query: { ...this.$route.query, ascending: `${ascending}` }});
+  }
+
+
+  public get sortBy() {
+    const sortBy = (this.$route.query.sortBy as string);
+    if(!this.sortBys.find(category => category.value === sortBy)){
+      return 'memberstatus' as keyof IUserProfile;
+    }
+    return sortBy as keyof IUserProfile;
+  }
+
+  public set sortBy(sortBy) {
+    this.$router.replace({ query: { ...this.$route.query, sortBy }});
+  }
+
   @Watch('$route', { immediate: true })
   public onRouteChange() {
     try {
@@ -193,9 +260,9 @@ export default class EmployeesView extends Vue {
   }
 
   @Watch('filters', { deep: true })
-  setFilters(value: { [key in keyof IUserProfile]?: string }, prev?: { [key in keyof IUserProfile]?: string }) {
+  setFilters(value: { [key in keyof IUserProfile]?: string }) {
     const newString = JSON.stringify(value);
-    if (newString === JSON.stringify(prev)) {
+    if (newString === this.$route.query.filters as string) {
       return;
     }
     this.$router.replace({ query: { ...this.$route.query, filters: JSON.stringify(value) } });
@@ -215,6 +282,8 @@ export default class EmployeesView extends Vue {
       .filter(employee => employee.full_name && employee.full_name?.toLowerCase().indexOf(this.searchText?.toLowerCase() || '') !== -1)
       .filter(employee => !this.filters.ressort || this.filters.ressort == employee.ressort)
       .filter(employee => !this.filters.memberstatus || this.filters.memberstatus == employee.memberstatus)
+      .filter(employee => !this.filters.university || this.filters.university == employee.university)
+      .sort((o1, o2) => (o1[this.sortBy] < o2[this.sortBy] ? -1 : 1) * (this.ascending ? 1 : -1))
   }
 
   public async mounted() {
@@ -227,7 +296,7 @@ export default class EmployeesView extends Vue {
 }
 </script>
 
-<style>
+<style lang="scss">
 .expand-filters {
   overflow: hidden;
   height: 100%;
@@ -239,6 +308,11 @@ export default class EmployeesView extends Vue {
 
 .select-wrapper {
   max-width: 160px;
+}
+
+.sort-by {
+  flex-grow: 0;
+  width: 250px;
 }
 
 </style>

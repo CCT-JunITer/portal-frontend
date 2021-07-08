@@ -15,15 +15,14 @@
     <v-card v-if="userProfile">
       <v-list dense nav>
         <v-list-item>
-          <v-list-item-avatar>
-            <employee-profile-picture
-              :employee="userProfile"
-              size="40"
-            ></employee-profile-picture>
-          </v-list-item-avatar>
+          <employee-profile-picture
+            :employee="userProfile"
+            component="v-list-item-avatar"
+            size="40"
+          ></employee-profile-picture>
 
           <v-list-item-content class="d-block">
-            <v-list-item-title class="title">
+            <v-list-item-title class="text-h6">
               {{ userProfile.full_name }}
             </v-list-item-title>
             <v-list-item-subtitle>{{ userProfile.email }}</v-list-item-subtitle>
@@ -39,6 +38,14 @@
           </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title>Mein Profil</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item to="/main/people/profile/requests" color="cctBlue">
+          <v-list-item-icon>
+            <v-icon>mdi-clipboard-text</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Meine Anträge</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
         <v-list-item to="/main/people/profile/edit" color="cctGreen">

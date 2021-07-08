@@ -71,7 +71,7 @@
             type="email"
             class="input-lg"
             v-model="email"
-            disabled
+            :disabled="isEdit()"
             :rules="[$common.required]"
           ></v-text-field>
           <v-text-field
@@ -94,14 +94,6 @@
               $common.required,
               v => /^([0-9\(\)\/\+ \-]*)$/.test(v) || 'Dies ist keine gültige Telefonnummer']"
           ></vue-tel-input-vuetify>
-          <v-select
-            label="Mitgliedsstatus"
-            v-model = "memberstatus"
-            class="input-lg"
-            required
-            :items="$common.MEMBERSTATUS"
-            :rules="[$common.required]"
-          ></v-select>
           <v-text-field
             label="Eingangsdatum"
             type = "date"
@@ -149,23 +141,6 @@
             hint="(Format: https://www.linkedin.com/in/name)"
             :rules="[v => !v || $common.isLinkedIn(v) || 'Dies ist keine gültige LinkedIn-URL']"
           ></v-text-field>
-          <v-select
-            v-model = "ressort"
-            class="input-lg"
-            :items="$common.RESSORTS"
-            label="Ressort"
-            :rules="[$common.required]"
-          ></v-select>
-          <div class="subheading secondary--text text--lighten-2">User is superuser <span v-if="isSuperuser">(currently is a superuser)</span><span v-else>(currently is not a superuser)</span></div>
-          <v-checkbox
-            label="Is Superuser"
-            v-model="isSuperuser"
-          ></v-checkbox>
-          <div class="subheading secondary--text text--lighten-2">User is active <span v-if="isActive">(currently active)</span><span v-else>(currently not active)</span></div>
-          <v-checkbox
-            label="Is Active"
-            v-model="isActive"
-          ></v-checkbox>
           <v-layout align-center>
             <v-flex shrink v-if="isEdit()">
               <v-checkbox
@@ -181,7 +156,7 @@
                 label="Set Password"
                 class="input-lg"
                 v-model="password1"
-                :rules="[v => v && v.length > 8 || 'Das Passwort muss mindestens 8 Zeichen lang sein']"
+                :rules="[v => !setPassword || v && v.length > 8 || 'Das Passwort muss mindestens 8 Zeichen lang sein']"
               >
               </v-text-field>
               <v-text-field
@@ -190,7 +165,7 @@
                 label="Confirm Password"
                 class="input-lg"
                 v-model="password2"
-                :rules="[v => v === password1 || 'Die Passwörter stimmen nicht überein']"
+                :rules="[v => !setPassword || v === password1 || 'Die Passwörter stimmen nicht überein']"
               >
               </v-text-field>
             </v-flex>
@@ -211,25 +186,124 @@
         </v-card-actions>
       </v-col>
     </v-row>
+    <v-divider class="my-5"></v-divider>
+    <v-row>
+      <v-col cols="12" md="4" class="px-5">
+        <h4 class="text-h4 text--primary mb-3">Gruppen</h4>
+        <p class="text-body-2 text--secondary">Gruppenzuweisung</p>
+      </v-col>
+      <v-col cols="12" md="8">
+
+        <v-card-actions>
+          <v-dialog
+            v-model="addToGroupDialog"
+            persistent
+            max-width="600px"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn color="cctGreen" outlined v-on="on" v-attrs="attrs">
+                <v-icon left>
+                  mdi-plus
+                </v-icon>
+                Zu Gruppe hinzufügen
+              </v-btn>
+            </template>
+            <v-card>
+              <v-card-title>
+                <span class="text-h5">Gruppe hinzufügen</span>
+              </v-card-title>
+              <v-card-text>
+                <v-container>
+                  <v-form lazy-validation ref="groupForm">
+                    <v-alert outlined border="left" type="warning">
+                      Vorhandene Gruppen des selben Typs werden gelöscht
+                    </v-alert>
+                    <v-select
+                      label="Gruppe"
+                      item-text="name"
+                      return-object
+                      v-model="group"
+                      required
+                      :rules="[$common.required]"
+                      :items="groups">
+                      <template v-slot:item="{ item, on, attrs}">
+                        <v-list-item v-on="on" v-attrs="attrs" two-line>
+                          <v-list-item-content>
+                            <v-list-item-title>
+                              {{ item.name }}
+                            </v-list-item-title>
+                            <v-list-item-subtitle>
+                              {{ item.type }}
+                            </v-list-item-subtitle>
+                          </v-list-item-content>
+                        </v-list-item>
+                      </template>
+                    </v-select>
+                  </v-form>
+                </v-container>
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn
+                  color="red darken-1"
+                  text
+                  @click="addToGroupDialog = false"
+                >
+                  Abbrechen
+                </v-btn>
+                <v-btn
+                  color="cctBlue darken-1"
+                  text
+                  @click="addToGroup()"
+                >
+                  Hinzufügen
+                </v-btn>
+              </v-card-actions>
+            </v-card>  
+          </v-dialog>
+        </v-card-actions>
+        <v-row v-if="userProfile">
+          <v-col cols="12" v-for="group in userProfile.groups" :key="group.id">
+            <user-group-card :group="group">
+              <template v-slot:actions>
+                <v-btn text small color="cctGreen" disabled>
+                  <v-icon left>edit</v-icon>
+                  Editieren
+                </v-btn>
+                <v-btn text small color="red" @click="removeFromGroup(group.group)">
+                  <v-icon left>delete</v-icon>
+                  Löschen
+                </v-btn>
+              </template>
+            </user-group-card>
+          </v-col> 
+        </v-row>
+
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { IUserProfileCreate } from '@/interfaces';
-import { readAdminOneUser } from '@/store/main/getters';
-import { dispatchGetUsers, dispatchUploadFile } from '@/store/main/actions';
+import { Group, IUserProfileCreate } from '@/interfaces';
+import { readAdminOneUser, readGroups } from '@/store/main/getters';
+import { dispatchGetGroups, dispatchGetUsers, dispatchUploadFile } from '@/store/main/actions';
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 import UploadButton from '@/components/UploadButton.vue';
 import VueTelInputVuetify from 'vue-tel-input-vuetify/lib/vue-tel-input-vuetify.vue';
 import AvatarCropperDialog from '@/components/AvatarCropperDialog.vue';
-import { dispatchCreateUser, dispatchUpdateUser } from '@/store/admin/actions';
+import { dispatchAddUserToGroup, dispatchCreateUser, dispatchRemoveUserFromGroup, dispatchUpdateUser } from '@/store/admin/actions';
+import UserGroupCard from '@/components/user-group/UserGroupCard.vue';
 
 @Component({
-  components: {AvatarCropperDialog, UploadButton, EmployeeProfilePicture,VueTelInputVuetify},
+  components: {AvatarCropperDialog, UploadButton, EmployeeProfilePicture,VueTelInputVuetify, UserGroupCard},
 })
 export default class EditUser extends Vue {
   public valid = true;
+
+  public addToGroupDialog = false;
+  public group: Group | null = null;
 
   // profile fields
   public avatar: string | Blob | null = '';
@@ -281,6 +355,7 @@ export default class EditUser extends Vue {
 
   public async mounted() {
     await dispatchGetUsers(this.$store);
+    await dispatchGetGroups(this.$store);
     this.reset();
   }
 
@@ -301,6 +376,9 @@ export default class EditUser extends Vue {
       this.district = this.userProfile.district;
       this.linkedin = this.userProfile.linkedin;
       this.ressort = this.userProfile.ressort;
+      this.isSuperuser = this.userProfile.is_superuser;
+      this.isActive = this.userProfile.is_active;
+
     }
   }
 
@@ -369,6 +447,21 @@ export default class EditUser extends Vue {
 
   get userProfile() {
     return readAdminOneUser(this.$store)(+this.$router.currentRoute.params.id);
+  }
+
+  get groups() {
+    return readGroups(this.$store)
+      .filter(group => !this.userProfile?.active_groups.find(g => g.id === group.id))
+  }
+
+  async addToGroup() {
+    if ((this.$refs.groupForm as HTMLFormElement).validate()) {
+      await dispatchAddUserToGroup(this.$store, { userId: this.userProfile!.id, groupId: this.group!.id });
+      this.addToGroupDialog = false;
+    }
+  }
+  async removeFromGroup(group: Group) {
+    await dispatchRemoveUserFromGroup(this.$store, { userId: this.userProfile!.id, groupId: group.id });
   }
 }
 </script>

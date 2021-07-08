@@ -1,6 +1,6 @@
 import { removeLocalUserStatus, saveLocalUserStatus, getLocalUserStatus } from './../../utils';
 import { api } from '@/api';
-import { IUserProfileCreate } from '@/interfaces';
+import { IUserProfileCreate, RequestCreate } from '@/interfaces';
 import router from '@/router';
 import { getLocalToken, removeLocalToken, saveLocalToken } from '@/utils';
 import { AxiosError } from 'axios';
@@ -10,9 +10,13 @@ import { State } from '../state';
 import {
   commitAddNotification,
   commitRemoveNotification,
+  commitSetGroups,
   commitSetLoggedIn,
   commitSetLogInError,
+  commitSetMyRequests,
   commitSetToken,
+  commitSetTrainingsFor,
+  commitSetTrainings,
   commitSetUserProfile,
   commitSetUsers,
   commitSetUserStatus
@@ -202,6 +206,26 @@ export const actions = {
       await dispatchCheckApiError(context, error);
     }
   },
+  async actionGetTrainingsFor(context: MainContext, userId: number) {
+    try {
+      const response = await api.getPersonalTrainings(context.rootState.main.token, userId);
+      if (response) {
+        commitSetTrainingsFor(context, { userId, payload: response.data });
+      }
+    } catch (error) {
+      await dispatchCheckApiError(context, error);
+    }
+  },
+  async actionGetTrainings(context: MainContext) {
+    try {
+      const response = await api.getTrainings(context.rootState.main.token);
+      if (response) {
+        commitSetTrainings(context, response.data);
+      }
+    } catch (error) {
+      await dispatchCheckApiError(context, error);
+    }
+  },
   async actionCreateUserOpen(context: MainContext, payload: {user: IUserProfileCreate; token: string}) {
     try {
       const response = await api.createUserOpen(payload.token, payload.user);
@@ -224,6 +248,35 @@ export const actions = {
       commitAddNotification(context, { content: `Error: ${error.response.data?.detail}`, color: 'error' });
     }
   },
+  // requests
+  async actionGetMyRequests(context: MainContext) {
+    try {
+      const response = await api.getMyRequests(context.rootState.main.token);
+      if (response) {
+        commitSetMyRequests(context, response.data);
+      }
+    } catch (error) {
+      await dispatchCheckApiError(context, error);
+    }
+  },
+  async actionAddRequestMe(context: MainContext, payload: RequestCreate) {
+    try {
+      const response = await api.addMeRequest(context.rootState.main.token, payload);
+      commitAddNotification(context, { content: 'Antrag wurde abgeschickt', color: 'success' });
+    } catch (error) {
+      await dispatchCheckApiError(context, error);
+    }
+  },
+  async actionGetGroups(context: MainContext) {
+    try {
+      const response = await api.getGroups(context.rootState.main.token);
+      if (response) {
+        commitSetGroups(context, response.data);
+      }
+    } catch (error) {
+      await dispatchCheckApiError(context, error);
+    }
+  },
 };
 
 const { dispatch } = getStoreAccessors<MainState | any, State>('');
@@ -244,4 +297,9 @@ export const dispatchRemoveNotification = dispatch(actions.removeNotification);
 export const dispatchPasswordRecovery = dispatch(actions.passwordRecovery);
 export const dispatchResetPassword = dispatch(actions.resetPassword);
 export const dispatchGetUsers = dispatch(actions.actionGetUsers);
+export const dispatchGetTrainings = dispatch(actions.actionGetTrainings);
 export const dispatchCreateUserOpen = dispatch(actions.actionCreateUserOpen); 
+export const dispatchGetTrainingsFor = dispatch(actions.actionGetTrainingsFor); 
+export const dispatchGetMyRequests = dispatch(actions.actionGetMyRequests); 
+export const dispatchAddRequestMe = dispatch(actions.actionAddRequestMe); 
+export const dispatchGetGroups = dispatch(actions.actionGetGroups); 

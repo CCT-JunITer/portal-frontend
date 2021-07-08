@@ -5,6 +5,7 @@ import Router, { Route } from 'vue-router';
 import RouterComponent from './components/RouterComponent.vue';
 import { State } from './store/state';
 import { Store } from 'vuex';
+import { component } from 'vue/types/umd';
 
 Vue.use(Router);
 
@@ -54,7 +55,24 @@ export default new Router({
                 },
                 {
                   path: 'training',
-                  component: () => import(/* webpackChunkName: "admin-training" */ './views/main/training/AdminViewTraining.vue')
+                  component: RouterComponent,                  
+                  children: [
+                    {
+                      path: '',
+                      name: 'admin-training',
+                      component: () => import(/* webpackChunkName: "admin-training" */ './views/main/training/AdminViewTraining.vue'),
+                    },
+                    {
+                      path: 'create',
+                      name: 'admin-training-create',
+                      component: () => import(/* webpackChunkName: "admin-training-create" */ './views/main/training/AdminCreateTraining.vue'),
+                    },
+                    {
+                      path: 'edit/:id',
+                      name: 'admin-training-edit',
+                      component: () => import(/* webpackChunkName: "admin-training-edit" */ './views/main/training/AdminCreateTraining.vue'),
+                    }
+                  ]
                 },
               ]
             },
@@ -100,6 +118,12 @@ export default new Router({
                           redirect: (to) => ({ name: 'profile-about', params: { id: to.params?.id || 'me' } })
                         },
                         {
+                          path: 'trainings',
+                          name: 'profile-trainings',
+                          component: () => import(
+                          /* webpackChunkName: "main-profile-trainings" */ './views/main/people/profile/UserProfileTrainings.vue')
+                        },
+                        {
                           path: 'skills',
                           name: 'profile-skills',
                           component: () => import(
@@ -116,7 +140,7 @@ export default new Router({
                           name: 'profile-about',
                           component: () => import(
                           /* webpackChunkName: "main-profile-about" */  './views/main/people/profile/UserProfileAbout.vue'),
-                        }
+                        },
                       ]
                     },
                     {
@@ -127,6 +151,47 @@ export default new Router({
                       },
                       component: () => import(
                       /* webpackChunkName: "main-profile-edit" */ './views/main/people/profile/UserProfileEdit.vue'),
+                    }, 
+                    {
+                      path: 'requests',
+                      name: 'profile-requests',
+                      meta: {
+                        title: 'Anträge',
+                      },
+                      component: () => import(
+                      /* webpackChunkName: "main-profile-requests" */ './views/main/people/profile/requests/UserProfileRequests.vue'),
+                    }, 
+                    {
+                      path: 'request-create',
+                      name: 'profile-request-create',
+                      meta: {
+                        title: 'Antrag erstellen',
+                      },
+                      component: () => import(
+                      /* webpackChunkName: "main-profile-request-create" */ './views/main/people/profile/requests/UserProfileRequestCreate.vue'),
+                      redirect: 'request-create/ressort-change',
+                      children: [
+                        {
+                          path: 'ressort-change',
+                          name: 'profile-request-ressort-change',
+                          component: () => import('./views/main/people/profile/requests/RequestRessortChange.vue'),
+                        },
+                        {
+                          path: 'alumni',
+                          name: 'profile-request-alumni',
+                          component: () => import('./views/main/people/profile/requests/RequestAlumni.vue'),
+                        },
+                        {
+                          path: 'passive',
+                          name: 'profile-request-passive',
+                          component: () => import('./views/main/people/profile/requests/RequestPassive.vue'),
+                        }, 
+                        {
+                          path: 'memberstatus',
+                          name: 'profile-request-memberstatus',
+                          component: () => import('./views/main/people/profile/requests/RequestMemberstatus.vue'),
+                        } 
+                      ]
                     }, 
                     {
                       path: 'edit-password',
@@ -165,6 +230,12 @@ export default new Router({
                       component: () => import(
                       /* webpackChunkName: "main-admin-users-edit" */ './views/main/people/admin/EditUser.vue'),
                     },
+                    {
+                      path: 'requests',
+                      name: 'main-admin-requests',
+                      component: () => import(
+                      /* webpackChunkName: "main-admin-requests" */ './views/main/people/admin/AdminRequests.vue'),
+                    },
                   ],
                 }
               ]
@@ -172,6 +243,10 @@ export default new Router({
             {
               path: 'guide',
               component: () => import('./views/main/guide/Guide.vue')
+            },
+            {
+              path: 'trainings',
+              component: () => import(/* webpackChunkName: "admin-training" */ './views/main/training/TrainingMain.vue'),
             },
             {
               path: 'calendar',
@@ -184,6 +259,10 @@ export default new Router({
             {
               path: 'shop',
               component: () => import('./views/main/shop/Shop.vue')
+            },
+            {
+              path: 'hochladen',
+              component: () => import('./views/main/hochladen/Hochladen.vue')
             }
           ],
         },

@@ -1,6 +1,6 @@
 <template>
   <div class="root">
-    <iframe src="https://teamup.com/kshdk6aqp73tb5o1ef" width="100%" height="100%">
+    <iframe src="https://teamup.com/kshdk6aqp73tb5o1ef" width="100%" height="100%" frameBorder="0">
 
     </iframe>
   </div>

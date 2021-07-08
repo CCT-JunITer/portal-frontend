@@ -4,6 +4,7 @@ import { actions } from './actions';
 import { AdminState } from './state';
 
 const defaultState: AdminState = {
+  requests: []
 };
 
 export const adminModule = {

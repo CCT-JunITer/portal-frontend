@@ -13,6 +13,10 @@ const defaultState: MainState = {
   dashboardShowDrawer: false,
   notifications: [],
   users: [],
+  trainingsParticipants: {},
+  trainings: [],
+  myRequests: [],
+  groups: [],
 };
 
 export const mainModule = {
