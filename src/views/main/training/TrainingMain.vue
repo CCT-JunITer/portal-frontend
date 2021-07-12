@@ -5,6 +5,13 @@
       <v-toolbar-title>
         Schulungen und Trainings
       </v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-btn color="cctOrange" style="color: white" :to="{name: 'admin-training-create'}">
+        <v-icon left>
+          mdi-school
+        </v-icon>
+        Neue Schulung
+      </v-btn>
     </v-toolbar>
     <v-container>
       <v-data-table
