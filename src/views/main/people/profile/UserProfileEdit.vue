@@ -236,7 +236,7 @@
         <v-col cols="12" md="4" class="px-5">
           <h4 class="text-h4 text--primary mb-3">Personales</h4>
           <p class="text-body-2 text--secondary">
-            Diese Informationen sind für das Personalmanagement notwendig und können nur vom Personalvorstand eingesehen werden
+            Diese Informationen sind für das Personalmanagement notwendig und können nur von der Ressortleitungsrunde eingesehen werden
           </p>
         </v-col>
 

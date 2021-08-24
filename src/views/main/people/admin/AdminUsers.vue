@@ -21,6 +21,7 @@
       :search="search" 
       multi-sort
       show-expand
+      dense
     >
       <template v-slot:item.birthdate="{ value }">
         {{ $common.format(new Date(value), "dd.MM.yyyy") }}
@@ -33,9 +34,9 @@
       </template>
       <template v-slot:item.actions="{ item }">
         <v-tooltip top>
-          <span>Edit</span>
+          <span>Editieren</span>
           <template v-slot:activator="{ on, attrs }">
-            <v-btn v-bind="attrs" v-on="on" text :to="{name: 'main-admin-users-edit', params: {id: item.id}}">
+            <v-btn v-bind="attrs" v-on="on" text icon :to="{name: 'main-admin-users-edit', params: {id: item.id}}">
               <v-icon :to="{name: 'main-admin-users-edit', params: {id: item.id}}">edit</v-icon>
             </v-btn>
           </template>
@@ -61,6 +62,11 @@ export default class AdminUsers extends Vue {
   public search = '';
 
   public headers = [
+    {
+      text: '',
+      value: 'actions',
+      sortable: false,
+    },
     {
       text: 'Name',
       sortable: true,
@@ -141,11 +147,7 @@ export default class AdminUsers extends Vue {
       sortable: true,
       value: 'highest_project_position',
     },
-    {
-      text: 'Actions',
-      value: 'actions',
-      sortable: false,
-    },
+
   ];
   get users() {
     return readAdminUsers(this.$store);

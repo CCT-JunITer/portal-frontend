@@ -29,10 +29,6 @@ export default class UserProfileAbout extends Vue {
   get items() { 
     return [
       {
-        text: 'Mitgliedsstatus',
-        key: this.userProfile?.memberstatus
-      },
-      {
         text: 'Eintrittsdatum',
         key: this.userProfile && format(new Date(this.userProfile.entrydate), 'dd. MMMM yyyy', { locale: de }),
       },

@@ -8,7 +8,7 @@
       v-slot="{ navigate, isActive }"
     >
       <div v-ripple :active="isActive" @click="navigate">
-        <backdrop class="d-flex align-center justify-center" color="grey lighten-4" height="84%">
+        <backdrop class="d-flex align-center justify-center" color="grey lighten-3" height="84%">
           <employee-profile-picture :employee="employee" class="mt-5" size="72"></employee-profile-picture>
         </backdrop>
         <div class="pa-2">
@@ -16,17 +16,25 @@
             {{ employee.full_name || 'Kein Name' }}
             <v-icon v-if="hasBirthday" color="cctOrange" size="20">mdi-cake-variant</v-icon>
           </div>
-          <div class="text-subtitle-2 mb-2">
-            {{ employee.ressort || 'Kein Ressort' }}
+          <div v-if="!isAlumni">
+            <div class="text-subtitle-2 mb-2">
+              {{ employee.ressort || 'Kein Ressort' }}
 
-            <group-icon
-              v-for="group in positions"
-              :key="group.id"
-              :group="group"
-            >
-            </group-icon> 
+              <group-icon
+                v-for="group in positions"
+                :key="group.id"
+                :group="group"
+              >
+              </group-icon> 
+            </div>
+            <v-chip small color="cctBlue" outlined dark label>{{ employee.memberstatus }}</v-chip>
           </div>
-          <v-chip small color="cctBlue" outlined dark label>{{ employee.memberstatus }}</v-chip>
+          <div v-else>
+            <div class="text-body-2 mb-2">
+              Alumni seit <b>{{ exitFormatted }}</b>
+            </div>
+            <v-chip small color="cctOrange" outlined dark label>{{ yearsIn }} im Verein</v-chip>
+          </div>
         </div>
       </div>
     </router-link>
@@ -61,6 +69,8 @@ import {IUserProfile} from '@/interfaces';
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 import Backdrop from '@/components/Backdrop.vue';
 import GroupIcon from './GroupIcon.vue';
+import { format, formatDistance } from 'date-fns';
+import { de } from 'date-fns/locale';
 
 @Component({
   components: { Backdrop, EmployeeProfilePicture, GroupIcon }
@@ -74,6 +84,18 @@ export default class EmployeeCard extends Vue {
       return false;
     }
     return this.$common.isTodayBirthday(this.employee.birthdate);
+  }
+
+  get isAlumni() {
+    return this.employee.is_alumni;
+  }
+
+  get exitFormatted() {
+    return format(new Date(this.employee.exitdate), 'MMMM yyyy', { locale: de });
+  }
+
+  get yearsIn() {
+    return formatDistance(new Date(this.employee.exitdate), new Date(this.employee.entrydate), { locale: de })
   }
 
 

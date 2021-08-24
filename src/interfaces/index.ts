@@ -8,6 +8,7 @@ export interface IUserProfile {
     birthdate: string;
     district: string;
     entrydate: string;
+    exitdate: string;
     linkedin: string;
     major: string;
     memberstatus: string;

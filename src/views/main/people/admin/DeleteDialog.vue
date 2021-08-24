@@ -14,24 +14,37 @@
     </template>
     <v-card>
       <v-card-title>
-        <span class="text-h5">Alumnisiserung</span>
+        <span class="text-h5">Alumnisierung</span>
       </v-card-title>
       <v-card-text>
+        <v-alert
+          outlined
+          type="error"
+        >
+          Der Zugang zu den IT-Diensten wird entzogen. 
+          Außerdem wird das Mail-Postfach, und somit alle E-Mails für <b>{{ userProfile.email }}</b>, unwideruflich gelöscht.
+        </v-alert>
         <span>
-          Account löschen <b>{{ userProfile.full_name }}</b>
+          Das Löschen des Accounts kann <b>nicht rückgängig</b> gemacht werden. 
+          <br />
+          <br />
+          Bitte gib zur Bestätigung folgendes ein:
+          <br />
+          <pre class="text-h6"><b>{{ userProfile.full_name }}</b></pre>
         </span>
-        <v-container>
-          <v-form lazy-validation ref="groupForm">
-            <v-text-field
-              v-model="name"
-              required
-              :rules="[$common.required, isName]"
-              label="Name"
-            >
+        <v-divider class="my-5"></v-divider>
 
-            </v-text-field>
-          </v-form>
-        </v-container>
+        <v-form lazy-validation ref="groupForm">
+          <v-text-field
+            v-model="name"
+            required
+            :rules="[$common.required, isName]"
+            outlined
+            dense
+          >
+
+          </v-text-field>
+        </v-form>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
@@ -75,6 +88,7 @@ export default class DeleteDialog extends Vue {
 
   public async deleteAccount() {
     await dispatchDeleteUser(this.$store, this.userProfile.id)
+    this.dialogOpen = false;
   }
 
 }
