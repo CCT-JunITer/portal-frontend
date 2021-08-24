@@ -42,10 +42,17 @@ export default class App extends Vue {
 }
 </script>
 
-<style>
-html {
-  overflow-y: auto!important;
+<style lang="sass">
+@import '~vuetify/src/styles/styles.sass'
 
-}
+html
+  overflow-y: auto!important
+
+
+@media #{map-get($display-breakpoints, 'md-and-up')}
+  .input-lg
+    max-width: 340px!important
+
 
 </style>
+

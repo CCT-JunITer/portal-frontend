@@ -241,7 +241,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { readAdminUsers, readTrainings, readUserProfile } from '@/store/main/getters';
+import { readUsers, readTrainings, readUserProfile } from '@/store/main/getters';
 import { dispatchGetTrainings, dispatchGetUserProfile, dispatchGetUsers } from '@/store/main/actions';
 import { dispatchUpdateTraining } from '@/store/admin/actions';
 import { ITraining, ITrainingCreate } from '@/interfaces';
@@ -347,7 +347,7 @@ export default class AdminUsers extends Vue {
   }
 
   get users() {
-    return readAdminUsers(this.$store);
+    return readUsers(this.$store);
   }
   get trainings() {
     return readTrainings(this.$store)

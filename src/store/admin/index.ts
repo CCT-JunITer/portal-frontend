@@ -4,7 +4,8 @@ import { actions } from './actions';
 import { AdminState } from './state';
 
 const defaultState: AdminState = {
-  requests: []
+  requests: [],
+  users: [],
 };
 
 export const adminModule = {

@@ -27,6 +27,20 @@ export const api = {
   async updateMe(token: string, data: IUserProfileUpdate) {
     return axios.put<IUserProfile>(`${apiUrl}/api/v1/users/me`, data, authHeaders(token));
   },
+  async getAdminUsers(token: string, type: UserType) {
+
+    // https://gitlab.cct-ev.de/juniter/pv-tool3/backend/-/issues/4
+    const params: any = {};
+    switch(type) {
+    case 'alumni': params.onlyalumni = true; break;
+    case 'all': params.includealumni = true; break;
+    case 'members':
+    default:
+      break;
+    }
+
+    return axios.get<IUserProfile[]>(`${apiUrl}/api/v1/users/admin`, { ...authHeaders(token), params });
+  },
   async getUsers(token: string, type: UserType) {
 
     // https://gitlab.cct-ev.de/juniter/pv-tool3/backend/-/issues/4
@@ -68,6 +82,9 @@ export const api = {
   async downloadFile(token: string, filename: string) {
     const params = { filename };
     return axios.get(`${apiUrl}/api/v1/utils/download-file`, { ...authHeaders(token), params, responseType: 'blob' });
+  },
+  async deleteUser(token: string, userId: number) {
+    return axios.delete(`${apiUrl}/api/v1/users/${userId}`, authHeaders(token));
   },
   async updateUser(token: string, userId: number, data: IUserProfileUpdate) {
     return axios.put(`${apiUrl}/api/v1/users/${userId}`, data, authHeaders(token));
@@ -111,6 +128,12 @@ export const api = {
   },
   async removeUserFromGroup(token: string, userId: number, groupId: number) {
     return axios.post(`${apiUrl}/api/v1/groups/${userId}/remove`, { group_id: groupId }, authHeaders(token));
+  },
+  async setPrimaryGroup(token: string, userId: number, groupId: number) {
+    return axios.post(`${apiUrl}/api/v1/groups/${userId}/primary`, { group_id: groupId }, authHeaders(token));
+  },
+  async setPrimaryGroupMe(token: string, groupId: number) {
+    return axios.post(`${apiUrl}/api/v1/groups/me/primary`, { group_id: groupId }, authHeaders(token));
   },
   async addMeRequest(token: string, request: RequestCreate) {
     return axios.post(`${apiUrl}/api/v1/groups/requests/me`, request, authHeaders(token));

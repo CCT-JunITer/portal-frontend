@@ -16,7 +16,16 @@
             {{ employee.full_name || 'Kein Name' }}
             <v-icon v-if="hasBirthday" color="cctOrange" size="20">mdi-cake-variant</v-icon>
           </div>
-          <div class="text-subtitle-2 mb-2">{{ employee.ressort || 'Kein Ressort' }}</div>
+          <div class="text-subtitle-2 mb-2">
+            {{ employee.ressort || 'Kein Ressort' }}
+
+            <group-icon
+              v-for="group in positions"
+              :key="group.id"
+              :group="group"
+            >
+            </group-icon> 
+          </div>
           <v-chip small color="cctBlue" outlined dark label>{{ employee.memberstatus }}</v-chip>
         </div>
       </div>
@@ -51,9 +60,10 @@ import { Component, Vue, Prop } from 'vue-property-decorator';
 import {IUserProfile} from '@/interfaces';
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 import Backdrop from '@/components/Backdrop.vue';
+import GroupIcon from './GroupIcon.vue';
 
 @Component({
-  components: { Backdrop, EmployeeProfilePicture }
+  components: { Backdrop, EmployeeProfilePicture, GroupIcon }
 })
 export default class EmployeeCard extends Vue {
   @Prop()
@@ -64,6 +74,11 @@ export default class EmployeeCard extends Vue {
       return false;
     }
     return this.$common.isTodayBirthday(this.employee.birthdate);
+  }
+
+
+  get positions() {
+    return this.employee.active_groups?.filter(group => group.type === 'position')
   }
 }
 </script>

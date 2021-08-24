@@ -225,6 +225,23 @@
             :rules="[v => !v || $common.isLinkedIn(v) || 'Dies ist keine gültige LinkedIn-URL']"
           ></v-text-field>
 
+
+
+          
+        </v-col>
+      </v-row>
+      <v-divider class="my-5"></v-divider>
+
+      <v-row>
+        <v-col cols="12" md="4" class="px-5">
+          <h4 class="text-h4 text--primary mb-3">Personales</h4>
+          <p class="text-body-2 text--secondary">
+            Diese Informationen sind für das Personalmanagement notwendig und können nur vom Personalvorstand eingesehen werden
+          </p>
+        </v-col>
+
+        <v-col cols="12" md="8">
+
           <v-select
             v-model = "gender"
             class="input-lg"
@@ -233,40 +250,91 @@
             :rules="[$common.required]"
           ></v-select>
 
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn @click="cancel" raised>Abbrechen</v-btn>
-            <v-btn
-              @click="submit"
-              color="primary"
-              raised
-              :disabled="!valid"
-            >
-              Profil speichern
-            </v-btn>
-          </v-card-actions>
+          <v-text-field
+            label="Adresse"
+            class="input-lg"
+            v-model="address"
+          >
+          </v-text-field>
 
-          
+          <v-text-field
+            label="Matrikelnummer"
+            class="input-lg"
+            v-model="matriculationNumber"
+          >
+          </v-text-field>
+
+
+          <v-select
+            label="Höchste Projektposition"
+            class="input-lg"
+            :items="$common.PROJECT_POSITIONS"
+            v-model="highestProjectPosition"
+          >
+          </v-select>
+
         </v-col>
       </v-row>
+
+      <v-divider class="my-5"></v-divider>
+
+      <v-row>
+        <v-col cols="12" md="4" class="px-5">
+          <h4 class="text-h4 text--primary mb-3">Gruppen</h4>
+          <p class="text-body-2 text--secondary">Gruppenzuweisung</p>
+        </v-col>
+        <v-col cols="12" md="8">
+
+          <v-row v-for="[type, groups] in Object.entries(sortedGroups)" :key="type">
+            <p class="text-overline text--primary px-5">{{ type }}</p>
+
+            <v-col cols="12" v-for="group in groups" :key="group.id">
+              <user-group-card :group="group">
+                <template v-slot:actions>
+                  <v-btn text small color="primary" @click="setPrimaryGroup(group.group)" v-if="!group.is_primary">
+                    <v-icon left>mdi-account-check</v-icon>
+                    primäre Gruppe für {{ group.group.type }} setzen
+                  </v-btn>
+                </template>
+              </user-group-card>
+            </v-col> 
+          </v-row>
+
+        </v-col>
+      </v-row>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn @click="cancel" raised>Abbrechen</v-btn>
+        <v-btn
+          @click="submit"
+          color="primary"
+          raised
+          :disabled="!valid"
+        >
+          Profil speichern
+        </v-btn>
+      </v-card-actions>
+
     </v-form>
   </v-container>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { IUserProfileUpdate } from '@/interfaces';
+import { Group, IUserProfileUpdate, UserGroup } from '@/interfaces';
 import { readUserProfile } from '@/store/main/getters';
-import { dispatchRouteLoggedIn, dispatchUpdateUserProfile, dispatchUploadFile } from '@/store/main/actions';
+import { dispatchRouteLoggedIn, dispatchSetPrimaryGroupMe, dispatchUpdateUserProfile, dispatchUploadFile } from '@/store/main/actions';
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 import UploadButton from '@/components/UploadButton.vue';
 import VueTelInputVuetify from 'vue-tel-input-vuetify/lib/vue-tel-input-vuetify.vue';
 import AvatarCropperDialog from '@/components/AvatarCropperDialog.vue';
 import DatePickerMenu from '@/components/DatePickerMenu.vue';
+import UserGroupCard from '@/components/user-group/UserGroupCard.vue';
+import { compareAsc } from 'date-fns';
 
 
 @Component({
-  components: {AvatarCropperDialog, UploadButton, EmployeeProfilePicture,VueTelInputVuetify, DatePickerMenu},
+  components: {AvatarCropperDialog, UploadButton, EmployeeProfilePicture,VueTelInputVuetify, DatePickerMenu, UserGroupCard},
 })
 export default class UserProfileEdit extends Vue {
   public valid = true;
@@ -284,6 +352,9 @@ export default class UserProfileEdit extends Vue {
   public linkedin = '';
   public gender = '';
   public privateEmail = '';
+  public address = '';
+  public highestProjectPosition = '';
+  public matriculationNumber = '';
 
   public async onFileChanged(files: File[]) {
     this.inputAvatar = files[0];
@@ -295,20 +366,7 @@ export default class UserProfileEdit extends Vue {
   }
 
   public created() {
-    const userProfile = readUserProfile(this.$store);
-    if (userProfile) {
-      this.fullName = userProfile.full_name;
-      this.email = userProfile.email;
-      this.birthdate = userProfile.birthdate;
-      this.phonenumber = userProfile.phonenumber;
-      this.entrydate = userProfile.entrydate;
-      this.major = userProfile.major;
-      this.university = userProfile.university;
-      this.studylevel = userProfile.studylevel;
-      this.district = userProfile.district;
-      this.linkedin = userProfile.linkedin;
-      this.gender = userProfile.gender;
-    }
+    this.reset();
   }
 
   get userProfile() {
@@ -329,6 +387,9 @@ export default class UserProfileEdit extends Vue {
       this.district = userProfile.district;
       this.linkedin = userProfile.linkedin;
       this.gender = userProfile.gender;
+      this.address = userProfile.address;
+      this.highestProjectPosition = userProfile.highest_project_position;
+      this.matriculationNumber = userProfile.matriculation_number;
     }
   }
 
@@ -338,41 +399,22 @@ export default class UserProfileEdit extends Vue {
 
   public async submit() {
     if ((this.$refs.form as HTMLFormElement).validate()) {
-      const updatedProfile: IUserProfileUpdate = {};
-      if (this.fullName) {
-        updatedProfile.full_name = this.fullName;
-      }
-      if (this.email) {
-        updatedProfile.email = this.email;
-      }
-      if (this.birthdate) {
-        updatedProfile.birthdate = this.birthdate;
-      }
-      if (this.phonenumber) {
-        updatedProfile.phonenumber = this.phonenumber;
-      }
-      if(this.entrydate) {
-        updatedProfile.entrydate = this.entrydate;
-      }
-      if(this.major) {
-        updatedProfile.major= this.major;
-      }
-      if(this.university) {
-        updatedProfile.university= this.university;
-      }
-      if(this.studylevel) {
-        updatedProfile.studylevel= this.studylevel;
-      }
-      if(this.district) {
-        updatedProfile.district = this.district;
-      }
-      if(this.linkedin) {
-        updatedProfile.linkedin= this.linkedin;
-      }
-      if(this.gender) {
-        updatedProfile.gender= this.gender;
-      }
-
+      const updatedProfile: IUserProfileUpdate = {
+        full_name: this.fullName,
+        email: this.email,
+        birthdate: this.birthdate,
+        phonenumber: this.phonenumber,
+        entrydate: this.entrydate,
+        major: this.major,
+        university: this.university,
+        studylevel: this.studylevel,
+        district: this.district,
+        linkedin: this.linkedin,
+        gender: this.gender,
+        address: this.address,
+        matriculation_number: this.matriculationNumber,
+        highest_project_position: this.highestProjectPosition,
+      };
 
       if(this.avatar) {
         const upload = await dispatchUploadFile(this.$store, {
@@ -389,6 +431,23 @@ export default class UserProfileEdit extends Vue {
       await dispatchRouteLoggedIn(this.$store);
     }
   }
+
+  get sortedGroups(): { [key: string]: UserGroup[] } {
+    return this.userProfile?.groups
+      .sort((a,b) => compareAsc(new Date(a.date_from), new Date(b.date_from)))
+      .reduce((prev, curr) => {
+        if(!prev[curr.group.type]){
+          prev[curr.group.type] = []
+        }
+        prev[curr.group.type].push(curr)
+        return prev;
+      }, {}) as {[key: string]: UserGroup[]}
+  }
+
+  async setPrimaryGroup(group: Group) {
+    await dispatchSetPrimaryGroupMe(this.$store, group.id);
+  }
+
 }
 
 

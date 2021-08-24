@@ -1,15 +1,27 @@
 <template>
   <v-card v-bind="$attrs" v-on="$listeners" :disabled="request.status !== 'in progress'">
     <v-card-title>
-      {{ { add: 'Hinzufügen zu', remove: 'Entfernen von' }[request.mode] }} {{ request.group.name }}
+      Antrag
     </v-card-title>
     <v-card-subtitle>
       <div class="text-overline purple--text">
         {{ {'in progress': 'In Bearbeitung', accepted: 'Angenommen', denied: 'Abgelehnt' }[request.status] }}
       </div>
     </v-card-subtitle>
+    <v-list dense>
+      <v-list-item v-for="group in request.groups" :key="`${group.group_id} ${group.request_id}`" dense>
+        <v-list-item-icon>
+          <v-icon :color="group.mode === 'add' ? 'green' : 'red'">
+            {{ group.mode === 'add' ? 'mdi-plus' : 'mdi-minus' }}
+          </v-icon>
+        </v-list-item-icon>
+        <v-list-item-content>
+          <v-list-item-title v-if="group.group">{{ group.group.name }}</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+    </v-list>
     <v-card-text>
-      {{ request.description }}
+      <div v-text="request.description" class="pre-formatted"></div>
     </v-card-text>
     <v-card-actions>
       <v-list-item>
@@ -45,5 +57,8 @@ export default class RequestCard extends Vue {
 </script>
 
 <style>
+.pre-formatted {
+  white-space: pre;
+}
 
 </style>

@@ -1,10 +1,16 @@
 import Vue from 'vue';
 import Vuetify from 'vuetify';
 import CCTIcon from '@/common/icons/cctIcon.vue';
+import de from 'vuetify/lib/locale/de'
+
 
 Vue.use(Vuetify);
 
 export default new Vuetify({
+  lang: {
+    locales: { de },
+    current: 'de'
+  },
   icons: {
     iconfont: 'mdi',
     values: {

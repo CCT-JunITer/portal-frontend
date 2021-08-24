@@ -96,13 +96,14 @@ export default class UserProfileRessortChange extends Vue {
     if ((this.$refs.form as HTMLFormElement).validate()) {
       //
       const requestCreate: RequestCreate = {
-        mode: 'remove',
-        description: `
-        Adresse: ${this.address}
-        PLZ: ${this.postcode}
-        Kontakt: ${this.contact}
-        `,
-        group_id: this.activeGroup!.id,
+        description: `Adresse: ${this.address}\nPLZ: ${this.postcode}\nKontakt: ${this.contact}`,
+        groups: [
+          {
+            mode: 'remove',
+            group_id: this.activeGroup!.id,
+            is_primary: true,
+          }
+        ]
       };
 
       await dispatchAddRequestMe(this.$store, requestCreate);

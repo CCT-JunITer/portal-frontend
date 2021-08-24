@@ -21,7 +21,14 @@ export interface IUserProfile {
     groups: UserGroup[];
 
     active_groups: Group[];
+
     gender: string;
+    highest_project_position: string;
+    matriculation_number: string;
+    direct_debit_mandate: string;
+    address: string;
+
+    admin_comment?: string;
 }
 
 export interface IUserProfileUpdate {
@@ -41,6 +48,13 @@ export interface IUserProfileUpdate {
     university?: string;
     profile_picture?: string;
     gender?: string;
+    highest_project_position?: string;
+    matriculation_number?: string;
+    direct_debit_mandate?: string;
+    address?: string;
+
+
+    admin_comment?: string;
 }
 
 export interface IUserProfileCreate extends IUserProfileUpdate {
@@ -117,19 +131,24 @@ export interface Group {
     kas_mailinglist: string;
 }
 
+export interface RequestGroup {
+    mode: 'add' | 'remove';
+    group_id: number;
+    request_id?: number;
+    group?: Group;
+    is_primary?: boolean;
+}
+
 export interface Request {
     id: number;
-    mode: 'add' | 'remove';
     description: string;
     user_id: number;
     user: IUserProfile;
-    group_id: number;
-    group: Group;
     status: 'in progress' | 'accepted' | 'denied';
+    groups: RequestGroup[];
 }
 
 export interface RequestCreate {
-    mode: 'add' | 'remove';
     description: string;
-    group_id: number;
+    groups: RequestGroup[];
 }
