@@ -234,7 +234,7 @@ import { Vue, Component} from 'vue-property-decorator';
 import VueTelInputVuetify from 'vue-tel-input-vuetify/lib/vue-tel-input-vuetify.vue';
 import DatePickerMenu from '@/components/DatePickerMenu.vue';
 import { dispatchGetUsers } from '@/store/main/actions';
-import { readAdminOneTraining, readAdminUsers,} from '@/store/main/getters';
+import { readOneTraining, readUsers,} from '@/store/main/getters';
 import { ITrainingCreate } from '@/interfaces';
 import { dispatchCreateTraining, dispatchUpdateTraining } from '@/store/admin/actions';
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
@@ -262,7 +262,7 @@ export default class AdminViewTraining extends Vue {
 
 
   get userProfiles() {
-    return readAdminUsers(this.$store);
+    return readUsers(this.$store);
   }
 
   get trainingDate() {
@@ -315,7 +315,7 @@ export default class AdminViewTraining extends Vue {
   }
 
   get editTraining() {
-    return readAdminOneTraining(this.$store)(+this.$router.currentRoute.params.id);
+    return readOneTraining(this.$store)(+this.$router.currentRoute.params.id);
   }
   public reset() {
     if(this.editTraining) {

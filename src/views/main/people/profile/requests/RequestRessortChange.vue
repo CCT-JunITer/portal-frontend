@@ -9,6 +9,17 @@
             ref="form"
             lazy-validation
           >
+            <v-select
+              label="In Ressort bleiben"
+              v-model="keepRessorts"
+              class="input-lg"
+              item-text="name"
+              multiple
+              return-object
+              :items="currentRessortGroups"
+            >
+
+            </v-select>
 
             <v-select
               label="Neues Ressort"
@@ -20,6 +31,14 @@
               :items="ressorts"
               :rules="[$common.required]"
             ></v-select>
+
+            <v-checkbox
+              v-if="ressort && keepRessorts.length"
+              :label="`${ressort.name || 'Neues Ressort'} ist neues primäres Ressort`"
+              v-model="newPrimary"
+            >
+
+            </v-checkbox>
 
             <v-textarea
               label="Beschreibung"
@@ -55,7 +74,7 @@
 
 <script lang="ts">
 import UserGroupCard from '@/components/user-group/UserGroupCard.vue';
-import { Group, RequestCreate } from '@/interfaces';
+import { Group, RequestCreate, RequestGroup } from '@/interfaces';
 import { dispatchAddRequestMe, dispatchGetGroups } from '@/store/main/actions';
 import { readGroups, readUserProfile } from '@/store/main/getters';
 import { Vue, Component, Prop } from 'vue-property-decorator'
@@ -67,22 +86,51 @@ export default class UserProfileRessortChange extends Vue {
 
   public valid = false;
   public ressort: Group | null = null;
+  public keepRessorts: Group[] = [];
+  public newPrimary = true;
   public description = '';
 
 
   public async submit() {
 
     if ((this.$refs.form as HTMLFormElement).validate()) {
+      if (!this.keepRessorts.length) {
+        this.newPrimary = true;
+      }
+
+      const dontKeep = this.currentRessortGroups.filter((group) => {
+        return !this.keepRessorts.find((keep) => keep.id === group.id)
+      }).map(group => {
+        return {
+          mode: 'remove',
+          group_id: group.id,
+          is_primary: false,
+        } as RequestGroup
+      });
+
+
       //
       const requestCreate: RequestCreate = {
-        mode: 'add',
         description: this.description,
-        group_id: this.ressort!.id
+        groups: [
+          {
+            mode: 'add',
+            group_id: this.ressort!.id,
+            is_primary: this.newPrimary,
+          },
+          ...dontKeep
+        ]
       };
 
       await dispatchAddRequestMe(this.$store, requestCreate);
       this.$router.push('/main/people/profile/requests');
     }
+  }
+
+  get currentRessortGroups() {
+    return this.userProfile?.groups
+      .filter(group => group.group.type === 'ressort' && group.is_active)
+      .map(group => group.group) || [];
   }
 
   get ressortGroups() {

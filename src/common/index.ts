@@ -1,4 +1,4 @@
-import { getDayOfYear } from 'date-fns';
+import { format, getDayOfYear } from 'date-fns';
 
 
 export const RESSORTS = [
@@ -33,6 +33,19 @@ export const GENDER = [
   'männlich', 'weiblich', 'nicht binär', 'keine Angabe'
 ]
 
+export const PROJECT_POSITIONS = [
+  'Angebot',
+  'Projektmitarbeiter',
+  'Projektleiter',
+  'Projektcontroller',
+];
+
+export const PASSIVE_CAUSES = [
+  'Auslandssemester',
+  'Praktikum',
+  'Sonstiges',
+]
+
 const LINKED_IN_REGEX = /^(https:\/\/)?([a-z]{2,3}\.)?linkedin\.com\/in\//;
 
 export const linkedInRegex = LINKED_IN_REGEX;
@@ -52,3 +65,5 @@ export const isTodayBirthday = (date: Date | string) => {
   const now = new Date();
   return getDayOfYear(date) === getDayOfYear(now);
 }
+
+export { format };

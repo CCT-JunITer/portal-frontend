@@ -146,7 +146,7 @@ import { Component, Vue, Watch } from 'vue-property-decorator';
 import Backdrop from '@/components/Backdrop.vue';
 import { IUserProfile, UserType } from '@/interfaces';
 import EmployeeCard from '@/components/employee/EmployeeCard.vue';
-import { readAdminUsers } from '@/store/main/getters';
+import { readUsers } from '@/store/main/getters';
 import { dispatchGetUsers } from '@/store/main/actions';
 import { MEMBERSTATUS, RESSORTS, UNIVERSITIES } from '@/common';
 
@@ -277,13 +277,13 @@ export default class EmployeesView extends Vue {
   }
 
   get employees(): IUserProfile[] {
-    return readAdminUsers(this.$store)
+    return readUsers(this.$store)
       .filter(employee => this.category === 'all' || (this.category === 'alumni' ? employee.is_alumni : !employee.is_alumni))
       .filter(employee => employee.full_name && employee.full_name?.toLowerCase().indexOf(this.searchText?.toLowerCase() || '') !== -1)
       .filter(employee => !this.filters.ressort || this.filters.ressort == employee.ressort)
       .filter(employee => !this.filters.memberstatus || this.filters.memberstatus == employee.memberstatus)
       .filter(employee => !this.filters.university || this.filters.university == employee.university)
-      .sort((o1, o2) => (o1[this.sortBy] < o2[this.sortBy] ? -1 : 1) * (this.ascending ? 1 : -1))
+      .sort((o1, o2) => (o1[this.sortBy]! < o2[this.sortBy]! ? -1 : 1) * (this.ascending ? 1 : -1))
   }
 
   public async mounted() {

@@ -22,7 +22,7 @@ export const getters = {
     const isMe = id === 'me' || numberId === me?.id;
     return isMe;
   },
-  adminUsers: (state: MainState) => state.users,
+  users: (state: MainState) => state.users,
   trainingsForRoute: (state: MainState) => (route: Route) => {
     const user = getters.routeUser(state)(route);
     if (!user) {
@@ -30,13 +30,13 @@ export const getters = {
     }
     return state.trainingsParticipants[user.id] || [];
   },
-  adminOneUser: (state: MainState) => (userId: number) => {
+  oneUser: (state: MainState) => (userId: number) => {
     const filteredUsers = state.users.filter((user) => user.id === userId);
     if (filteredUsers.length > 0) {
       return { ...filteredUsers[0] };
     }
   },
-  adminOneTraining: (state: MainState) => (trainingId: number) => {
+  oneTraining: (state: MainState) => (trainingId: number) => {
     const filteredTrainings = state.trainings.filter((trainig) => trainig.id === trainingId);
     if (filteredTrainings.length > 0) {
       return { ...filteredTrainings[0] };
@@ -71,9 +71,9 @@ export const readToken = read(getters.token);
 export const readUserStatus = read(getters.userStatus);
 export const readUserProfile = read(getters.userProfile);
 export const readFirstNotification = read(getters.firstNotification);
-export const readAdminOneUser = read(getters.adminOneUser);
-export const readAdminOneTraining = read(getters.adminOneTraining);
-export const readAdminUsers = read(getters.adminUsers);
+export const readOneUser = read(getters.oneUser);
+export const readOneTraining = read(getters.oneTraining);
+export const readUsers = read(getters.users);
 export const readIsMe = read(getters.isMe);
 export const readRouteUser = read(getters.routeUser);
 export const readTrainingsForRoute = read(getters.trainingsForRoute)

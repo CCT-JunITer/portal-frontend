@@ -22,7 +22,7 @@
 <script lang="ts">
 import { UserGroup } from '@/interfaces';
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { format, parse, isAfter } from 'date-fns'
+import { format } from 'date-fns'
 
 
 @Component({})
@@ -36,12 +36,10 @@ export default class UserGroupCard extends Vue {
   }
   
   get toDate() {
-    const date = new Date(this.group.date_to)
-
-    if (isAfter(date, new Date())) {
+    if (!this.group.date_to) {
       return 'heute';
     }
-
+    const date = new Date(this.group.date_to)
     return format(date, 'dd.MM.yyyy')
   }
 

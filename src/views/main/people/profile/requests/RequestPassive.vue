@@ -1,59 +1,62 @@
 <template>
   <div class="root">
     <v-container v-if="userProfile">
-      <v-row>
-        <v-col sm="8" cols="12" order="last" order-sm="first">
-          <h5 class="text-h6">Antrag auf Ressortwechsel</h5>
-          <v-form
-            v-model="valid"
-            ref="form"
-            lazy-validation
-          >
 
-            <v-select
-              label="Neues Ressort"
-              v-model="ressort"
+      <h5 class="text-h6">Antrag auf Passivisierung</h5>
+      <v-form
+        v-model="valid"
+        ref="form"
+        lazy-validation
+      >
+        <date-picker-menu
+          v-model="desiredDateTo"
+          defaultPicker="MONTH"
+          :pickerProps="{
+            min: new Date().toISOString().substr(0, 10),
+            'no-title': true
+          }"
+        >
+          <template v-slot:activator="{ on, attrs, }">
+            <v-text-field
+              label="Passiv bis"
+              v-bind="attrs"
+              v-on="on"
               class="input-lg"
               required
-              item-text="name"
-              return-object
-              :items="ressorts"
               :rules="[$common.required]"
-            ></v-select>
+            ></v-text-field>
+          </template>
+        </date-picker-menu>
 
-            <v-textarea
-              label="Beschreibung"
-              rows="4"
-              v-model="description"
-            >
-            </v-textarea>
+        <v-select
+          v-model="cause"
+          :items="$common.PASSIVE_CAUSES"
+          label="Grund"
+          class="input-lg"
 
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="primary" @click="submit">
-                Absenden
-              </v-btn>
-            </v-card-actions>
-          </v-form>
-        </v-col>
+        >
+        </v-select>
 
-        <v-col sm="4" cols="12" v-if="ressortGroups">
-          <h5 class="text-h6">Aktuelle Ressorts</h5>
-          <user-group-card
-            class="my-2"
-            v-for="group in ressortGroups"
-            outlined
-            :key="group.id"
-            :group="group"
-          ></user-group-card>
-        </v-col>
+        <v-textarea
+          label="Beschreibung"
+          rows="4"
+          v-model="description"
+        >
+        </v-textarea>
 
-      </v-row>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" @click="submit">
+            Absenden
+          </v-btn>
+        </v-card-actions>
+      </v-form>
     </v-container>
   </div>
 </template>
 
 <script lang="ts">
+import DatePickerMenu from '@/components/DatePickerMenu.vue';
 import UserGroupCard from '@/components/user-group/UserGroupCard.vue';
 import { Group, RequestCreate } from '@/interfaces';
 import { dispatchAddRequestMe, dispatchGetGroups } from '@/store/main/actions';
@@ -61,13 +64,14 @@ import { readGroups, readUserProfile } from '@/store/main/getters';
 import { Vue, Component, Prop } from 'vue-property-decorator'
 
 @Component({
-  components: { UserGroupCard }
+  components: { UserGroupCard, DatePickerMenu }
 })
 export default class UserProfileRessortChange extends Vue {
 
   public valid = false;
-  public ressort: Group | null = null;
+  public desiredDateTo: Date | null = null;
   public description = '';
+  public cause = '';
 
 
   public async submit() {
@@ -75,9 +79,14 @@ export default class UserProfileRessortChange extends Vue {
     if ((this.$refs.form as HTMLFormElement).validate()) {
       //
       const requestCreate: RequestCreate = {
-        mode: 'add',
-        description: this.description,
-        group_id: this.ressort!.id
+        description: `${this.description}\nGrund: ${this.cause}\nBis: ${this.desiredDateTo}`,
+        groups: [
+          {
+            mode: 'add',
+            group_id: this.passiveGroup!.id,
+            is_primary: true,
+          }
+        ]
       };
 
       await dispatchAddRequestMe(this.$store, requestCreate);
@@ -85,10 +94,10 @@ export default class UserProfileRessortChange extends Vue {
     }
   }
 
-  get ressortGroups() {
-    return this.userProfile?.groups
-      .filter(group => group.group.type === 'ressort')
+  get passiveGroup() {
+    return readGroups(this.$store).find((group) => group.name === 'passiv')
   }
+
 
   get userProfile() {
     return readUserProfile(this.$store);
@@ -96,12 +105,6 @@ export default class UserProfileRessortChange extends Vue {
 
   async mounted() {
     await dispatchGetGroups(this.$store);
-  }
-
-  get ressorts() {
-    return this.groups
-      .filter(group => group.type === 'ressort')
-      .filter(group => !this.userProfile?.active_groups.find(g => g.id === group.id))
   }
 
   get groups() {

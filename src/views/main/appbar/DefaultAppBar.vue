@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar dark color="cctBlue" class="flex-grow-0" app>
+  <v-app-bar dark color="cctBlue" class="flex-grow-0" app ref="toolbar" v-mutate="onMutate">
     <v-app-bar-nav-icon default @click.stop="switchShowDrawer"></v-app-bar-nav-icon>
     <portal-button></portal-button>
     <v-container class="pa-0">
@@ -37,5 +37,13 @@ export default class DefaultAppBar extends Vue {
     );
   }
 
+  onMutate() {
+    let height = '0'
+    const toolbar = this.$refs.toolbar
+    if (toolbar) {
+      height = `${(toolbar as any).$el.offsetHeight}px`
+    }
+    document.documentElement.style.setProperty('--toolbarHeight', height)
+  }
 }
 </script>

@@ -12,7 +12,10 @@ exports[`EmployeeCard.vue should match snapshot 1`] = `
         Test
         <!---->
       </div>
-      <div class="text-subtitle-2 mb-2">Juniter</div> <span class="v-chip v-chip--label v-chip--outlined theme--dark v-size--small cctBlue cctBlue--text"><span class="v-chip__content">Consultant</span></span>
+      <div class="text-subtitle-2 mb-2">
+        Juniter
+
+      </div> <span class="v-chip v-chip--label v-chip--outlined theme--dark v-size--small cctBlue cctBlue--text"><span class="v-chip__content">Consultant</span></span>
     </div>
   </div>
   <hr role="separator" aria-orientation="horizontal" class="v-divider theme--light">

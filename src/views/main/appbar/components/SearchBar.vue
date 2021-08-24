@@ -45,7 +45,7 @@
 
 <script lang="ts">
 import { IUserProfile } from '@/interfaces';
-import { readAdminUsers } from '@/store/main/getters';
+import { readUsers } from '@/store/main/getters';
 import { Vue, Component } from 'vue-property-decorator'
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 import { dispatchGetUsers } from '@/store/main/actions';
@@ -63,7 +63,7 @@ export default class SearchBar extends Vue {
   }
 
   get employees(): IUserProfile[] {
-    return readAdminUsers(this.$store)
+    return readUsers(this.$store)
       .filter(user => user.full_name);
   }
 
