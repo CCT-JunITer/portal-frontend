@@ -112,9 +112,10 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { readRouteUser, readTrainingsForRoute } from '@/store/main/getters';
-import { dispatchGetTrainingsFor } from '@/store/main/actions';
+import { readRouteUser } from '@/store/main/getters';
 import { format, isAfter } from 'date-fns';
+import { readTrainingsForRoute } from '@/store/training/getters';
+import { dispatchGetTrainingsFor } from '@/store/training/actions';
 
 @Component({})
 export default class UserProfileTrainings extends Vue {

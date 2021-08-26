@@ -1,4 +1,4 @@
-import { Group, IUserProfile, Request, ITraining } from '@/interfaces';
+import { Group, IUserProfile, Request, ITraining, ITrainingApplication } from '@/interfaces';
 import { MainState, AppNotification } from './state';
 import { getStoreAccessors } from 'typesafe-vuex';
 import { State } from '../state';
@@ -35,21 +35,10 @@ export const mutations = {
   setUsers(state: MainState, payload: IUserProfile[]) {
     state.users = payload;
   },
-  setTrainingsFor(state: MainState, payload: { userId: number; payload: ITraining[] }) {
-    state.trainingsParticipants = { ...state.trainingsParticipants, [payload.userId]: payload.payload };
-  },
-  setTrainings(state: MainState, payload: ITraining[]) {
-    state.trainings = payload;
-  },
   setUser(state: MainState, payload: IUserProfile) {
     const users = state.users.filter((user: IUserProfile) => user.id !== payload.id);
     users.push(payload);
     state.users = users;
-  },
-  setTraining(state: MainState, payload: ITraining) {
-    const trainings = state.trainings.filter((training: ITraining) => training.id !== payload.id);
-    trainings.push(payload);
-    state.trainings = trainings;
   },
   setMyRequests(state: MainState, payload: Request[]) {
     state.myRequests = payload;
@@ -72,8 +61,6 @@ export const commitAddNotification = commit(mutations.addNotification);
 export const commitRemoveNotification = commit(mutations.removeNotification);
 export const commitSetUser = commit(mutations.setUser);
 export const commitSetUsers = commit(mutations.setUsers);
-export const commitSetTrainingsFor = commit(mutations.setTrainingsFor);
-export const commitSetTraining = commit(mutations.setTraining);
-export const commitSetTrainings = commit(mutations.setTrainings);
 export const commitSetMyRequests = commit(mutations.setMyRequests);
 export const commitSetGroups = commit(mutations.setGroups);
+

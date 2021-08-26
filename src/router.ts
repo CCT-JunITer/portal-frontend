@@ -52,28 +52,7 @@ export default new Router({
                 {
                   path: 'user-invite',
                   component: () => import(/* webpackChunkName: "admin-user-invite" */ './views/main/admin/UserInvitation.vue')
-                },
-                {
-                  path: 'training',
-                  component: RouterComponent,                  
-                  children: [
-                    {
-                      path: '',
-                      name: 'admin-training',
-                      component: () => import(/* webpackChunkName: "admin-training" */ './views/main/training/AdminViewTraining.vue'),
-                    },
-                    {
-                      path: 'create',
-                      name: 'admin-training-create',
-                      component: () => import(/* webpackChunkName: "admin-training-create" */ './views/main/training/AdminCreateTraining.vue'),
-                    },
-                    {
-                      path: 'edit/:id',
-                      name: 'admin-training-edit',
-                      component: () => import(/* webpackChunkName: "admin-training-edit" */ './views/main/training/AdminCreateTraining.vue'),
-                    }
-                  ]
-                },
+                }
               ]
             },
             {
@@ -246,7 +225,30 @@ export default new Router({
             },
             {
               path: 'trainings',
-              component: () => import(/* webpackChunkName: "admin-training" */ './views/main/training/TrainingMain.vue'),
+              name: 'trainings-all',
+              component: RouterComponent,
+              children: [
+                {
+                  path: '',
+                  component: () => import(/* webpackChunkName: "admin-training" */ './views/main/training/TrainingMain.vue'),
+                },
+                {
+                  path: 'create',
+                  name: 'training-create',
+                  component: () => import(/* webpackChunkName: "admin-training-create" */ './views/main/training/EditTraining.vue'),
+                },
+                {
+                  path: 'edit/:id',
+                  name: 'training-edit',
+                  component: () => import(/* webpackChunkName: "admin-training-edit" */ './views/main/training/EditTraining.vue'),
+                },
+                {
+                  path: ':id',
+                  name: 'trainings-details',
+                  component: () => import(
+                  /* webpackChunkName: "training-detail" */ './views/main/training/TrainingDetail.vue'),
+                },
+              ]
             },
             {
               path: 'calendar',
