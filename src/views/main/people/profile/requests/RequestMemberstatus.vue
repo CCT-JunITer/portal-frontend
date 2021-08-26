@@ -38,7 +38,7 @@
         </v-col>
 
         <v-col sm="4" cols="12" v-if="memberstatusGroups">
-          <h5 class="text-h6">Mitgliedsstati</h5>
+          <h5 class="text-h6">Mitgliedsstatus</h5>
           <user-group-card
             class="my-2"
             v-for="group in memberstatusGroups"
@@ -55,7 +55,7 @@
 
 <script lang="ts">
 import UserGroupCard from '@/components/user-group/UserGroupCard.vue';
-import { Group, RequestCreate } from '@/interfaces';
+import { Group, RequestCreate, RequestGroup } from '@/interfaces';
 import { dispatchAddRequestMe, dispatchGetGroups } from '@/store/main/actions';
 import { readGroups, readUserProfile } from '@/store/main/getters';
 import { Vue, Component, Prop } from 'vue-property-decorator'
@@ -73,11 +73,25 @@ export default class UserProfileRessortChange extends Vue {
   public async submit() {
 
     if ((this.$refs.form as HTMLFormElement).validate()) {
+      const dontKeep = this.currentMemberstatusGroups.map(group => {
+        return {
+          mode: 'remove',
+          group_id: group.id,
+          is_primary: false,
+        } as RequestGroup
+      });
+
       //
       const requestCreate: RequestCreate = {
-        mode: 'add',
         description: this.description,
-        group_id: this.memberstatus!.id
+        groups: [
+          {
+            mode: 'add',
+            group_id: this.memberstatus!.id,
+            is_primary: true,
+          },
+          ...dontKeep
+        ]
       };
 
       await dispatchAddRequestMe(this.$store, requestCreate);
@@ -88,6 +102,12 @@ export default class UserProfileRessortChange extends Vue {
   get memberstatusGroups() {
     return this.userProfile?.groups
       .filter(group => group.group.type === 'memberstatus')
+  }
+
+  get currentMemberstatusGroups() {
+    return this.userProfile?.groups
+      .filter(group => group.group.type === 'memberstatus' && group.is_active)
+      .map(group => group.group) || []
   }
 
   get userProfile() {

@@ -44,6 +44,60 @@
         </v-btn>
       </v-col>
     </v-row>
+    
+    <v-divider class="my-5"></v-divider>
+
+    <v-row>
+      <v-col cols="12" md="4" class="px-5">
+        <h4 class="text-h4 text--primary mb-3">Personales</h4>
+        <p class="text-body-2 text--secondary">
+          Diese Informationen sind für das Personalmanagement notwendig und können nur von der Ressortleitungsrunde eingesehen werden
+        </p>
+      </v-col>
+
+      <v-col cols="12" md="8">
+
+        <v-select
+          v-model = "gender"
+          class="input-lg"
+          :items="$common.GENDER"
+          label="Gender"
+          :rules="[$common.required]"
+        ></v-select>
+
+        <v-text-field
+          label="Adresse"
+          class="input-lg"
+          v-model="address"
+        >
+        </v-text-field>
+
+        <v-text-field
+          label="Matrikelnummer"
+          class="input-lg"
+          v-model="matriculationNumber"
+        >
+        </v-text-field>
+
+
+        <v-select
+          label="Höchste Projektposition"
+          class="input-lg"
+          :items="$common.PROJECT_POSITIONS"
+          v-model="highestProjectPosition"
+        >
+        </v-select>
+
+        <v-textarea
+          label="Kommentar"
+          class="input-lg"
+          v-model="adminComment"
+        >
+        </v-textarea>
+
+      </v-col>
+    </v-row>
+
 
     <v-divider class="my-5"></v-divider>
 
@@ -74,14 +128,27 @@
             :disabled="isEdit()"
             :rules="[$common.required]"
           ></v-text-field>
-          <v-text-field
-            label="Geburtstag"
-            type="date"
+          <date-picker-menu
             v-model="birthdate"
-            class="input-lg"
-            required
-            :rules="[$common.required]"
-          ></v-text-field>
+            defaultPicker="YEAR"
+            :pickerProps="{
+              min: '1950-01-01',
+              max: new Date().toISOString().substr(0, 10),
+              'no-title': true
+            }"
+          >
+            <template v-slot:activator="{ on, attrs, }">
+              <v-text-field
+                label="Geburtstag"
+                class="input-lg"
+                v-bind="attrs"
+                v-on="on"
+                required
+                :rules="[$common.required]"
+              ></v-text-field>
+            </template>
+          </date-picker-menu>
+
           <vue-tel-input-vuetify
             label="Handynummer"
             v-model="phonenumber"
@@ -94,14 +161,48 @@
               $common.required,
               v => /^([0-9\(\)\/\+ \-]*)$/.test(v) || 'Dies ist keine gültige Telefonnummer']"
           ></vue-tel-input-vuetify>
-          <v-text-field
-            label="Eingangsdatum"
-            type = "date"
-            v-model = "entrydate"
-            class="input-lg"
-            required
-            :rules="[$common.required]"
-          ></v-text-field>
+
+          <date-picker-menu
+            v-model="entrydate"
+            defaultPicker="MONTH"
+            :pickerProps="{
+              min: '1950-01-01',
+              max: new Date().toISOString().substr(0, 10),
+            }"
+          >
+            <template v-slot:activator="{on, attrs}">
+              <v-text-field
+                label="Eintrittsdatum"
+                class="input-lg"
+                required
+                v-bind="attrs"
+                v-on="on"
+                :rules="[$common.required]"
+              >
+                <template v-slot:append="">
+                  <v-tooltip right>
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-icon v-bind="attrs" v-on="on">mdi-help-circle</v-icon>
+                    </template>
+                    <span>
+                      <ul>Das Eintrittsdatum ist der Tag des Onboarding Days. <br>(Bei JunITer der Tag der entgültigen Zusage.)
+                        <li>SS16 - 25.05.2016</li>
+                        <li>WS16/17 - 22.11.2016</li>
+                        <li>SS17 - 10.05.2017</li>
+                        <li>WS17/18 - 15.11.2017</li>
+                        <li>SS18 - 08.05.2018</li>
+                        <li>WS18/19 - 18.11.2018</li>
+                        <li>SS19 - 18.05.2019</li>
+                        <li>WS19/20 - 23.11.2019</li>
+                        <li>SS20 - 6.6.2020</li>
+                        <li>S20/21 - 28.11.2020</li>
+                      </ul>
+                    </span>
+                  </v-tooltip>
+                </template>
+              </v-text-field>
+            </template>
+          </date-picker-menu>
           <v-text-field
             label="Studiengang"
             v-model="major"
@@ -141,6 +242,7 @@
             hint="(Format: https://www.linkedin.com/in/name)"
             :rules="[v => !v || $common.isLinkedIn(v) || 'Dies ist keine gültige LinkedIn-URL']"
           ></v-text-field>
+
           <v-layout align-center>
             <v-flex shrink v-if="isEdit()">
               <v-checkbox
@@ -195,72 +297,8 @@
       <v-col cols="12" md="8">
 
         <v-card-actions>
-          <v-dialog
-            v-model="addToGroupDialog"
-            persistent
-            max-width="600px"
-          >
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn color="cctGreen" outlined v-on="on" v-attrs="attrs">
-                <v-icon left>
-                  mdi-plus
-                </v-icon>
-                Zu Gruppe hinzufügen
-              </v-btn>
-            </template>
-            <v-card>
-              <v-card-title>
-                <span class="text-h5">Gruppe hinzufügen</span>
-              </v-card-title>
-              <v-card-text>
-                <v-container>
-                  <v-form lazy-validation ref="groupForm">
-                    <v-alert outlined border="left" type="warning">
-                      Vorhandene Gruppen des selben Typs werden gelöscht
-                    </v-alert>
-                    <v-select
-                      label="Gruppe"
-                      item-text="name"
-                      return-object
-                      v-model="group"
-                      required
-                      :rules="[$common.required]"
-                      :items="groups">
-                      <template v-slot:item="{ item, on, attrs}">
-                        <v-list-item v-on="on" v-attrs="attrs" two-line>
-                          <v-list-item-content>
-                            <v-list-item-title>
-                              {{ item.name }}
-                            </v-list-item-title>
-                            <v-list-item-subtitle>
-                              {{ item.type }}
-                            </v-list-item-subtitle>
-                          </v-list-item-content>
-                        </v-list-item>
-                      </template>
-                    </v-select>
-                  </v-form>
-                </v-container>
-              </v-card-text>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn
-                  color="red darken-1"
-                  text
-                  @click="addToGroupDialog = false"
-                >
-                  Abbrechen
-                </v-btn>
-                <v-btn
-                  color="cctBlue darken-1"
-                  text
-                  @click="addToGroup()"
-                >
-                  Hinzufügen
-                </v-btn>
-              </v-card-actions>
-            </v-card>  
-          </v-dialog>
+          <group-dialog :userProfile="userProfile"></group-dialog> 
+          <delete-dialog :userProfile="userProfile" v-if="userProfile && !userProfile.is_alumni"></delete-dialog>
         </v-card-actions>
         <v-row v-if="userProfile">
           <v-col cols="12" v-for="group in userProfile.groups" :key="group.id">
@@ -273,6 +311,10 @@
                 <v-btn text small color="red" @click="removeFromGroup(group.group)">
                   <v-icon left>delete</v-icon>
                   Löschen
+                </v-btn>
+                <v-btn depressed small color="primary" @click="setPrimaryGroup(group.group)" v-if="!group.is_primary">
+                  <v-icon left>mdi-account-check</v-icon>
+                  primäre Gruppe für {{ group.group.type }} setzen
                 </v-btn>
               </template>
             </user-group-card>
@@ -287,17 +329,20 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { Group, IUserProfileCreate } from '@/interfaces';
-import { readAdminOneUser, readGroups } from '@/store/main/getters';
-import { dispatchGetGroups, dispatchGetUsers, dispatchUploadFile } from '@/store/main/actions';
+import { dispatchGetGroups, dispatchUploadFile } from '@/store/main/actions';
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 import UploadButton from '@/components/UploadButton.vue';
 import VueTelInputVuetify from 'vue-tel-input-vuetify/lib/vue-tel-input-vuetify.vue';
 import AvatarCropperDialog from '@/components/AvatarCropperDialog.vue';
-import { dispatchAddUserToGroup, dispatchCreateUser, dispatchRemoveUserFromGroup, dispatchUpdateUser } from '@/store/admin/actions';
+import { dispatchCreateUser, dispatchGetAdminUsers, dispatchRemoveUserFromGroup, dispatchSetPrimaryGroup, dispatchUpdateUser } from '@/store/admin/actions';
 import UserGroupCard from '@/components/user-group/UserGroupCard.vue';
+import GroupDialog from './GroupDialog.vue';
+import DeleteDialog from './DeleteDialog.vue';
+import { readAdminOneUser } from '@/store/admin/getters';
+import DatePickerMenu from '@/components/DatePickerMenu.vue';
 
 @Component({
-  components: {AvatarCropperDialog, UploadButton, EmployeeProfilePicture,VueTelInputVuetify, UserGroupCard},
+  components: {AvatarCropperDialog, UploadButton, EmployeeProfilePicture,VueTelInputVuetify, UserGroupCard, GroupDialog, DatePickerMenu, DeleteDialog},
 })
 export default class EditUser extends Vue {
   public valid = true;
@@ -319,9 +364,13 @@ export default class EditUser extends Vue {
   public studylevel = '';
   public district = '';
   public linkedin = '';
-  public ressort = '';
-  public isActive = true;
-  public isSuperuser = false;
+  public gender = '';
+  public adminComment? = '';
+  public address = '';
+  public highestProjectPosition = '';
+  public matriculationNumber = '';
+
+
   public password1 = '';
   public password2 = '';
 
@@ -354,7 +403,7 @@ export default class EditUser extends Vue {
   }
 
   public async mounted() {
-    await dispatchGetUsers(this.$store);
+    await dispatchGetAdminUsers(this.$store);
     await dispatchGetGroups(this.$store);
     this.reset();
   }
@@ -375,9 +424,11 @@ export default class EditUser extends Vue {
       this.studylevel = this.userProfile.studylevel;
       this.district = this.userProfile.district;
       this.linkedin = this.userProfile.linkedin;
-      this.ressort = this.userProfile.ressort;
-      this.isSuperuser = this.userProfile.is_superuser;
-      this.isActive = this.userProfile.is_active;
+      this.gender = this.userProfile.gender;
+      this.adminComment = this.userProfile.admin_comment;
+      this.address = this.userProfile.address;
+      this.highestProjectPosition = this.userProfile.highest_project_position;
+      this.matriculationNumber = this.userProfile.matriculation_number;
 
     }
   }
@@ -390,49 +441,29 @@ export default class EditUser extends Vue {
     if ((this.$refs.form as HTMLFormElement).validate()) {
       const updatedProfile: IUserProfileCreate = {
         email: this.email,
+        full_name: this.fullName,
+        birthdate: this.birthdate,
+        phonenumber: this.phonenumber,
+        entrydate: this.entrydate,
+        major: this.major,
+        university: this.university,
+        studylevel: this.studylevel,
+        district: this.district,
+        linkedin: this.linkedin,
+        gender: this.gender,
+        admin_comment: this.adminComment,
+        address: this.address,
+        matriculation_number: this.matriculationNumber,
+        highest_project_position: this.highestProjectPosition,
+
       };
-      if (this.fullName) {
-        updatedProfile.full_name = this.fullName;
-      }
-      if (this.birthdate) {
-        updatedProfile.birthdate = this.birthdate;
-      }
-      if (this.phonenumber) {
-        updatedProfile.phonenumber = this.phonenumber;
-      }
-      if(this.memberstatus) {
-        updatedProfile.memberstatus = this.memberstatus;
-      }
-      if(this.entrydate) {
-        updatedProfile.entrydate = this.entrydate;
-      }
-      if(this.major) {
-        updatedProfile.major= this.major;
-      }
-      if(this.university) {
-        updatedProfile.university= this.university;
-      }
-      if(this.studylevel) {
-        updatedProfile.studylevel= this.studylevel;
-      }
-      if(this.district) {
-        updatedProfile.district = this.district;
-      }
-      if(this.linkedin) {
-        updatedProfile.linkedin= this.linkedin;
-      }
-      if(this.ressort) {
-        updatedProfile.ressort= this.ressort;
-      }
+
       if(this.avatar) {
         const uploadObject = await dispatchUploadFile(this.$store, {
           file: this.avatar,
         })
         updatedProfile.profile_picture = uploadObject?.filename;
       }
-      updatedProfile.is_active = this.isActive;
-      updatedProfile.is_superuser = this.isSuperuser;
-      updatedProfile.ressort = this.ressort;
       if (this.setPassword) {
         updatedProfile.password = this.password1;
       }
@@ -449,19 +480,12 @@ export default class EditUser extends Vue {
     return readAdminOneUser(this.$store)(+this.$router.currentRoute.params.id);
   }
 
-  get groups() {
-    return readGroups(this.$store)
-      .filter(group => !this.userProfile?.active_groups.find(g => g.id === group.id))
-  }
-
-  async addToGroup() {
-    if ((this.$refs.groupForm as HTMLFormElement).validate()) {
-      await dispatchAddUserToGroup(this.$store, { userId: this.userProfile!.id, groupId: this.group!.id });
-      this.addToGroupDialog = false;
-    }
-  }
   async removeFromGroup(group: Group) {
     await dispatchRemoveUserFromGroup(this.$store, { userId: this.userProfile!.id, groupId: group.id });
+  }
+
+  async setPrimaryGroup(group: Group) {
+    await dispatchSetPrimaryGroup(this.$store, { userId: this.userProfile!.id, groupId: group.id });
   }
 }
 </script>

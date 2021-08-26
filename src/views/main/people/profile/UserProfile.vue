@@ -12,7 +12,10 @@
           {{ userProfile.full_name || 'Kein Name' }}
           <v-icon v-if="hasBirthday" color="cctOrange">mdi-cake-variant</v-icon>  
         </div>
-        <div class="text-subtitle-1 text--secondary mb-1">{{ userProfile.ressort || 'Kein Ressort' }} - {{ userProfile.memberstatus }}</div>
+        <div class="text-subtitle-1 text--secondary mb-1" v-if="!userProfile.is_alumni">{{ userProfile.ressort || 'Kein Ressort' }} - {{ userProfile.memberstatus }}</div>
+        <div v-else class="mb-1 text-subtitle-1 text-secondary">
+          Alumni seit <b>{{ exitFormatted }}</b>
+        </div>
 
         <div class="text-body-2 text--secondary mb-1">
           <v-icon left>
@@ -149,6 +152,8 @@ import { dispatchGetUsers } from '@/store/main/actions';
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 import EmployeeCard from '@/components/employee/EmployeeCard.vue';
 import { copyTextToClipboard } from '@/utils';
+import format from 'date-fns/format';
+import { de } from 'date-fns/locale';
 
 
 @Component({
@@ -215,6 +220,14 @@ export default class UserProfile extends Vue {
   get isSuperuser() {
     return readUserProfile(this.$store)?.is_superuser;
   }
+
+  get exitFormatted() {
+    if (!this.userProfile) {
+      return '';
+    }
+    return format(new Date(this.userProfile.exitdate), 'MMMM yyyy', { locale: de });
+  }
+
 
   public goToEdit() {
     this.$router.push('/main/people/profile/edit');

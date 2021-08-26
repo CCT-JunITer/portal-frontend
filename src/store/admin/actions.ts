@@ -6,11 +6,36 @@ import { AdminState } from './state';
 import { getStoreAccessors } from 'typesafe-vuex';
 import { dispatchCheckApiError, dispatchGetUsers, dispatchGetTrainings } from '../main/actions';
 import { commitAddNotification, commitRemoveNotification, commitSetUser } from '../main/mutations';
-import { commitSetRequests } from './mutations';
+import { commitSetAdminUsers, commitSetRequests } from './mutations';
 
 type MainContext = ActionContext<AdminState, State>;
 
 export const actions = {
+  async actionGetAdminUsers(context: MainContext) {
+    try {
+      const response = await api.getAdminUsers(context.rootState.main.token, 'all');
+      if (response) {
+        commitSetAdminUsers(context, response.data);
+      }
+    } catch (error) {
+      await dispatchCheckApiError(context, error);
+    }
+  },
+  async actionDeleteUser(context: MainContext, id: number) {
+    try {
+      const loadingNotification = { content: 'saving', showProgress: true };
+      commitAddNotification(context, loadingNotification);
+      const response = (await Promise.all([
+        api.deleteUser(context.rootState.main.token, id),
+        await new Promise((resolve, reject) => setTimeout(() => resolve(), 500)),
+      ]))[0];
+      commitSetUser(context, response.data);
+      commitRemoveNotification(context, loadingNotification);
+      commitAddNotification(context, { content: 'User successfully updated', color: 'success' });
+    } catch (error) {
+      await dispatchCheckApiError(context, error);
+    }
+  },
   async actionUpdateUser(context: MainContext, payload: { id: number; user: IUserProfileUpdate }) {
     try {
       const loadingNotification = { content: 'saving', showProgress: true };
@@ -122,7 +147,7 @@ export const actions = {
       const response = await api.addUserToGroup(context.rootState.main.token, payload.userId, payload.groupId);
       commitRemoveNotification(context, loadingNotification);
       commitAddNotification(context, { content: 'Erfolgreich hinzugefügt', color: 'success' });
-      await dispatchGetUsers(context);
+      await dispatchGetAdminUsers(context);
     } catch (error) {
       await dispatchCheckApiError(context, error);
     }
@@ -134,7 +159,19 @@ export const actions = {
       const response = await api.removeUserFromGroup(context.rootState.main.token, payload.userId, payload.groupId);
       commitRemoveNotification(context, loadingNotification);
       commitAddNotification(context, { content: 'Erfolgreich gelöscht', color: 'success' });
-      await dispatchGetUsers(context);
+      await dispatchGetAdminUsers(context);
+    } catch (error) {
+      await dispatchCheckApiError(context, error);
+    }
+  },
+  async actionSetPrimaryGroup(context: MainContext, payload: { userId: number; groupId: number }) {
+    try {
+      const loadingNotification = { content: 'saving', showProgress: true };
+      commitAddNotification(context, loadingNotification);
+      const response = await api.setPrimaryGroup(context.rootState.main.token, payload.userId, payload.groupId);
+      commitRemoveNotification(context, loadingNotification);
+      commitAddNotification(context, { content: 'Erfolgreich primäre Gruppe gesetzt', color: 'success' });
+      await dispatchGetAdminUsers(context);
     } catch (error) {
       await dispatchCheckApiError(context, error);
     }
@@ -156,8 +193,10 @@ export const actions = {
 
 const { dispatch } = getStoreAccessors<AdminState, State>('');
 
+export const dispatchGetAdminUsers = dispatch(actions.actionGetAdminUsers);
 export const dispatchCreateUser = dispatch(actions.actionCreateUser);
 export const dispatchUpdateUser = dispatch(actions.actionUpdateUser);
+export const dispatchDeleteUser = dispatch(actions.actionDeleteUser);
 export const dispatchCreateTraining = dispatch(actions.actionCreateTraining);
 export const dispatchDeleteTraining = dispatch(actions.actionDeleteTraining);
 export const dispatchUpdateTraining = dispatch(actions.actionUpdateTraining);
@@ -167,3 +206,4 @@ export const dispatchAdminRequests = dispatch(actions.actionGetRequests);
 export const dispatchApplyRequest = dispatch(actions.actionApplyRequest);
 export const dispatchAddUserToGroup = dispatch(actions.actionAddUserToGroup);
 export const dispatchRemoveUserFromGroup = dispatch(actions.actionRemoveUserFromGroup);
+export const dispatchSetPrimaryGroup = dispatch(actions.actionSetPrimaryGroup);

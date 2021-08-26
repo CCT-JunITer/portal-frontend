@@ -74,6 +74,18 @@ export const actions = {
       await dispatchCheckApiError(context, error);
     }
   },
+  async actionSetPrimaryGroupMe(context: MainContext, groupId: number ) {
+    try {
+      const loadingNotification = { content: 'saving', showProgress: true };
+      commitAddNotification(context, loadingNotification);
+      const response = await api.setPrimaryGroupMe(context.rootState.main.token, groupId);
+      commitRemoveNotification(context, loadingNotification);
+      commitAddNotification(context, { content: 'Erfolgreich primäre Gruppe gesetzt', color: 'success' });
+      await dispatchGetUserProfile(context);
+    } catch (error) {
+      await dispatchCheckApiError(context, error);
+    }
+  },
   async actionUploadFile(context: MainContext, payload: { file: File | string | Blob; fileName?: string }) {
     try {
       const loadingNotification = { content: 'Uploading', showProgress: true };
@@ -303,3 +315,4 @@ export const dispatchGetTrainingsFor = dispatch(actions.actionGetTrainingsFor);
 export const dispatchGetMyRequests = dispatch(actions.actionGetMyRequests); 
 export const dispatchAddRequestMe = dispatch(actions.actionAddRequestMe); 
 export const dispatchGetGroups = dispatch(actions.actionGetGroups); 
+export const dispatchSetPrimaryGroupMe = dispatch(actions.actionSetPrimaryGroupMe)

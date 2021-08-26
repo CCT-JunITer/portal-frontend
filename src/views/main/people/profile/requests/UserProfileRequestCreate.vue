@@ -10,7 +10,7 @@
             </v-icon>
             Alumnisierung
           </v-tab>
-          <v-tab :ripple="false" :to="{name: 'profile-request-passive'}" disabled>
+          <v-tab :ripple="false" :to="{name: 'profile-request-passive'}">
             <v-icon left>
               mdi-sleep
             </v-icon>
