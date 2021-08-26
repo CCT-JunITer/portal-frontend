@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/interface-name-prefix */
 export interface IUserProfile {
     email: string;
     is_active: boolean;
@@ -76,9 +77,11 @@ export interface ITraining {
     wms_link: string;
     external_trainers: string;
     id: number;
-    author: IUserProfile[];
+    files: string;
+    author: IUserProfile;
     trainers: IUserProfile[];
     participants: IUserProfile[];
+    applications: ITrainingApplication[];
 }
 export interface ITrainingCreate {
     title: string;
@@ -89,6 +92,7 @@ export interface ITrainingCreate {
     date: string;
     wms_link: string;
     external_trainers: string;
+    files: string;
     trainer_ids: number[];
     participant_ids: number[];
 }
@@ -100,20 +104,6 @@ export interface UserInvite {
     email: string;
 }
 
-export interface ITraining {
-    title: string;
-    type: string;
-    is_membership_progression: boolean;
-    topic: string;
-    description: string;
-    date: string;
-    wms_link: string;
-    external_trainers: string;
-    id: number;
-    author: IUserProfile[];
-    trainers: IUserProfile[];
-    participants: IUserProfile[];
-}
 export interface UserGroup {
     id: number;
     group: Group;
@@ -148,6 +138,26 @@ export interface Request {
     status: 'in progress' | 'accepted' | 'denied';
     groups: RequestGroup[];
 }
+
+export type ITrainingApplicationStatus = 'in progress' | 'accepted' | 'denied' | 'waiting'
+
+export interface ITrainingApplication {
+    id: number;
+    training_id: number;
+    training: ITraining;
+    applicant_id: number;
+    applicant: IUserProfile;
+    description: string;
+    status: ITrainingApplicationStatus;
+}
+export interface ITrainingApplicationUpdate {
+    status: ITrainingApplicationStatus;
+}
+export interface ITrainingApplicationCreate {
+    description: string;
+}
+
+
 
 export interface RequestCreate {
     description: string;

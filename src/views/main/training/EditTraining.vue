@@ -90,7 +90,7 @@
                 icon
                 class="input-lg"
                 v-model="training_time"
-                label="Picker in menu"
+                label="Uhrzeit"
                 prepend-icon="mdi-clock-outline"
                 readonly
                 v-bind="attrs"
@@ -209,9 +209,32 @@
               </template>
             </template>
           </v-autocomplete>
+          <div class="text-subtitle-2 mb-2">Schulungsmaterial hochladen</div>
+          <upload-button
+            :loading="this.isUploading"
+            :disabled="this.isUploading"
+            outlined
+            class="my-1"
+            color="primary"
+            accept=".pdf,.pptxm.,.ppt,.docx,.doc,.jgp,.jpeg"
+            style="max-width: 340px !important"
+            @files="onFileChanged"
+          >
+            <v-icon left>
+              cloud_upload
+            </v-icon>
+            Schulungsmaterial hochladen
+          </upload-button>
+          <div>
+            <p v-if="!this.training_files.length">
+              Noch keine Dateien hochgeladen
+            </p>
 
-          
-
+            <file-chip-group v-else>
+              <file-chip :key="file" :filename="file" v-for="file in training_files" @delete-file="removeFile">
+              </file-chip>
+            </file-chip-group>
+          </div>
         </v-form>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -233,20 +256,22 @@
 import { Vue, Component} from 'vue-property-decorator';
 import VueTelInputVuetify from 'vue-tel-input-vuetify/lib/vue-tel-input-vuetify.vue';
 import DatePickerMenu from '@/components/DatePickerMenu.vue';
-import { dispatchGetUsers } from '@/store/main/actions';
-import { readOneTraining, readUsers,} from '@/store/main/getters';
-import { ITrainingCreate } from '@/interfaces';
-import { dispatchCreateTraining, dispatchUpdateTraining } from '@/store/admin/actions';
+import { dispatchGetUsers, dispatchUploadFile } from '@/store/main/actions';
+import { readUsers,} from '@/store/main/getters';
+import { ITraining, ITrainingCreate } from '@/interfaces';
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
+import UploadButton from '@/components/UploadButton.vue';
+import { readOneTraining } from '@/store/training/getters';
+import FileChipGroup from '@/components/file-chip/FileChipGroup.vue';
+import FileChip from '@/components/file-chip/FileChip.vue';
+import { dispatchCreateTraining, dispatchGetTrainings, dispatchUpdateTraining } from '@/store/training/actions';
 
 @Component({
-  components: {VueTelInputVuetify, DatePickerMenu, EmployeeProfilePicture},
+  components: {VueTelInputVuetify, UploadButton, DatePickerMenu, EmployeeProfilePicture, FileChipGroup, FileChip},
 })
 export default class AdminViewTraining extends Vue {
 
   public time_menu = false;
-
-
   public valid = false;
   public training_titel = '';
   public training_type = '';
@@ -259,6 +284,12 @@ export default class AdminViewTraining extends Vue {
   public training_external_trainers = '';
   public training_trainers: number[] = [];
   public training_participants: number[] = [];
+  public training_files: string[] = [];
+
+  public isUploading = false;
+  
+  
+  
 
 
   get userProfiles() {
@@ -270,10 +301,27 @@ export default class AdminViewTraining extends Vue {
   }
 
   public async mounted() {
-    this.reset();
     await dispatchGetUsers(this.$store);
+    await dispatchGetTrainings(this.$store);
+    this.reset();
     this.valid = false;
   }
+
+  public async onFileChanged(files: File[]) {
+    this.isUploading = true;
+    const response = await dispatchUploadFile(this.$store, {
+      file: files[0],
+    });
+    this.isUploading = false;
+    
+    if (response)
+      this.training_files.push(response.filename);
+  }
+
+  public removeFile(file: string) {
+    this.training_files = this.training_files.filter((f) => f !== file);
+  }
+
   public removeTrainer(item) {
     const index = this.training_trainers.indexOf(item.id);
     if (index >= 0) this.training_trainers.splice(index, 1);
@@ -298,18 +346,19 @@ export default class AdminViewTraining extends Vue {
         description: this.training_description,
         date: this.trainingDate,
         wms_link: this.training_wms_link,
+        files: this.training_files.join(','),
         external_trainers: this.training_external_trainers,
         trainer_ids: this.training_trainers,
         participant_ids: this.training_participants,
       };
 
-      if(this.editTraining?.id) {
-        await dispatchUpdateTraining(this.$store, {id: this.editTraining.id, training: new_training});
+      let training: ITraining | undefined;
+      if (this.editTraining?.id) {
+        training = await dispatchUpdateTraining(this.$store, {id: this.editTraining.id, training: new_training});
+      } else {
+        training = await dispatchCreateTraining(this.$store, new_training);
       }
-      else {
-        await dispatchCreateTraining(this.$store, new_training);
-      }
-      this.$router.push('/main/admin/training');
+      this.$router.push(`/main/trainings/${training?.id}`);
       
     }
   }
@@ -324,7 +373,7 @@ export default class AdminViewTraining extends Vue {
       const participant_ids: number[] = this.editTraining.participants.map(participant => participant.id);
       const date_only = this.editTraining.date.split('T')[0];
       const time = this.editTraining.date.split('T')[1].substring(0,5);
-
+      
       this.training_titel = this.editTraining.title;
       this.training_type = this.editTraining.type;
       this.training_is_membership_progression = this.editTraining.is_membership_progression;
@@ -336,6 +385,7 @@ export default class AdminViewTraining extends Vue {
       this.training_external_trainers = this.editTraining.external_trainers;
       this.training_trainers = trainer_ids;
       this.training_participants = participant_ids;
+      this.training_files = this.editTraining.files ? this.editTraining.files.split(',') : []
     }
   }
 }

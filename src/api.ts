@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {apiUrl} from '@/env';
-import { ITraining, ITrainingCreate, IUserProfile, IUserProfileCreate, IUserProfileUpdate, UserType, RequestCreate, UserInvite } from './interfaces';
+import { ITraining, ITrainingCreate, IUserProfile, IUserProfileCreate, IUserProfileUpdate, UserType, RequestCreate, UserInvite, ITrainingApplicationCreate, ITrainingApplicationUpdate } from './interfaces';
 import {dataURItoBlob} from '@/utils';
 
 function authHeaders(token: string, headers = {}) {
@@ -69,7 +69,11 @@ export const api = {
     } else {
       // replace type from 'image/jpeg' to 'image.jpeg' for proper
       // detection in backend
-      fileName = fileName || file.type.replace('/', '.');
+      if ((file as File).name) {
+        fileName = fileName || (file as File).name;
+      } else {
+        fileName = fileName || file.type.replace('/', '.');
+      }
       image = file;
     }
     formData.append('file', image, fileName || 'image.png');
@@ -90,7 +94,7 @@ export const api = {
     return axios.put(`${apiUrl}/api/v1/users/${userId}`, data, authHeaders(token));
   },
   async updateTraining(token: string, trainingId: number, data: ITrainingCreate) {
-    return axios.put(`${apiUrl}/api/v1/training/${trainingId}`, data, authHeaders(token));
+    return axios.put<ITraining>(`${apiUrl}/api/v1/training/${trainingId}`, data, authHeaders(token));
   },
   async sendInvites(token: string, data: UserInvite[]) {
     return axios.post(`${apiUrl}/api/v1/users/send-invites`, data, authHeaders(token))
@@ -99,7 +103,7 @@ export const api = {
     return axios.post(`${apiUrl}/api/v1/users/`, data, authHeaders(token));
   },
   async createTraining(token: string, data: ITrainingCreate) {
-    return axios.post(`${apiUrl}/api/v1/training/`, data, authHeaders(token));
+    return axios.post<ITraining>(`${apiUrl}/api/v1/training/`, data, authHeaders(token));
   },
   async getTrainings(token: string) {
     return axios.get<ITraining[]>(`${apiUrl}/api/v1/training/`, { ...authHeaders(token)});
@@ -146,5 +150,14 @@ export const api = {
   },
   async getGroups(token: string) {
     return axios.get(`${apiUrl}/api/v1/groups/`, authHeaders(token));
+  },
+  async getTrainingApplications(token: string, trainingId: number) {
+    return axios.get(`${apiUrl}/api/v1/training/application/${trainingId}`, authHeaders(token));
+  },
+  async createTrainingApplication(token: string, trainingId: number, application: ITrainingApplicationCreate) {
+    return axios.post(`${apiUrl}/api/v1/training/application/${trainingId}`, application, authHeaders(token));
+  },
+  async updateTrainingApplication(token: string, applicationId: number, application: ITrainingApplicationUpdate) {
+    return axios.put(`${apiUrl}/api/v1/training/application/${applicationId}`, application, authHeaders(token));
   },
 };

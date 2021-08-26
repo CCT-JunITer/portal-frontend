@@ -4,7 +4,7 @@ import { IUserProfileCreate, IUserProfileUpdate, UserInvite, ITrainingCreate } f
 import { State } from '../state';
 import { AdminState } from './state';
 import { getStoreAccessors } from 'typesafe-vuex';
-import { dispatchCheckApiError, dispatchGetUsers, dispatchGetTrainings } from '../main/actions';
+import { dispatchCheckApiError } from '../main/actions';
 import { commitAddNotification, commitRemoveNotification, commitSetUser } from '../main/mutations';
 import { commitSetAdminUsers, commitSetRequests } from './mutations';
 
@@ -51,22 +51,6 @@ export const actions = {
       await dispatchCheckApiError(context, error);
     }
   },
-  async actionUpdateTraining(context: MainContext, payload: { id: number; training: ITrainingCreate }) {
-    try {
-      const loadingNotification = { content: 'saving', showProgress: true };
-      commitAddNotification(context, loadingNotification);
-      const response = (await Promise.all([
-        api.updateTraining(context.rootState.main.token, payload.id, payload.training),
-        await new Promise((resolve, reject) => setTimeout(() => resolve(), 500)),
-      ]))[0];
-      //commitSetUser(context, response.data);
-      commitRemoveNotification(context, loadingNotification);
-      commitAddNotification(context, { content: 'Änderung erfolgreich', color: 'success' });
-      await dispatchGetTrainings(context);
-    } catch (error) {
-      await dispatchCheckApiError(context, error);
-    }
-  },
   async actionCreateUser(context: MainContext, payload: IUserProfileCreate) {
     try {
       const loadingNotification = { content: 'saving', showProgress: true };
@@ -78,21 +62,6 @@ export const actions = {
       //commitSetUser(context, response.data);
       commitRemoveNotification(context, loadingNotification);
       commitAddNotification(context, { content: 'User successfully created', color: 'success' });
-    } catch (error) {
-      await dispatchCheckApiError(context, error);
-    }
-  },
-  async actionCreateTraining(context: MainContext, payload: ITrainingCreate) {
-    try {
-      const loadingNotification = { content: 'saving', showProgress: true };
-      commitAddNotification(context, loadingNotification);
-      const response = (await Promise.all([
-        api.createTraining(context.rootState.main.token, payload),
-        await new Promise((resolve, reject) => setTimeout(() => resolve(), 500)),
-      ]))[0];
-      //commitSetUser(context, response.data);
-      commitRemoveNotification(context, loadingNotification);
-      commitAddNotification(context, { content: 'Schulung erfolgreich angelegt', color: 'success' });
     } catch (error) {
       await dispatchCheckApiError(context, error);
     }
@@ -109,22 +78,6 @@ export const actions = {
       commitAddNotification(context, { content: 'Einladungen wurden versendet', color: 'success' });
 
       return response.data;
-    } catch (error) {
-      await dispatchCheckApiError(context, error);
-    }
-  },
-  async actionDeleteTraining(context: MainContext, payload: number) {
-    try {
-      const loadingNotification = { content: 'saving', showProgress: true };
-      commitAddNotification(context, loadingNotification);
-      const response = (await Promise.all([
-        api.deleteTraining(context.rootState.main.token, payload),
-        await new Promise((resolve, reject) => setTimeout(() => resolve(), 500)),
-      ]))[0];
-      commitSetUser(context, response.data);
-      commitRemoveNotification(context, loadingNotification);
-      commitAddNotification(context, { content: 'Schulung erfolgreich gelöscht', color: 'success' });
-      await dispatchGetTrainings(context);
     } catch (error) {
       await dispatchCheckApiError(context, error);
     }
@@ -197,10 +150,6 @@ export const dispatchGetAdminUsers = dispatch(actions.actionGetAdminUsers);
 export const dispatchCreateUser = dispatch(actions.actionCreateUser);
 export const dispatchUpdateUser = dispatch(actions.actionUpdateUser);
 export const dispatchDeleteUser = dispatch(actions.actionDeleteUser);
-export const dispatchCreateTraining = dispatch(actions.actionCreateTraining);
-export const dispatchDeleteTraining = dispatch(actions.actionDeleteTraining);
-export const dispatchUpdateTraining = dispatch(actions.actionUpdateTraining);
-
 export const dispatchSendInvites = dispatch(actions.actionSendInvites);
 export const dispatchAdminRequests = dispatch(actions.actionGetRequests);
 export const dispatchApplyRequest = dispatch(actions.actionApplyRequest);
