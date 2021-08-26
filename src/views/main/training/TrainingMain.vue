@@ -6,7 +6,7 @@
         Schulungen und Trainings
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn color="cctOrange" style="color: white" :to="{name: 'admin-training-create'}">
+      <v-btn color="cctOrange" style="color: white" :to="{name: 'training-create'}">
         <v-icon left>
           mdi-school
         </v-icon>
@@ -78,6 +78,42 @@
             </v-icon>
           </v-btn>
         </template>
+        <template v-slot:item.custom_register="{ item }">
+          <v-btn
+            v-if="isParticipant(item)"
+            disabled
+            style="margin: 10px;"
+          >
+            <v-icon>
+              mdi-account-check
+            </v-icon>
+          </v-btn>
+          <v-btn
+            v-else
+            color="cctGreen"
+            style="color: #fff; margin: 10px;"
+            @click="openRegisterTraining(item)"
+          >
+            <v-icon>
+              mdi-account-plus
+            </v-icon>
+          </v-btn>
+        </template>
+
+        <template v-slot:item.custom_details="{ item }">
+          <v-btn
+            color="cctGrey"
+            :to="{name: 'trainings-details', params: {id: item.id}}"
+            style="color:#fff;"
+          >
+            <v-icon>
+              mdi-text
+            </v-icon>
+          </v-btn>
+        </template>
+
+
+
       </v-data-table>
 
 
@@ -155,6 +191,39 @@
             </v-icon>
           </v-btn>
         </template>
+        <template v-slot:item.custom_register="{ item }">
+          <v-btn
+            v-if="isParticipant(item)"
+            disabled
+            style="margin: 10px;"
+          >
+            <v-icon>
+              mdi-account-check
+            </v-icon>
+          </v-btn>
+          <v-btn
+            v-else
+            disabled
+            style="margin: 10px;"
+          >
+            <v-icon>
+              mdi-account-cancel
+            </v-icon>
+          </v-btn>
+        </template>
+
+        <template v-slot:item.custom_details="{ item }">
+          <v-btn
+            color="cctGrey"
+            :to="{name: 'trainings-details', params: {id: item.id}}"
+            style="color:#fff;"
+          >
+            <v-icon>
+              mdi-text
+            </v-icon>
+          </v-btn>
+        </template>
+
   
       </v-data-table>
       
@@ -184,6 +253,7 @@
     <v-dialog 
       v-model="dialog_participants" 
       max-width="450px"
+      v-if="this.training_details"
     >
       <v-card>
         <v-card-title class="text-h5">Teilnehmerliste: {{ this.training_details.title }}</v-card-title>
@@ -223,9 +293,20 @@
     <v-dialog 
       v-model="dialog_register" 
       max-width="700px"
+      v-if="this.training_details"
     >
       <v-card>
-        <v-card-title class="text-h5">Willst du dich verbindlich zu dieser Schulung anmelden?</v-card-title>
+        <v-card-title class="text-h5">Willst du dich verbindlich zu "{{ training_details.title }}" anmelden?</v-card-title>
+        <v-spacer></v-spacer>
+        <v-card-subtitle>Die Anmeldung muss durch das HR Ressort freigeschaltet werden</v-card-subtitle>
+        <v-card-text>
+          <v-textarea
+            solo
+            v-model="application_text"
+            label="Nachricht/Bewerbung an das HR Schulungsteam"
+          >
+          </v-textarea>
+        </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="cctBlue" text @click="closeRegisterTraining">Abbrechen</v-btn>
@@ -241,16 +322,17 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { readUsers, readTrainings, readUserProfile } from '@/store/main/getters';
-import { dispatchGetTrainings, dispatchGetUserProfile, dispatchGetUsers } from '@/store/main/actions';
-import { dispatchUpdateTraining } from '@/store/admin/actions';
-import { ITraining, ITrainingCreate } from '@/interfaces';
+import { readTrainings } from '@/store/training/getters';
+import { dispatchCreateTrainingApplication, dispatchGetTrainings } from '@/store/training/actions';
+import { ITraining } from '@/interfaces';
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
+import { dispatchGetUserProfile, dispatchGetUsers } from '@/store/main/actions';
+import { readUserProfile, readUsers } from '@/store/main/getters';
 
 @Component({
   components: {EmployeeProfilePicture},
 })
-export default class AdminUsers extends Vue {
+export default class TrainingMain extends Vue {
 
   today = new Date();
 
@@ -260,20 +342,9 @@ export default class AdminUsers extends Vue {
 
   delete_item_id = 0;
 
-  training_details: ITraining = {
-    title: '',
-    type: '',
-    is_membership_progression: false,
-    topic: '',
-    description: '',
-    date: '',
-    wms_link: '',
-    external_trainers: '',
-    id: 0,
-    author: [],
-    trainers: [],
-    participants: [],
-  }
+  training_details: ITraining | null = null;
+
+  application_text = '';
 
   public headers = [
     {
@@ -323,10 +394,24 @@ export default class AdminUsers extends Vue {
       align: 'center',
       sortable: false,
     },
+
+    {
+      text: 'Anmelden',
+      value: 'custom_register',
+      align: 'center',
+      sortable: false,
+    },
     
     {
       text: 'Teilnehmer:innen',
       value: 'custom_show_participants',
+      align: 'center',
+      sortable: false,
+      
+    },
+    {
+      text: 'Details',
+      value: 'custom_details',
       align: 'center',
       sortable: false,
       
@@ -365,31 +450,13 @@ export default class AdminUsers extends Vue {
 
 
   public async registerForTraining() {
-    if(this.userProfile?.id) {
-      const trainer_ids: number[] = this.training_details.trainers.map(trainer => trainer.id);
-      const participant_ids: number[] = this.training_details.participants.map(participant => participant.id);
-      participant_ids.push(this.userProfile.id);
-
-      const new_training: ITrainingCreate = {
-        title: this.training_details.title,
-        type: this.training_details.type,
-        is_membership_progression: this.training_details.is_membership_progression,
-        topic: this.training_details.topic,
-        description: this.training_details.description,
-        date: this.training_details.date,
-        wms_link: this.training_details.wms_link,
-        external_trainers: this.training_details.external_trainers,
-        trainer_ids: trainer_ids,
-        participant_ids: participant_ids, 
-      };
-      await dispatchUpdateTraining(this.$store, {id: this.training_details.id, training: new_training});
-      this.closeRegisterTraining();
-    
-    }
+    dispatchCreateTrainingApplication(this.$store, { trainingId: this.training_details!.id, application: { description:  this.application_text} });
+    this.closeRegisterTraining();
   }
 
 
   public isParticipant(item: ITraining): boolean {
+    console.log(this.userProfile?.id);
     return item.participants.some(participant => participant.id == this.userProfile?.id);
   }
 

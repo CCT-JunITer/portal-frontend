@@ -15,6 +15,7 @@ export const getters = {
     }
     return state.users.find(user => user.id === numberId);
   },
+
   isMe: (state: MainState) => (route: Route) => {
     const id = route.params.id;
     const numberId = parseInt(id);
@@ -23,23 +24,10 @@ export const getters = {
     return isMe;
   },
   users: (state: MainState) => state.users,
-  trainingsForRoute: (state: MainState) => (route: Route) => {
-    const user = getters.routeUser(state)(route);
-    if (!user) {
-      return [];
-    }
-    return state.trainingsParticipants[user.id] || [];
-  },
   oneUser: (state: MainState) => (userId: number) => {
     const filteredUsers = state.users.filter((user) => user.id === userId);
     if (filteredUsers.length > 0) {
       return { ...filteredUsers[0] };
-    }
-  },
-  oneTraining: (state: MainState) => (trainingId: number) => {
-    const filteredTrainings = state.trainings.filter((trainig) => trainig.id === trainingId);
-    if (filteredTrainings.length > 0) {
-      return { ...filteredTrainings[0] };
     }
   },
   hasAdminAccess: (state: MainState) => {
@@ -47,7 +35,6 @@ export const getters = {
       state.userProfile &&
             state.userProfile.is_superuser && state.userProfile.is_active);
   },
-  trainings: (state: MainState) => state.trainings,
   loginError: (state: MainState) => state.logInError,
   dashboardShowDrawer: (state: MainState) => state.dashboardShowDrawer,
   dashboardMiniDrawer: (state: MainState) => state.dashboardMiniDrawer,
@@ -72,11 +59,8 @@ export const readUserStatus = read(getters.userStatus);
 export const readUserProfile = read(getters.userProfile);
 export const readFirstNotification = read(getters.firstNotification);
 export const readOneUser = read(getters.oneUser);
-export const readOneTraining = read(getters.oneTraining);
 export const readUsers = read(getters.users);
 export const readIsMe = read(getters.isMe);
 export const readRouteUser = read(getters.routeUser);
-export const readTrainingsForRoute = read(getters.trainingsForRoute)
-export const readTrainings = read(getters.trainings);
 export const readMyRequests = read(getters.myRequests);
 export const readGroups = read(getters.groups);

@@ -15,8 +15,6 @@ import {
   commitSetLogInError,
   commitSetMyRequests,
   commitSetToken,
-  commitSetTrainingsFor,
-  commitSetTrainings,
   commitSetUserProfile,
   commitSetUsers,
   commitSetUserStatus
@@ -218,26 +216,6 @@ export const actions = {
       await dispatchCheckApiError(context, error);
     }
   },
-  async actionGetTrainingsFor(context: MainContext, userId: number) {
-    try {
-      const response = await api.getPersonalTrainings(context.rootState.main.token, userId);
-      if (response) {
-        commitSetTrainingsFor(context, { userId, payload: response.data });
-      }
-    } catch (error) {
-      await dispatchCheckApiError(context, error);
-    }
-  },
-  async actionGetTrainings(context: MainContext) {
-    try {
-      const response = await api.getTrainings(context.rootState.main.token);
-      if (response) {
-        commitSetTrainings(context, response.data);
-      }
-    } catch (error) {
-      await dispatchCheckApiError(context, error);
-    }
-  },
   async actionCreateUserOpen(context: MainContext, payload: {user: IUserProfileCreate; token: string}) {
     try {
       const response = await api.createUserOpen(payload.token, payload.user);
@@ -309,9 +287,7 @@ export const dispatchRemoveNotification = dispatch(actions.removeNotification);
 export const dispatchPasswordRecovery = dispatch(actions.passwordRecovery);
 export const dispatchResetPassword = dispatch(actions.resetPassword);
 export const dispatchGetUsers = dispatch(actions.actionGetUsers);
-export const dispatchGetTrainings = dispatch(actions.actionGetTrainings);
 export const dispatchCreateUserOpen = dispatch(actions.actionCreateUserOpen); 
-export const dispatchGetTrainingsFor = dispatch(actions.actionGetTrainingsFor); 
 export const dispatchGetMyRequests = dispatch(actions.actionGetMyRequests); 
 export const dispatchAddRequestMe = dispatch(actions.actionAddRequestMe); 
 export const dispatchGetGroups = dispatch(actions.actionGetGroups); 
