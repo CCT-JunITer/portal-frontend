@@ -215,6 +215,12 @@ export default new Router({
                       component: () => import(
                       /* webpackChunkName: "main-admin-requests" */ './views/main/people/admin/AdminRequests.vue'),
                     },
+                    {
+                      path: 'financerequests',
+                      name: 'main-admin-finance-requests',
+                      component: () => import(
+                      /* webpackChunkName: "main-admin-requests" */ './views/main/finanzen/AdminFinanceRequests.vue'),
+                    },
                   ],
                 }
               ]
@@ -249,6 +255,10 @@ export default new Router({
                   /* webpackChunkName: "training-detail" */ './views/main/training/TrainingDetail.vue'),
                 },
               ]
+            },
+            {
+              path: 'finanzen',
+              component: () => import('./views/main/finanzen/FinanceRequests.vue')
             },
             {
               path: 'calendar',

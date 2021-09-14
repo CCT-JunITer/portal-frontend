@@ -82,13 +82,13 @@
               :src="require('@/assets/admin_finanzantrag.jpg')"
             ></v-img>
             <v-card-title>
-              <v-icon left>money</v-icon>
+              <v-icon left>mdi-cash</v-icon>
               Finanzanträge verwalten
             </v-card-title>
             <v-card-text>Hier können eingegangene Finanzanträge verwaltet werden.</v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn text to="/main/admin/training" color="cctBlue">Verwalten</v-btn>
+              <v-btn text to="/main/finanzen" color="cctBlue">Verwalten</v-btn>
             </v-card-actions>
           </v-card>
         </v-col>
