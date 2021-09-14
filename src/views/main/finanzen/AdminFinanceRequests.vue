@@ -4,14 +4,14 @@
       <v-flex>
         <h4 class="text-h4 my-5">Meine Finanzanträge</h4>
       </v-flex>
-      <div class="d-flex align-center">
+      <!-- <div class="d-flex align-center">
         <v-btn outlined color="cctBlue" :to="{ name: 'profile-request-create' }">
           <v-icon left>
             mdi-clipboard-text
           </v-icon>
           Finanzantrag stellen
         </v-btn>
-      </div>
+      </div> -->
     </div>
     <v-divider></v-divider>
     <v-card-actions>
@@ -26,20 +26,20 @@
     </v-card-actions>
     <v-row>
       <v-col v-for="request in requests" :key="request.id" cols="12" sm="6" lg="3">
-        <request-card :request="request" outlined></request-card>
+        <finance-request-card :request="request" outlined></finance-request-card>
       </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script lang="ts">
-import RequestCard from '@/components/request/RequestCard.vue';
+import FinanceRequestCard from '@/components/request/FinanceRequestCard.vue';
 import { dispatchGetMyRequests } from '@/store/main/actions';
 import { readMyRequests } from '@/store/main/getters';
 import { Component, Vue } from 'vue-property-decorator';
 
 @Component({
-  components: { RequestCard }
+  components: { FinanceRequestCard }
 })
 export default class UserProfileRequests extends Vue {
 

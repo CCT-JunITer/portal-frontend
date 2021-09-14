@@ -88,7 +88,7 @@
             <v-card-text>Hier können eingegangene Finanzanträge verwaltet werden.</v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn text to="/main/finanzen" color="cctBlue">Verwalten</v-btn>
+              <v-btn text to="/main/admin/finance-requests" color="cctBlue">Verwalten</v-btn>
             </v-card-actions>
           </v-card>
         </v-col>

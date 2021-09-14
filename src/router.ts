@@ -52,6 +52,10 @@ export default new Router({
                 {
                   path: 'user-invite',
                   component: () => import(/* webpackChunkName: "admin-user-invite" */ './views/main/admin/UserInvitation.vue')
+                },
+                {
+                  path: 'finance-requests',
+                  component: () => import(/* webpackChunkName: "admin-user-invite" */ './views/main/finanzen/AdminFinanceRequests.vue')
                 }
               ]
             },
@@ -214,12 +218,6 @@ export default new Router({
                       name: 'main-admin-requests',
                       component: () => import(
                       /* webpackChunkName: "main-admin-requests" */ './views/main/people/admin/AdminRequests.vue'),
-                    },
-                    {
-                      path: 'financerequests',
-                      name: 'main-admin-finance-requests',
-                      component: () => import(
-                      /* webpackChunkName: "main-admin-requests" */ './views/main/finanzen/AdminFinanceRequests.vue'),
                     },
                   ],
                 }
