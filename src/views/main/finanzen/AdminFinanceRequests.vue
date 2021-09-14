@@ -2,7 +2,7 @@
   <v-container>
     <div class="d-flex">
       <v-flex>
-        <h4 class="text-h4 my-5">Meine Finanzanträge</h4>
+        <h4 class="text-h4 my-5">Übersicht Finanzanträge</h4>
       </v-flex>
       <!-- <div class="d-flex align-center">
         <v-btn outlined color="cctBlue" :to="{ name: 'profile-request-create' }">
