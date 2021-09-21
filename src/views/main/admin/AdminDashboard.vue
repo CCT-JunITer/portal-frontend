@@ -75,6 +75,24 @@
           </v-card>
         </v-col>
 
+        <v-col cols="12" sm="6" md="4">
+          <v-card elevation="5">
+            <v-img
+              height="250"
+              :src="require('@/assets/admin_finanzantrag.jpg')"
+            ></v-img>
+            <v-card-title>
+              <v-icon left>mdi-cash</v-icon>
+              Finanzanträge verwalten
+            </v-card-title>
+            <v-card-text>Hier können eingegangene Finanzanträge verwaltet werden.</v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn text to="/main/admin/finance-requests" color="cctBlue">Verwalten</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-col>
+
       </v-row>
     </v-container>
   </div>
