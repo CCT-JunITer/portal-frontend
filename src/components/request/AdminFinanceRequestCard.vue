@@ -4,9 +4,9 @@
       Finanzantrag
     </v-card-title>
     <v-card-subtitle>
-      <div><v-chip>300€</v-chip><v-chip>WORKEND</v-chip></div>
+      <div  style="float: right"><v-chip>300€</v-chip></div>
       <div class="text-overline purple--text">
-        {{ {'in progress': 'In Bearbeitung', accepted: 'Angenommen', denied: 'Abgelehnt' }[request.status] }}
+        Anfrage: {{ {'in progress': 'In Bearbeitung', accepted: 'Angenommen', denied: 'Abgelehnt' }[request.status] }}
       </div>
       <div class="text-overline green--text">
         Freigabe: {{ {'in progress': 'In Bearbeitung', accepted: 'Freigegeben', denied: 'Zurückgewiesen' }[request.status] }}
@@ -25,8 +25,12 @@
       </v-list-item>
     </v-list>
     <v-card-text>
+      Kostenart
+      <div style="float: right"><v-chip>WORKEND</v-chip></div>
+    </v-card-text>
+    <v-card-text>
       Verwendungszweck:
-      <div v-text="request.description" class="pre-formatted"></div>
+      <div>Platzhalter Verwendungszweck</div>
     </v-card-text>
     <v-card-actions>
       <v-list-item>

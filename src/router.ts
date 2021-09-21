@@ -256,7 +256,7 @@ export default new Router({
             },
             {
               path: 'finanzen',
-              component: () => import('./views/main/finanzen/FinanceRequests.vue')
+              component: () => import('./views/main/finanzen/UserFinanceRequests.vue')
             },
             {
               path: 'calendar',
