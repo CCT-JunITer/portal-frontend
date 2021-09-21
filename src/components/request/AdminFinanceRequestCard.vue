@@ -4,7 +4,7 @@
       Finanzantrag
     </v-card-title>
     <v-card-subtitle>
-      <div  style="float: right"><v-chip>300€</v-chip></div>
+      <div><v-chip>300€</v-chip><v-chip>WORKEND</v-chip></div>
       <div class="text-overline purple--text">
         Anfrage: {{ {'in progress': 'In Bearbeitung', accepted: 'Angenommen', denied: 'Abgelehnt' }[request.status] }}
       </div>
@@ -24,10 +24,6 @@
         </v-list-item-content>
       </v-list-item>
     </v-list>
-    <v-card-text>
-      Kostenart
-      <div style="float: right"><v-chip>WORKEND</v-chip></div>
-    </v-card-text>
     <v-card-text>
       Verwendungszweck:
       <div>Platzhalter Verwendungszweck</div>
