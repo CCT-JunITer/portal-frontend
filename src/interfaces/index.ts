@@ -29,6 +29,9 @@ export interface IUserProfile {
     matriculation_number: string;
     direct_debit_mandate: string;
     address: string;
+    iban: string;
+    bic: string;
+    bank: string;
 
     admin_comment?: string;
 }
@@ -54,6 +57,9 @@ export interface IUserProfileUpdate {
     matriculation_number?: string;
     direct_debit_mandate?: string;
     address?: string;
+    iban?: string;
+    bic?: string;
+    bank?: string;
 
 
     admin_comment?: string;

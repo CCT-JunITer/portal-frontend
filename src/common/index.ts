@@ -58,6 +58,8 @@ export const required = (v: string) => !!v || 'Dieses Feld wird benötigt.';
 
 export const isNumber = (v: string) => (v && !!v.match(/[0-9]+/)) || 'Dies ist keine Zahl.';
 
+export const isIBAN = (v: string) => (!v || !!v.match(/[A-Z]{2}[0-9]{2}(?:[ ]?[0-9]{4}){4}(?!(?:[ ]?[0-9]){3})(?:[ ]?[0-9]{1,2})?/)) || 'Dies ist keine IBAN.';
+
 export const isTodayBirthday = (date: Date | string) => {
   if (typeof date === 'string') {
     date = new Date(date);

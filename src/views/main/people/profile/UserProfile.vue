@@ -43,6 +43,12 @@
           Anrufen
         </v-btn>
 
+        <v-btn color="cctBlue lighten-2" small outlined v-if="isMe" class="ma-2 flex-grow-1" @click="downloadDebitMandate">
+          <v-icon left small>
+            mdi-file-document-edit-outline
+          </v-icon>
+          Lastschriftmandat
+        </v-btn>
 
         <v-dialog width="700px" transition="dialog-bottom-transition" v-model="showSignatureDialog">
           
@@ -148,7 +154,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { readIsMe, readRouteUser, readUserProfile } from '@/store/main/getters';
-import { dispatchGetUsers } from '@/store/main/actions';
+import { dispatchDownloadDebitMandate, dispatchGetUsers } from '@/store/main/actions';
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 import EmployeeCard from '@/components/employee/EmployeeCard.vue';
 import { copyTextToClipboard } from '@/utils';
@@ -243,6 +249,21 @@ export default class UserProfile extends Vue {
 
   public copySignatureToClipboard() {
     copyTextToClipboard(this.userSignature);
+  }
+
+  public async downloadDebitMandate() {
+    const fileBlob = await dispatchDownloadDebitMandate(this.$store);
+    const fileUrl = URL.createObjectURL(fileBlob);
+
+    // rename to original name
+    const link = document.createElement('a');
+    document.body.appendChild(link);
+    link.href = fileUrl;
+    link.setAttribute('type', 'hidden');
+    link.setAttribute('download', `Lastschriftmandat_${this.userProfile?.full_name.replaceAll(' ', '_')}.pdf`);
+    link.click();
+
+    URL.revokeObjectURL(fileUrl);
   }
 }
 </script>
