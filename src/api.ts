@@ -87,6 +87,9 @@ export const api = {
     const params = { filename };
     return axios.get(`${apiUrl}/api/v1/utils/download-file`, { ...authHeaders(token), params, responseType: 'blob' });
   },
+  async downloadDebitMandate(token: string) {
+    return axios.get(`${apiUrl}/api/v1/documents/sepa/me`, { ...authHeaders(token), responseType: 'blob' });
+  },
   async deleteUser(token: string, userId: number) {
     return axios.delete(`${apiUrl}/api/v1/users/${userId}`, authHeaders(token));
   },

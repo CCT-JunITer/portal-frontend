@@ -99,6 +99,17 @@ export const actions = {
       await dispatchCheckApiError(context, error);
     }
   },
+  async actionDownloadDebitMandate(context: MainContext) {
+    try {
+      const loadingNotification = { content: 'Generiere Lastschriftmandat', showProgress: true, color: 'cctBlue' };
+      commitAddNotification(context, loadingNotification);
+      const response = await api.downloadDebitMandate(context.state.token);
+      commitRemoveNotification(context, loadingNotification);
+      return response.data;
+    } catch (error) {
+      await dispatchCheckApiError(context, error);
+    }
+  },
   async actionDownloadFile(context: MainContext, payload: { filename: string }) {
     try {
       const response = await api.downloadFile(context.state.token, payload.filename);
@@ -283,6 +294,7 @@ export const dispatchRouteLogOut = dispatch(actions.actionRouteLogOut);
 export const dispatchUpdateUserProfile = dispatch(actions.actionUpdateUserProfile);
 export const dispatchUploadFile = dispatch(actions.actionUploadFile);
 export const dispatchDownloadFile = dispatch(actions.actionDownloadFile);
+export const dispatchDownloadDebitMandate = dispatch(actions.actionDownloadDebitMandate);
 export const dispatchRemoveNotification = dispatch(actions.removeNotification);
 export const dispatchPasswordRecovery = dispatch(actions.passwordRecovery);
 export const dispatchResetPassword = dispatch(actions.resetPassword);

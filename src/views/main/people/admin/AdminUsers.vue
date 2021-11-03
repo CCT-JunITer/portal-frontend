@@ -103,6 +103,11 @@ export default class AdminUsers extends Vue {
       value: 'matriculation_number',
     },
     {
+      text: 'IBAN',
+      sortable: true,
+      value: 'iban',
+    },
+    {
       text: 'Geburtsdatum',
       sortable: true,
       value: 'birthdate',

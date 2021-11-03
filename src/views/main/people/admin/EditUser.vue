@@ -79,6 +79,34 @@
         >
         </v-text-field>
 
+        <v-row dense>
+          <v-col cols="12">
+            <v-text-field
+              label="Bank"
+              class="input-lg"
+              v-model="bank"
+            >
+            </v-text-field>
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-text-field
+              label="IBAN"
+              class="input-lg"
+              v-model="iban"
+              :rules="[$common.isIBAN]"
+            >
+            </v-text-field>
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-text-field
+              label="BIC"
+              class="input-lg"
+              v-model="bic"
+            >
+            </v-text-field>
+          </v-col>
+
+        </v-row>
 
         <v-select
           label="Höchste Projektposition"
@@ -369,6 +397,9 @@ export default class EditUser extends Vue {
   public address = '';
   public highestProjectPosition = '';
   public matriculationNumber = '';
+  public iban = '';
+  public bic = '';
+  public bank = '';
 
 
   public password1 = '';
@@ -429,6 +460,9 @@ export default class EditUser extends Vue {
       this.address = this.userProfile.address;
       this.highestProjectPosition = this.userProfile.highest_project_position;
       this.matriculationNumber = this.userProfile.matriculation_number;
+      this.iban = this.userProfile.iban;
+      this.bic = this.userProfile.bic;
+      this.bank = this.userProfile.bank;
 
     }
   }
@@ -455,7 +489,9 @@ export default class EditUser extends Vue {
         address: this.address,
         matriculation_number: this.matriculationNumber,
         highest_project_position: this.highestProjectPosition,
-
+        iban: this.iban,
+        bic: this.bic,
+        bank: this.bank,
       };
 
       if(this.avatar) {
