@@ -1,15 +1,13 @@
 import { mutations } from './mutations';
 import { getters } from './getters';
 import { actions } from './actions';
-import { AdminState } from './state';
+import { FinanceRequestState } from './state';
 
-const defaultState: AdminState = {
-  requests: [],
-  users: [],
-  financeRequests: [],
+const defaultState: FinanceRequestState = {
+  myFinanceRequests: [],
 };
 
-export const adminModule = {
+export const financeRequestModule = {
   state: defaultState,
   mutations,
   actions,

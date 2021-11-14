@@ -5,6 +5,10 @@ export const RESSORTS = [
   'Kein Ressort', 'Juniter','Public Affairs','Human Resources', 'Quality Management', 'International Networks','Board','Vorstand','Projektmanager'
 ]
 
+export const FINANCE_REQUEST_STATUS = [
+  'created', 'request_rejected','request_accepted','file_uploaded', 'file_rejected', 'file_accpeted'
+]
+
 export const STUDYLEVELS = [
   'Bachelor', 'Master', 'Promotion', 'Staatsexamen'
 ]
@@ -24,6 +28,10 @@ export const UNIVERSITIES = [
 
 export const SCHULUNGSART = [
   'Pflichtschulung', 'Zusatzschulung', 'Allgemeine Schulung'
+];
+
+export const KOSTENART = [
+  'Workend', 'Interne Vereinsevents', 'Tower & Material', 'Fixkosten', 'Vorstandsbudget', 'Geschenke', 'Sonstiges' 
 ];
 
 export const SCHULUNGSTHEMA = [

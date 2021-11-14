@@ -55,7 +55,7 @@ export default new Router({
                 },
                 {
                   path: 'finance-requests',
-                  component: () => import(/* webpackChunkName: "admin-user-invite" */ './views/main/finanzen/AdminFinanceRequests.vue')
+                  component: () => import(/* webpackChunkName: "admin-user-invite" */ './views/main/people/admin/AdminFinanceRequests.vue')
                 }
               ]
             },
@@ -255,8 +255,30 @@ export default new Router({
               ]
             },
             {
-              path: 'finanzen',
-              component: () => import('./views/main/finanzen/UserFinanceRequests.vue')
+              path: 'finance-requests',
+              component: RouterComponent,
+              children: [
+                {
+                  path: '',
+                  name: 'finance-request',
+                  component: () => import('./views/main/finance-request/UserFinanceRequests.vue'),
+                },
+                {
+                  path: ':id',
+                  name: 'finance-request-detail',
+                  component: () => import('./views/main/finance-request/FinanceRequestDetail.vue'),
+                },
+                {
+                  path: 'edit/:id',
+                  name: 'finance-request-edit',
+                  component: () => import('./views/main/finance-request/CreateFinanceRequest.vue'),
+                },
+                {
+                  path: 'create',
+                  name: 'finance-request-create',
+                  component: () => import('./views/main/finance-request/CreateFinanceRequest.vue'),
+                },
+              ]
             },
             {
               path: 'calendar',

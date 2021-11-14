@@ -66,3 +66,28 @@ export function copyTextToClipboard(text: string) {
     console.error('Async: Could not copy text: ', err);
   });
 }
+
+
+export function financeRequestNextStep(status: string): string {
+  switch (status) {
+  case 'created': return 'Finanzvorstand entscheidet über Budget';
+  case 'request_rejected': return 'Budget anpassen';
+  case 'request_accepted': return 'Rechnung hochladen';
+  case 'file_uploaded': return 'Rechnungsprüfung druch Finanzvorstand';
+  case 'file_rejected': return 'Rechnung anpassen und erneut hochladen';
+  case 'file_accepted': return 'Keine';
+  default: return '';
+  }
+}
+
+export function translateFinanceRequestStatus(status: string): string {
+  switch (status) {
+  case 'created': return 'Budget Angefragt';
+  case 'request_rejected': return 'Budget nicht genehmigt';
+  case 'request_accepted': return 'Budget genehmigt';
+  case 'file_uploaded': return 'Rechnung hochgeladen';
+  case 'file_rejected': return 'Rechnung nicht angenommen';
+  case 'file_accepted': return 'Finanzantrag erfolgreich bearbeitet';
+  default: return '';
+  }
+}
