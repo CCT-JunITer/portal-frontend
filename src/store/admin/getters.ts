@@ -11,6 +11,14 @@ export const getters = {
       return { ...filteredUsers[0] };
     }
   },
+  adminFinanceRequests: (state: AdminState) => state.financeRequests,
+  adminOneFinanceRequest: (state: AdminState) => (financeId: number) => {
+    const filteredFinanceRequests = state.financeRequests.filter((financeRequest) => financeRequest.id === financeId);
+    if (filteredFinanceRequests.length > 0) {
+      return { ...filteredFinanceRequests[0] };
+    }
+  },
+  
 };
 
 const { read } = getStoreAccessors<AdminState, State>('');
@@ -18,3 +26,5 @@ const { read } = getStoreAccessors<AdminState, State>('');
 export const readAdminRequests = read(getters.requests);
 export const readAdminUsers = read(getters.adminUsers);
 export const readAdminOneUser = read(getters.adminOneUser);
+export const readAdminFinanceRequests = read(getters.adminFinanceRequests);
+export const readAdminOneFinanceRequest = read(getters.adminOneFinanceRequest);

@@ -7,9 +7,9 @@ let envApiUrl = '';
 if (env === 'production') {
   envApiUrl = `https://${process.env.VUE_APP_DOMAIN_PROD}`;
 } else if (env === 'staging') {
-  envApiUrl = `https://${process.env.VUE_APP_DOMAIN_STAG}`;
+  envApiUrl = 'http://127.0.0.1:8000';
 } else {
-  envApiUrl = `http://${process.env.VUE_APP_DOMAIN_DEV}`;
+  envApiUrl = 'http://127.0.0.1:8000';
 }
 
 export const apiUrl = envApiUrl;

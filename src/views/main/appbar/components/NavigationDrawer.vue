@@ -41,7 +41,7 @@
         </v-list-item-content>
       </v-list-item>
 
-      <v-list-item to="/main/finanzen" color="cctBlue">
+      <v-list-item :to="{ name: 'finance-request'}" color="cctBlue">
         <v-list-item-icon>
           <v-icon>mdi-cash</v-icon>
         </v-list-item-icon>

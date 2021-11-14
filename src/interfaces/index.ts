@@ -169,3 +169,45 @@ export interface RequestCreate {
     description: string;
     groups: RequestGroup[];
 }
+
+
+
+export type IFinanceRequestStatus = 'created' | 'request_rejected' | 'request_rejected' | 'file_uploaded' | 'file_rejected' | 'file_accepted'
+
+
+export interface IFinanceRequest {
+    type: string;
+    purpose: string;
+    amount: number;
+    files: string;
+    message: string;
+    id: number;
+    status: IFinanceRequestStatus;
+    date_created: string;
+    date_last_update: string;
+    author_id: number;
+    author: IUserProfile;
+    association: string;
+    iban: string;
+}
+
+export interface IFinanceRequestUpdate {
+    type: string;
+    purpose: string;
+    amount: number;
+    files: string;
+    message: string;
+    status: IFinanceRequestStatus;
+    association: string;
+    date_last_update: string;
+    iban: string;
+}
+export interface IFinanceRequestCreate {
+    type: string;
+    purpose: string;
+    amount: number;
+    files: string;
+    message: string;
+    association: string;
+    iban: string;
+}
