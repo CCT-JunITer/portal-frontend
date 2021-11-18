@@ -185,8 +185,8 @@ export const api = {
   async deleteFinanceRequest(token: string, financeId: number) {
     return axios.delete(`${apiUrl}/api/v1/finance/${financeId}`, authHeaders(token));
   },
-  async updateFinanceRequestState(token: string, financeId: number, updated_status: string) {
-    return axios.put(`${apiUrl}/api/v1/finance/status/${financeId}`, { updated_status } , authHeaders(token));
+  async updateFinanceRequestState(token: string, financeId: number, updated_status: string, updated_message_file: string, updated_message_request: string ) {
+    return axios.put(`${apiUrl}/api/v1/finance/status/${financeId}`, { updated_status, updated_message_file, updated_message_request } , authHeaders(token));
   },
   
   async updateFinanceRequestStateReceipt(token: string, financeId: number, updated_status, updated_receipt) {

@@ -264,11 +264,6 @@ export default new Router({
                   component: () => import('./views/main/finance-request/UserFinanceRequests.vue'),
                 },
                 {
-                  path: ':id',
-                  name: 'finance-request-detail',
-                  component: () => import('./views/main/finance-request/FinanceRequestDetail.vue'),
-                },
-                {
                   path: 'edit/:id',
                   name: 'finance-request-edit',
                   component: () => import('./views/main/finance-request/CreateFinanceRequest.vue'),
@@ -277,6 +272,11 @@ export default new Router({
                   path: 'create',
                   name: 'finance-request-create',
                   component: () => import('./views/main/finance-request/CreateFinanceRequest.vue'),
+                },
+                {
+                  path: ':id',
+                  name: 'finance-request-detail',
+                  component: () => import('./views/main/finance-request/FinanceRequestDetail.vue'),
                 },
               ]
             },

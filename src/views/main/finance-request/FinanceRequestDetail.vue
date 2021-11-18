@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container v-if="this.financeRequest">
     <div>
       <div class="d-flex">
         <h1 class="text-md-h2 text-sm-h3 text-h4 text--primary mb-3">Finanzantrag</h1>
@@ -44,18 +44,40 @@
         </v-col>
         <v-col cols="12" md="8" class="px-5">  
           <v-row v-for="item in financeRequestDetails" :key="item.name" class="my-4">
-            <span class="col-xs-12 col-md-6 col-lg-4 col-xl-3 my-0 py-0 font-weight-normal">
+            <span class="col-xs-12 col-md-6 col-lg-4 col-xl-3 my-0 py-0">
               {{ item.name }}
             </span>
-
             <span class="col-xs-12 col-md-6 col-lg-8 col-xl-9 my-0 py-0 font-weight-medium">
               {{ item.key }}
             </span>
+          </v-row>
+
+          <v-row class="my-4" v-if="this.financeRequest.association">
+            <span justify="center" class="col-xs-12 col-md-6 col-lg-4 col-xl-3 my-0 py-0">
+              Ressortbudget für
+            </span>
+            <v-list-item justify="center" class="col-xs-12 col-md-6 col-lg-4 col-xl-3 my-0 py-0 font-weight-medium">
+              {{this.financeRequest.association}}
+            </v-list-item>
+          </v-row>
+
+          <v-row class="my-4">
+            <span justify="center" class="col-xs-12 col-md-6 col-lg-4 col-xl-3 my-0 py-0">
+              Antragsteller
+            </span>
+            <v-list-item justify="center" class="col-xs-12 col-md-6 col-lg-4 col-xl-3 my-0 py-0">
+              <employee-profile-picture :employee="this.financeRequest.author" component="v-list-item-avatar" small></employee-profile-picture>
+              <v-list-item-content>
+                <v-list-item-title v-text="this.financeRequest.author.full_name"></v-list-item-title>
+                <v-list-item-subtitle v-text="this.financeRequest.author.ressort"></v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
           </v-row>
         </v-col>
       </v-row>
 
       <v-divider class="my-5"></v-divider>
+      
       <v-row>
         <v-col cols="12" md="4" class="px-5">
           <h2 class="text-h4 text--primary mb-3">Status</h2>
@@ -157,11 +179,13 @@
                   Ablehnen
                 </v-btn>
               </div>
+              
               <v-textarea 
                 :disabled="isAccepted"
                 placeholder="Ablehnungsgrund"
-                v-model="this.message"
+                v-model="message_request"
               ></v-textarea>
+              
               <div class="d-flex justify-end">
                 <v-btn color="primary" @click="changeStatusCreated()">
                   Abschicken
@@ -180,7 +204,7 @@
                 Das Budget wurde nicht genehmigt
               </v-alert>
               <div class="text-overline">Ablehnungsgrund:</div>
-              <p v-text="this.financeRequest.message"></p>
+              <p v-text="this.financeRequest.message_request"></p>
               <v-alert 
                 type="info"
                 prominent
@@ -218,30 +242,8 @@
               >
                 Dein Budget wurde genehmigt. Lade deine Rechnung(en) hier hoch.
               </v-alert>
-              <upload-button
-                :loading="this.isUploading"
-                :disabled="this.isUploading"
-                outlined
-                class="my-1"
-                color="primary"
-                accept=".pdf,.docx,.doc,.jgp,.jpeg,.png"
-                style="max-width: 340px !important"
-                @files="onFileChanged"
-              >
-                <v-icon left>
-                  cloud_upload
-                </v-icon>
-                Rechnung hochladen
-              </upload-button>
               <div>
-                <p v-if="!this.files.length">
-                  Noch keine Rechnung hochgeladen
-                </p>
-
-                <file-chip-group v-else>
-                  <file-chip :key="file" :filename="file" v-for="file in files" @delete-file="removeFile">
-                  </file-chip>
-                </file-chip-group>
+                <file-manager v-model="files" :multiple="true" class="my-2"></file-manager>
                 <v-btn
                   color="#66BB6A"
                   dark 
@@ -260,9 +262,7 @@
               >
                 Bitte überprüfe die Rechnung(en) und drücke auf annehmen/ablehnen
               </v-alert>
-              <file-chip-group class="d-flex flex-wrap space-between my-3" v-if="this.financeRequest.files">
-                <file-chip :key="file" :filename="file" v-for="file in this.currentFiles"></file-chip>
-              </file-chip-group>
+              <file-manager :value="this.currentFiles" class="my-2" :readonly="true" v-if="this.financeRequest.files"></file-manager>
               <div class="d-flex justify-space-around">
                 <v-btn outlined large :class="{'btn-accept-active': isAccepted}" color="#66BB6A" small @click="isAccepted = true">
                   Annehmen
@@ -274,7 +274,7 @@
               <v-textarea 
                 :disabled="isAccepted"
                 placeholder="Ablehnungsgrund"
-                v-model="this.message"
+                v-model="message_file"
               ></v-textarea>
               <div class="d-flex justify-end">
                 <v-btn color="primary" @click="changeStatusFileUploaded()">
@@ -293,32 +293,10 @@
                 Die Rechnun(en) wurden nicht akzeptiert. Bitte lies dir die Begründung durch und lade sie erneut hoch. Die alten Rechnungen werden beim Abschicken entfernt.
               </v-alert>
               <div class="text-overline">Ablehnungsgrund:</div>
-              <p v-text="this.financeRequest.message"></p>
-              <div class="text-subtitle-2 mb-2">Rechnung hochladen</div>
-              <upload-button
-                :loading="this.isUploading"
-                :disabled="this.isUploading"
-                outlined
-                class="my-1"
-                color="primary"
-                accept=".pdf,.docx,.doc,.jgp,.jpeg,.png"
-                style="max-width: 340px !important"
-                @files="onFileChanged"
-              >
-                <v-icon left>
-                  cloud_upload
-                </v-icon>
-                Rechnung(en) hochladen
-              </upload-button>
-              <div>
-                <p v-if="!this.files.length">
-                  Noch keine Rechnung hochgeladen
-                </p>
-                <file-chip-group v-else>
-                  <file-chip :key="file" :filename="file" v-for="file in this.files" @delete-file="removeFile">
-                  </file-chip>
-                </file-chip-group>
-              </div>
+              <p v-text="this.financeRequest.message_file"></p>
+
+              <file-manager v-model="files" :multiple="true" class="my-2"></file-manager>
+
               <div class="d-flex justify-start">
                 <v-btn color="primary" @click="changeStatusFileRejected()">
                   Abschicken
@@ -371,11 +349,7 @@
         </v-col>
         
         <v-col cols="12" md="8">  
-          
-          <file-chip-group class="d-flex flex-wrap space-between" v-if="this.financeRequest.files">
-            <file-chip :key="file" :filename="file" v-for="file in this.currentFiles"></file-chip>
-          </file-chip-group>
-        
+          <file-manager :value="this.currentFiles" class="my-2" :readonly="true" v-if="this.financeRequest.files"></file-manager>
         </v-col>
       </v-row>
 
@@ -397,21 +371,23 @@ import { IFinanceRequest } from '@/interfaces';
 import { readOneFinanceRequestMe } from '@/store/finance_request/getters';
 import { dispatchDeleteFinanceRequest, dispatchGetMyFinanceRequests, dispatchUpdateFinanceRequestState, dispatchUpdateFinanceRequestStateFile } from '@/store/finance_request/actions';
 import { financeRequestNextStep, translateFinanceRequestStatus } from '@/utils';
-import { dispatchGetUserProfile, dispatchUploadFile } from '@/store/main/actions';
+import { dispatchGetUserProfile } from '@/store/main/actions';
 import UploadButton from '@/components/UploadButton.vue';
 import { dispatchAdminFinanceRequests } from '@/store/admin/actions';
 import { readAdminOneFinanceRequest } from '@/store/admin/getters';
-
+import FileManager from '@/components/file-manager/FileManager.vue';
 
 @Component({
-  components: { EmployeeProfilePicture, EmployeeCard, FileChip, FileChipGroup, UploadButton },
+  components: { EmployeeProfilePicture, EmployeeCard, FileChip, FileChipGroup, UploadButton, FileManager },
 })
 export default class AdminUsers extends Vue {
-
+  
+  public message_file = '';
+  public message_request = '';
   public isAccepted = true;
   public isUploading = false;
   public files: string[] = [];
-  public message = '';
+  
 
   get financeRequest() {
     if(this.isAdmin) return readAdminOneFinanceRequest(this.$store)(+this.$router.currentRoute.params.id) as IFinanceRequest;
@@ -431,38 +407,35 @@ export default class AdminUsers extends Vue {
   }
 
   public get isAdmin() {
-    return this.user?.is_superuser;
+    return this.user?.active_groups.map(group => group.name).includes('Finanzvorstand');
   }
 
   public async changeStatusCreated() {
+    const message = this.message_request;
     let newStatus = 'request_rejected';
     if (this.isAccepted) newStatus = 'request_accepted'
-    dispatchUpdateFinanceRequestState(this.$store, {financeId: this.financeRequest.id, updated_status: newStatus });
-    setTimeout('', 1000);
-    window.location.reload();
+    await dispatchUpdateFinanceRequestState(this.$store, {financeId: this.financeRequest.id, updated_status: newStatus, updated_message_file: '', updated_message_request: message });
+    await this.loadFinanceRequests();
   }
 
   public async changeStatusRequestAccepted() {
     const newStatus = 'file_uploaded';
-    dispatchUpdateFinanceRequestStateFile(this.$store, {financeId: this.financeRequest.id, updated_status: newStatus, updated_receipt: this.files.join('/') });
-    setTimeout('', 1000);
-    window.location.reload();
+    await dispatchUpdateFinanceRequestStateFile(this.$store, {financeId: this.financeRequest.id, updated_status: newStatus, updated_receipt: this.files.join('/') });
+    await this.loadFinanceRequests();
   }
 
   public async changeStatusFileUploaded() {
+    const message = this.message_file;
     let newStatus = 'file_rejected';
     if (this.isAccepted) newStatus = 'file_accepted'
-    dispatchUpdateFinanceRequestState(this.$store, {financeId: this.financeRequest.id, updated_status: newStatus });
-    setTimeout('', 1000);
-    window.location.reload();
+    await dispatchUpdateFinanceRequestState(this.$store, {financeId: this.financeRequest.id, updated_status: newStatus, updated_message_file: message, updated_message_request: '' });
+    await this.loadFinanceRequests();
   }
   
   public async changeStatusFileRejected() {
-    // message
     const newStatus = 'file_uploaded';
-    dispatchUpdateFinanceRequestStateFile(this.$store, {financeId: this.financeRequest.id, updated_status: newStatus, updated_receipt: this.files.join('/') });
-    setTimeout('', 1000);
-    window.location.reload();
+    await dispatchUpdateFinanceRequestStateFile(this.$store, {financeId: this.financeRequest.id, updated_status: newStatus, updated_receipt: this.files.join('/') });
+    await this.loadFinanceRequests();
   }
   
   public isCurrentStatus(statusArr: string[]): boolean {
@@ -473,43 +446,31 @@ export default class AdminUsers extends Vue {
   }
 
   public async deleteFinanceRequest() {
-    dispatchDeleteFinanceRequest(this.$store, this.financeRequest.id);
+    await dispatchDeleteFinanceRequest(this.$store, this.financeRequest.id);
     this.$router.back();
+  }
+
+  public async loadFinanceRequests() {
+    if(this.isAdmin)
+      await dispatchAdminFinanceRequests(this.$store);
+    else await dispatchGetMyFinanceRequests(this.$store);
+
   }
 
   public async mounted() {
     await dispatchGetUserProfile(this.$store);
-    if(this.user?.is_superuser)
-      await dispatchAdminFinanceRequests(this.$store);
-    else await dispatchGetMyFinanceRequests(this.$store);
+    await this.loadFinanceRequests();
   }
-
-  public async onFileChanged(files: File[]) {
-    this.isUploading = true;
-    const response = await dispatchUploadFile(this.$store, {
-      file: files[0],
-    });
-    this.isUploading = false;
-    
-    if (response)
-      this.files.push(response.filename);
-  }
-
-  public removeFile(file: string) {
-    this.files = this.files.filter((f) => f !== file);
-  }
-
-
 
 
   get financeRequestDetails() {
     return [
       {
-        name: 'Antragsteller',
-        key: this.financeRequest.author.full_name,
+        name: 'ID',
+        key: this.financeRequest.id,
       },
       {
-        name: 'Typ',
+        name: 'Ausgabetyp',
         key: this.financeRequest.type,
       },
       {
@@ -518,7 +479,7 @@ export default class AdminUsers extends Vue {
       },
       {
         name: 'Betrag',
-        key: this.financeRequest.amount + '€',
+        key: this.financeRequest.amount.toFixed(2).replace('.', ',') + '€',
       },
       {
         name: 'Erstellungsdatum',
@@ -531,6 +492,10 @@ export default class AdminUsers extends Vue {
       {
         name: 'Status',
         key: translateFinanceRequestStatus(this.financeRequest.status) + ' -- ' + financeRequestNextStep(this.financeRequest.status),
+      },
+      {
+        name: 'IBAN',
+        key: this.financeRequest.iban,
       },
     ];
   }

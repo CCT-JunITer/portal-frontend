@@ -7,12 +7,7 @@
     >
       <v-toolbar-title class="text-h4">Finanzanträge</v-toolbar-title>
       <v-spacer></v-spacer>
-      <!--
-      <v-btn x-large icon color="cctGrey">
-        <v-icon> mdi-help-circle</v-icon>
-      </v-btn>
-      -->
-      <v-btn x-large icon :disabled="isIbanMissing" color="cctOrange" :to="{ name: 'finance-request-create' }">
+      <v-btn x-large icon color="cctOrange" :to="{ name: 'finance-request-create' }">
         <v-icon> mdi-plus-circle</v-icon>
       </v-btn>
     </v-toolbar>
@@ -32,33 +27,6 @@
           <finance-request-card class="my-2" :request="financeRequest" outlined></finance-request-card>
         </v-col>
       </v-row>
-      <div class="text-center">
-        <v-dialog
-          v-model="ibanDialog"
-          width="500"
-        >
-          <v-card>
-            <v-card-title class="text-h5 grey lighten-2">
-              Hinweis
-            </v-card-title>
-            <v-card-text class="mt-2">
-              Bevor du einen Finanzantrag stellen kannst, musst du deine IBAN im Profil hinzufügen.
-              <!-- Input Feld mit IBAN -->
-            </v-card-text>
-            <v-divider></v-divider>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn
-                color="primary"
-                text
-                @click="ibanDialog = false"
-              >
-                Verstanden
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-      </div>
     </v-container>
   </div>
 </template>
@@ -78,18 +46,6 @@ export default class UserProfileRequests extends Vue {
 
   public showCompleted = false;
 
-  public ibanDialog = false;
-
-
-  get isIbanMissing() {
-    // change to iban
-    if(this.userProfile?.full_name)
-      return false;
-    else {
-      this.ibanDialog = true;
-      return true; 
-    }  
-  }
 
   get userProfile() {
     return readUserProfile(this.$store);
