@@ -1,12 +1,12 @@
 import { api } from '@/api';
 import { ActionContext } from 'vuex';
-import { IUserProfileCreate, IUserProfileUpdate, UserInvite, ITrainingCreate } from '@/interfaces';
+import { IUserProfileCreate, IUserProfileUpdate, UserInvite, ITrainingCreate, IFinanceRequestCreate, IFinanceRequestUpdate } from '@/interfaces';
 import { State } from '../state';
 import { AdminState } from './state';
 import { getStoreAccessors } from 'typesafe-vuex';
 import { dispatchCheckApiError } from '../main/actions';
 import { commitAddNotification, commitRemoveNotification, commitSetUser } from '../main/mutations';
-import { commitSetAdminUsers, commitSetRequests } from './mutations';
+import { commitSetAdminFinanceRequest, commitSetAdminFinanceRequests, commitSetAdminUsers, commitSetRequests } from './mutations';
 
 type MainContext = ActionContext<AdminState, State>;
 
@@ -141,7 +141,50 @@ export const actions = {
     } catch (error) {
       await dispatchCheckApiError(context, error);
     }
-  }
+  },
+  async actionGetFinanceRequestsAdmin(context: MainContext) {
+    try {
+      const response = await api.getAllFinanceRequests(context.rootState.main.token);
+      if (response) {
+        commitSetAdminFinanceRequests(context, response.data);
+      }
+    } catch (error) {
+      await dispatchCheckApiError(context, error);
+    }
+  },
+  // TODO User ID?? 
+  async actionCreateFinanceRequestAdmin(context: MainContext, payload: IFinanceRequestCreate) {
+    try {
+      const loadingNotification = { content: 'saving', showProgress: true };
+      commitAddNotification(context, loadingNotification);
+      const response = (await Promise.all([
+        api.createFinanceRequest(context.rootState.main.token, payload),
+        await new Promise((resolve, reject) => setTimeout(() => resolve(), 500)),
+      ]))[0];
+      commitSetAdminFinanceRequest(context, response.data);
+      commitRemoveNotification(context, loadingNotification);
+      commitAddNotification(context, { content: 'Finance Request successfully created', color: 'success' });
+    } catch (error) {
+      await dispatchCheckApiError(context, error);
+    }
+  },
+
+  async actionUpdateFinanceRequestAdmin(context: MainContext, payload: { id: number; financeRequest: IFinanceRequestUpdate }) {
+    try {
+      const loadingNotification = { content: 'saving', showProgress: true };
+      commitAddNotification(context, loadingNotification);
+      const response = (await Promise.all([
+        api.updateFinanceRequest(context.rootState.main.token, payload.id, payload.financeRequest),
+        await new Promise((resolve, reject) => setTimeout(() => resolve(), 500)),
+      ]))[0];
+      commitSetAdminFinanceRequest(context, response.data);
+      commitRemoveNotification(context, loadingNotification);
+      commitAddNotification(context, { content: 'Finance Request successfully updated', color: 'success' });
+    } catch (error) {
+      await dispatchCheckApiError(context, error);
+    }
+  },
+  
 };
 
 const { dispatch } = getStoreAccessors<AdminState, State>('');
@@ -156,3 +199,5 @@ export const dispatchApplyRequest = dispatch(actions.actionApplyRequest);
 export const dispatchAddUserToGroup = dispatch(actions.actionAddUserToGroup);
 export const dispatchRemoveUserFromGroup = dispatch(actions.actionRemoveUserFromGroup);
 export const dispatchSetPrimaryGroup = dispatch(actions.actionSetPrimaryGroup);
+export const dispatchAdminFinanceRequests = dispatch(actions.actionGetFinanceRequestsAdmin);
+

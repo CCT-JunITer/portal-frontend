@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {apiUrl} from '@/env';
-import { ITraining, ITrainingCreate, IUserProfile, IUserProfileCreate, IUserProfileUpdate, UserType, RequestCreate, UserInvite, ITrainingApplicationCreate, ITrainingApplicationUpdate } from './interfaces';
+import { ITraining, ITrainingCreate, IUserProfile, IUserProfileCreate, IUserProfileUpdate, UserType, RequestCreate, UserInvite, ITrainingApplicationCreate, ITrainingApplicationUpdate, IFinanceRequestCreate, IFinanceRequestUpdate, IFinanceRequest } from './interfaces';
 import {dataURItoBlob} from '@/utils';
 
 function authHeaders(token: string, headers = {}) {
@@ -87,6 +87,9 @@ export const api = {
     const params = { filename };
     return axios.get(`${apiUrl}/api/v1/utils/download-file`, { ...authHeaders(token), params, responseType: 'blob' });
   },
+  async downloadDebitMandate(token: string) {
+    return axios.get(`${apiUrl}/api/v1/documents/sepa/me`, { ...authHeaders(token), responseType: 'blob' });
+  },
   async deleteUser(token: string, userId: number) {
     return axios.delete(`${apiUrl}/api/v1/users/${userId}`, authHeaders(token));
   },
@@ -160,4 +163,37 @@ export const api = {
   async updateTrainingApplication(token: string, applicationId: number, application: ITrainingApplicationUpdate) {
     return axios.put(`${apiUrl}/api/v1/training/application/${applicationId}`, application, authHeaders(token));
   },
+  // Finance Request
+  async createFinanceRequest(token: string, request: IFinanceRequestCreate) {
+    return axios.post(`${apiUrl}/api/v1/finance/`, request, authHeaders(token));
+  },
+  async getAllFinanceRequests(token: string) {
+    return axios.get(`${apiUrl}/api/v1/finance/`, authHeaders(token));
+  },
+  async getMyFinanceRequests(token: string) {
+    return axios.get(`${apiUrl}/api/v1/finance/me`, authHeaders(token));
+  },
+  async getFinanceRequestById(token: string, financeId: number) {
+    return axios.get(`${apiUrl}/api/v1/finance/${financeId}`, authHeaders(token));
+  },
+  async getFinanceRequestByAuthor(token: string, authorId: number) {
+    return axios.get(`${apiUrl}/api/v1/finance/author/${authorId}`, authHeaders(token));
+  },
+  async updateFinanceRequest(token: string, financeId: number, data: IFinanceRequestUpdate) {
+    return axios.put<IFinanceRequest>(`${apiUrl}/api/v1/finance/${financeId}`, data, authHeaders(token));
+  },
+  async deleteFinanceRequest(token: string, financeId: number) {
+    return axios.delete(`${apiUrl}/api/v1/finance/${financeId}`, authHeaders(token));
+  },
+  async updateFinanceRequestState(token: string, financeId: number, updated_status: string, updated_message_file: string, updated_message_request: string ) {
+    return axios.put(`${apiUrl}/api/v1/finance/status/${financeId}`, { updated_status, updated_message_file, updated_message_request } , authHeaders(token));
+  },
+  
+  async updateFinanceRequestStateReceipt(token: string, financeId: number, updated_status, updated_receipt) {
+    return axios.put(`${apiUrl}/api/v1/finance/status/${financeId}`, { updated_status, updated_receipt }, authHeaders(token));
+  },
+  async updateFinanceRequestStateType(token: string, financeId: number, updated_status: string, updated_association: string) {
+    return axios.put(`${apiUrl}/api/v1/finance/status/${financeId}`, { updated_status, updated_association }, authHeaders(token));
+  },
+  
 };

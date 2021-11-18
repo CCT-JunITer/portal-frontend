@@ -16,8 +16,6 @@ export default class FileChipGroup extends Vue {
 <style lang="scss">
 
 .file-chip-group {
-  display: flex;
-  flex-wrap: wrap;
 
   & > * {
     margin: 8px;

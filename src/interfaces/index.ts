@@ -29,6 +29,9 @@ export interface IUserProfile {
     matriculation_number: string;
     direct_debit_mandate: string;
     address: string;
+    iban: string;
+    bic: string;
+    bank: string;
 
     admin_comment?: string;
 }
@@ -54,6 +57,9 @@ export interface IUserProfileUpdate {
     matriculation_number?: string;
     direct_debit_mandate?: string;
     address?: string;
+    iban?: string;
+    bic?: string;
+    bank?: string;
 
 
     admin_comment?: string;
@@ -162,4 +168,46 @@ export interface ITrainingApplicationCreate {
 export interface RequestCreate {
     description: string;
     groups: RequestGroup[];
+}
+
+
+
+export type IFinanceRequestStatus = 'created' | 'request_rejected' | 'request_rejected' | 'file_uploaded' | 'file_rejected' | 'file_accepted'
+
+
+export interface IFinanceRequest {
+    type: string;
+    purpose: string;
+    amount: number;
+    files: string;
+    message_file: string;
+    message_request: string;
+    id: number;
+    status: IFinanceRequestStatus;
+    date_created: string;
+    date_last_update: string;
+    author_id: number;
+    author: IUserProfile;
+    association: string;
+    iban: string;
+}
+
+export interface IFinanceRequestUpdate {
+    type: string;
+    purpose: string;
+    amount: number;
+    files: string;
+    message_file: string;
+    message_request: string;
+    status: IFinanceRequestStatus;
+    association: string;
+    iban: string;
+}
+export interface IFinanceRequestCreate {
+    type: string;
+    purpose: string;
+    amount: number;
+    files: string;
+    association: string;
+    iban: string;
 }

@@ -5,6 +5,10 @@ export const RESSORTS = [
   'Kein Ressort', 'Juniter','Public Affairs','Human Resources', 'Quality Management', 'International Networks','Board','Vorstand','Projektmanager'
 ]
 
+export const FINANCE_REQUEST_STATUS = [
+  'created', 'request_rejected','request_accepted','file_uploaded', 'file_rejected', 'file_accepted'
+]
+
 export const STUDYLEVELS = [
   'Bachelor', 'Master', 'Promotion', 'Staatsexamen'
 ]
@@ -24,6 +28,10 @@ export const UNIVERSITIES = [
 
 export const SCHULUNGSART = [
   'Pflichtschulung', 'Zusatzschulung', 'Allgemeine Schulung'
+];
+
+export const KOSTENART = [
+  'Workend', 'Interne Vereinsevents', 'Tower & Material', 'Fixkosten', 'Vorstandsbudget', 'Geschenke', 'Sonstiges' 
 ];
 
 export const SCHULUNGSTHEMA = [
@@ -56,7 +64,11 @@ export const isLinkedIn = (url: string) => {
 
 export const required = (v: string) => !!v || 'Dieses Feld wird benötigt.';
 
-export const isNumber = (v: string) => (v && !!v.match(/[0-9]+/)) || 'Dies ist keine Zahl.';
+export const isNumber = (v: string) => (v && !!v.match(/^[0-9]+$/)) || 'Dies ist keine Zahl.';
+
+export const isCurrency = (v: string) => (v && !!v.match(/^\d+$|^\d+,\d{2}$/) || 'Dies ist kein gültiger Geldbetrag.')
+
+export const isIBAN = (v: string) => (!v || !!v.match(/[A-Z]{2}[0-9]{2}(?:[ ]?[0-9]{4}){4}(?!(?:[ ]?[0-9]){3})(?:[ ]?[0-9]{1,2})?/)) || 'Dies ist keine IBAN.';
 
 export const isTodayBirthday = (date: Date | string) => {
   if (typeof date === 'string') {

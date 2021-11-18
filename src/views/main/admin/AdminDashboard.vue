@@ -75,16 +75,47 @@
           </v-card>
         </v-col>
 
+        <v-col cols="12" sm="6" md="4" v-if="isFinanzvorstand()">
+          <v-card elevation="5">
+            <v-img
+              height="250"
+              :src="require('@/assets/admin_finanzantrag.jpg')"
+            ></v-img>
+            <v-card-title>
+              <v-icon left>mdi-cash</v-icon>
+              Finanzanträge verwalten
+            </v-card-title>
+            <v-card-text>Hier können eingegangene Finanzanträge verwaltet werden.</v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn text to="/main/admin/finance-requests" color="cctBlue">Verwalten</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-col>
+
       </v-row>
     </v-container>
   </div>
 </template>
 
 <script lang="ts">
+import { dispatchGetUserProfile } from '@/store/main/actions';
+import { readUserProfile } from '@/store/main/getters';
 import { Vue, Component, Prop } from 'vue-property-decorator'
 
 @Component({})
 export default class AdminDashboard extends Vue {
+
+  get user() {
+    return readUserProfile(this.$store)
+  }
+  public isFinanzvorstand() {
+    return this.user?.active_groups.map(group => group.name).includes('Finanzvorstand');
+  }
+  async mounted() {
+    await dispatchGetUserProfile(this.$store);
+  }
+    
 
 }
 </script>
