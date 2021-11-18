@@ -52,12 +52,12 @@ export const actions = {
     }
   },
   
-  async actionUpdateFinanceRequestState(context: MainContext, payload: { financeId: number; updated_status: string }) {
+  async actionUpdateFinanceRequestState(context: MainContext, payload: { financeId: number; updated_status: string; updated_message_file: string; updated_message_request: string }) {
     try {
       const loadingNotification = { content: 'saving', showProgress: true };
       commitAddNotification(context, loadingNotification);
       const response = (await Promise.all([
-        api.updateFinanceRequestState(context.rootState.main.token, payload.financeId, payload.updated_status),
+        api.updateFinanceRequestState(context.rootState.main.token, payload.financeId, payload.updated_status, payload.updated_message_file, payload.updated_message_request),
         await new Promise((resolve, reject) => setTimeout(() => resolve(), 500)),
       ]))[0];
       //commitSetMyFinanceRequests(context, response.data);

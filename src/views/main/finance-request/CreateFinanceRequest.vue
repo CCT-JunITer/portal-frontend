@@ -1,4 +1,3 @@
-/* eslint-disable vue/html-indent */
 <template>
   <v-container>
     <v-row>
@@ -49,7 +48,7 @@
               type="info"
               class="input-lg"
             >
-              Ressortsbudgets werden nicht vom Finazvorstand geprüft und müssen vorher unbedingt mit dem Ressortleiter abgesprochen werden.
+              Ressortsbudgets werden nicht vom Finanzvorstand geprüft und müssen vorher unbedingt mit dem Ressortleiter abgesprochen werden.
             </v-alert>
           </div>  
 
@@ -59,9 +58,9 @@
             prepend-icon="mdi-account-arrow-left"
             class="input-lg"
             persistent-hint
-            type="number"
+            prefix="€"
             required
-            :rules="[$common.required]"
+            :rules="[$common.required, $common.isCurrency]" 
           ></v-text-field>
 
           <v-text-field
@@ -71,7 +70,7 @@
             class="input-lg"
             hint="IBAN"
             required
-            :rules="[$common.required]"
+            :rules="[$common.required, $common.isIBAN]"
           ></v-text-field>
 
           <v-textarea
@@ -86,8 +85,17 @@
 
           <v-textarea
             v-if="isAdmin"
-            label="Ablehnungsnachricht manuell bearbeiten"
-            v-model="this.message"
+            label="Budget Ablehnungsnachricht manuell bearbeiten"
+            v-model="message_request"
+            prepend-icon="mdi-text-subject"
+            class="input-lg"
+            hint="Nachricht"
+          ></v-textarea>
+
+          <v-textarea
+            v-if="isAdmin"
+            label="Rechnung Ablehnungsnachricht manuell bearbeiten"
+            v-model="message_file"
             prepend-icon="mdi-text-subject"
             class="input-lg"
             hint="Nachricht"
@@ -96,50 +104,27 @@
           <v-select
             v-if="isAdmin"
             label="Status manuell bearbeiten"
-            v-model ="this.status"
+            v-model ="status"
             class="input-lg"
             prepend-icon="mdi-animation"
             :items="$common.FINANCE_REQUEST_STATUS"
           ></v-select>
           
           <div v-if="isAdmin">
-            <div class="text-subtitle-2 mb-2">Rechnungen hochladen</div>
-            <upload-button
-              :loading="this.isUploading"
-              :disabled="this.isUploading"
-              outlined
-              class="my-1"
-              color="primary"
-              accept=".pdf,.pptxm.,.ppt,.docx,.doc,.jgp,.jpeg"
-              style="max-width: 340px !important"
-              @files="onFileChanged"
-            >
-              <v-icon left>
-                cloud_upload
-              </v-icon>
-              Rechnung hochladen
-            </upload-button>
-            <div>
-              <p v-if="!this.files.length">
-                Noch keine Dateien hochgeladen
-              </p>
-              <file-chip-group v-else>
-                <file-chip :key="file" :filename="file" v-for="file in files" @delete-file="removeFile">
-                </file-chip>
-              </file-chip-group>
-            </div>
+            <div class="text-subtitle-2 mb-2">Rechnungen manuell hochladen</div>
+            <file-manager v-model="files" :multiple="true"></file-manager>
           </div>
           
           <v-spacer class="my-4"></v-spacer>
 
           <v-alert
-            v-if="isEdit && isAdmin"
+            v-if="isEdit && !isAdmin"
             prominent
             dense
             type="info"
             class="input-lg"
           >
-            Wenn du den Finazantrag bearbeitest, muss er den Genehmigungsprozess von vorne durchlaufen.
+            Wenn du den Finanzantrag bearbeitest, muss er den Genehmigungsprozess von vorne durchlaufen.
           </v-alert>
         </v-form>
         <v-card-actions>
@@ -148,7 +133,6 @@
           <v-btn
             @click="submit"
             color="primary"
-            :disabled="isIbanMissing"
           >
             Antrag speichern
           </v-btn>
@@ -156,36 +140,6 @@
       </v-col>
     </v-row>
     
-    <div class="text-center">
-      <v-dialog
-        v-model="ibanDialog"
-        width="500"
-      >
-        <v-card>
-          <v-card-title class="text-h5 grey lighten-2">
-            Hinweis
-          </v-card-title>
-
-          <v-card-text class="mt-2">
-            Bevor du einen Finanzantrag stellen kannst, musst du deine IBAN im Profil hinzufügen.
-            <!-- Input Feld mit IBAN -->
-          </v-card-text>
-
-          <v-divider></v-divider>
-
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn
-              color="primary"
-              text
-              @click="ibanDialog = false"
-            >
-              Verstanden
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-    </div>
   </v-container>
 </template>
 
@@ -193,70 +147,42 @@
 import { Vue, Component} from 'vue-property-decorator';
 import VueTelInputVuetify from 'vue-tel-input-vuetify/lib/vue-tel-input-vuetify.vue';
 import DatePickerMenu from '@/components/DatePickerMenu.vue';
-import { dispatchGetUsers, dispatchUploadFile } from '@/store/main/actions';
+import { dispatchGetUsers } from '@/store/main/actions';
 import { readUserProfile, } from '@/store/main/getters';
 import { IFinanceRequest, IFinanceRequestCreate, IFinanceRequestStatus, IFinanceRequestUpdate } from '@/interfaces';
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 import UploadButton from '@/components/UploadButton.vue';
-import FileChipGroup from '@/components/file-chip/FileChipGroup.vue';
-import FileChip from '@/components/file-chip/FileChip.vue';
 import { dispatchAddFinanceRequest, dispatchUpdateFinanceRequest, dispatchUpdateFinanceRequestStateType } from '@/store/finance_request/actions';
 import { readOneFinanceRequestMe } from '@/store/finance_request/getters';
-import { FinanceRequestState } from '@/store/finance_request/state';
 import { readAdminOneFinanceRequest } from '@/store/admin/getters';
+import FileManager from '@/components/file-manager/FileManager.vue';
+
 @Component({
-  components: {VueTelInputVuetify, UploadButton, DatePickerMenu, EmployeeProfilePicture, FileChipGroup, FileChip},
+  components: {VueTelInputVuetify, UploadButton, DatePickerMenu, EmployeeProfilePicture, FileManager },
 })
-export default class AdminViewTraining extends Vue {
+export default class CreateFinanceRequest extends Vue {
 
   public type = '';
-  public amount = 0;
+  public amount = '';
   public purpose = '';
   public files: string[] = [];
   public association = '';
-  public status: IFinanceRequestStatus = 'created';
+  public status = '';
   public iban = '';
-  public message = ''
+  public message_file = ''
+  public message_request = ''
 
   
   public isRessortBudget = false;
   public valid = false;
-  public ibanDialog = false;
-  public isEdit = false;
-  public isUploading = false;
   
 
   get userProfile() {
     return readUserProfile(this.$store);
   }
 
-  get isIbanMissing() {
-    // change to iban
-    if(this.userProfile?.full_name)
-      return false;
-    else {
-      this.ibanDialog = true;
-      return true; 
-    }  
-  }
-
   public get isAdmin() {
-    return Boolean(this.userProfile?.is_superuser);
-  }
-
-  public async onFileChanged(files: File[]) {
-    this.isUploading = true;
-    const response = await dispatchUploadFile(this.$store, {
-      file: files[0],
-    });
-    this.isUploading = false;
-    
-    if (response)
-      this.files.push(response.filename);
-  }
-
-  public removeFile(file: string) {
-    this.files = this.files.filter((f) => f !== file);
+    return this.userProfile?.active_groups.map(group => group.name).includes('Finanzvorstand');
   }
 
 
@@ -274,64 +200,66 @@ export default class AdminViewTraining extends Vue {
     let newAssociation = '';
     if(this.association) newAssociation = this.association;
 
-    let newStatus = this.status;
-    newStatus = 'created'; 
-    //if(this.isAdmin) {
-    //  newStatus = this.editFinanceRequest?.status as IFinanceRequestStatus;
-    //}
-    
-
     if ((this.$refs.form as HTMLFormElement).validate()) {
       const newFinanceRequest: IFinanceRequestCreate = {
-        amount: this.amount,
+        amount: +this.amount.replace(',', '.'),
         type: this.type,
         purpose: this.purpose,
-        files: this.files.join(','),
-        message: this.message,
+        files: this.files.join('/'),
+        
         association: newAssociation,
         iban: this.iban,
       };
       const updatedFinanceRequest: IFinanceRequestUpdate = {
-        amount: this.amount,
+        amount: +this.amount.replace(',', '.'),
         type: this.type,
         purpose: this.purpose,
         files: this.files.join('/'),
-        status: newStatus, 
-        message: this.message, 
+        status: this.status as IFinanceRequestStatus, 
+        message_file: this.message_file,
+        message_request: this.message_request,
         association: newAssociation,
-        date_last_update: '2021-11-01T00:51:12.865Z',
         iban: this.iban,
       };
-      // change to IBAN
-      if(this.userProfile?.full_name) {
-        if (this.editFinanceRequest) {
-          await dispatchUpdateFinanceRequest(this.$store, {id: this.editFinanceRequest.id, financeRequest: updatedFinanceRequest});
-        } else {
-          await dispatchAddFinanceRequest(this.$store, newFinanceRequest);
-        }
+      if (this.editFinanceRequest) {
+        await dispatchUpdateFinanceRequest(this.$store, {id: this.editFinanceRequest.id, financeRequest: updatedFinanceRequest});
       } else {
-        this.ibanDialog = true;
+        await dispatchAddFinanceRequest(this.$store, newFinanceRequest);
+      }
+      if(this.isRessortBudget) {
+        //changeStatusRessortBudget();
       }
       this.$router.back();
     }
   }
 
   get editFinanceRequest() {
-    if(this.isAdmin) return readAdminOneFinanceRequest(this.$store)(+this.$router.currentRoute.params.id) as IFinanceRequest;
-    else return readOneFinanceRequestMe(this.$store)(+this.$router.currentRoute.params.id) as IFinanceRequest
+    if (!this.$route.params.id) {
+      return null;
+    }
+    if (this.isAdmin) return readAdminOneFinanceRequest(this.$store)(+this.$route.params.id) as IFinanceRequest;
+    else return readOneFinanceRequestMe(this.$store)(+this.$route.params.id) as IFinanceRequest
   }
+
+  get isEdit() {
+    return !!this.editFinanceRequest;
+  }
+
   public reset() {
-    if(this.editFinanceRequest) {
-      this.isEdit = true;
+    if (this.userProfile?.iban){
+      this.iban = this.userProfile.iban;
+    }
+    if (this.editFinanceRequest) {
       if(this.editFinanceRequest.association) {
         this.isRessortBudget = true;
         this.association = this.editFinanceRequest.association;
       }
-      this.amount = this.editFinanceRequest.amount;
+      this.amount = this.editFinanceRequest.amount.toFixed(2).replace('.', ',');
       this.type = this.editFinanceRequest.type;
       this.purpose = this.editFinanceRequest.purpose;
       this.files = this.editFinanceRequest.files ? this.editFinanceRequest.files.split('/') : []
-      this.message = this.editFinanceRequest.message;
+      this.message_request = this.editFinanceRequest.message_request;
+      this.message_file = this.editFinanceRequest.message_file; 
       this.status = this.editFinanceRequest.status;
       this.iban = this.editFinanceRequest.iban;
     }

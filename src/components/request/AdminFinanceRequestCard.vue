@@ -1,5 +1,5 @@
 <template>
-  <v-card v-bind="$attrs" v-on="$listeners" :to="{ name: 'finance-request-detail', params: { id: request.id } }" :class="{'archived': this.request.status == 'file_accepted'}">
+  <v-card v-bind="$attrs" v-on="$listeners" :to="{ name: 'finance-request-detail', params: { id: request.id } }">
     <v-card-title>
       Finanzantrag
     </v-card-title>
@@ -59,8 +59,4 @@ export default class FinanceRequestCard extends Vue {
 .pre-formatted {
   white-space: pre;
 }
-.archived {
-  opacity: 75%;
-}
-
 </style>

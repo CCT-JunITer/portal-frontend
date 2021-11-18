@@ -180,7 +180,8 @@ export interface IFinanceRequest {
     purpose: string;
     amount: number;
     files: string;
-    message: string;
+    message_file: string;
+    message_request: string;
     id: number;
     status: IFinanceRequestStatus;
     date_created: string;
@@ -196,10 +197,10 @@ export interface IFinanceRequestUpdate {
     purpose: string;
     amount: number;
     files: string;
-    message: string;
+    message_file: string;
+    message_request: string;
     status: IFinanceRequestStatus;
     association: string;
-    date_last_update: string;
     iban: string;
 }
 export interface IFinanceRequestCreate {
@@ -207,7 +208,6 @@ export interface IFinanceRequestCreate {
     purpose: string;
     amount: number;
     files: string;
-    message: string;
     association: string;
     iban: string;
 }

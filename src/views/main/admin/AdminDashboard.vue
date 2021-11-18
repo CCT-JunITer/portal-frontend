@@ -75,7 +75,7 @@
           </v-card>
         </v-col>
 
-        <v-col cols="12" sm="6" md="4">
+        <v-col cols="12" sm="6" md="4" v-if="isFinanzvorstand()">
           <v-card elevation="5">
             <v-img
               height="250"
@@ -99,10 +99,23 @@
 </template>
 
 <script lang="ts">
+import { dispatchGetUserProfile } from '@/store/main/actions';
+import { readUserProfile } from '@/store/main/getters';
 import { Vue, Component, Prop } from 'vue-property-decorator'
 
 @Component({})
 export default class AdminDashboard extends Vue {
+
+  get user() {
+    return readUserProfile(this.$store)
+  }
+  public isFinanzvorstand() {
+    return this.user?.active_groups.map(group => group.name).includes('Finanzvorstand');
+  }
+  async mounted() {
+    await dispatchGetUserProfile(this.$store);
+  }
+    
 
 }
 </script>

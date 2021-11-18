@@ -6,7 +6,7 @@ export const RESSORTS = [
 ]
 
 export const FINANCE_REQUEST_STATUS = [
-  'created', 'request_rejected','request_accepted','file_uploaded', 'file_rejected', 'file_accpeted'
+  'created', 'request_rejected','request_accepted','file_uploaded', 'file_rejected', 'file_accepted'
 ]
 
 export const STUDYLEVELS = [
@@ -64,7 +64,9 @@ export const isLinkedIn = (url: string) => {
 
 export const required = (v: string) => !!v || 'Dieses Feld wird benötigt.';
 
-export const isNumber = (v: string) => (v && !!v.match(/[0-9]+/)) || 'Dies ist keine Zahl.';
+export const isNumber = (v: string) => (v && !!v.match(/^[0-9]+$/)) || 'Dies ist keine Zahl.';
+
+export const isCurrency = (v: string) => (v && !!v.match(/^\d+$|^\d+,\d{2}$/) || 'Dies ist kein gültiger Geldbetrag.')
 
 export const isIBAN = (v: string) => (!v || !!v.match(/[A-Z]{2}[0-9]{2}(?:[ ]?[0-9]{4}){4}(?!(?:[ ]?[0-9]){3})(?:[ ]?[0-9]{1,2})?/)) || 'Dies ist keine IBAN.';
 

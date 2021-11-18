@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="flex-1">
     <v-chip 
       v-bind="$attrs" 
       v-on="$listeners" 
@@ -17,7 +17,9 @@
           indeterminate
         ></v-progress-circular>
       </v-avatar>
-      {{ displayName }}
+      <span class="text-truncate">
+        {{ displayName }}
+      </span>
       <v-avatar right>
         <v-btn @click="preview" icon right color="cctBlue" small>
           <v-icon size="20">

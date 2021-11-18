@@ -4,7 +4,7 @@
       Finanzantrag
     </v-card-title>
     <v-card-subtitle>
-      <div class="my-2"><v-chip class="mx-1">{{request.amount}} €</v-chip><v-chip class="mx-1">{{request.type}}</v-chip><v-chip v-if="this.request.association" class="mx-1">Ressortbudget: {{this.request.association}}</v-chip></div>
+      <div class="my-2"><v-chip class="mx-1">{{request.amount.toFixed(2).replace('.', ',')}} €</v-chip><v-chip class="mx-1">{{request.type}}</v-chip><v-chip v-if="this.request.association" class="mx-1">Ressortbudget: {{this.request.association}}</v-chip></div>
       <div class="text-overline green--text">
         {{translateFinanceRequestStatus(request.status)}}
       </div>
@@ -56,7 +56,7 @@ export default class FinanceRequestCard extends Vue {
 
 </script>
 
-<style>
+<style lang="scss" scoped>
 .pre-formatted {
   white-space: pre;
 }
