@@ -167,16 +167,6 @@
                     </template>
                     <span>
                       <ul>Das Eintrittsdatum ist der Tag des Onboarding Days. <br>(Bei JunITer der Tag der entgültigen Zusage.)
-                        <li>SS16 - 25.05.2016</li>
-                        <li>WS16/17 - 22.11.2016</li>
-                        <li>SS17 - 10.05.2017</li>
-                        <li>WS17/18 - 15.11.2017</li>
-                        <li>SS18 - 08.05.2018</li>
-                        <li>WS18/19 - 18.11.2018</li>
-                        <li>SS19 - 18.05.2019</li>
-                        <li>WS19/20 - 23.11.2019</li>
-                        <li>SS20 - 6.6.2020</li>
-                        <li>S20/21 - 28.11.2020</li>
                       </ul>
                     </span>
                   </v-tooltip>

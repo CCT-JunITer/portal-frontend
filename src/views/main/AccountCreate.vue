@@ -105,7 +105,7 @@
               <v-text-field
                 type="password"
                 ref="password"
-                label="Passwort"
+                label="Passwort setzen"
                 class="input-lg"
                 v-model="password1"
                 :rules="[v => v && v.length >= 8 || 'Das Passwort muss mindestens 8 Zeichen lang sein']"
@@ -176,7 +176,6 @@
                 v-model="entrydate"
                 :pickerProps="{
                   min: '1950-01-01',
-                  max: new Date().toISOString().substr(0, 10),
                 }"
               >
                 <template v-slot:activator="{ on, attrs }">
@@ -192,25 +191,12 @@
                     <template v-slot:append="">
                       <v-tooltip right>
                         <template v-slot:activator="{ on, attrs }">
-                          <v-icon v-bind="attrs" v-on="on"
-                          >mdi-help-circle</v-icon
-                          >
+                          <v-icon v-bind="attrs" v-on="on">mdi-help-circle</v-icon>
                         </template>
                         <span>
                           <ul>
                             Das Eintrittsdatum ist der Tag des Onboarding Days.
                             <br />(Bei JunITer der Tag der entgültigen Zusage.)
-                            <li>SS16 - 25.05.2016</li>
-                            <li>WS16/17 - 22.11.2016</li>
-                            <li>SS17 - 10.05.2017</li>
-                            <li>WS17/18 - 15.11.2017</li>
-                            <li>SS18 - 08.05.2018</li>
-                            <li>WS18/19 - 18.11.2018</li>
-                            <li>SS19 - 18.05.2019</li>
-                            <li>WS19/20 - 23.11.2019</li>
-                            <li>SS20 - 6.6.2020</li>
-                            <li>WS20/21 - 28.11.2020</li>
-                            <li>SS21 - 10.5.2021</li>
                           </ul>
                         </span>
                       </v-tooltip>
@@ -263,6 +249,21 @@
                     'Dies ist keine gültige LinkedIn-URL',
                 ]"
               ></v-text-field>
+            </v-col>
+          </v-row>
+
+          <v-divider class="my-5"></v-divider>
+
+          <v-row>
+            <v-col cols="12" md="4" class="px-5">
+              <h4 class="text-h4 text--primary mb-3">Personales</h4>
+              <p class="text-body-2 text--secondary">
+                Diese Informationen sind für das Personalmanagement notwendig und können nur von der Ressortleitungsrunde eingesehen werden
+              </p>
+            </v-col>
+
+            <v-col cols="12" md="8">
+
               <v-select
                 v-model = "gender"
                 class="input-lg"
@@ -270,15 +271,57 @@
                 label="Gender"
                 :rules="[$common.required]"
               ></v-select>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn @click="cancel" raised>Abbrechen</v-btn>
-                <v-btn @click="submit" color="primary" raised :disabled="!valid">
-                  Account erstellen
-                </v-btn>
-              </v-card-actions>
+
+              <v-text-field
+                label="Adresse"
+                class="input-lg"
+                v-model="address"
+              >
+              </v-text-field>
+
+              <v-text-field
+                label="Matrikelnummer"
+                class="input-lg"
+                v-model="matriculationNumber"
+              >
+              </v-text-field>
+
+              <v-row dense>
+                <v-col cols="12">
+                  <v-text-field
+                    label="Bank"
+                    class="input-lg"
+                    v-model="bank"
+                  >
+                  </v-text-field>
+                </v-col>
+                <v-col cols="12" md="6">
+                  <v-text-field
+                    label="IBAN"
+                    class="input-lg"
+                    v-model="iban"
+                    :rules="[$common.isIBAN]"
+                  >
+                  </v-text-field>
+                </v-col>
+                <v-col cols="12" md="6">
+                  <v-text-field
+                    label="BIC"
+                    class="input-lg"
+                    v-model="bic"
+                  >
+                  </v-text-field>
+                </v-col>
+              </v-row>
             </v-col>
           </v-row>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn @click="cancel" raised>Abbrechen</v-btn>
+            <v-btn @click="submit" color="primary" raised :disabled="!valid">
+              Account erstellen
+            </v-btn>
+          </v-card-actions>
         </v-form>
       </v-container>
     </v-main>
@@ -327,6 +370,12 @@ export default class AccountCreate extends Vue {
   public linkedin = '';
   public ressort = '';
   public gender = '';
+  public address = '';
+  public matriculationNumber = '';
+  public iban = '';
+  public bic = '';
+  public bank = '';
+
 
   public async onFileChanged(files: File[]) {
     this.inputAvatar = files[0];
@@ -375,6 +424,7 @@ export default class AccountCreate extends Vue {
     if ((this.$refs.form as HTMLFormElement).validate()) {
       const createProfile: IUserProfileCreate = {
         email: this.email,
+        private_email: this.privateEmail,
         full_name: this.fullName,
         password: this.password1,
         birthdate: this.birthdate,
@@ -388,6 +438,10 @@ export default class AccountCreate extends Vue {
         linkedin: this.linkedin,
         ressort: this.ressort,
         gender: this.gender,
+        matriculation_number: this.matriculationNumber,
+        iban: this.iban,
+        bic: this.bic,
+        bank: this.bank,
       };
       if (this.avatar) {
         const upload = await dispatchUploadFile(this.$store, {
