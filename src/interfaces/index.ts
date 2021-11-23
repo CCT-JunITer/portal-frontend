@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/interface-name-prefix */
 export interface IUserProfile {
     email: string;
+    private_email: string;
     is_active: boolean;
     is_superuser: boolean;
     is_alumni: boolean;
@@ -38,6 +39,7 @@ export interface IUserProfile {
 
 export interface IUserProfileUpdate {
     email?: string;
+    private_email?: string;
     full_name?: string;
     password?: string;
     birthdate?: string;
