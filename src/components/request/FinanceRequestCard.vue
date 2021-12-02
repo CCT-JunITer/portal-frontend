@@ -4,7 +4,7 @@
       Finanzantrag
     </v-card-title>
     <v-card-subtitle>
-      <div class="my-2"><v-chip class="mx-1">{{request.amount.toFixed(2).replace('.', ',')}} €</v-chip><v-chip class="mx-1">{{request.type}}</v-chip><v-chip v-if="this.request.association" class="mx-1">Ressortbudget: {{this.request.association}}</v-chip></div>
+      <div class="my-2"><v-chip class="mx-1">{{request.amount.toFixed(2).replace('.', ',')}} €</v-chip><v-chip class="mx-1 my-2">{{request.type}}</v-chip><v-chip v-if="this.request.association" class="mx-1">Ressortbudget: {{this.request.association}}</v-chip></div>
       <div class="text-overline green--text">
         {{translateFinanceRequestStatus(request.status)}}
       </div>
@@ -15,7 +15,8 @@
       -->
     </v-card-subtitle>
     <v-card-text>
-      <b>Verwendungszweck:</b> <span v-text="request.purpose" class="pre-formatted"></span>
+      <b>Verwendungszweck:</b> 
+      <span v-text="request.purpose" class="pre-formatted"></span>
     </v-card-text>
     <v-card-actions>
       <v-list-item>

@@ -8,6 +8,27 @@
           <span v-else> erstellen</span>
         </h4>
         <p class="text-body-2 text--secondary">Hier kannst du dir dein Geld zurück holen.</p>
+
+        <span>Anforderungen an den Beleg</span>
+        <ul class="text--secondary" style="font-size: 16px">
+          <li>Optimal ist eine richtige Rechnung, diese enthält:</li>
+        
+          <li>Optimal ist eine richtige Rechnung, diese enthält:</li>
+          <ul>
+            <li>Rechnungsnummer</li>
+            <li>Steuernummer</li>
+            <li>Rechnungsanschrift</li> 
+            <li>Datum</li>
+            <li>Rechnungssumme brutto & netto</li> 
+          </ul>
+          <li>Mindestens braucht es eine Quittung, diese enthält:</li>
+          <ul>
+            <li>Bestätigung der erhaltenen Leistung</li>
+            <li>gezahlten Betrag</li> 
+            <li>Datum</li>
+            <li>Unterschrift</li>
+          </ul>
+        </ul>
       </v-col>
       <v-col cols="12" md="8">
         <v-form
