@@ -5,7 +5,7 @@
       flat
       color="#eee"
     >
-      <v-toolbar-title class="text-h4">Finanzanträge</v-toolbar-title>
+      <v-toolbar-title class="text-h4">Finanzanträge (Beta)</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn x-large icon color="cctOrange" :to="{ name: 'finance-request-create' }">
         <v-icon> mdi-plus-circle</v-icon>
@@ -23,7 +23,7 @@
         </v-checkbox>
       </v-card-actions>
       <v-row>
-        <v-col v-for="financeRequest in financeRequests" :key="financeRequest.id" cols="12" sm="6" lg="4">
+        <v-col v-for="financeRequest in financeRequests" :key="financeRequest.id" cols="12" md="6">
           <finance-request-card class="my-2" :request="financeRequest" outlined></finance-request-card>
         </v-col>
       </v-row>
