@@ -1,5 +1,5 @@
 <template>
-  <v-tooltip bottom content-class="tooltip">
+  <v-tooltip bottom content-class="tooltip" v-if="group.icon">
     <template v-slot:activator="{ on, attrs }">
       <v-icon 
         color="cctGrey"
@@ -22,11 +22,7 @@ export default class GroupIcon extends Vue {
   public group!: Group;
 
   get icon() {
-    return {
-      'Ressortleitung': 'mdi-account-star',
-      'Personalvorstand': 'mdi-account-heart',
-      'Finanzvorstand': 'mdi-account-cash',
-    }[this.group.name] ||'mdi-account';
+    return `${this.group.icon}`;
   }
 
 }

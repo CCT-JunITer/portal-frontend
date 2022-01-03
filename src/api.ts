@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {apiUrl} from '@/env';
-import { ITraining, ITrainingCreate, IUserProfile, IUserProfileCreate, IUserProfileUpdate, UserType, RequestCreate, UserInvite, ITrainingApplicationCreate, ITrainingApplicationUpdate, IFinanceRequestCreate, IFinanceRequestUpdate, IFinanceRequest } from './interfaces';
+import { ITraining, ITrainingCreate, IUserProfile, IUserProfileCreate, IUserProfileUpdate, UserType, RequestCreate, UserInvite, ITrainingApplicationCreate, ITrainingApplicationUpdate, IFinanceRequestCreate, IFinanceRequestUpdate, IFinanceRequest, Group, GroupUpdate, IUserSettings } from './interfaces';
 import {dataURItoBlob} from '@/utils';
 
 function authHeaders(token: string, headers = {}) {
@@ -24,6 +24,12 @@ export const api = {
   async getMe(token: string) {
     return axios.get<IUserProfile>(`${apiUrl}/api/v1/users/me`, authHeaders(token));
   },
+  async getUserSettingsMe(token: string) {
+    return axios.get<IUserSettings>(`${apiUrl}/api/v1/users/email-settings/me`, authHeaders(token));
+  },
+  async updateUserSettingsMe(token: string, data: IUserSettings) {
+    return axios.put<IUserProfile>(`${apiUrl}/api/v1/users/email-settings/me`, data, authHeaders(token));
+  },
   async updateMe(token: string, data: IUserProfileUpdate) {
     return axios.put<IUserProfile>(`${apiUrl}/api/v1/users/me`, data, authHeaders(token));
   },
@@ -40,6 +46,9 @@ export const api = {
     }
 
     return axios.get<IUserProfile[]>(`${apiUrl}/api/v1/users/admin`, { ...authHeaders(token), params });
+  },
+  async getAlumniUsers(token: string) {
+    return axios.get<IUserProfile[]>(`${apiUrl}/api/v1/alumni/admin`, { ...authHeaders(token) });
   },
   async getUsers(token: string, type: UserType) {
 
@@ -129,6 +138,15 @@ export const api = {
   // requests
   async getMyRequests(token: string) {
     return axios.get(`${apiUrl}/api/v1/groups/requests/me`, authHeaders(token));
+  },
+  async getAdminGroups(token: string) {
+    return axios.get<Group[]>(`${apiUrl}/api/v1/groups/admin`, authHeaders(token));
+  },
+  async updateGroup(token: string, groupId: number, data: GroupUpdate) {
+    return axios.put<Group>(`${apiUrl}/api/v1/groups/${groupId}`, data, authHeaders(token));
+  },
+  async createGroup(token: string, data: GroupUpdate) {
+    return axios.post<Group>(`${apiUrl}/api/v1/groups/`, data, authHeaders(token));
   },
   async addUserToGroup(token: string, userId: number, groupId: number) {
     return axios.post(`${apiUrl}/api/v1/groups/${userId}/add`, { group_id: groupId }, authHeaders(token));

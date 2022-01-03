@@ -55,7 +55,27 @@ export default new Router({
                 },
                 {
                   path: 'finance-requests',
-                  component: () => import(/* webpackChunkName: "admin-user-invite" */ './views/main/people/admin/AdminFinanceRequests.vue')
+                  component: () => import(/* webpackChunkName: "admin-user-invite" */ './views/main/admin/AdminFinanceRequests.vue')
+                },
+                {
+                  path: 'groups',
+                  component: RouterComponent,
+                  children: [
+                    {
+                      path: '',
+                      component: () => import(/* webpackChunkName: "admin-user-groups" */ './views/main/admin/AdminGroups.vue')
+                    },
+                    {
+                      path: 'create',
+                      name: 'main-admin-groups-create',
+                      component: () => import(/* webpackChunkName: "admin-user-groups-create" */ './views/main/admin/EditGroup.vue')
+                    },
+                    {
+                      path: ':id',
+                      name: 'main-admin-groups-edit',
+                      component: () => import(/* webpackChunkName: "admin-user-groups-create" */ './views/main/admin/EditGroup.vue')
+                    },
+                  ]
                 }
               ]
             },
@@ -86,6 +106,7 @@ export default new Router({
                     },
                     {
                       path: 'view/:id',
+                      name: 'profile',
                       component: () => import(
                       /* webpackChunkName: "main-profile" */ './views/main/people/profile/UserProfile.vue'),
                       meta: {
@@ -134,6 +155,15 @@ export default new Router({
                       },
                       component: () => import(
                       /* webpackChunkName: "main-profile-edit" */ './views/main/people/profile/UserProfileEdit.vue'),
+                    }, 
+                    {
+                      path: 'settings',
+                      name: 'profile-settings',
+                      meta: {
+                        title: 'Accounteinstellungen',
+                      },
+                      component: () => import(
+                      /* webpackChunkName: "main-profile-edit" */ './views/main/people/profile/UserProfileSettings.vue'),
                     }, 
                     {
                       path: 'requests',
@@ -200,6 +230,11 @@ export default new Router({
                       path: 'users/all',
                       component: () => import(
                       /* webpackChunkName: "main-admin-users" */ './views/main/people/admin/AdminUsers.vue'),
+                    },
+                    {
+                      path: 'alumni/all',
+                      component: () => import(
+                      /* webpackChunkName: "main-admin-alumni-users" */ './views/main/admin/AdminAlumniUsers.vue'),
                     },
                     {
                       path: 'users/edit/:id',

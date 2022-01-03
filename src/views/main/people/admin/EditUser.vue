@@ -1,146 +1,155 @@
 <template>
   <v-container>
 
-    <avatar-cropper-dialog
-      :input-avatar="inputAvatar"
-      :value="inputAvatar"
-      @avatar="onAvatarCropped"
-      @close="inputAvatar = null"
+    <v-form
+      v-model="valid"
+      ref="form"
+      lazy-validation
     >
-    </avatar-cropper-dialog>
+      <avatar-cropper-dialog
+        :input-avatar="inputAvatar"
+        :value="inputAvatar"
+        @avatar="onAvatarCropped"
+        @close="inputAvatar = null"
+      >
+      </avatar-cropper-dialog>
 
-    <v-row>
-      <v-col cols="12" md="4" class="px-5">
-        <h4 class="text-h4 text--primary mb-3">Avatar</h4>
-        <p class="text-body-2 text--secondary">Ändere dein Avatar</p>
-      </v-col>
+      <v-row>
+        <v-col cols="12" md="4" class="px-5">
+          <h4 class="text-h4 text--primary mb-3">Avatar</h4>
+          <p class="text-body-2 text--secondary">Ändere dein Avatar</p>
+        </v-col>
 
-      <v-col cols="12" md="8">
-        <employee-profile-picture
-          :src="avatar"
-          :employee="userProfile"
-          size="128"
-          class="mr-5 float-left">
-        </employee-profile-picture>
-        <div class="text-subtitle-2 mb-2">Neues Avatar hochladen</div>
-        <upload-button
-          outlined
-          class="my-1"
-          color="primary"
-          accept="image/jpeg,image/png"
-          @files="onFileChanged">
-          <v-icon left>
-            cloud_upload
-          </v-icon>
-          Avatar setzen
-        </upload-button>
-        <div class="text-caption">
-          Die Datei darf nicht über 2 MB groß sein
-        </div>
-        <v-btn color="error" outlined icon @click="avatar = null">
-          <v-icon>
-            mdi-delete
-          </v-icon>
-        </v-btn>
-      </v-col>
-    </v-row>
+        <v-col cols="12" md="8">
+          <employee-profile-picture
+            :src="avatar"
+            :employee="userProfile"
+            size="128"
+            class="mr-5 float-left">
+          </employee-profile-picture>
+          <div class="text-subtitle-2 mb-2">Neues Avatar hochladen</div>
+          <upload-button
+            outlined
+            class="my-1"
+            color="primary"
+            accept="image/jpeg,image/png"
+            @files="onFileChanged">
+            <v-icon left>
+              cloud_upload
+            </v-icon>
+            Avatar setzen
+          </upload-button>
+          <div class="text-caption">
+            Die Datei darf nicht über 2 MB groß sein
+          </div>
+          <v-btn color="error" outlined icon @click="avatar = null">
+            <v-icon>
+              mdi-delete
+            </v-icon>
+          </v-btn>
+        </v-col>
+      </v-row>
     
-    <v-divider class="my-5"></v-divider>
+      <v-divider class="my-5"></v-divider>
 
-    <v-row>
-      <v-col cols="12" md="4" class="px-5">
-        <h4 class="text-h4 text--primary mb-3">Personales</h4>
-        <p class="text-body-2 text--secondary">
-          Diese Informationen sind für das Personalmanagement notwendig und können nur von der Ressortleitungsrunde eingesehen werden
-        </p>
-      </v-col>
+      <v-row>
+        <v-col cols="12" md="4" class="px-5">
+          <h4 class="text-h4 text--primary mb-3">Personales</h4>
+          <p class="text-body-2 text--secondary">
+            Diese Informationen sind für das Personalmanagement notwendig und können nur von der Ressortleitungsrunde eingesehen werden
+          </p>
+        </v-col>
 
-      <v-col cols="12" md="8">
+        <v-col cols="12" md="8">
+          <v-select
+            v-model="contact"
+            class="input-lg"
+            :items="$common.CONTACT_OPTIONS"
+            label="Kontaktmöglichkeit bei Alumnisierung"
+            multiple
+            chips
+            deletable-chips
+          ></v-select>
 
-        <v-select
-          v-model = "gender"
-          class="input-lg"
-          :items="$common.GENDER"
-          label="Gender"
-          :rules="[$common.required]"
-        ></v-select>
+          <v-select
+            v-model="gender"
+            class="input-lg"
+            :items="$common.GENDER"
+            label="Gender"
+            :rules="[$common.required]"
+          ></v-select>
 
-        <v-text-field
-          label="Adresse"
-          class="input-lg"
-          v-model="address"
-        >
-        </v-text-field>
+          <v-text-field
+            label="Adresse"
+            class="input-lg"
+            v-model="address"
+          >
+          </v-text-field>
 
-        <v-text-field
-          label="Matrikelnummer"
-          class="input-lg"
-          v-model="matriculationNumber"
-        >
-        </v-text-field>
+          <v-text-field
+            label="Matrikelnummer"
+            class="input-lg"
+            v-model="matriculationNumber"
+          >
+          </v-text-field>
 
-        <v-row dense>
-          <v-col cols="12">
-            <v-text-field
-              label="Bank"
-              class="input-lg"
-              v-model="bank"
-            >
-            </v-text-field>
-          </v-col>
-          <v-col cols="12" md="6">
-            <v-text-field
-              label="IBAN"
-              class="input-lg"
-              v-model="iban"
-              :rules="[$common.isIBAN]"
-            >
-            </v-text-field>
-          </v-col>
-          <v-col cols="12" md="6">
-            <v-text-field
-              label="BIC"
-              class="input-lg"
-              v-model="bic"
-            >
-            </v-text-field>
-          </v-col>
+          <v-row dense>
+            <v-col cols="12">
+              <v-text-field
+                label="Bank"
+                class="input-lg"
+                v-model="bank"
+              >
+              </v-text-field>
+            </v-col>
+            <v-col cols="12" md="6">
+              <v-text-field
+                label="IBAN"
+                class="input-lg"
+                v-model="iban"
+                :rules="[$common.isIBAN]"
+              >
+              </v-text-field>
+            </v-col>
+            <v-col cols="12" md="6">
+              <v-text-field
+                label="BIC"
+                class="input-lg"
+                v-model="bic"
+              >
+              </v-text-field>
+            </v-col>
 
-        </v-row>
+          </v-row>
 
-        <v-select
-          label="Höchste Projektposition"
-          class="input-lg"
-          :items="$common.PROJECT_POSITIONS"
-          v-model="highestProjectPosition"
-        >
-        </v-select>
+          <v-select
+            label="Höchste Projektposition"
+            class="input-lg"
+            :items="$common.PROJECT_POSITIONS"
+            v-model="highestProjectPosition"
+          >
+          </v-select>
 
-        <v-textarea
-          label="Kommentar"
-          class="input-lg"
-          v-model="adminComment"
-        >
-        </v-textarea>
+          <v-textarea
+            label="Kommentar"
+            class="input-lg"
+            v-model="adminComment"
+          >
+          </v-textarea>
 
-      </v-col>
-    </v-row>
+        </v-col>
+      </v-row>
 
 
-    <v-divider class="my-5"></v-divider>
+      <v-divider class="my-5"></v-divider>
 
-    <v-row>
-      <v-col cols="12" md="4" class="px-5">
-        <h4 class="text-h4 text--primary mb-3">Profil</h4>
-        <p class="text-body-2 text--secondary">Diese Informationen sind in deinem Profil sichtbar</p>
-      </v-col>
+      <v-row>
+        <v-col cols="12" md="4" class="px-5">
+          <h4 class="text-h4 text--primary mb-3">Profil</h4>
+          <p class="text-body-2 text--secondary">Diese Informationen sind in deinem Profil sichtbar</p>
+        </v-col>
 
-      <v-col cols="12" md="8">
-        <v-form
-          v-model="valid"
-          ref="form"
-          lazy-validation
-        >
+        <v-col cols="12" md="8">
           <v-text-field
             label="Full Name"
             v-model="fullName"
@@ -301,56 +310,56 @@
             </v-flex>
           </v-layout>
 
-        </v-form>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn @click="cancel" raised>Abbrechen</v-btn>
-          <v-btn
-            @click="submit"
-            color="primary"
-            raised
-            :disabled="!valid"
-          >
-            Profil speichern
-          </v-btn>
-        </v-card-actions>
-      </v-col>
-    </v-row>
-    <v-divider class="my-5"></v-divider>
-    <v-row>
-      <v-col cols="12" md="4" class="px-5">
-        <h4 class="text-h4 text--primary mb-3">Gruppen</h4>
-        <p class="text-body-2 text--secondary">Gruppenzuweisung</p>
-      </v-col>
-      <v-col cols="12" md="8">
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn @click="cancel" raised>Abbrechen</v-btn>
+            <v-btn
+              @click="submit"
+              color="primary"
+              raised
+              :disabled="!valid"
+            >
+              Profil speichern
+            </v-btn>
+          </v-card-actions>
+        </v-col>
+      </v-row>
+      <v-divider class="my-5"></v-divider>
+      <v-row>
+        <v-col cols="12" md="4" class="px-5">
+          <h4 class="text-h4 text--primary mb-3">Gruppen</h4>
+          <p class="text-body-2 text--secondary">Gruppenzuweisung</p>
+        </v-col>
+        <v-col cols="12" md="8">
 
-        <v-card-actions>
-          <group-dialog :userProfile="userProfile"></group-dialog> 
-          <delete-dialog :userProfile="userProfile" v-if="userProfile && !userProfile.is_alumni"></delete-dialog>
-        </v-card-actions>
-        <v-row v-if="userProfile">
-          <v-col cols="12" v-for="group in userProfile.groups" :key="group.id">
-            <user-group-card :group="group">
-              <template v-slot:actions>
-                <v-btn text small color="cctGreen" disabled>
-                  <v-icon left>edit</v-icon>
-                  Editieren
-                </v-btn>
-                <v-btn text small color="red" @click="removeFromGroup(group.group)">
-                  <v-icon left>delete</v-icon>
-                  Löschen
-                </v-btn>
-                <v-btn depressed small color="primary" @click="setPrimaryGroup(group.group)" v-if="!group.is_primary">
-                  <v-icon left>mdi-account-check</v-icon>
-                  primäre Gruppe für {{ group.group.type }} setzen
-                </v-btn>
-              </template>
-            </user-group-card>
-          </v-col> 
-        </v-row>
+          <v-card-actions>
+            <group-dialog :userProfile="userProfile"></group-dialog> 
+            <delete-dialog :userProfile="userProfile" v-if="userProfile && !userProfile.is_alumni"></delete-dialog>
+          </v-card-actions>
+          <v-row v-if="userProfile">
+            <v-col cols="12" v-for="group in userProfile.groups" :key="group.id">
+              <user-group-card :group="group">
+                <template v-slot:actions>
+                  <v-btn text small color="cctGreen" disabled>
+                    <v-icon left>edit</v-icon>
+                    Editieren
+                  </v-btn>
+                  <v-btn text small color="red" @click="removeFromGroup(group.group)">
+                    <v-icon left>delete</v-icon>
+                    Löschen
+                  </v-btn>
+                  <v-btn depressed small color="primary" @click="setPrimaryGroup(group.group)" v-if="!group.is_primary">
+                    <v-icon left>mdi-account-check</v-icon>
+                    primäre Gruppe für {{ group.group.type }} setzen
+                  </v-btn>
+                </template>
+              </user-group-card>
+            </v-col> 
+          </v-row>
 
-      </v-col>
-    </v-row>
+        </v-col>
+      </v-row>
+    </v-form>
   </v-container>
 </template>
 
@@ -400,6 +409,7 @@ export default class EditUser extends Vue {
   public iban = '';
   public bic = '';
   public bank = '';
+  public contact: string[] = [];
 
 
   public password1 = '';
@@ -463,6 +473,7 @@ export default class EditUser extends Vue {
       this.iban = this.userProfile.iban;
       this.bic = this.userProfile.bic;
       this.bank = this.userProfile.bank;
+      this.contact = this.userProfile.contact;
 
     }
   }
@@ -492,6 +503,7 @@ export default class EditUser extends Vue {
         iban: this.iban,
         bic: this.bic,
         bank: this.bank,
+        contact: this.contact,
       };
 
       if(this.avatar) {

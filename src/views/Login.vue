@@ -4,11 +4,8 @@
       <v-layout align-center justify-center>
         <v-flex xs12 sm8 md4>
           <v-card elevation="10">
-            <v-toolbar dark color="cctBlue">
-              <v-btn text :ripple="false">
-                <v-icon left>$cct</v-icon>
-                Portal
-              </v-btn>
+            <v-toolbar dark :color="env === 'production' ? 'cctBlue' : 'cctOrange darken-3'">
+              <portal-button></portal-button>
               <v-spacer></v-spacer>
             </v-toolbar>
             <v-card-text>
@@ -37,11 +34,16 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { readLoginError } from '@/store/main/getters';
 import { dispatchLogIn } from '@/store/main/actions';
+import PortalButton from './main/appbar/components/PortalButton.vue';
+import { env } from '@/env';
 
-@Component
+@Component({
+  components: { PortalButton }
+})
 export default class Login extends Vue {
   public email = '';
   public password = '';
+  public env = env;
 
   public get loginError() {
     return readLoginError(this.$store);

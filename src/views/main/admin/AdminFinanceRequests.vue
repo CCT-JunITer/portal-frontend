@@ -54,8 +54,6 @@
 import AdminFinanceRequestCard from '@/components/request/AdminFinanceRequestCard.vue';
 import { dispatchAdminFinanceRequests } from '@/store/admin/actions';
 import { readAdminFinanceRequests } from '@/store/admin/getters';
-import { dispatchUpdateFinanceRequestState } from '@/store/finance_request/actions';
-import { FinanceRequestState } from '@/store/finance_request/state';
 import { format, isAfter } from 'date-fns';
 import { Vue, Component } from 'vue-property-decorator';
 

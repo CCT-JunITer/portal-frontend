@@ -1,4 +1,4 @@
-import { Group, IUserProfile, Request, ITraining, ITrainingApplication } from '@/interfaces';
+import { Group, IUserProfile, Request, ITraining, ITrainingApplication, IUserSettings } from '@/interfaces';
 import { MainState, AppNotification } from './state';
 import { getStoreAccessors } from 'typesafe-vuex';
 import { State } from '../state';
@@ -19,6 +19,9 @@ export const mutations = {
   },
   setUserProfile(state: MainState, payload: IUserProfile) {
     state.userProfile = payload;
+  },
+  setUserSettings(state: MainState, payload: IUserSettings) {
+    state.userSettings = payload;
   },
   setDashboardMiniDrawer(state: MainState, payload: boolean) {
     state.dashboardMiniDrawer = payload;
@@ -57,6 +60,7 @@ export const commitSetLogInError = commit(mutations.setLogInError);
 export const commitSetToken = commit(mutations.setToken);
 export const commitSetUserStatus = commit(mutations.setUserStatus);
 export const commitSetUserProfile = commit(mutations.setUserProfile);
+export const commitSetUserSettings = commit(mutations.setUserSettings);
 export const commitAddNotification = commit(mutations.addNotification);
 export const commitRemoveNotification = commit(mutations.removeNotification);
 export const commitSetUser = commit(mutations.setUser);

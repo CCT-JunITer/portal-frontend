@@ -21,7 +21,7 @@
               {{ employee.ressort || 'Kein Ressort' }}
 
               <group-icon
-                v-for="group in positions"
+                v-for="group in groups"
                 :key="group.id"
                 :group="group"
               >
@@ -99,8 +99,8 @@ export default class EmployeeCard extends Vue {
   }
 
 
-  get positions() {
-    return this.employee.active_groups?.filter(group => group.type === 'position')
+  get groups() {
+    return this.employee.active_groups;
   }
 }
 </script>

@@ -54,6 +54,15 @@ export const PASSIVE_CAUSES = [
   'Sonstiges',
 ]
 
+export const CONTACT_OPTIONS = [
+  'Alumni Newsletter / Hinweise zu CCT Events',
+  'Einladungen zu Events',
+  'Get Togethers',
+  'Persönliche Kontaktaufnahme',
+  'Alumni Networking 4.0 Gruppe LinkedIn',
+  'Facebook Gruppe'
+]
+
 const LINKED_IN_REGEX = /^(https:\/\/)?([a-z]{2,3}\.)?linkedin\.com\/in\//;
 
 export const linkedInRegex = LINKED_IN_REGEX;
@@ -65,6 +74,8 @@ export const isLinkedIn = (url: string) => {
 export const required = (v: string) => !!v || 'Dieses Feld wird benötigt.';
 
 export const isNumber = (v: string) => (v && !!v.match(/^[0-9]+$/)) || 'Dies ist keine Zahl.';
+
+export const isEmail = (v: string) => (v && !!v.match(/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/)) || 'Dies ist keine E-Mail.';
 
 export const isCurrency = (v: string) => (v && !!v.match(/^\d+$|^\d+,\d{2}$/) || 'Dies ist kein gültiger Geldbetrag.')
 
