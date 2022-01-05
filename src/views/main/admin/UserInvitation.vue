@@ -136,7 +136,7 @@ export default class UserInvitation extends Vue {
   }
 
   public getInvites(lines: string) {
-    const regex = (/^([\w -]+)\s+([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)$/mig)
+    const regex = (/^(.+)\s+([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)$/mig)
     let match = regex.exec(lines);
     const newInvites: UserInvite[] = [];
 

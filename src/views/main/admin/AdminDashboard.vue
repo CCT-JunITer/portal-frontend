@@ -3,7 +3,7 @@
     <v-container>
       <h2 class="text-h2 my-5">Admin Dashboard</h2>
       <v-row>
-        <v-col cols="12" sm="6" md="4">
+        <v-col cols="12" md="8">
           <v-card elevation="5">
             <v-img
               height="250"
@@ -11,12 +11,19 @@
             ></v-img>
             <v-card-title>
               <v-icon left>people</v-icon>
-              Mitglieder verwalten
+              Personalmanagement
             </v-card-title>
             <v-card-text>Hier kannst du bestehende Mitgliederaccounts verändern und verwalten.</v-card-text>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn text to="/main/people/admin" color="cctOrange">Verwalten</v-btn>
+            <v-card-actions class="flex-wrap flex-end">
+              <v-btn text to="/main/people/admin" color="cctGreen">
+                Alumni verwalten
+              </v-btn>
+              <v-btn text to="/main/admin/groups" color="cctBlue">
+                Gruppen verwalten
+              </v-btn>
+              <v-btn text to="/main/people/admin" color="cctOrange">
+                Mitglieder verwalten
+              </v-btn>
             </v-card-actions>
           </v-card>
         </v-col>
@@ -100,7 +107,7 @@
 
 <script lang="ts">
 import { dispatchGetUserProfile } from '@/store/main/actions';
-import { readUserProfile } from '@/store/main/getters';
+import { readHasAnyPermission, readUserProfile } from '@/store/main/getters';
 import { Vue, Component, Prop } from 'vue-property-decorator'
 
 @Component({})
@@ -110,7 +117,7 @@ export default class AdminDashboard extends Vue {
     return readUserProfile(this.$store)
   }
   public isFinanzvorstand() {
-    return this.user?.active_groups.map(group => group.name).includes('Finanzvorstand');
+    return readHasAnyPermission(this.$store)(['portal.finance.admin']);
   }
   async mounted() {
     await dispatchGetUserProfile(this.$store);

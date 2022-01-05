@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar dark color="cctBlue" class="flex-grow-0" app ref="toolbar" v-mutate="onMutate">
+  <v-app-bar dark :color="env === 'production' ? 'cctBlue' : 'cctOrange darken-3'" class="flex-grow-0" app ref="toolbar" v-mutate="onMutate">
     <v-app-bar-nav-icon default @click.stop="switchShowDrawer"></v-app-bar-nav-icon>
     <portal-button></portal-button>
     <v-container class="pa-0">
@@ -19,12 +19,14 @@ import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture
 import SearchBar from './components/SearchBar.vue';
 import UserMenu from './components/UserMenu.vue';
 import PortalButton from './components/PortalButton.vue';
-
+import { env } from '@/env';
 
 @Component({
-  components: { EmployeeProfilePicture, UserMenu, SearchBar, PortalButton }
+  components: { EmployeeProfilePicture, UserMenu, SearchBar, PortalButton },
 })
 export default class DefaultAppBar extends Vue {
+
+  public env = env;
 
   public get userProfile() {
     return readUserProfile(this.$store);

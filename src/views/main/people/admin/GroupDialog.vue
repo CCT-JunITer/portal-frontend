@@ -19,12 +19,13 @@
       <v-card-text>
         <v-container>
           <v-form lazy-validation ref="groupForm">
-            <v-select
+            <v-combobox
               label="Gruppe"
               item-text="name"
               return-object
               v-model="group"
               required
+              chips
               :rules="[$common.required]"
               :items="groups">
               <template v-slot:item="{ item, on, attrs}">
@@ -39,7 +40,7 @@
                   </v-list-item-content>
                 </v-list-item>
               </template>
-            </v-select>
+            </v-combobox>
           </v-form>
         </v-container>
       </v-card-text>

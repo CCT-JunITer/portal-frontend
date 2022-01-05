@@ -48,12 +48,23 @@
             <v-list-item-title>Meine Anträge</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
+      </v-list>
+      <v-divider class="mx-5"></v-divider>
+      <v-list dense nav>
         <v-list-item to="/main/people/profile/edit" color="cctGreen">
           <v-list-item-icon>
             <v-icon>edit</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title>Profil bearbeiten</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item to="/main/people/profile/settings" color="cctGreen">
+          <v-list-item-icon>
+            <v-icon>mdi-cog</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Einstellungen</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
         <v-list-item to="/main/people/profile/edit-password" color="cctOrange">

@@ -31,7 +31,17 @@ export const SCHULUNGSART = [
 ];
 
 export const KOSTENART = [
-  'Workend', 'Interne Vereinsevents', 'Tower & Material', 'Fixkosten', 'Vorstandsbudget', 'Geschenke', 'Sonstiges' 
+  { name: 'Topf Mitgliederförderung', associations: [] },
+  { name: 'Topf Mitgliedergewinnung', associations: [] },
+  { name: 'Topf Außendarstellung', associations: [] },
+  { name: 'Workend', associations: [] },
+  { name: 'Schulung (Pflicht)', associations: [] },
+  { name: 'Schulung (Zusatz)', associations: [] },
+  { name: 'Workingsession', associations: ['Board', 'RL Runde', 'PM', 'Woman @CCT', 'Diversity @CCT', 'Sustainability @CCT', 'IT', 'HR', 'QM', 'PA', 'IN'] },
+  { name: 'OOE', associations: ['IT', 'HR', 'QM', 'PA', 'IN'] },
+  { name: 'Verpflegung ISO audit QM', associations: [] },
+  { name: 'Verpflegung BDSU audit QM', associations: [] },
+  { name: 'Andere', associations: [] },
 ];
 
 export const SCHULUNGSTHEMA = [
@@ -54,6 +64,15 @@ export const PASSIVE_CAUSES = [
   'Sonstiges',
 ]
 
+export const CONTACT_OPTIONS = [
+  'Alumni Newsletter / Hinweise zu CCT Events',
+  'Einladungen zu Events',
+  'Get Togethers',
+  'Persönliche Kontaktaufnahme',
+  'Alumni Networking 4.0 Gruppe LinkedIn',
+  'Facebook Gruppe'
+]
+
 const LINKED_IN_REGEX = /^(https:\/\/)?([a-z]{2,3}\.)?linkedin\.com\/in\//;
 
 export const linkedInRegex = LINKED_IN_REGEX;
@@ -65,6 +84,8 @@ export const isLinkedIn = (url: string) => {
 export const required = (v: string) => !!v || 'Dieses Feld wird benötigt.';
 
 export const isNumber = (v: string) => (v && !!v.match(/^[0-9]+$/)) || 'Dies ist keine Zahl.';
+
+export const isEmail = (v: string) => (v && !!v.match(/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/)) || 'Dies ist keine E-Mail.';
 
 export const isCurrency = (v: string) => (v && !!v.match(/^\d+$|^\d+,\d{2}$/) || 'Dies ist kein gültiger Geldbetrag.')
 

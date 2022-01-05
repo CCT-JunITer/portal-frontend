@@ -22,7 +22,7 @@ export interface IUserProfile {
     profile_picture: string;
 
     groups: UserGroup[];
-
+    permissions: string[];
     active_groups: Group[];
 
     gender: string;
@@ -33,6 +33,7 @@ export interface IUserProfile {
     iban: string;
     bic: string;
     bank: string;
+    contact: string[];
 
     admin_comment?: string;
 }
@@ -62,6 +63,7 @@ export interface IUserProfileUpdate {
     iban?: string;
     bic?: string;
     bank?: string;
+    contact?: string[];
 
 
     admin_comment?: string;
@@ -69,11 +71,16 @@ export interface IUserProfileUpdate {
 
 export interface IUserProfileCreate extends IUserProfileUpdate {
     email: string;
-    is_active?: boolean;
-    is_superuser?: boolean;
-    is_alumni?: boolean;
 }
 
+export interface IUserSettings {
+    is_responder: boolean;
+    responder_from: string;
+    responder_to: string;
+    responder_html: string;
+    copy_adress: string[];
+    used_mailaccount_space: number;
+}
 
 export interface ITraining {
     title: string;
@@ -128,6 +135,28 @@ export interface Group {
     type: string;
     ldap_group: string;
     kas_mailinglist: string;
+    permissions: string[];
+    users?: UserGroup[];
+    active_users?: IUserProfile[];
+    icon: string;
+}
+
+export interface GroupUpdate {
+    name?: string;
+    type?: string;
+    ldap_group?: string;
+    kas_mailinglist?: string;
+    permissions: string[];
+    icon: string;
+}
+
+export interface GroupCreate {
+    name: string;
+    type: string;
+    ldap_group: string;
+    kas_mailinglist: string;
+    permissions: string[];
+    icon: string;
 }
 
 export interface RequestGroup {

@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 dotenv.config();
-const env = process.env.VUE_APP_ENV;
+export const env = process.env.VUE_APP_ENV;
 
 let envApiUrl = '';
 

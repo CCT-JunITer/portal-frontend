@@ -1,4 +1,4 @@
-import { Group, IUserProfile, Request, ITraining, ITrainingApplication, IFinanceRequest } from '@/interfaces';
+import { Group, IUserProfile, Request, ITraining, ITrainingApplication, IFinanceRequest, IUserSettings } from '@/interfaces';
 
 export interface AppNotification {
     content: string;
@@ -12,6 +12,7 @@ export interface MainState {
     isLoggedIn: boolean | null;
     logInError: boolean;
     userProfile: IUserProfile | null;
+    userSettings: IUserSettings | null;
     dashboardMiniDrawer: boolean;
     dashboardShowDrawer: boolean;
     notifications: AppNotification[];

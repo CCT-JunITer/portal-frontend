@@ -1,7 +1,7 @@
 <template>
   <v-navigation-drawer temporary v-model="showDrawer" fixed>
     <template v-slot:prepend>
-      <v-app-bar dark color="cctBlue" class="flex-grow-0">
+      <v-app-bar dark :color="env === 'production' ? 'cctBlue' : 'cctOrange darken-3'" class="flex-grow-0">
         <v-app-bar-nav-icon default @click.stop="switchShowDrawer"></v-app-bar-nav-icon>
         <portal-button></portal-button>
       </v-app-bar>
@@ -186,6 +186,7 @@
 
 <script lang="ts">
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
+import { env } from '@/env';
 import {
   readDashboardShowDrawer,
   readUserProfile
@@ -206,6 +207,8 @@ import PortalButton from './PortalButton.vue';
   }
 })
 export default class NavigationDrawer extends Vue {
+
+  public env = env;
 
   public get userProfile() {
     return readUserProfile(this.$store);

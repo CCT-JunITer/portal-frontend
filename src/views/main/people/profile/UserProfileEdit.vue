@@ -83,19 +83,18 @@
             required
           ></v-text-field>
           <v-text-field
-            disabled
             label="E-mail"
             type="email"
             v-model="email"
             class="input-lg"
-            :rules="[$common.required]"
+            :rules="[$common.required, $common.isEmail]"
           ></v-text-field>
           <v-text-field
-            disabled
             label="Private E-mail"
             type="email"
             v-model="privateEmail"
             class="input-lg"
+            :rules="[$common.required, $common.isEmail]"
           ></v-text-field>
         </v-col>
       </v-row>
@@ -231,9 +230,17 @@
         </v-col>
 
         <v-col cols="12" md="8">
-
           <v-select
-            v-model = "gender"
+            v-model="contact"
+            class="input-lg"
+            :items="$common.CONTACT_OPTIONS"
+            label="Kontaktmöglichkeit bei Alumnisierung"
+            multiple
+            chips
+            deletable-chips
+          ></v-select>
+          <v-select
+            v-model="gender"
             class="input-lg"
             :items="$common.GENDER"
             label="Gender"
@@ -358,6 +365,7 @@ export default class UserProfileEdit extends Vue {
   public valid = true;
   public avatar: string | Blob | null = '';
   public inputAvatar: Blob | null = null;
+  public contact: string[] = [];
   public fullName = '';
   public email = '';
   public birthdate = '';
@@ -398,6 +406,7 @@ export default class UserProfileEdit extends Vue {
     const userProfile = readUserProfile(this.$store);
     if (userProfile) {
       this.fullName = userProfile.full_name;
+      this.privateEmail = userProfile.private_email;
       this.email = userProfile.email;
       this.birthdate = userProfile.birthdate;
       this.phonenumber = userProfile.phonenumber;
@@ -414,6 +423,7 @@ export default class UserProfileEdit extends Vue {
       this.iban = userProfile.iban;
       this.bic = userProfile.bic;
       this.bank = userProfile.bank;
+      this.contact = userProfile.contact;
     }
   }
 
@@ -441,6 +451,8 @@ export default class UserProfileEdit extends Vue {
         iban: this.iban,
         bic: this.bic,
         bank: this.bank,
+        private_email: this.privateEmail,
+        contact: this.contact,
       };
 
       if(this.avatar) {
