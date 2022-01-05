@@ -12,12 +12,10 @@
         <span>Anforderungen an den Beleg</span>
         <ul class="text--secondary" style="font-size: 16px">
           <li>Optimal ist eine richtige Rechnung, diese enthält:</li>
-        
-          <li>Optimal ist eine richtige Rechnung, diese enthält:</li>
           <ul>
             <li>Rechnungsnummer</li>
             <li>Steuernummer</li>
-            <li>Rechnungsanschrift</li> 
+            <li>Rechnungsanschrift des CCTs</li>
             <li>Datum</li>
             <li>Rechnungssumme brutto & netto</li> 
           </ul>
