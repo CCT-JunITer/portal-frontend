@@ -34,7 +34,7 @@
         </span>
         <v-divider class="my-5"></v-divider>
 
-        <v-form lazy-validation ref="groupForm">
+        <v-form lazy-validation ref="groupForm" v-model="valid">
           <v-text-field
             v-model="name"
             required
@@ -59,6 +59,7 @@
           color="cctBlue darken-1"
           text
           @click="deleteAccount()"
+          :disabled="!valid"
         >
           Alumnisieren
         </v-btn>
@@ -75,6 +76,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator'
 @Component({})
 export default class DeleteDialog extends Vue {
 
+  public valid = false;
   public dialogOpen = false;
   public group: Group | null = null;
   public name = '';
@@ -87,8 +89,10 @@ export default class DeleteDialog extends Vue {
   public userProfile!: IUserProfile;
 
   public async deleteAccount() {
-    await dispatchDeleteUser(this.$store, this.userProfile.id)
-    this.dialogOpen = false;
+    if ((this.$refs.groupForm as HTMLFormElement).validate()){
+      await dispatchDeleteUser(this.$store, this.userProfile.id)
+      this.dialogOpen = false;
+    }
   }
 
 }

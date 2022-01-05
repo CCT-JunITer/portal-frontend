@@ -2,7 +2,6 @@ import { Route } from 'vue-router';
 import { MainState } from './state';
 import { getStoreAccessors } from 'typesafe-vuex';
 import { State } from '../state';
-import { IFinanceRequest } from '@/interfaces';
 
 export const getters = {
   routeUser: (state: MainState) => (route: Route) => {

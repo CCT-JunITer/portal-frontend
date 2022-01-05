@@ -12,12 +12,10 @@
         <span>Anforderungen an den Beleg</span>
         <ul class="text--secondary" style="font-size: 16px">
           <li>Optimal ist eine richtige Rechnung, diese enthält:</li>
-        
-          <li>Optimal ist eine richtige Rechnung, diese enthält:</li>
           <ul>
             <li>Rechnungsnummer</li>
             <li>Steuernummer</li>
-            <li>Rechnungsanschrift</li> 
+            <li>Rechnungsanschrift des CCTs</li>
             <li>Datum</li>
             <li>Rechnungssumme brutto & netto</li> 
           </ul>
@@ -42,26 +40,18 @@
             class="input-lg"
             required
             prepend-icon="mdi-animation"
+            item-text="name"
+            return-object
             :items="$common.KOSTENART"
             :rules="[$common.required]"
           ></v-select>
-          <div class="d-flex justify-content-between align-center" style="width:100%">
-            <v-checkbox
-              v-model="isRessortBudget"
-              style="display: inline"
-            >
-            </v-checkbox>
-            <span>
-              Ausgabe Teil eines Ressortbudgets
-            </span>
-          </div>
-          <div v-if="isRessortBudget">
+          <div v-if="type && type.associations.length">
             <v-select
               label="Ressort"
               v-model ="association"
               class="input-lg"
               prepend-icon="mdi-animation"
-              :items="$common.RESSORTS"
+              :items="type.associations"
             ></v-select>
             <v-alert
               prominent
@@ -183,7 +173,7 @@ import FileManager from '@/components/file-manager/FileManager.vue';
 })
 export default class CreateFinanceRequest extends Vue {
 
-  public type = '';
+  public type: null | {name: string; associations: string[]} = null;
   public amount = '';
   public purpose = '';
   public files: string[] = [];
@@ -219,12 +209,12 @@ export default class CreateFinanceRequest extends Vue {
 
   public async submit() {
     let newAssociation = '';
-    if(this.association) newAssociation = this.association;
+    if(this.association && this.type?.associations.length) newAssociation = this.association;
 
     if ((this.$refs.form as HTMLFormElement).validate()) {
       const newFinanceRequest: IFinanceRequestCreate = {
         amount: +this.amount.replace(',', '.'),
-        type: this.type,
+        type: this.type?.name || 'unknown',
         purpose: this.purpose,
         files: this.files.join('/'),
         
@@ -233,7 +223,7 @@ export default class CreateFinanceRequest extends Vue {
       };
       const updatedFinanceRequest: IFinanceRequestUpdate = {
         amount: +this.amount.replace(',', '.'),
-        type: this.type,
+        type: this.type?.name || 'unknown',
         purpose: this.purpose,
         files: this.files.join('/'),
         status: this.status as IFinanceRequestStatus, 
@@ -276,7 +266,7 @@ export default class CreateFinanceRequest extends Vue {
         this.association = this.editFinanceRequest.association;
       }
       this.amount = this.editFinanceRequest.amount.toFixed(2).replace('.', ',');
-      this.type = this.editFinanceRequest.type;
+      this.type = this.$common.KOSTENART.find(o => o.name === this.editFinanceRequest?.type) || { name: this.editFinanceRequest.type, associations: [] };
       this.purpose = this.editFinanceRequest.purpose;
       this.files = this.editFinanceRequest.files ? this.editFinanceRequest.files.split('/') : []
       this.message_request = this.editFinanceRequest.message_request;

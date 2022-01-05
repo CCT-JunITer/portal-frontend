@@ -335,20 +335,21 @@
           <v-card-actions>
             <group-dialog :userProfile="userProfile"></group-dialog> 
             <delete-dialog :userProfile="userProfile" v-if="userProfile && !userProfile.is_alumni"></delete-dialog>
+            <edit-group-dialog :userProfile="userProfile" ref="edit"></edit-group-dialog>
           </v-card-actions>
           <v-row v-if="userProfile">
             <v-col cols="12" v-for="group in userProfile.groups" :key="group.id">
               <user-group-card :group="group">
                 <template v-slot:actions>
-                  <v-btn text small color="cctGreen" disabled>
+                  <v-btn text small color="cctGreen" @click="$refs.edit.setEditGroup(group)">
                     <v-icon left>edit</v-icon>
                     Editieren
                   </v-btn>
-                  <v-btn text small color="red" @click="removeFromGroup(group.group)">
+                  <v-btn text small v-if="group.is_active" color="red" @click="removeFromGroup(group.group)">
                     <v-icon left>delete</v-icon>
                     Löschen
                   </v-btn>
-                  <v-btn depressed small color="primary" @click="setPrimaryGroup(group.group)" v-if="!group.is_primary">
+                  <v-btn depressed small color="primary" @click="setPrimaryGroup(group.group)" v-if="!group.is_primary && group.is_active">
                     <v-icon left>mdi-account-check</v-icon>
                     primäre Gruppe für {{ group.group.type }} setzen
                   </v-btn>
@@ -377,14 +378,14 @@ import GroupDialog from './GroupDialog.vue';
 import DeleteDialog from './DeleteDialog.vue';
 import { readAdminOneUser } from '@/store/admin/getters';
 import DatePickerMenu from '@/components/DatePickerMenu.vue';
+import EditGroupDialog from './EditGroupDialog.vue';
 
 @Component({
-  components: {AvatarCropperDialog, UploadButton, EmployeeProfilePicture,VueTelInputVuetify, UserGroupCard, GroupDialog, DatePickerMenu, DeleteDialog},
+  components: {AvatarCropperDialog, UploadButton, EmployeeProfilePicture,VueTelInputVuetify, UserGroupCard, GroupDialog, DatePickerMenu, DeleteDialog, EditGroupDialog},
 })
 export default class EditUser extends Vue {
   public valid = true;
 
-  public addToGroupDialog = false;
   public group: Group | null = null;
 
   // profile fields

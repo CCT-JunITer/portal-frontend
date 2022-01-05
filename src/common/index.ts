@@ -31,7 +31,17 @@ export const SCHULUNGSART = [
 ];
 
 export const KOSTENART = [
-  'Workend', 'Interne Vereinsevents', 'Tower & Material', 'Fixkosten', 'Vorstandsbudget', 'Geschenke', 'Sonstiges' 
+  { name: 'Topf Mitgliederförderung', associations: [] },
+  { name: 'Topf Mitgliedergewinnung', associations: [] },
+  { name: 'Topf Außendarstellung', associations: [] },
+  { name: 'Workend', associations: [] },
+  { name: 'Schulung (Pflicht)', associations: [] },
+  { name: 'Schulung (Zusatz)', associations: [] },
+  { name: 'Workingsession', associations: ['Board', 'RL Runde', 'PM', 'Woman @CCT', 'Diversity @CCT', 'Sustainability @CCT', 'IT', 'HR', 'QM', 'PA', 'IN'] },
+  { name: 'OOE', associations: ['IT', 'HR', 'QM', 'PA', 'IN'] },
+  { name: 'Verpflegung ISO audit QM', associations: [] },
+  { name: 'Verpflegung BDSU audit QM', associations: [] },
+  { name: 'Andere', associations: [] },
 ];
 
 export const SCHULUNGSTHEMA = [
