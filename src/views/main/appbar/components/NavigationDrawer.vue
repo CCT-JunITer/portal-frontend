@@ -50,7 +50,7 @@
         </v-list-item-content>
       </v-list-item>
 
-      <v-list-item to="/main/admin/dashboard" color="cctOrange" v-if="userProfile && userProfile.is_superuser">
+      <v-list-item to="/main/admin/dashboard" color="cctOrange" v-if="hasAdminAccess">
         <v-list-item-icon>
           <v-icon>mdi-wizard-hat</v-icon>
         </v-list-item-icon>
@@ -189,6 +189,7 @@ import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture
 import { env } from '@/env';
 import {
   readDashboardShowDrawer,
+  readHasAdminAccess,
   readUserProfile
 } from '@/store/main/getters';
 import {
@@ -209,6 +210,10 @@ import PortalButton from './PortalButton.vue';
 export default class NavigationDrawer extends Vue {
 
   public env = env;
+
+  public get hasAdminAccess() {
+    return readHasAdminAccess(this.$store);
+  }
 
   public get userProfile() {
     return readUserProfile(this.$store);
