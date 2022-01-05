@@ -1,6 +1,6 @@
 
 <template>
-  <v-card :disabled="!group.is_active" v-bind="$attrs" v-on="$listeners" >
+  <v-card outlined v-bind="$attrs" v-on="$listeners" >
     <v-card-title>
       {{ group.group.name }} {{ !group.is_primary ? '(sekundär)' : '' }}
     </v-card-title>

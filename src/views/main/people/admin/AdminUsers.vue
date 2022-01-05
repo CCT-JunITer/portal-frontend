@@ -23,11 +23,17 @@
       show-expand
       dense
     >
+      <template v-slot:item.passive_to="{ value }">
+        {{ value ? $common.format(new Date(value), "dd.MM.yyyy") : '' }}
+      </template>
       <template v-slot:item.birthdate="{ value }">
         {{ $common.format(new Date(value), "dd.MM.yyyy") }}
       </template>
       <template v-slot:item.entrydate="{ value }">
         {{ $common.format(new Date(value), "dd.MM.yyyy") }}
+      </template>
+      <template v-slot:item.is_passive="{ value }">
+        <v-icon v-if="value">checkmark</v-icon>
       </template>
       <template v-slot:item.direct_debit_mandate="{ value }">
         <v-icon v-if="value">checkmark</v-icon>
@@ -73,6 +79,11 @@ export default class AdminUsers extends Vue {
       value: 'full_name',
     },
     {
+      text: 'E-Mail',
+      sortable: true,
+      value: 'email',
+    },
+    {
       text: 'Ressort',
       sortable: true,
       value: 'ressort',
@@ -81,6 +92,16 @@ export default class AdminUsers extends Vue {
       text: 'Mitgliedsstatus',
       sortable: true,
       value: 'memberstatus',
+    },
+    {
+      text: 'Ist passiv',
+      sortable: true,
+      value: 'is_passive',
+    },
+    {
+      text: 'Passiv bis',
+      sortable: true,
+      value: 'passive_to',
     },
     {
       text: 'Universität',
@@ -93,7 +114,7 @@ export default class AdminUsers extends Vue {
       value: 'major',
     },
     {
-      text: 'Studiengang',
+      text: 'Hochschulgrad des Studiums',
       sortable: true,
       value: 'studylevel',
     },
@@ -126,11 +147,6 @@ export default class AdminUsers extends Vue {
       text: 'Generation',
       sortable: true,
       value: 'generation',
-    },
-    {
-      text: 'E-Mail',
-      sortable: true,
-      value: 'email',
     },
     {
       text: 'Lastschriftmandat',

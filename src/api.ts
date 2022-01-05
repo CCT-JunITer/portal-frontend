@@ -151,6 +151,9 @@ export const api = {
   async addUserToGroup(token: string, userId: number, groupId: number) {
     return axios.post(`${apiUrl}/api/v1/groups/${userId}/add`, { group_id: groupId }, authHeaders(token));
   },
+  async editUserGroup(token: string, userId: number, userGroupId: number, payload: { date_from: string; date_to: string }) {
+    return axios.put(`${apiUrl}/api/v1/groups/${userId}/edit/${userGroupId}`, payload, authHeaders(token));
+  },
   async removeUserFromGroup(token: string, userId: number, groupId: number) {
     return axios.post(`${apiUrl}/api/v1/groups/${userId}/remove`, { group_id: groupId }, authHeaders(token));
   },

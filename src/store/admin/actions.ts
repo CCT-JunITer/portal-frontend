@@ -55,6 +55,10 @@ export const actions = {
     const response = await apiCallNotify(context, (token) => api.addUserToGroup(token, payload.userId, payload.groupId));
     await dispatchGetAdminUsers(context);
   },
+  async actionEditUserGroup(context: MainContext, payload: { userId: number; userGroupId: number; payload: { date_from: string; date_to: string } }) {
+    const response = await apiCallNotify(context, (token) => api.editUserGroup(token, payload.userId, payload.userGroupId, payload.payload));
+    await dispatchGetAdminUsers(context);
+  },
   async actionRemoveUserFromGroup(context: MainContext, payload: { userId: number; groupId: number }) {
     const response = await apiCallNotify(context, (token) => api.removeUserFromGroup(token, payload.userId, payload.groupId));
     await dispatchGetAdminUsers(context);
@@ -96,6 +100,7 @@ export const dispatchUpdateGroup = dispatch(actions.actionUpdateGroup);
 export const dispatchCreateGroup = dispatch(actions.actionCreateGroup);
 export const dispatchApplyRequest = dispatch(actions.actionApplyRequest);
 export const dispatchAddUserToGroup = dispatch(actions.actionAddUserToGroup);
+export const dispatchEditUserGroup = dispatch(actions.actionEditUserGroup);
 export const dispatchRemoveUserFromGroup = dispatch(actions.actionRemoveUserFromGroup);
 export const dispatchSetPrimaryGroup = dispatch(actions.actionSetPrimaryGroup);
 export const dispatchAdminFinanceRequests = dispatch(actions.actionGetFinanceRequestsAdmin);
