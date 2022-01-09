@@ -18,14 +18,35 @@
     </v-toolbar>
     <v-container> 
       <h4 class="text-h4 mb-3 mt-5">Offene Anträge</h4>
-      <v-row>
-        <v-col v-for="financeRequest in openFinanceRequests" :key="financeRequest.id" cols="12" md="6" lg="4">
-          <admin-finance-request-card class="my-2" :request="financeRequest">
-            <template v-slot:actions>
-            </template>
-          </admin-finance-request-card>
-        </v-col>
-      </v-row>
+      
+      <v-select
+        :items="statuslist"
+        label="Status"
+        v-model="filterkey"
+      ></v-select>
+
+
+      <div v-if="filterkey == 'all'">
+        <v-row>
+          <v-col v-for="financeRequest in openFinanceRequests" :key="financeRequest.id" cols="12" md="6" lg="4">
+            <admin-finance-request-card class="my-2" :request="financeRequest">
+              <template v-slot:actions>
+              </template>
+            </admin-finance-request-card>
+          </v-col>
+        </v-row>
+      </div>
+      
+      <div>
+        <v-row>
+          <v-col v-for="financeRequest in openFinanceRequests.filter(request => request.status == this.filterkey)" :key="financeRequest.id" cols="12" md="6" lg="4">
+            <admin-finance-request-card class="my-2" :request="financeRequest">
+              <template v-slot:actions>
+              </template>
+            </admin-finance-request-card>
+          </v-col>
+        </v-row>
+      </div>
 
       <h4 class="text-h4 mb-3 mt-5">Archivierte Anträge</h4>
       <v-data-table
@@ -66,6 +87,9 @@ import { Vue, Component } from 'vue-property-decorator';
   }
 })
 export default class AdminFinanceRequests extends Vue {
+
+  public filterkey = 'all';
+  public statuslist = ['all', 'created','request_rejected', 'request_accepted', 'file_uploaded', 'file_rejected', 'file_accepted'];
 
   public handleClickRow(value) {
     this.$router.push({ name: 'finance-request-detail', params: { id: value.id } })
