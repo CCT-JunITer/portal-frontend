@@ -1,20 +1,37 @@
 <template>
   <div id="app">
     <v-app>
-      <v-main v-if="loggedIn===null">
-        <v-container fill-height>
-          <v-layout align-center justify-center>
-            <v-flex>
-              <div class="text-center">
-                <div class="text-h5 my-5">Loading...</div>
-                <v-progress-circular size="100" indeterminate color="primary"></v-progress-circular>
-              </div>
-            </v-flex>
-          </v-layout>
-        </v-container>
-      </v-main>
-      <router-view v-else />
+      <router-view v-if="loggedIn !== null" />
       <NotificationsManager></NotificationsManager>
+      <v-snackbar
+        v-model="hasUpdate"
+        color="cctBlue"
+        shaped
+        right
+        bottom
+        timeout="-1"
+      >
+        Update verfügbar
+        <template v-slot:action="{ attrs }">
+          <v-btn
+            color="green"
+            text
+            v-bind="attrs"
+            @click="skipWaiting"
+          >
+            Aktualisieren
+          </v-btn>
+          <v-btn
+            color="pink"
+            text
+            v-bind="attrs"
+            @click="hasUpdate = false"
+          >
+            Ignorieren
+          </v-btn>
+        </template>
+      </v-snackbar>
+
     </v-app>
   </div>
 </template>
@@ -31,14 +48,26 @@ import { dispatchCheckLoggedIn } from '@/store/main/actions';
   },
 })
 export default class App extends Vue {
+  public hasUpdate = false;
 
   get loggedIn() {
     return readIsLoggedIn(this.$store);
   }
 
+  public async skipWaiting() {
+    this.hasUpdate = false;
+    await (this as any).$workbox.messageSW({ type: 'SKIP_WAITING' });
+  }
+
   public async created() {
+    if ((this as any).$workbox) {
+      (this as any).$workbox.addEventListener('waiting', () => {
+        this.hasUpdate = true;
+      });
+    }
     await dispatchCheckLoggedIn(this.$store);
   }
+  
 }
 </script>
 

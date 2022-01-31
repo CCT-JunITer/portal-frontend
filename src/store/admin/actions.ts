@@ -5,7 +5,7 @@ import { State } from '../state';
 import { AdminState } from './state';
 import { getStoreAccessors } from 'typesafe-vuex';
 import { commitSetUser } from '../main/mutations';
-import { commitSetAdminFinanceRequest, commitSetAdminFinanceRequests, commitSetAdminGroup, commitSetAdminGroups, commitSetAdminUsers, commitSetAlumniUsers, commitSetRequests } from './mutations';
+import { commitSetAdminFinanceRequest, commitSetAdminFinanceRequests, commitSetAdminGroup, commitSetAdminGroups, commitSetAdminOneUser, commitSetAdminUsers, commitSetAlumniUsers, commitSetRequests } from './mutations';
 import { apiCall, apiCallNotify } from '../utils';
 
 type MainContext = ActionContext<AdminState, State>;
@@ -18,6 +18,10 @@ export const actions = {
   async actionGetAdminAlumni(context: MainContext) {
     const response = await apiCall(context, api.getAlumniUsers);
     commitSetAlumniUsers(context, response.data);
+  },
+  async actionGetOneAdminUser(context: MainContext, payload: { userId: number }) {
+    const response = await apiCall(context, (token) => api.getAdminOneUser(token, payload.userId));
+    commitSetAdminOneUser(context, response.data);
   },
   async actionDeleteUser(context: MainContext, id: number) {
     const response = await apiCallNotify(context, (token) => api.deleteUser(token, id));
@@ -90,6 +94,7 @@ const { dispatch } = getStoreAccessors<AdminState, State>('');
 
 export const dispatchGetAdminUsers = dispatch(actions.actionGetAdminUsers);
 export const dispatchGetAdminAlumni = dispatch(actions.actionGetAdminAlumni);
+export const dispatchGetOneAdminUser = dispatch(actions.actionGetOneAdminUser);
 export const dispatchCreateUser = dispatch(actions.actionCreateUser);
 export const dispatchUpdateUser = dispatch(actions.actionUpdateUser);
 export const dispatchDeleteUser = dispatch(actions.actionDeleteUser);

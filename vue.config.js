@@ -1,9 +1,12 @@
+const { GenerateSW } = require('workbox-webpack-plugin');
+
 module.exports = {
   'transpileDependencies': [
     'vuetify'
   ],
   // Fix Vuex-typescript in prod: https://github.com/istrib/vuex-typescript/issues/13#issuecomment-409869231
   configureWebpack: (config) => {
+    config.plugins.push(new GenerateSW());
     if (process.env.NODE_ENV === 'production') {
       config.optimization.minimizer[0].options.terserOptions = Object.assign(
         {},

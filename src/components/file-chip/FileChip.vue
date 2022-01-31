@@ -3,7 +3,7 @@
     <v-chip 
       v-bind="$attrs" 
       v-on="$listeners" 
-      :color="filename ? 'cctBlue' : 'red'"
+      :color="filename && !error ? 'cctBlue' : 'error'"
       outlined
     >
       <v-icon left size="20">
@@ -21,21 +21,21 @@
         {{ displayName }}
       </span>
       <v-avatar right>
-        <v-btn @click="preview" icon right color="cctBlue" small>
+        <v-btn @click="preview" icon right style="color: currentColor;" small>
           <v-icon size="20">
             mdi-eye
           </v-icon>
         </v-btn>
       </v-avatar>
       <v-avatar right>
-        <v-btn @click="downloadAndSave" icon color="cctBlue" small>
+        <v-btn @click="downloadAndSave" icon style="color: currentColor;" small>
           <v-icon size="20">
             mdi-download
           </v-icon>
         </v-btn>
       </v-avatar>
       <v-avatar right v-if="$listeners['delete-file']">
-        <v-btn @click="deleteFile()" icon color="cctBlue" small>
+        <v-btn @click="deleteFile()" icon style="color: currentColor;" small>
           <v-icon size="20">
             delete
           </v-icon>
@@ -76,9 +76,12 @@
         </v-toolbar>
 
         <div class="flex-grow-1 d-flex flex-column">
-          <object :data="fileUrl" width="100%" class="file-chip__preview flex-grow-1">
-
-          </object>
+          <iframe v-if="!error" :src="fileUrl" width="100%" class="file-chip__preview flex-grow-1" />
+          <div v-else>
+            <v-icon color="error" x-large>
+              error
+            </v-icon>
+          </div>
         </div>
       </v-card>
     </v-dialog>
@@ -95,6 +98,7 @@ export default class FileChip extends Vue {
   public dialog = false;
   public isDownloading = false;
   public fileUrl: string | null = null;
+  public error = false;
 
   @Prop()
   public filename!: string;
@@ -113,7 +117,7 @@ export default class FileChip extends Vue {
   public get fileIcon() {
     switch(this.filename.split('.')[this.filename.split('.').length-1]) {
     case 'pdf':
-      return 'mdi-file-pdf';
+      return 'mdi-file-document';
     case 'ppt':
     case 'pptx': 
       return 'mdi-file-powerpoint';
@@ -137,10 +141,13 @@ export default class FileChip extends Vue {
   }
 
   public save() {
+    if (!this.fileUrl) {
+      return;
+    }
     // rename to original name
     const link = document.createElement('a');
     document.body.appendChild(link);
-    link.href = this.fileUrl!;
+    link.href = this.fileUrl;
     link.setAttribute('type', 'hidden');
     link.setAttribute('download', this.displayName);
     link.click();
@@ -150,13 +157,19 @@ export default class FileChip extends Vue {
 
   public async download() {
     this.isDownloading = true;
-    const fileBlob = await dispatchDownloadFile(this.$store, { filename: this.filename });
-    if(!fileBlob) {
+    this.error = false;
+    try {
+      const fileBlob = await dispatchDownloadFile(this.$store, { filename: this.filename });
+      if(!fileBlob) {
+        this.isDownloading = false;
+        return;
+      }
+      this.fileUrl = URL.createObjectURL(fileBlob);
       this.isDownloading = false;
-      return;
+    } catch(e) {
+      this.isDownloading = false;
+      this.error = true;
     }
-    this.fileUrl = URL.createObjectURL(fileBlob);
-    this.isDownloading = false;
   }
 
   public async preview() {

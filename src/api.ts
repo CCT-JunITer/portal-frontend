@@ -64,7 +64,12 @@ export const api = {
 
     return axios.get<IUserProfile[]>(`${apiUrl}/api/v1/users/`, { ...authHeaders(token), params });
   },
-
+  async getAdminOneUser(token: string, userId: number) {
+    return axios.get<IUserProfile>(`${apiUrl}/api/v1/users/admin/${userId}`, {...authHeaders(token)});
+  },
+  async getUser(token: string, userId: number) {
+    return axios.get<IUserProfile>(`${apiUrl}/api/v1/users/${userId}`, {...authHeaders(token)});
+  },
   async getPersonalTrainings(token: string, userId: number) {
     return axios.get<ITraining[]>(`${apiUrl}/api/v1/training/participants/${userId}`, { ...authHeaders(token)});
   },

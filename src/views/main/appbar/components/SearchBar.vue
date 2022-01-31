@@ -8,6 +8,8 @@
     :items="employees"
     @change="goToProfile"
     @keydown.enter="goToSearch"
+    @click="fetchData"
+    :loading="isLoading"
     :search-input.sync="searchText"
     return-object
     clearable
@@ -57,9 +59,15 @@ export default class SearchBar extends Vue {
 
   public model = {};
   public searchText = '';
+  public isLoading = false;
 
-  public async created() {
+  public async fetchData() {
+    if (readUsers(this.$store).length) {
+      return;
+    }
+    this.isLoading = true;
     await dispatchGetUsers(this.$store);
+    this.isLoading = false;
   }
 
   get employees(): IUserProfile[] {

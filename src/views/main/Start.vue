@@ -34,5 +34,16 @@ export default class Start extends Vue {
   public beforeRouteUpdate(to, from, next) {
     startRouteGuard(to, from, next);
   }
+
+  mounted() {
+    setTimeout(() => {
+      const splash = document.getElementById('splash-screen');
+      if (!splash) {
+        return;
+      }
+      splash.classList.add('ended');
+      setTimeout(() => splash.remove(), 1000);
+    }, 1000);
+  }
 }
 </script>

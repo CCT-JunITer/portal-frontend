@@ -159,11 +159,11 @@ import { Vue, Component} from 'vue-property-decorator';
 import VueTelInputVuetify from 'vue-tel-input-vuetify/lib/vue-tel-input-vuetify.vue';
 import DatePickerMenu from '@/components/DatePickerMenu.vue';
 import { dispatchGetUsers } from '@/store/main/actions';
-import { readUserProfile, } from '@/store/main/getters';
+import { readHasAnyPermission, readUserProfile, } from '@/store/main/getters';
 import { IFinanceRequest, IFinanceRequestCreate, IFinanceRequestStatus, IFinanceRequestUpdate } from '@/interfaces';
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 import UploadButton from '@/components/UploadButton.vue';
-import { dispatchAddFinanceRequest, dispatchUpdateFinanceRequest, dispatchUpdateFinanceRequestStateType } from '@/store/finance_request/actions';
+import { dispatchAddFinanceRequest, dispatchUpdateFinanceRequest } from '@/store/finance_request/actions';
 import { readOneFinanceRequestMe } from '@/store/finance_request/getters';
 import { readAdminOneFinanceRequest } from '@/store/admin/getters';
 import FileManager from '@/components/file-manager/FileManager.vue';
@@ -193,7 +193,7 @@ export default class CreateFinanceRequest extends Vue {
   }
 
   public get isAdmin() {
-    return this.userProfile?.active_groups.map(group => group.name).includes('Finanzvorstand');
+    return readHasAnyPermission(this.$store)(['portal.finance.admin'])
   }
 
 

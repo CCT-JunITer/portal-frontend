@@ -209,32 +209,7 @@
               </template>
             </template>
           </v-autocomplete>
-          <div class="text-subtitle-2 mb-2">Schulungsmaterial hochladen</div>
-          <upload-button
-            :loading="this.isUploading"
-            :disabled="this.isUploading"
-            outlined
-            class="my-1"
-            color="primary"
-            accept=".pdf,.pptxm.,.ppt,.docx,.doc,.jgp,.jpeg"
-            style="max-width: 340px !important"
-            @files="onFileChanged"
-          >
-            <v-icon left>
-              cloud_upload
-            </v-icon>
-            Schulungsmaterial hochladen
-          </upload-button>
-          <div>
-            <p v-if="!this.training_files.length">
-              Noch keine Dateien hochgeladen
-            </p>
-
-            <file-chip-group v-else>
-              <file-chip :key="file" :filename="file" v-for="file in training_files" @delete-file="removeFile">
-              </file-chip>
-            </file-chip-group>
-          </div>
+          <file-manager v-model="training_files" :multiple="true"></file-manager>
         </v-form>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -262,12 +237,11 @@ import { ITraining, ITrainingCreate } from '@/interfaces';
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 import UploadButton from '@/components/UploadButton.vue';
 import { readOneTraining } from '@/store/training/getters';
-import FileChipGroup from '@/components/file-chip/FileChipGroup.vue';
-import FileChip from '@/components/file-chip/FileChip.vue';
 import { dispatchCreateTraining, dispatchGetTrainings, dispatchUpdateTraining } from '@/store/training/actions';
+import FileManager from '@/components/file-manager/FileManager.vue';
 
 @Component({
-  components: {VueTelInputVuetify, UploadButton, DatePickerMenu, EmployeeProfilePicture, FileChipGroup, FileChip},
+  components: {VueTelInputVuetify, UploadButton, DatePickerMenu, EmployeeProfilePicture, FileManager},
 })
 export default class AdminViewTraining extends Vue {
 

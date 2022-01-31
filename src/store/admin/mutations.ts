@@ -2,6 +2,7 @@ import { Group, IFinanceRequest, IUserProfile, Request } from '@/interfaces';
 import { AdminState } from './state';
 import { getStoreAccessors } from 'typesafe-vuex';
 import { State } from '../state';
+import { replace } from '../utils';
 
 export const mutations = {
   setRequests(state: AdminState, payload: Request[]) {
@@ -10,6 +11,9 @@ export const mutations = {
   setAdminUsers(state: AdminState, payload: IUserProfile[]) {
     state.users = payload;
   },
+  setAdminOneUser(state: AdminState, payload: IUserProfile) {
+    state.users = replace(state.users, payload);
+  },
   setAlumniUsers(state: AdminState, payload: IUserProfile[]) {
     state.alumni = payload;
   },
@@ -17,17 +21,13 @@ export const mutations = {
     state.groups = payload;
   },
   setAdminGroup(state: AdminState, payload: Group) {
-    const users = state.groups.filter((group: Group) => group.id !== payload.id);
-    users.push(payload);
-    state.groups = users;
+    state.groups = replace(state.groups, payload);
   },
   setAdminFinanceRequests(state: AdminState, payload: IFinanceRequest[]){
     state.financeRequests = payload;
   },
   setAdminFinanceRequest(state: AdminState, payload: IFinanceRequest){
-    const financeReqeusts = state.financeRequests.filter((financeRequest: IFinanceRequest) => financeRequest.id !== payload.id);
-    financeReqeusts.push(payload);
-    state.financeRequests = financeReqeusts;
+    state.financeRequests = state.financeRequests.map(financeRequest => financeRequest.id !== payload.id ? financeRequest : payload);
   },
 };
 
@@ -35,6 +35,7 @@ const { commit } = getStoreAccessors<AdminState, State>('');
 
 export const commitSetRequests = commit(mutations.setRequests)
 export const commitSetAdminUsers = commit(mutations.setAdminUsers)
+export const commitSetAdminOneUser = commit(mutations.setAdminOneUser)
 export const commitSetAlumniUsers = commit(mutations.setAlumniUsers)
 export const commitSetAdminGroups = commit(mutations.setAdminGroups)
 export const commitSetAdminGroup = commit(mutations.setAdminGroup)

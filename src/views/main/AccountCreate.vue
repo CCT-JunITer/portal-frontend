@@ -79,11 +79,17 @@
 
             <v-col cols="12" md="8">  
               <v-text-field
-                disabled
-                label="Vor- und Nachname"
+                label="Vorname"
                 class="input-lg"
                 :rules="[$common.required]"
-                v-model="fullName"
+                v-model="firstName"
+                required
+              ></v-text-field>
+              <v-text-field
+                label="Nachname"
+                class="input-lg"
+                :rules="[$common.required]"
+                v-model="lastName"
                 required
               ></v-text-field>
               <v-text-field
@@ -272,12 +278,32 @@
                 :rules="[$common.required]"
               ></v-select>
 
-              <v-text-field
-                label="Adresse"
-                class="input-lg"
-                v-model="address"
-              >
-              </v-text-field>
+              <v-row dense>
+                <v-col cols="12">
+                  <v-text-field
+                    label="Straße"
+                    class="input-lg"
+                    v-model="street"
+                  >
+                  </v-text-field>
+                </v-col>
+                <v-col cols="12" md="6">
+                  <v-text-field
+                    label="PLZ"
+                    class="input-lg"
+                    v-model="postcode"
+                  >
+                  </v-text-field>
+                </v-col>
+                <v-col cols="12" md="6">
+                  <v-text-field
+                    label="Stadt"
+                    class="input-lg"
+                    v-model="city"
+                  >
+                  </v-text-field>
+                </v-col>
+              </v-row>
 
               <v-text-field
                 label="Matrikelnummer"
@@ -370,7 +396,9 @@ export default class AccountCreate extends Vue {
   public linkedin = '';
   public ressort = '';
   public gender = '';
-  public address = '';
+  public street = '';
+  public postcode = '';
+  public city = '';
   public matriculationNumber = '';
   public iban = '';
   public bic = '';
@@ -404,10 +432,19 @@ export default class AccountCreate extends Vue {
     return token?.sub || '';
   }
 
-  public get fullName() {
+  public get firstName() {
     const token = this.getToken();
+    const names = (token?.invite.name || '').split(' ');
 
-    return token?.invite.name || '';
+    names.splice(names.length - 1, 1);
+    return names.join(' ');
+  }
+
+  public get lastName() {
+    const token = this.getToken();
+    const names = (token?.invite.name || '').split(' ');
+
+    return names[names.length - 1];
   }
 
   public get privateEmail() {
@@ -425,7 +462,8 @@ export default class AccountCreate extends Vue {
       const createProfile: IUserProfileCreate = {
         email: this.email,
         private_email: this.privateEmail,
-        full_name: this.fullName,
+        first_name: this.firstName,
+        last_name: this.lastName,
         password: this.password1,
         birthdate: this.birthdate,
         phonenumber: this.phonenumber,
@@ -437,7 +475,10 @@ export default class AccountCreate extends Vue {
         district: this.district,
         linkedin: this.linkedin,
         ressort: this.ressort,
-        gender: this.gender,
+        gender: this.gender,      
+        street: this.street,
+        city: this.city,
+        postcode: this.postcode,
         matriculation_number: this.matriculationNumber,
         iban: this.iban,
         bic: this.bic,

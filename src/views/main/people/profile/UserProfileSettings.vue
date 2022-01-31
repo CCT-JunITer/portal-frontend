@@ -12,69 +12,107 @@
           </v-icon>
           Lastschriftmandat generieren
         </v-btn>
+      </v-col>
+    </v-row>
 
-        <v-dialog width="700px" transition="dialog-bottom-transition" v-model="showSignatureDialog">
-          
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn  v-bind="attrs" v-on="on" color="cctGreen" small outlined class="ma-2 flex-grow-1">
-              <v-icon left small>
-                mdi-fingerprint
-              </v-icon>
-              Signatur erstellen
-            </v-btn>
-          </template>
-          
-          <v-card>
-            <v-card-title>
-              Deine persönliche Signatur
-            </v-card-title>
-            <v-divider></v-divider>
-            <v-card-text>
-              <div class="mt-2">
-                <a target="_blank" href="https://wiki.cct-ev.de/index.php/Signatur_erstellen">Hier</a> findest du den Wiki-Eintrag zur Einrichtung der Signatur im Email Programm.
-              </div>
-            </v-card-text>
-            <v-card-actions>
-              <v-btn color="cctOrange" dark @click="codeSignatureOpen = !codeSignatureOpen" outlined small>
-                <v-icon left>
-                  mdi-filter-variant
-                </v-icon>
-                Code anzeigen
-              </v-btn>
-              <v-btn color="cctBlue" dark @click="copySignatureToClipboard" outlined small>
-                <v-icon left small>
-                  mdi-content-copy
-                </v-icon>
-                In Zwischenablage kopieren
-              </v-btn>
+    <v-divider class="my-5"></v-divider>
+  
+    <v-row>
+      <v-col cols="12" md="4" class="px-5">
+        <h5 class="text-h5 text--primary mb-3">Deine persönliche Signatur</h5>
+        <p class="text-body-2 text--secondary">Erstelle deine persönliche Signatur</p>
+      </v-col>
 
-            </v-card-actions>
-            <v-card-text>
-              <v-expand-transition>
-                <div v-show="codeSignatureOpen">
-                  <p style="background-color: #F5F5F5; padding: 10px; border-radius: 5px; font-style: italic;" id="code-to-copy">
-                    {{ this.userSignature }}
-                  </p>
-                </div>
-              </v-expand-transition>
-            </v-card-text>
-            <v-card-subtitle>
-              Vorschau der Signatur:
-            </v-card-subtitle>
-            <v-card-text>
-              <div>
-                <div id="preview" v-html="`${userSignature}`"/>
-              </div>
-            </v-card-text>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="cctBlue" text @click="showSignatureDialog = false">
-                Fenster schließen
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
+      <v-col cols="12" md="8">
+        <v-alert border="left" dark type="warning" dense text>
+          Das Einfügen einer persönlichen Signatur am Ende einer gesendeten E-Mail ist bei der Kommunikation mit externen Parteien Pflicht. Bestehende Signaturen müssen zu jedem Vorstandswechsel entsprechend aktualisiert werden.
+        </v-alert>
+        <v-alert border="left" type="info" dense text>
+          <a target="_blank" href="https://wiki.cct-ev.de/index.php/Signatur_erstellen">Hier</a> findest du den Wiki-Eintrag zur Einrichtung der Signatur im Email Programm.
+        </v-alert>
+        <v-btn class="ma-2" color="cctOrange" dark @click="codeSignatureOpen = !codeSignatureOpen" outlined small>
+          <v-icon left>
+            mdi-filter-variant
+          </v-icon>
+          Code anzeigen
+        </v-btn>
+        <v-btn class="ma-2" color="cctBlue" dark @click="copySignatureToClipboard" outlined small>
+          <v-icon left small>
+            mdi-content-copy
+          </v-icon>
+          In Zwischenablage kopieren
+        </v-btn>
+        <v-btn class="ma-2" color="cctGreen" dark @click="resetFields" outlined small>
+          <v-icon left small>
+            mdi-account
+          </v-icon>
+          Felder aus Profil übernehmen
+        </v-btn>
+        <v-form lazy-validation @submit="() => {}" class="pa-2">
+          <v-text-field
+            label="Name"
+            v-model="name"
+            filled
+            required
+            class="input-lg"
+            :rules="[$common.required]"
+          >
+          </v-text-field>
+          <v-text-field
+            label="Email"
+            v-model="email"
+            filled
+            required
+            class="input-lg"
+            :rules="[$common.required]"
+          >
+          </v-text-field>
+          <v-text-field
+            label="Telefon"
+            v-model="tel"
+            filled
+            required
+            class="input-lg"
+            :rules="[$common.required]"
+          >
+          </v-text-field>
+          <v-text-field
+            label="Titelbezeichnung"
+            v-model="ressort"
+            filled
+            required
+            class="input-lg"
+            :rules="[$common.required]"
+          >
+          </v-text-field>
+        </v-form>
+        <v-expand-transition>
+          <div v-show="codeSignatureOpen">
+            <p style="background-color: #F5F5F5; padding: 10px; border-radius: 5px; font-style: italic;" id="code-to-copy">
+              {{ this.userSignature }}
+            </p>
+          </div>
+        </v-expand-transition>
+        <div>
+          <v-sheet outlined rounded class="pa-5" id="preview" v-html="`${userSignature}`"/>
+        </div>
+      </v-col>
+    </v-row>
+      
+    <v-divider class="my-5"></v-divider>
 
+    <v-row>
+      <v-col cols="12" md="4" class="px-5">
+        <h5 class="text-h5 text--primary mb-3">Speicherplatz</h5>
+        <p class="text-body-2 text--secondary"></p>
+      </v-col>
+
+      <v-col cols="12" md="8" v-if="userSettings">
+        <div style="max-width: 200px;">
+          <p class="text-subtitle-2"><v-icon left small>email</v-icon> Email-Speichernutzung</p>
+          <v-progress-linear :value="spaceUsed" class="mb-2" rounded height="7px"></v-progress-linear>
+          <p class="text-caption"><b>{{ (userSettings.used_mailaccount_space / 1024).toFixed(2).replace(".", ",") }} MB </b> belegt</p>
+        </div>
       </v-col>
     </v-row>
 
@@ -87,7 +125,7 @@
     >
       <v-row>
         <v-col cols="12" md="4" class="px-5">
-          <h5 class="text-h5 text--primary mb-3">Email Kopie</h5>
+          <h5 class="text-h5 text--primary mb-3">Email&shy;kopie</h5>
           <p class="text-body-2 text--secondary">Bei Erhalt einer E-Mail wird diese an gegebene E-Mail Adressen weitergeleitet.</p>
         </v-col>
 
@@ -121,7 +159,7 @@
           >
           </v-switch>
 
-          <div v-show="userSettings.is_responder">
+          <div v-if="userSettings.is_responder">
 
             <date-picker-menu
               v-model="userSettings.responder_from"
@@ -197,10 +235,9 @@
 
 <script lang="ts">
 import DatePickerMenu from '@/components/DatePickerMenu.vue';
-import { dispatchDownloadDebitMandate, dispatchGetUserSettingsMe, dispatchUpdateUserSettingsMe } from '@/store/main/actions';
-import { readRouteUser, readUserSettings } from '@/store/main/getters';
-import { copyTextToClipboard } from '@/utils';
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
+import { dispatchCopyTextToClipboard, dispatchDownloadDebitMandate, dispatchGetUserSettingsMe, dispatchRemoveNotification, dispatchUpdateUserSettingsMe } from '@/store/main/actions';
+import { readUserProfile, readUserSettings } from '@/store/main/getters';
+import { Vue, Component } from 'vue-property-decorator'
 
 
 @Component({
@@ -209,14 +246,21 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 export default class UserProfileSettings extends Vue {
 
   public valid = false;
+  public codeSignatureOpen = false;
 
-  showSignatureDialog = false;
-  codeSignatureOpen = false;
+  public name = '';
+  public email = '';
+  public ressort = '';
+  public tel = '';
 
   public async submit() {
     if ((this.$refs.form as HTMLFormElement).validate()) {
       await dispatchUpdateUserSettingsMe(this.$store, this.userSettings!);
     }
+  }
+
+  get spaceUsed() {
+    return this.userSettings!.used_mailaccount_space / (1024 * 1024) * 100;
   }
 
   get copyAdress() {
@@ -230,22 +274,28 @@ export default class UserProfileSettings extends Vue {
     this.userSettings.copy_adress = emails.filter(this.$common.isEmail);
   }
 
+  public resetFields() {
+    if (!this.userProfile) {
+      return;
+    }
+    this.name = this.userProfile.full_name || '';
+    this.email = this.userProfile.email || '';
+    this.ressort = this.userProfile.ressort || '';
+    this.tel = this.userProfile.phonenumber || '';
+  }
+
   get userSignature() {
-    const name = this.userProfile?.full_name;
-    const email = this.userProfile?.email;
-    const ressort = this.userProfile?.ressort;
-    const tel = this.userProfile?.phonenumber;
 
     return `<table cellpadding="0" cellspacing="0" border="0" id="backgroundTable"><tr>
     <td valign="top">
     <table border="0" cellspacing="0" cellpadding="0" align="left">
     <tr>
     <td style="border-bottom: 1px dotted; border-top: 1px solid #757070; color: #44546a; margin-top: 10px; font-family: Calibri, sans-serif; font-size: 12.5px;" valign="top" width="460">
-    <p style="margin: 8px 0;"><span><strong id="name">`+ name + `</strong></span>
-    <br /><span id="ressort">`+ ressort +`</span>
-    </p><p style="margin: 8px 0;"><span>Mobil: <span id="mobil">`+ tel + `</span></span>
-    <br /><span>E-Mail: <a id="maillink" style="color: #44546a; font-family: Calibri, sans-serif; text-decoration: underline;" href="mailto:`+ email + `">
-    <span id="mail">`+ email + `</span>
+    <p style="margin: 8px 0;"><span><strong id="name">`+ this.name + `</strong></span>
+    <br /><span id="ressort">`+ this.ressort +`</span>
+    </p><p style="margin: 8px 0;"><span>Mobil: <span id="mobil">`+ this.tel + `</span></span>
+    <br /><span>E-Mail: <a id="maillink" style="color: #44546a; font-family: Calibri, sans-serif; text-decoration: underline;" href="mailto:`+ this.email + `">
+    <span id="mail">`+ this.email + `</span>
     </a></span></p></td></tr><tr>
     <td style="color: #757070; border-bottom: 1px solid #757070; font-family: Calibri, sans-serif; font-size: 12.5px;" valign="top" width="460">
     <p style="margin: 8px 0;">Company Consulting Team e.V.
@@ -265,11 +315,12 @@ export default class UserProfileSettings extends Vue {
   }
 
   async mounted() {
-    await dispatchGetUserSettingsMe(this.$store)
+    this.resetFields();
+    await dispatchGetUserSettingsMe(this.$store);
   }
 
   get userProfile() {
-    return readRouteUser(this.$store)(this.$route);
+    return readUserProfile(this.$store);
   }
 
   get userSettings() {
@@ -277,8 +328,8 @@ export default class UserProfileSettings extends Vue {
   }
 
 
-  public copySignatureToClipboard() {
-    copyTextToClipboard(this.userSignature);
+  public async copySignatureToClipboard() {
+    await dispatchCopyTextToClipboard(this.$store, this.userSignature);
   }
 
   public async downloadDebitMandate() {

@@ -361,7 +361,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { readUserProfile } from '@/store/main/getters';
+import { readHasAnyPermission, readUserProfile } from '@/store/main/getters';
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 import { format } from 'date-fns';
 import EmployeeCard from '@/components/employee/EmployeeCard.vue';
@@ -407,7 +407,7 @@ export default class AdminUsers extends Vue {
   }
 
   public get isAdmin() {
-    return this.user?.active_groups.map(group => group.name).includes('Finanzvorstand');
+    return readHasAnyPermission(this.$store)(['portal.finance.admin'])
   }
 
   public async changeStatusCreated() {
@@ -439,10 +439,7 @@ export default class AdminUsers extends Vue {
   }
   
   public isCurrentStatus(statusArr: string[]): boolean {
-    for(let i = 0; i<statusArr.length; i++) {
-      if(this.financeRequest.status == statusArr[i]) return true;
-    }
-    return false;
+    return statusArr.indexOf(this.financeRequest.status) !== -1;
   }
 
   public async deleteFinanceRequest() {

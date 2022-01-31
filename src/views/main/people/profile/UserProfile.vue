@@ -89,13 +89,14 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import { readIsMe, readRouteUser, readUserProfile } from '@/store/main/getters';
-import { dispatchGetUsers } from '@/store/main/actions';
+import { dispatchGetOneUser } from '@/store/main/actions';
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 import EmployeeCard from '@/components/employee/EmployeeCard.vue';
 import format from 'date-fns/format';
 import { de } from 'date-fns/locale';
+import { Route } from 'vue-router';
 
 
 @Component({
@@ -116,6 +117,15 @@ export default class UserProfile extends Vue {
 
   get strippedLinkedIn() {
     return decodeURI(`/in/${this.userProfile?.linkedin?.replace(this.$common.linkedInRegex, '')}`);
+  }
+
+  @Watch('$route', { immediate: true })
+  public async onRoute(route?: Route, oldRoute?: Route) {
+    if (route?.params.id !== oldRoute?.params.id) {
+      if (+route!.params.id) {
+        await dispatchGetOneUser(this.$store, { userId: +route!.params.id });
+      }
+    }
   }
 
   get userProfile() {
@@ -140,10 +150,6 @@ export default class UserProfile extends Vue {
 
   public goToPassword() {
     this.$router.push('/main/people/profile/password');
-  }
-
-  public async mounted() {
-    await dispatchGetUsers(this.$store);
   }
 
 }
