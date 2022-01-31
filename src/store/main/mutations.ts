@@ -2,6 +2,7 @@ import { Group, IUserProfile, Request, ITraining, ITrainingApplication, IUserSet
 import { MainState, AppNotification } from './state';
 import { getStoreAccessors } from 'typesafe-vuex';
 import { State } from '../state';
+import { replace } from '../utils';
 
 
 export const mutations = {
@@ -39,9 +40,7 @@ export const mutations = {
     state.users = payload;
   },
   setUser(state: MainState, payload: IUserProfile) {
-    const users = state.users.filter((user: IUserProfile) => user.id !== payload.id);
-    users.push(payload);
-    state.users = users;
+    state.users = replace(state.users, payload);
   },
   setMyRequests(state: MainState, payload: Request[]) {
     state.myRequests = payload;

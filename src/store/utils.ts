@@ -5,6 +5,13 @@ import { commitAddNotification, commitRemoveNotification } from './main/mutation
 import { AppNotification } from './main/state';
 import { State } from './state';
 
+export const replace = <T extends {id: number}>(array: T[], payload: T): T[] => {
+  const replaced = array.map(item => item.id !== payload.id ? item : payload)
+  if(!replaced.find(item => item.id === payload.id)) {
+    replaced.push(payload);
+  }
+  return replaced;
+}
 
 export const apiCallNotify = async <T>(context: ActionContext<unknown, State>, apicall: (token: string) => Promise<AxiosResponse<T>>, options: {successText?: string | null; loadingText?: string | null} = {}) => {
   const { loadingText = 'Lade', successText = 'Erfolgreich gespeichert' } = options;

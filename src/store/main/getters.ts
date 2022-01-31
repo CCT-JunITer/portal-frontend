@@ -42,7 +42,7 @@ export const getters = {
       return false;
     }
     return permissions.some(p => 
-      user.permissions.some(perm => p.match(new RegExp(perm.replace('*', '.*'))))
+      user.permissions.some(perm => p.match(new RegExp('^' + perm.replace('*', '.*') + '$')))
     );
   },
   loginError: (state: MainState) => state.logInError,

@@ -1,4 +1,10 @@
 import Vue from 'vue';
+import '@mdi/font/css/materialdesignicons.css' // Ensure you are using css-loader
+import 'material-design-icons-iconfont/dist/material-design-icons.css' // Ensure you are using css-loader
+import '@fontsource/roboto/900.css'; 
+import '@fontsource/roboto/500.css'; 
+import '@fontsource/roboto/400.css'; 
+import '@fontsource/roboto/300.css'; 
 import Vuetify from 'vuetify';
 import CCTIcon from '@/common/icons/cctIcon.vue';
 import de from 'vuetify/lib/locale/de'

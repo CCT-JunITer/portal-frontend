@@ -1,4 +1,4 @@
-import { removeLocalUserStatus, saveLocalUserStatus, getLocalUserStatus } from './../../utils';
+import { removeLocalUserStatus, saveLocalUserStatus, getLocalUserStatus, copyTextToClipboard } from './../../utils';
 import { api } from '@/api';
 import { 
   IUserProfileCreate, IUserProfileUpdate, IUserSettings, RequestCreate } from '@/interfaces';
@@ -16,6 +16,7 @@ import {
   commitSetLogInError,
   commitSetMyRequests,
   commitSetToken,
+  commitSetUser,
   commitSetUserProfile,
   commitSetUsers,
   commitSetUserSettings,
@@ -23,6 +24,7 @@ import {
 } from './mutations';
 import { AppNotification, MainState } from './state';
 import { apiCall, apiCallNotify } from '../utils';
+import { format } from 'date-fns';
 
 type MainContext = ActionContext<MainState, State>;
 
@@ -145,6 +147,40 @@ export const actions = {
       router.push('/main');
     }
   },
+  async copyTextToClipboard(context: MainContext, payload: string) {
+    try {
+      await copyTextToClipboard(payload);
+      commitAddNotification(context, { content: 'Text kopiert', color: 'success' })
+    } catch(e) {
+      commitAddNotification(context, { content: 'Text kopieren fehlgeschlagen', color: 'error' })
+    }
+  },
+  async saveAsCsv(context: MainContext, payload: { data: any[]; fileName: string; headers: string[] ; renderRow: (row: any) => any[] }) {
+    const { data, headers, renderRow, fileName } = payload;
+    // file name
+    const filename = `${format(new Date(), 'yyyyMMdd')}_${fileName}_PT.csv`;
+    
+    // column names
+    const rows = [
+      headers,
+      ...data.map(item => {
+        const row = renderRow(item);
+        return row.map(value => value ? String(value) : '');
+      })
+    ];
+
+    // create CSV
+    const csvContent = 'data:text/csv;charset=utf-8,'
+      + rows.map(e => e.join(',')).join('\n');
+
+    // download file
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+  },
   async removeNotification(context: MainContext, payload: { notification: AppNotification; timeout: number }) {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -164,6 +200,10 @@ export const actions = {
   async actionGetUsers(context: MainContext) {
     const response = await apiCall(context, token => api.getUsers(token, 'all'));
     commitSetUsers(context, response.data);
+  },
+  async actionGetOneUser(context: MainContext, payload: { userId: number }) {
+    const response = await apiCall(context, token => api.getUser(token, payload.userId));
+    commitSetUser(context, response.data);
   },
   async actionCreateUserOpen(context: MainContext, payload: {user: IUserProfileCreate; token: string}) {
     const loadingNotification = { content: 'Account wird erstellt', showProgress: true };
@@ -223,10 +263,13 @@ export const dispatchUpdateUserProfile = dispatch(actions.actionUpdateUserProfil
 export const dispatchUploadFile = dispatch(actions.actionUploadFile);
 export const dispatchDownloadFile = dispatch(actions.actionDownloadFile);
 export const dispatchDownloadDebitMandate = dispatch(actions.actionDownloadDebitMandate);
+export const dispatchCopyTextToClipboard = dispatch(actions.copyTextToClipboard);
+export const dispatchSaveAsCsv = dispatch(actions.saveAsCsv);
 export const dispatchRemoveNotification = dispatch(actions.removeNotification);
 export const dispatchPasswordRecovery = dispatch(actions.passwordRecovery);
 export const dispatchResetPassword = dispatch(actions.resetPassword);
 export const dispatchGetUsers = dispatch(actions.actionGetUsers);
+export const dispatchGetOneUser = dispatch(actions.actionGetOneUser);
 export const dispatchCreateUserOpen = dispatch(actions.actionCreateUserOpen); 
 export const dispatchGetMyRequests = dispatch(actions.actionGetMyRequests); 
 export const dispatchAddRequestMe = dispatch(actions.actionAddRequestMe); 

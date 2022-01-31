@@ -6,10 +6,11 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
-    "test": "vue-cli-service test:unit --watch",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "test": "vue-cli-service test:unit --watch"
   },
   "dependencies": {
+    "@fontsource/roboto": "^4.5.1",
     "@mdi/font": "^6.5.95",
     "@mdi/svg": "^6.5.95",
     "axios": "^0.20.0",
@@ -18,7 +19,6 @@
     "date-fns": "^2.22.1",
     "dotenv": "^8.6.0",
     "jwt-decode": "^3.1.2",
-    "register-service-worker": "^1.7.2",
     "typesafe-vuex": "^3.2.2",
     "vue": "^2.6.14",
     "vue-advanced-cropper": "^0.17.9",
@@ -27,7 +27,8 @@
     "vue-router": "^3.5.2",
     "vue-tel-input-vuetify": "^1.2.17",
     "vuetify": "^2.5.6",
-    "vuex": "^3.6.2"
+    "vuex": "^3.6.2",
+    "workbox-webpack-plugin": "^6.4.2"
   },
   "devDependencies": {
     "@types/jest": "^24.0.19",
@@ -46,6 +47,7 @@
     "eslint-plugin-vue": "^6.2.2",
     "eslint-plugin-vuetify": "^1.0.1",
     "jest": "^26.6.3",
+    "material-design-icons-iconfont": "^6.1.1",
     "sass": "~1.32.12",
     "sass-loader": "^8.0.0",
     "ts-jest": "^23.10.5",

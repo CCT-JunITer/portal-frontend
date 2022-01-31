@@ -23,6 +23,43 @@
         </v-icon>
         Datei{{ multiple ? 'en' : '' }} hochladen
       </upload-button>
+      <v-dialog
+        v-model="dialog"
+        persistent
+        max-width="600px"
+      >
+        <v-card v-if="this.files">
+          <v-card-title>
+            <span class="text-h5">Datei umbenennen</span>
+          </v-card-title>
+          <v-card-text>
+            <v-text-field
+              v-for="file in this.files"
+              :key="file.key"
+              label="Dateiname"
+              v-model="file.fileName"
+              required
+            ></v-text-field>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              color="blue darken-1"
+              text
+              @click="dialog = false"
+            >
+              Close
+            </v-btn>
+            <v-btn
+              color="blue darken-1"
+              text
+              @click="uploadFiles"
+            >
+              Save
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </div>
     <div>
       <p v-if="!this.value.length">
@@ -30,7 +67,7 @@
       </p>
 
       <file-chip-group v-else>
-        <file-chip :key="file" :filename="file" v-for="file in value" @delete-file="removeFile">
+        <file-chip :key="file" :filename="file" v-for="file in value" @[readonly?null:`delete-file`]="removeFile">
         </file-chip>
       </file-chip-group>
     </div>
@@ -50,6 +87,8 @@ import UploadButton from '../UploadButton.vue';
 export default class FileManager extends Vue {
 
   public isUploading = false;
+  public dialog = false;
+  public files: { file: File; fileName: string; key: number }[] | null = null;
 
   @Prop({ default: false })
   public multiple!: boolean;
@@ -65,11 +104,21 @@ export default class FileManager extends Vue {
     return value;
   }
 
-  public async onFileChanged(files: File[]) {
+  public onFileChanged(files: File[]) {
+    this.files = files.map((file, i) => ({ file, fileName: file.name, key: i }));
+    this.dialog = true;
+  }
+
+  public async uploadFiles() {
+    if (!this.files) {
+      return;
+    }
     this.isUploading = true;
-    for(const file of files) {
+    this.dialog = false;
+    for(const { file, fileName } of this.files) {
       const response = await dispatchUploadFile(this.$store, {
-        file: file,
+        file,
+        fileName
       });
       if (response) {
         this.input([...this.value, response.filename]);

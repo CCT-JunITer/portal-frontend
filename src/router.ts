@@ -5,7 +5,6 @@ import Router, { Route } from 'vue-router';
 import RouterComponent from './components/RouterComponent.vue';
 import { State } from './store/state';
 import { Store } from 'vuex';
-import { component } from 'vue/types/umd';
 
 Vue.use(Router);
 
@@ -47,7 +46,10 @@ export default new Router({
               children: [
                 {
                   path: 'dashboard',
-                  component: () => import(/* webpackChunkName: "admin-dashboard" */ './views/main/admin/AdminDashboard.vue')
+                  component: () => import(/* webpackChunkName: "admin-dashboard" */ './views/main/admin/AdminDashboard.vue'),
+                  meta: {
+                    permissions: ['*admin*']
+                  }
                 },  
                 {
                   path: 'user-invite',

@@ -6,6 +6,7 @@
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn color="cctGreen" to="/main/admin/user-invite">Trainees einladen</v-btn>
+      <v-btn color="cctBlue" @click="exportAsCsv" class="ml-1">Exportieren</v-btn>
     </v-toolbar>
     <v-card-title>
       <v-text-field
@@ -62,114 +63,111 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { readAdminUsers } from '@/store/admin/getters';
 import { dispatchGetAdminUsers } from '@/store/admin/actions';
+import { dispatchSaveAsCsv } from '@/store/main/actions';
+import { IUserProfile } from '@/interfaces';
 
 @Component
 export default class AdminUsers extends Vue {
   public search = '';
-
-  public headers = [
+  public headers: { text: string; value: keyof IUserProfile | string; sortable?: boolean }[] = [
     {
       text: '',
       value: 'actions',
       sortable: false,
     },
     {
-      text: 'Name',
-      sortable: true,
-      value: 'full_name',
+      text: 'Vorname',
+      value: 'first_name',
     },
     {
-      text: 'E-Mail',
-      sortable: true,
-      value: 'email',
+      text: 'Nachname',
+      value: 'last_name',
     },
     {
       text: 'Ressort',
-      sortable: true,
       value: 'ressort',
     },
     {
       text: 'Mitgliedsstatus',
-      sortable: true,
       value: 'memberstatus',
     },
     {
       text: 'Ist passiv',
-      sortable: true,
       value: 'is_passive',
     },
     {
-      text: 'Passiv bis',
-      sortable: true,
-      value: 'passive_to',
+      text: 'Höchste Projektposition',
+      value: 'highest_project_position',
     },
     {
       text: 'Universität',
-      sortable: true,
       value: 'university',
     },
     {
-      text: 'Studiengang',
-      sortable: true,
-      value: 'major',
-    },
-    {
-      text: 'Hochschulgrad des Studiums',
-      sortable: true,
-      value: 'studylevel',
-    },
-    {
       text: 'Matrikelnummer',
-      sortable: true,
       value: 'matriculation_number',
     },
     {
-      text: 'IBAN',
-      sortable: true,
-      value: 'iban',
-    },
-    {
-      text: 'Geburtsdatum',
-      sortable: true,
+      text: 'Geburtstag',
       value: 'birthdate',
     },
     {
       text: 'Geschlecht',
-      sortable: true,
       value: 'gender',
     },
     {
-      text: 'Eintrittsdatum',
-      sortable: true,
-      value: 'entrydate',
-    },
-    {
       text: 'Generation',
-      sortable: true,
       value: 'generation',
     },
     {
+      text: 'E-Mail',
+      value: 'email',
+    },
+    {
       text: 'Lastschriftmandat',
-      sortable: true,
       value: 'direct_debit_mandate',
     },
     {
-      text: 'Adresse',
-      sortable: true,
-      value: 'address',
+      text: 'Studiengang',
+      value: 'major',
+    },
+    {
+      text: 'Hochschulgrad des Studiums',
+      value: 'studylevel',
+    },
+    {
+      text: 'passiv bis',
+      value: 'passive_to',
     },
     {
       text: 'Kommentar',
-      sortable: true,
       value: 'admin_comment',
     },
     {
-      text: 'Höchste Projektposition',
-      sortable: true,
-      value: 'highest_project_position',
+      text: 'Straße',
+      value: 'street',
     },
-
+    {
+      text: 'PLZ',
+      value: 'postcode',
+    },
+    {
+      text: 'Ort',
+      value: 'city',
+    },
   ];
+
+  public async exportAsCsv() {
+    const headers = this.headers.slice(1);
+
+    await dispatchSaveAsCsv(this.$store, {
+      data: this.users,
+      fileName: 'Personalbestand',
+      headers: headers.map(header => header.text),
+      renderRow: (item: IUserProfile) => headers.map(header => item[header.value])
+    })
+  }
+
   get users() {
     return readAdminUsers(this.$store);
   }

@@ -62,7 +62,7 @@ export default class FinanceRequestCard extends Vue {
   white-space: pre;
 }
 .archived {
-  opacity: 75%;
+  opacity: 0.75;
 }
 
 </style>

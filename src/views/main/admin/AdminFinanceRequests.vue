@@ -54,6 +54,7 @@
 import AdminFinanceRequestCard from '@/components/request/AdminFinanceRequestCard.vue';
 import { dispatchAdminFinanceRequests } from '@/store/admin/actions';
 import { readAdminFinanceRequests } from '@/store/admin/getters';
+import { dispatchSaveAsCsv } from '@/store/main/actions';
 import { format, isAfter } from 'date-fns';
 import { Vue, Component } from 'vue-property-decorator';
 
@@ -95,34 +96,13 @@ export default class AdminFinanceRequests extends Vue {
     await dispatchAdminFinanceRequests(this.$store);
   }
 
-  public exportAsCsv() {
-
-    // file name
-    const date: Date = new Date;
-    const filename: string = date.toISOString().split('T')[0].replace('-','').replace('-','') + '_finanzanträge_PT' + '.csv';
-    
-    // column names
-    const rows = [
-      ['id','Name','IBAN','Betrag','Verwendungszweck','']
-    ];
-    
-    // create Array
-    this.archivedFinanceRequests.forEach(function (item) {
-      const row: string[] = [String(item.id), item.author.full_name, String(item.iban) , String(item.amount), item.purpose]
-      rows.push(row)
+  public async exportAsCsv() {
+    await dispatchSaveAsCsv(this.$store, {
+      data: this.archivedFinanceRequests,
+      fileName: 'Finanzanträge',
+      headers: ['id','Name','IBAN','Betrag','Verwendungszweck',''],
+      renderRow: (item) => [String(item.id), item.author.full_name, String(item.iban) , String(item.amount), item.purpose]
     });
-
-    // create CSV
-    const csvContent = 'data:text/csv;charset=utf-8,'
-      + rows.map(e => e.join(',')).join('\n');
-
-    // download file
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
-    link.setAttribute('download', filename);
-    document.body.appendChild(link);
-    link.click();
   }
 
 

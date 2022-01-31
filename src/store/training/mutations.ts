@@ -2,6 +2,7 @@ import { ITraining, ITrainingApplication } from '@/interfaces';
 import { TrainingState } from './state';
 import { getStoreAccessors } from 'typesafe-vuex';
 import { State } from '../state';
+import { replace } from '../utils';
 
 
 export const mutations = {
@@ -15,9 +16,7 @@ export const mutations = {
     state.trainings = payload;
   },
   setTraining(state: TrainingState, payload: ITraining) {
-    const trainings = state.trainings.filter((training: ITraining) => training.id !== payload.id);
-    trainings.push(payload);
-    state.trainings = trainings;
+    state.trainings = replace(state.trainings, payload);
   },
 };
 

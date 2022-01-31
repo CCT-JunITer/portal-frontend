@@ -79,12 +79,34 @@
             :rules="[$common.required]"
           ></v-select>
 
-          <v-text-field
-            label="Adresse"
-            class="input-lg"
-            v-model="address"
-          >
-          </v-text-field>
+          <v-row dense>
+            <v-col cols="12">
+              <v-text-field
+                label="Straße"
+                class="input-lg"
+                v-model="street"
+              >
+              </v-text-field>
+            </v-col>
+            <v-col cols="12">
+              <v-text-field
+                label="PLZ"
+                class="input-lg"
+                v-model="postcode"
+              >
+              </v-text-field>
+            </v-col>
+            <v-col cols="12">
+              <v-text-field
+                label="Stadt"
+                class="input-lg"
+                v-model="city"
+              >
+              </v-text-field>
+            </v-col>
+          </v-row>
+          
+
 
           <v-text-field
             label="Matrikelnummer"
@@ -130,6 +152,13 @@
           >
           </v-select>
 
+          <v-checkbox
+            label="Lastschriftmandat"
+            class="input-lg"
+            v-model="directDebitMandate"
+          >
+          </v-checkbox>
+
           <v-textarea
             label="Kommentar"
             class="input-lg"
@@ -151,10 +180,17 @@
 
         <v-col cols="12" md="8">
           <v-text-field
-            label="Full Name"
-            v-model="fullName"
+            label="Vorname"
             class="input-lg"
             :rules="[$common.required]"
+            v-model="firstName"
+            required
+          ></v-text-field>
+          <v-text-field
+            label="Nachname"
+            class="input-lg"
+            :rules="[$common.required]"
+            v-model="lastName"
             required
           ></v-text-field>
           <v-text-field
@@ -365,20 +401,21 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import { Group, IUserProfileCreate } from '@/interfaces';
 import { dispatchGetGroups, dispatchUploadFile } from '@/store/main/actions';
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 import UploadButton from '@/components/UploadButton.vue';
 import VueTelInputVuetify from 'vue-tel-input-vuetify/lib/vue-tel-input-vuetify.vue';
 import AvatarCropperDialog from '@/components/AvatarCropperDialog.vue';
-import { dispatchCreateUser, dispatchGetAdminUsers, dispatchRemoveUserFromGroup, dispatchSetPrimaryGroup, dispatchUpdateUser } from '@/store/admin/actions';
+import { dispatchCreateUser, dispatchGetAdminUsers, dispatchGetOneAdminUser, dispatchRemoveUserFromGroup, dispatchSetPrimaryGroup, dispatchUpdateUser } from '@/store/admin/actions';
 import UserGroupCard from '@/components/user-group/UserGroupCard.vue';
 import GroupDialog from './GroupDialog.vue';
 import DeleteDialog from './DeleteDialog.vue';
 import { readAdminOneUser } from '@/store/admin/getters';
 import DatePickerMenu from '@/components/DatePickerMenu.vue';
 import EditGroupDialog from './EditGroupDialog.vue';
+import { Route } from 'vue-router';
 
 @Component({
   components: {AvatarCropperDialog, UploadButton, EmployeeProfilePicture,VueTelInputVuetify, UserGroupCard, GroupDialog, DatePickerMenu, DeleteDialog, EditGroupDialog},
@@ -391,7 +428,8 @@ export default class EditUser extends Vue {
   // profile fields
   public avatar: string | Blob | null = '';
   public inputAvatar: Blob | null = null;
-  public fullName = '';
+  public firstName = '';
+  public lastName = '';
   public email = '';
   public birthdate = '';
   public phonenumber = '';
@@ -404,9 +442,12 @@ export default class EditUser extends Vue {
   public linkedin = '';
   public gender = '';
   public adminComment? = '';
-  public address = '';
+  public city = '';
+  public postcode = '';
+  public street = '';
   public highestProjectPosition = '';
   public matriculationNumber = '';
+  public directDebitMandate = false;
   public iban = '';
   public bic = '';
   public bank = '';
@@ -440,14 +481,19 @@ export default class EditUser extends Vue {
     return !!this.userProfile?.id;
   }
 
-  public created() {
-    this.reset();
+
+  @Watch('$route', { immediate: true })
+  public async onRoute(route?: Route, oldRoute?: Route) {
+    if (route?.params.id !== oldRoute?.params.id) {
+      if (+route!.params.id) {
+        await dispatchGetOneAdminUser(this.$store, { userId: +route!.params.id });
+      }
+      this.reset();
+    }
   }
 
   public async mounted() {
-    await dispatchGetAdminUsers(this.$store);
     await dispatchGetGroups(this.$store);
-    this.reset();
   }
 
   public reset() {
@@ -455,7 +501,8 @@ export default class EditUser extends Vue {
     this.password1 = '';
     this.password2 = '';
     if (this.userProfile) {
-      this.fullName = this.userProfile.full_name;
+      this.firstName = this.userProfile.first_name;
+      this.lastName = this.userProfile.last_name;
       this.email = this.userProfile.email;
       this.birthdate = this.userProfile.birthdate;
       this.phonenumber = this.userProfile.phonenumber;
@@ -468,7 +515,10 @@ export default class EditUser extends Vue {
       this.linkedin = this.userProfile.linkedin;
       this.gender = this.userProfile.gender;
       this.adminComment = this.userProfile.admin_comment;
-      this.address = this.userProfile.address;
+      this.directDebitMandate = this.userProfile.direct_debit_mandate;
+      this.street = this.userProfile.street;
+      this.city = this.userProfile.city;
+      this.postcode = this.userProfile.postcode;
       this.highestProjectPosition = this.userProfile.highest_project_position;
       this.matriculationNumber = this.userProfile.matriculation_number;
       this.iban = this.userProfile.iban;
@@ -487,7 +537,8 @@ export default class EditUser extends Vue {
     if ((this.$refs.form as HTMLFormElement).validate()) {
       const updatedProfile: IUserProfileCreate = {
         email: this.email,
-        full_name: this.fullName,
+        first_name: this.firstName,
+        last_name: this.lastName,
         birthdate: this.birthdate,
         phonenumber: this.phonenumber,
         entrydate: this.entrydate,
@@ -498,9 +549,12 @@ export default class EditUser extends Vue {
         linkedin: this.linkedin,
         gender: this.gender,
         admin_comment: this.adminComment,
-        address: this.address,
+        street: this.street,
+        city: this.city,
+        postcode: this.postcode,
         matriculation_number: this.matriculationNumber,
         highest_project_position: this.highestProjectPosition,
+        direct_debit_mandate: this.directDebitMandate,
         iban: this.iban,
         bic: this.bic,
         bank: this.bank,

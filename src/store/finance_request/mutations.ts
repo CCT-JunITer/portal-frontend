@@ -2,6 +2,7 @@ import { IFinanceRequest } from '@/interfaces';
 import { FinanceRequestState } from './state';
 import { getStoreAccessors } from 'typesafe-vuex';
 import { State } from '../state';
+import { replace } from '../utils';
 
 
 export const mutations = {
@@ -9,9 +10,7 @@ export const mutations = {
     state.myFinanceRequests = payload;
   },
   setMyFinanceRequest(state: FinanceRequestState, payload: IFinanceRequest){
-    const financeReqeusts = state.myFinanceRequests.filter((financeRequest: IFinanceRequest) => financeRequest.id !== payload.id);
-    financeReqeusts.push(payload);
-    state.myFinanceRequests = financeReqeusts;
+    state.myFinanceRequests = replace(state.myFinanceRequests, payload);
   },
   deleteFinanceRequest(state: FinanceRequestState, payload: IFinanceRequest){
     state.myFinanceRequests = state.myFinanceRequests.filter((financeRequest: IFinanceRequest) => financeRequest.id !== payload.id);

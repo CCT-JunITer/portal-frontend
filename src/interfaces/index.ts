@@ -6,6 +6,8 @@ export interface IUserProfile {
     is_superuser: boolean;
     is_alumni: boolean;
     full_name: string;
+    first_name: string;
+    last_name: string;
     id: number;
     birthdate: string;
     district: string;
@@ -28,8 +30,10 @@ export interface IUserProfile {
     gender: string;
     highest_project_position: string;
     matriculation_number: string;
-    direct_debit_mandate: string;
-    address: string;
+    direct_debit_mandate: boolean;
+    street: string;
+    city: string;
+    postcode: string;
     iban: string;
     bic: string;
     bank: string;
@@ -41,7 +45,8 @@ export interface IUserProfile {
 export interface IUserProfileUpdate {
     email?: string;
     private_email?: string;
-    full_name?: string;
+    first_name?: string;
+    last_name?: string;
     password?: string;
     birthdate?: string;
     district?: string;
@@ -58,8 +63,10 @@ export interface IUserProfileUpdate {
     gender?: string;
     highest_project_position?: string;
     matriculation_number?: string;
-    direct_debit_mandate?: string;
-    address?: string;
+    direct_debit_mandate?: boolean;
+    street?: string;
+    city?: string;
+    postcode?: string;
     iban?: string;
     bic?: string;
     bank?: string;

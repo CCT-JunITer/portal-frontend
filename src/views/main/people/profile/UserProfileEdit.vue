@@ -76,10 +76,17 @@
 
         <v-col cols="12" md="8">  
           <v-text-field
-            label="Vor- und Nachname"
+            label="Vorname"
             class="input-lg"
             :rules="[$common.required]"
-            v-model="fullName"
+            v-model="firstName"
+            required
+          ></v-text-field>
+          <v-text-field
+            label="Nachname"
+            class="input-lg"
+            :rules="[$common.required]"
+            v-model="lastName"
             required
           ></v-text-field>
           <v-text-field
@@ -247,12 +254,33 @@
             :rules="[$common.required]"
           ></v-select>
 
-          <v-text-field
-            label="Adresse"
-            class="input-lg"
-            v-model="address"
-          >
-          </v-text-field>
+          <v-row dense>
+            <v-col cols="12">
+              <v-text-field
+                label="Straße"
+                class="input-lg"
+                v-model="street"
+              >
+              </v-text-field>
+            </v-col>
+            <v-col cols="12" md="6">
+              <v-text-field
+                label="PLZ"
+                class="input-lg"
+                v-model="postcode"
+              >
+              </v-text-field>
+            </v-col>
+            <v-col cols="12" md="6">
+              <v-text-field
+                label="Stadt"
+                class="input-lg"
+                v-model="city"
+              >
+              </v-text-field>
+            </v-col>
+          </v-row>
+          
 
           <v-text-field
             label="Matrikelnummer"
@@ -366,7 +394,8 @@ export default class UserProfileEdit extends Vue {
   public avatar: string | Blob | null = '';
   public inputAvatar: Blob | null = null;
   public contact: string[] = [];
-  public fullName = '';
+  public firstName = '';
+  public lastName = '';
   public email = '';
   public birthdate = '';
   public phonenumber = '';
@@ -378,7 +407,9 @@ export default class UserProfileEdit extends Vue {
   public linkedin = '';
   public gender = '';
   public privateEmail = '';
-  public address = '';
+  public street = '';
+  public postcode = '';
+  public city = '';
   public highestProjectPosition = '';
   public matriculationNumber = '';
   public iban = '';
@@ -405,7 +436,8 @@ export default class UserProfileEdit extends Vue {
   public reset() {
     const userProfile = readUserProfile(this.$store);
     if (userProfile) {
-      this.fullName = userProfile.full_name;
+      this.firstName = userProfile.first_name;
+      this.lastName = userProfile.last_name;
       this.privateEmail = userProfile.private_email;
       this.email = userProfile.email;
       this.birthdate = userProfile.birthdate;
@@ -417,7 +449,9 @@ export default class UserProfileEdit extends Vue {
       this.district = userProfile.district;
       this.linkedin = userProfile.linkedin;
       this.gender = userProfile.gender;
-      this.address = userProfile.address;
+      this.street = userProfile.street;
+      this.city = userProfile.city;
+      this.postcode = userProfile.postcode;
       this.highestProjectPosition = userProfile.highest_project_position;
       this.matriculationNumber = userProfile.matriculation_number;
       this.iban = userProfile.iban;
@@ -434,7 +468,8 @@ export default class UserProfileEdit extends Vue {
   public async submit() {
     if ((this.$refs.form as HTMLFormElement).validate()) {
       const updatedProfile: IUserProfileUpdate = {
-        full_name: this.fullName,
+        first_name: this.firstName,
+        last_name: this.lastName,
         email: this.email,
         birthdate: this.birthdate,
         phonenumber: this.phonenumber,
@@ -445,7 +480,9 @@ export default class UserProfileEdit extends Vue {
         district: this.district,
         linkedin: this.linkedin,
         gender: this.gender,
-        address: this.address,
+        street: this.street,
+        city: this.city,
+        postcode: this.postcode,
         matriculation_number: this.matriculationNumber,
         highest_project_position: this.highestProjectPosition,
         iban: this.iban,

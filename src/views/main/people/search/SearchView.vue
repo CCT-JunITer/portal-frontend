@@ -120,22 +120,39 @@
         </v-expand-transition>
       </v-container>
       <v-divider class="ma-3"></v-divider>
-      <v-container v-if="employees.length">
+      <v-container v-if="users.length">
         <v-row>
           <v-col
-            v-for="employee in employees"
+            v-for="(employee, i) in employees"
             :key="employee.id"
             cols="12"
             md="3"
             sm="6"
-            class="d-flex align-center flex-column pa-5"
+            class="pa-5"
           >
-            <employee-card :employee="employee" outlined rounded elevation="0" class="full-width"></employee-card>
+            <v-lazy :value="i < 4">
+              <employee-card :employee="employee" outlined rounded elevation="0" class="full-width"></employee-card>
+            </v-lazy>
           </v-col>
         </v-row>
       </v-container>
       <v-container v-else>
-        Keine Mitglieder gefunden
+        <v-row>
+          <v-col
+            v-for="employee in [1,2,3,4]"
+            :key="employee"
+            cols="12"
+            md="3"
+            sm="6"
+            class="pa-5"
+          >
+            <v-skeleton-loader
+              type="card"
+              width="100%"
+            ></v-skeleton-loader>
+          </v-col>
+        </v-row>
+
       </v-container>
     </v-container>
   </backdrop>
@@ -146,9 +163,9 @@ import { Component, Vue, Watch } from 'vue-property-decorator';
 import Backdrop from '@/components/Backdrop.vue';
 import { IUserProfile, UserType } from '@/interfaces';
 import EmployeeCard from '@/components/employee/EmployeeCard.vue';
-import { readUsers } from '@/store/main/getters';
-import { dispatchGetUsers } from '@/store/main/actions';
-import { MEMBERSTATUS, RESSORTS, UNIVERSITIES } from '@/common';
+import { readGroups, readUsers } from '@/store/main/getters';
+import { dispatchGetGroups, dispatchGetUsers } from '@/store/main/actions';
+import { MEMBERSTATUS, UNIVERSITIES } from '@/common';
 
 @Component({
   components: { EmployeeCard, Backdrop }
@@ -159,27 +176,28 @@ export default class EmployeesView extends Vue {
   private filters: { [key in keyof IUserProfile]?: string } = {};
 
 
-  readonly filterOptions: {
+  get filterOptions(): {
     value: keyof IUserProfile;
     text: string;
     values: string[];
-  }[] = [
-    {
-      value: 'ressort',
-      text: 'Ressort',
-      values: RESSORTS,
-    },
-    {
-      value: 'university',
-      text: 'Universität',
-      values: UNIVERSITIES,
-    },
-    {
-      value: 'memberstatus',
-      text: 'Mitgliedsstatus',
-      values: MEMBERSTATUS,
-    },
-  ];
+  }[] { 
+    return [
+      {
+        value: 'ressort',
+        text: 'Ressort',
+        values: readGroups(this.$store).filter(v => v.type == 'ressort').map(v => v.name),
+      },
+      {
+        value: 'university',
+        text: 'Universität',
+        values: UNIVERSITIES,
+      },
+      {
+        value: 'memberstatus',
+        text: 'Mitgliedsstatus',
+        values: MEMBERSTATUS,
+      },
+    ];}
 
   readonly sortBys: {
     value: keyof IUserProfile;
@@ -276,6 +294,10 @@ export default class EmployeesView extends Vue {
     this.$router.replace({ query: { ...this.$route.query, value: value } });
   }
 
+  get users() {
+    return readUsers(this.$store);
+  }
+
   get employees(): IUserProfile[] {
     return readUsers(this.$store)
       .filter(employee => this.category === 'all' || (this.category === 'alumni' ? employee.is_alumni : !employee.is_alumni))
@@ -288,6 +310,7 @@ export default class EmployeesView extends Vue {
 
   public async mounted() {
     await dispatchGetUsers(this.$store);
+    await dispatchGetGroups(this.$store);
   }
 
   public async onCategoryChange() {
