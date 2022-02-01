@@ -82,7 +82,7 @@
           <v-icon>upload</v-icon>
         </v-list-item-icon>
         <v-list-item-content>
-          <v-list-item-title>Dateien hochladen</v-list-item-title>
+          <v-list-item-title>DoSi-Folien hochladen</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
       
