@@ -68,6 +68,15 @@
         </v-list-item-content>
       </v-list-item>
 
+      <v-list-item to="/main/tower" color="cct-green">
+        <v-list-item-icon>
+          <v-icon>mdi-chess-rook</v-icon>
+        </v-list-item-icon>
+        <v-list-item-content>
+          <v-list-item-title>Towernutzung</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+
       <v-list-item to="/main/hochladen" color="cctGreen">
         <v-list-item-icon>
           <v-icon>upload</v-icon>
@@ -153,15 +162,6 @@
           </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title>CCT-Guide</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-
-        <v-list-item to="/main/tower" color="cctGreen">
-          <v-list-item-icon>
-            <v-icon>mdi-chess-rook</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-list-item-title>Towernutzung</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
 
