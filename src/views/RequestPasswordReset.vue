@@ -3,40 +3,46 @@
     <v-container fluid fill-height>
       <v-layout align-center justify-center>
         <v-flex xs12 sm8 md4>
-          <v-card elevation="10">
-            <v-form @submit.prevent="submit">
+          <v-form
+            v-model="valid"
+            ref="form"
+            lazy-validation
+            @submit.prevent="submit"
+          >
+            <v-card elevation="10">
               <v-toolbar dark :color="env === 'production' ? 'cctBlue' : 'cctOrange darken-3'">
+                <v-btn icon to="/login">
+                  <v-icon>
+                    mdi-arrow-left
+                  </v-icon>
+                </v-btn>
                 <portal-button></portal-button>
                 <v-spacer></v-spacer>
               </v-toolbar>
               <v-card-text>
                 <v-text-field
-                  prepend-icon="person" 
                   v-model="email"
-                  name="login" 
+                  prepend-icon="person"
                   label="E-Mail"
+                  name="login"
                   type="text"
-                  :rules="[$common.required, $common.isEmail]">
+                  :rules="[$common.required]">
                 </v-text-field>
+                <!-- Render non-visible password field, so the email is autocompleted -->
                 <v-text-field 
-                  prepend-icon="lock"
-                  v-model="password"
+                  v-show="false" 
+                  prepend-icon="lock" 
                   name="password" 
                   label="Password" 
-                  id="password" 
-                  type="password">
-                </v-text-field>
-                <v-alert :value="loginError" transition="fade-transition" type="error">
-                  Incorrect email or password
-                </v-alert>
+                  id="password"
+                  type="password"></v-text-field>
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn :to="{name: 'request-password-reset'}" text color="red">Passwort vergessen</v-btn>
-                <v-btn type="submit" depressed>Login</v-btn>
+                <v-btn @click.prevent="submit" color="cctGreen" class="white--text" :disabled="!valid">Reset</v-btn>
               </v-card-actions>
-            </v-form>
-          </v-card>
+            </v-card>
+          </v-form>
         </v-flex>
       </v-layout>
     </v-container>
@@ -46,24 +52,26 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { readLoginError } from '@/store/main/getters';
-import { dispatchLogIn } from '@/store/main/actions';
+import { dispatchPasswordRecovery } from '@/store/main/actions';
 import PortalButton from './main/appbar/components/PortalButton.vue';
 import { env } from '@/env';
 
 @Component({
   components: { PortalButton }
 })
-export default class Login extends Vue {
+export default class RequestPasswordReset extends Vue {
   public email = '';
-  public password = '';
   public env = env;
+  public valid = false;
 
   public get loginError() {
     return readLoginError(this.$store);
   }
 
   public submit() {
-    dispatchLogIn(this.$store, {username: this.email, password: this.password});
+    if ((this.$refs.form as HTMLFormElement).validate()){
+      dispatchPasswordRecovery(this.$store, {username: this.email});
+    }
   }
 }
 </script>
