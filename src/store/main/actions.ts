@@ -81,7 +81,7 @@ export const actions = {
     return response.data;
   },
   async actionDownloadDebitMandate(context: MainContext) {
-    const response = await apiCallNotify(context, api.downloadDebitMandate, { successText: null, loadingText: 'Generiere Lastschfiftmandat' });
+    const response = await apiCallNotify(context, api.downloadDebitMandate, { successText: null, loadingText: 'Generiere Lastschriftmandat' });
     return response.data;
   },
   async actionDownloadFile(context: MainContext, payload: { filename: string }) {
@@ -130,7 +130,7 @@ export const actions = {
   },
   actionRouteLogOut(context: MainContext) {
     if (router.currentRoute.path !== '/login') {
-      router.push('/login');
+      router.push({ path: '/login', query: { redirect: router.currentRoute.fullPath } });
     }
   },
   async actionCheckApiError(context: MainContext, payload: AxiosError) {
@@ -142,6 +142,11 @@ export const actions = {
     if (router.currentRoute.path !== '/main') {
       if (context.state.userStatus === 'created') {
         router.push('/main/welcome')
+        return;
+      }
+      const redirect = router.currentRoute.query.redirect;
+      if (redirect as string) {
+        router.push(redirect as string);
         return;
       }
       router.push('/main');
@@ -190,7 +195,7 @@ export const actions = {
     });
   },
   async passwordRecovery(context: MainContext, payload: { username: string }) {
-    await apiCallNotify(context, () => api.passwordRecovery(payload.username))
+    await apiCallNotify(context, () => api.passwordRecovery(payload.username), { successText: 'E-Mail versendet' })
     await dispatchLogOut(context);
   },
   async resetPassword(context: MainContext, payload: { password: string; token: string }) {

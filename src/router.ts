@@ -23,6 +23,18 @@ export default new Router({
           // which is lazy-loaded when the route is visited.
           component: () => import(/* webpackChunkName: "login" */ './views/Login.vue'),
         },
+
+        {
+          name: 'request-password-reset',
+          path: 'request-password-reset',
+          component: () => import(/* webpackChunkName: "account-create" */ './views/RequestPasswordReset.vue')
+        },
+
+        {
+          path: 'reset-password',
+          name: 'reset-password',
+          component: () => import(/* webpackChunkName: "account-create" */ './views/PasswordReset.vue')
+        },
         {
           path: 'account-create',
           component: () => import(/* webpackChunkName: "account-create" */ './views/main/AccountCreate.vue')

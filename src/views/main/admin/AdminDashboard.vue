@@ -15,7 +15,7 @@
             </v-card-title>
             <v-card-text>Hier kannst du bestehende Mitgliederaccounts verändern und verwalten.</v-card-text>
             <v-card-actions class="flex-wrap flex-end">
-              <v-btn text to="/main/people/admin" color="cctGreen">
+              <v-btn text to="/main/people/admin/alumni/all" color="cctGreen">
                 Alumni verwalten
               </v-btn>
               <v-btn text to="/main/admin/groups" color="cctBlue">

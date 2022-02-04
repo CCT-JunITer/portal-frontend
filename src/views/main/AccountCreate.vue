@@ -383,6 +383,8 @@ export default class AccountCreate extends Vue {
   public valid = true;
   public avatar: string | Blob | null = '';
   public inputAvatar: Blob | null = null;
+  public firstName = '';
+  public lastName = '';
   public password1 = '';
   public password2 = '';
   public birthdate = '';
@@ -426,25 +428,18 @@ export default class AccountCreate extends Vue {
     return jwt_decode(token) as { sub: string; invite: { name: string; email: string } };
   }
 
+  created() {
+    const token = this.getToken();
+    const names = (token?.invite.name || '').split(' ');
+    this.lastName = names[names.length - 1];
+    names.splice(names.length - 1, 1);
+    this.firstName = names.join(' ');
+  }
+
   public get email() {
     const token = this.getToken();
 
     return token?.sub || '';
-  }
-
-  public get firstName() {
-    const token = this.getToken();
-    const names = (token?.invite.name || '').split(' ');
-
-    names.splice(names.length - 1, 1);
-    return names.join(' ');
-  }
-
-  public get lastName() {
-    const token = this.getToken();
-    const names = (token?.invite.name || '').split(' ');
-
-    return names[names.length - 1];
   }
 
   public get privateEmail() {
