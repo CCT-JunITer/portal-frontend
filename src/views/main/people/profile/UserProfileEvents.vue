@@ -6,13 +6,13 @@
       </v-card-title>
       <v-expansion-panels>
         <v-expansion-panel
-          v-for="training in this.mandatoryTrainings"
-          :key="training.id"
+          v-for="event in this.mandatoryEvents"
+          :key="event.id"
         >
           <v-expansion-panel-header>
-            {{ training.title }} - {{ formatDate(training.date) }}
+            {{ event.title }} - {{ formatDate(event.date) }}
             <template v-slot:actions>
-              <v-icon v-if="(trainingIsDone(training.date))" color="green">
+              <v-icon v-if="(eventIsDone(event.date))" color="green">
                 mdi-check
               </v-icon>
               <v-icon v-else color="cctGrey">
@@ -24,7 +24,7 @@
             <v-icon>
               mdi-text
             </v-icon>
-            Beschreibung: {{ training.description }}
+            Beschreibung: {{ event.description }}
             <br/>
             <br/>
             <v-icon>
@@ -32,7 +32,7 @@
             </v-icon>
             Trainer:innen:
             <span>
-              {{ training.trainers.map(trainer => trainer.full_name).join(', ') }}
+              {{ event.trainers.map(trainer => trainer.full_name).join(', ') }}
             </span> 
             <br />
             <v-icon>
@@ -41,7 +41,7 @@
             
             Teilnehmer:innen: 
             <span>
-              {{ training.participants.map(participant => participant.full_name).join(', ') }}
+              {{ event.participants.map(participant => participant.full_name).join(', ') }}
             </span>  
             <br/>
             <br/>
@@ -59,13 +59,13 @@
       </v-card-title>
       <v-expansion-panels>
         <v-expansion-panel
-          v-for="training in this.optionalTrainings"
-          :key="training.id"
+          v-for="event in this.optionalEvents"
+          :key="event.id"
         >
           <v-expansion-panel-header>
-            {{ training.title }} - {{ formatDate(training.date) }}
+            {{ event.title }} - {{ formatDate(event.date) }}
             <template v-slot:actions>
-              <v-icon v-if="(trainingIsDone(training.date))" color="green">
+              <v-icon v-if="(eventIsDone(event.date))" color="green">
                 mdi-check
               </v-icon>
               <v-icon v-else color="cctGrey">
@@ -77,7 +77,7 @@
             <v-icon>
               mdi-text
             </v-icon>
-            Beschreibung: {{ training.description }}
+            Beschreibung: {{ event.description }}
             <br/>
             <br/>
             <v-icon>
@@ -85,7 +85,7 @@
             </v-icon>
             Trainer:innen:
             <span>
-              {{ training.trainers.map(trainer => trainer.full_name).join(', ') }}
+              {{ event.trainers.map(trainer => trainer.full_name).join(', ') }}
             </span> 
             <br />
             <v-icon>
@@ -94,7 +94,7 @@
             
             Teilnehmer:innen: 
             <span>
-              {{ training.participants.map(participant => participant.full_name).join(', ') }}
+              {{ event.participants.map(participant => participant.full_name).join(', ') }}
             </span>  
             <br/>
             <br/>
@@ -114,31 +114,31 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { readRouteUser } from '@/store/main/getters';
 import { format, isAfter } from 'date-fns';
-import { readTrainingsForRoute } from '@/store/training/getters';
-import { dispatchGetTrainingsFor } from '@/store/training/actions';
+import { readEventsForRoute } from '@/store/event/getters';
+import { dispatchGetEventsFor } from '@/store/event/actions';
 
 @Component({})
-export default class UserProfileTrainings extends Vue {
+export default class UserProfileEvents extends Vue {
 
-  public trainingIsDone(dateTimeStr: string) {
-    const training_date = new Date(dateTimeStr);
-    return isAfter(training_date, new Date());
+  public eventIsDone(dateTimeStr: string) {
+    const event_date = new Date(dateTimeStr);
+    return isAfter(event_date, new Date());
   }
 
-  get mandatoryTrainings() {
-    return this.trainings.filter(training => training.type == 'Pflichtschulung');
+  get mandatoryEvents() {
+    return this.events.filter(event => event.subtype == 'Pflichtschulung');
   }
 
-  get optionalTrainings() {
-    return this.trainings.filter(training => training.type != 'Pflichtschulung');
+  get optionalEvents() {
+    return this.events.filter(event => event.subtype != 'Pflichtschulung');
   }
 
-  get trainings() {
-    return readTrainingsForRoute(this.$store)(this.$route);
+  get events() {
+    return readEventsForRoute(this.$store)(this.$route);
   }
 
   async mounted() {
-    await dispatchGetTrainingsFor(this.$store, Number(this.userProfile?.id));
+    await dispatchGetEventsFor(this.$store, Number(this.userProfile?.id));
   }
 
   public formatDate(date: string) {

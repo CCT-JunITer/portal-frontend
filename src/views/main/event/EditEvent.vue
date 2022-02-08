@@ -6,7 +6,7 @@
 
     <v-row>
       <v-col cols="12" md="4" class="px-5">
-        <h4 class="text-h4 text--primary mb-3">Neue Schulung anlegen</h4>
+        <h4 class="text-h4 text--primary mb-3">Neue {{ {'meeting': 'Meeting', 'training': 'Training'}[type] }} anlegen</h4>
         <p class="text-body-2 text--secondary">Jede Schulung kann hier dokumentiert werden.</p>
       </v-col>
 
@@ -18,7 +18,7 @@
         >
           <v-text-field
             label="Titel"               
-            v-model="training_titel"
+            v-model="event.title"
             class="input-lg"
             prepend-icon="mdi-format-title"
             required
@@ -28,7 +28,8 @@
 
           <v-select
             label="Schulungsart"
-            v-model ="training_type"
+            v-if="type === 'training'"
+            v-model ="event.subtype"
             class="input-lg"
             required
             prepend-icon="mdi-animation"
@@ -37,7 +38,8 @@
           ></v-select>    
           <v-select
             label="Schulungsthema"
-            v-model="training_topic"
+            v-if="type === 'training'"
+            v-model="event.topic"
             :items="$common.SCHULUNGSTHEMA"
             prepend-icon="mdi-collage"
             class="input-lg"
@@ -46,7 +48,7 @@
           ></v-select>         
           <v-textarea
             label="Beschreibung"
-            v-model="training_description"
+            v-model="event.description"
             prepend-icon="mdi-text-subject"
             class="input-lg"
             hint="Hier soll eine kurze Beschreibung der Schulung eingegeben werden."
@@ -54,8 +56,8 @@
             :rules="[$common.required]"
           ></v-textarea>
 
-          <date-picker-menu
-            v-model ="training_date"
+          <date-time-picker-menu
+            v-model ="event.date_from"
             defaultPicker="MONTH"
             :pickerProps="{
               min: '2000-01-01',
@@ -64,7 +66,7 @@
           >
             <template v-slot:activator="{ on, attrs, }">
               <v-text-field
-                label="Datum"
+                label="Datum von"
                 class="input-lg"
                 v-bind="attrs"
                 v-on="on"
@@ -73,58 +75,46 @@
                 :rules="[$common.required]"
               ></v-text-field>
             </template>
-          </date-picker-menu>
+          </date-time-picker-menu>
           
-
-          <v-menu
-            class="input-lg"
-            ref="menu"
-            v-model="time_menu"
-            :close-on-content-click="false"
-            :nudge-right="40"
-            transition="scale-transition"
-            offset-y
+          <date-time-picker-menu
+            v-model ="event.date_to"
+            defaultPicker="MONTH"
+            :pickerProps="{
+              min: '2000-01-01',
+              max: '2025-01-01'
+            }"
           >
-            <template v-slot:activator="{ on, attrs }">
+            <template v-slot:activator="{ on, attrs, }">
               <v-text-field
-                icon
+                label="Datum bis"
                 class="input-lg"
-                v-model="training_time"
-                label="Uhrzeit"
-                prepend-icon="mdi-clock-outline"
-                readonly
                 v-bind="attrs"
                 v-on="on"
+                prepend-icon="mdi-calendar-range"
+                required
+                :rules="[$common.required]"
               ></v-text-field>
             </template>
-            <v-time-picker
-              color="cctBlue"
-              class="input-lg"  
-              v-if="time_menu"
-              v-model="training_time"
-              format="24hr"
-              full-width
-            ></v-time-picker>
-          </v-menu>
+          </date-time-picker-menu>
 
           <v-text-field
-            label="Externe Trainer:innen"
-            v-model="training_external_trainers"
+            label="Externe Personen"
+            v-model="event.external"
             prepend-icon="mdi-account-arrow-left"
             class="input-lg"
             persistent-hint
           ></v-text-field>
 
-          
 
           <v-autocomplete
-            v-model="training_trainers"
+            v-model="event.leader_ids"
             :items="this.userProfiles"
             filled
             chips
             class="input-lg"
             prepend-icon="mdi-school"
-            label="Trainer:innen"
+            label="Sitzungsleiter:innen"
             item-text="full_name"
             item-value="id"
             multiple
@@ -165,7 +155,7 @@
 
 
           <v-autocomplete
-            v-model="training_participants"
+            v-model="event.participant_ids"
             :items="this.userProfiles"
             filled
             chips
@@ -209,7 +199,7 @@
               </template>
             </template>
           </v-autocomplete>
-          <file-manager v-model="training_files" :multiple="true"></file-manager>
+          <file-manager v-model="event_files" :multiple="true"></file-manager>
         </v-form>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -228,82 +218,62 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component} from 'vue-property-decorator';
+import { Vue, Component, Watch} from 'vue-property-decorator';
 import VueTelInputVuetify from 'vue-tel-input-vuetify/lib/vue-tel-input-vuetify.vue';
-import DatePickerMenu from '@/components/DatePickerMenu.vue';
-import { dispatchGetUsers, dispatchUploadFile } from '@/store/main/actions';
+import { dispatchGetUsers } from '@/store/main/actions';
 import { readUsers,} from '@/store/main/getters';
-import { ITraining, ITrainingCreate } from '@/interfaces';
+import { IEvent, IEventCreate, IEventType } from '@/interfaces';
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 import UploadButton from '@/components/UploadButton.vue';
-import { readOneTraining } from '@/store/training/getters';
-import { dispatchCreateTraining, dispatchGetTrainings, dispatchUpdateTraining } from '@/store/training/actions';
+import { readOneEvent } from '@/store/event/getters';
+import { dispatchCreateEvent, dispatchGetOneEvent, dispatchUpdateEvent } from '@/store/event/actions';
 import FileManager from '@/components/file-manager/FileManager.vue';
+import DateTimePickerMenu from '@/components/DateTimePickerMenu.vue';
+import { Route } from 'vue-router';
+
 
 @Component({
-  components: {VueTelInputVuetify, UploadButton, DatePickerMenu, EmployeeProfilePicture, FileManager},
+  components: {VueTelInputVuetify, UploadButton, DateTimePickerMenu, EmployeeProfilePicture, FileManager},
 })
-export default class AdminViewTraining extends Vue {
+export default class AdminViewEvent extends Vue {
 
   public time_menu = false;
   public valid = false;
-  public training_titel = '';
-  public training_type = '';
-  public training_is_membership_progression = true;
-  public training_topic = '';
-  public training_description = ''; 
-  public training_date = '';
-  public training_time = '';
-  public training_wms_link = 'https://wms.cct-ev.de/node/';
-  public training_external_trainers = '';
-  public training_trainers: number[] = [];
-  public training_participants: number[] = [];
-  public training_files: string[] = [];
+  public event: Partial<IEventCreate> = {}
 
-  public isUploading = false;
-  
-  
-  
+  public get type() {
+    return (this.$route.meta?.event_type || 'training') as IEventType;
+  }
 
 
   get userProfiles() {
     return readUsers(this.$store);
   }
 
-  get trainingDate() {
-    return this.training_date + 'T' + this.training_time;
+  @Watch('$route', {immediate: true})
+  public async onRouteChange(newRoute?: Route, oldRoute?: Route) {
+    if (newRoute?.params.id !== oldRoute?.params.id) {
+      await dispatchGetOneEvent(this.$store, +this.$route.params.id)
+      this.reset();
+    }
   }
+
+
+
 
   public async mounted() {
     await dispatchGetUsers(this.$store);
-    await dispatchGetTrainings(this.$store);
-    this.reset();
     this.valid = false;
   }
 
-  public async onFileChanged(files: File[]) {
-    this.isUploading = true;
-    const response = await dispatchUploadFile(this.$store, {
-      file: files[0],
-    });
-    this.isUploading = false;
-    
-    if (response)
-      this.training_files.push(response.filename);
-  }
-
-  public removeFile(file: string) {
-    this.training_files = this.training_files.filter((f) => f !== file);
-  }
-
   public removeTrainer(item) {
-    const index = this.training_trainers.indexOf(item.id);
-    if (index >= 0) this.training_trainers.splice(index, 1);
+    const index = this.event.leader_ids.indexOf(item.id);
+    if (index >= 0) this.event.leader_ids.splice(index, 1);
   }
 
   public removeParticipant(item) {
-    const index = this.training_participants.indexOf(item.id);
-    if (index >= 0) this.training_participants.splice(index, 1);
+    const index = this.event.participant_ids.indexOf(item.id);
+    if (index >= 0) this.event.participant_ids.splice(index, 1);
   }
 
   public cancel() {
@@ -312,54 +282,46 @@ export default class AdminViewTraining extends Vue {
 
   public async submit() {
     if ((this.$refs.form as HTMLFormElement).validate()) {
-      const new_training: ITrainingCreate = {
-        title: this.training_titel,
-        type: this.training_type,
-        is_membership_progression: this.training_is_membership_progression,
-        topic: this.training_topic,
-        description: this.training_description,
-        date: this.trainingDate,
-        wms_link: this.training_wms_link,
-        files: this.training_files.join(','),
-        external_trainers: this.training_external_trainers,
-        trainer_ids: this.training_trainers,
-        participant_ids: this.training_participants,
-      };
+      const new_event = this.event as IEventCreate;
 
-      let training: ITraining | undefined;
-      if (this.editTraining?.id) {
-        training = await dispatchUpdateTraining(this.$store, {id: this.editTraining.id, training: new_training});
+      let event: IEvent | undefined;
+      if (this.editEvent?.id) {
+        event = await dispatchUpdateEvent(this.$store, {id: this.editEvent.id, event: new_event});
       } else {
-        training = await dispatchCreateTraining(this.$store, new_training);
+        event = await dispatchCreateEvent(this.$store, new_event);
       }
-      this.$router.push(`/main/trainings/${training?.id}`);
+      this.$router.push(`/main/events/${event?.id}`);
       
     }
   }
 
-  get editTraining() {
-    return readOneTraining(this.$store)(+this.$router.currentRoute.params.id);
+  get editEvent() {
+    return readOneEvent(this.$store)(+this.$router.currentRoute.params.id);
   }
   public reset() {
-    if(this.editTraining) {
+    if(this.editEvent) {
+      this.event = {
+        ...this.editEvent, 
+        participant_ids: this.editEvent.participants.map(u => u.id),
+        leader_ids: this.editEvent.leaders.map(u => u.id),
+      };
 
-      const trainer_ids: number[] = this.editTraining.trainers.map(trainer => trainer.id);
-      const participant_ids: number[] = this.editTraining.participants.map(participant => participant.id);
-      const date_only = this.editTraining.date.split('T')[0];
-      const time = this.editTraining.date.split('T')[1].substring(0,5);
+      // const trainer_ids: number[] = this.editEvent.leaders.map(trainer => trainer.id);
+      // const participant_ids: number[] = this.editEvent.participants.map(participant => participant.id);
+      // const date_only = this.editEvent.date.split('T')[0];
+      // const time = this.editEvent.date.split('T')[1].substring(0,5);
       
-      this.training_titel = this.editTraining.title;
-      this.training_type = this.editTraining.type;
-      this.training_is_membership_progression = this.editTraining.is_membership_progression;
-      this.training_topic = this.editTraining.topic;
-      this.training_description = this.editTraining.description;
-      this.training_date = date_only
-      this.training_time = time;      
-      this.training_wms_link = this.editTraining.wms_link;
-      this.training_external_trainers = this.editTraining.external_trainers;
-      this.training_trainers = trainer_ids;
-      this.training_participants = participant_ids;
-      this.training_files = this.editTraining.files ? this.editTraining.files.split(',') : []
+      // this.event_titel = this.editEvent.title;
+      // this.event_type = this.editEvent.type;
+      // this.event_topic = this.editEvent.topic;
+      // this.event_description = this.editEvent.description;
+      // this.event_date = date_only
+      // this.event_time = time;      
+      // this.event_wms_link = this.editEvent.wms_link;
+      // this.event_external_trainers = this.editEvent.external_trainers;
+      // this.event_trainers = trainer_ids;
+      // this.event_participants = participant_ids;
+      // this.event_files = this.editEvent.files ? this.editEvent.files.split(',') : []
     }
   }
 }

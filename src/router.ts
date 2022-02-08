@@ -136,10 +136,10 @@ export default new Router({
                           redirect: (to) => ({ name: 'profile-about', params: { id: to.params?.id || 'me' } })
                         },
                         {
-                          path: 'trainings',
-                          name: 'profile-trainings',
+                          path: 'events',
+                          name: 'profile-events',
                           component: () => import(
-                          /* webpackChunkName: "main-profile-trainings" */ './views/main/people/profile/UserProfileTrainings.vue')
+                          /* webpackChunkName: "main-profile-events" */ './views/main/people/profile/UserProfileEvents.vue')
                         },
                         {
                           path: 'skills',
@@ -278,28 +278,79 @@ export default new Router({
             },
             {
               path: 'trainings',
-              name: 'trainings-all',
+              name: 'trainings',
+              meta: {
+                event_type: 'training',
+              },
+              component: () => import(/* webpackChunkName: "admin-event" */ './views/main/event/EventMain.vue'),
+            },
+            {
+              path: 'wms',
+              name: 'wms',
+              component: RouterComponent,
+              children: [
+                {
+                  path: 'meetings',
+                  name: 'meetings',
+                  component: RouterComponent,
+                  children: [
+                    {
+                      meta: {
+                        event_type: 'meeting',
+                      },
+                      path: '',
+                      component: () => import(/* webpackChunkName: "admin-event" */ './views/main/event/EventMain.vue'),
+                    },
+                  ]
+                }
+              ]
+            },
+            {
+              path: 'events',
+              name: 'events-all',
               component: RouterComponent,
               children: [
                 {
                   path: '',
-                  component: () => import(/* webpackChunkName: "admin-training" */ './views/main/training/TrainingMain.vue'),
-                },
-                {
-                  path: 'create',
-                  name: 'training-create',
-                  component: () => import(/* webpackChunkName: "admin-training-create" */ './views/main/training/EditTraining.vue'),
+                  redirect: { name: 'trainings' }
                 },
                 {
                   path: 'edit/:id',
-                  name: 'training-edit',
-                  component: () => import(/* webpackChunkName: "admin-training-edit" */ './views/main/training/EditTraining.vue'),
+                  name: 'event-edit',
+                  component: () => import(/* webpackChunkName: "admin-event-edit" */ './views/main/event/EditEvent.vue'),
+                },
+                {
+                  path: 'create',
+                  name: 'event-create',
+                  component: () => import(/* webpackChunkName: "admin-event-create-entry" */ './views/main/event/EditEventEntry.vue'),
+                  children: [
+                    {
+                      path: '',
+                      redirect: () => ({ name: 'event-create-training' })
+                    },
+                    {
+                      meta: {
+                        event_type: 'training',
+                      },
+                      path: 'training',
+                      name: 'event-create-training',
+                      component: () => import(/* webpackChunkName: "admin-event-create" */ './views/main/event/EditEvent.vue'),
+                    },
+                    {
+                      meta: {
+                        event_type: 'meeting',
+                      },
+                      path: 'meeting',
+                      name: 'event-create-meeting',
+                      component: () => import(/* webpackChunkName: "admin-event-create" */ './views/main/event/EditEvent.vue'),
+                    },
+                  ]
                 },
                 {
                   path: ':id',
-                  name: 'trainings-details',
+                  name: 'events-details',
                   component: () => import(
-                  /* webpackChunkName: "training-detail" */ './views/main/training/TrainingDetail.vue'),
+                  /* webpackChunkName: "event-detail" */ './views/main/event/EventDetail.vue'),
                 },
               ]
             },

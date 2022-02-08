@@ -3,10 +3,10 @@
     <div>
 
       <div class="d-flex">
-        <h1 class="text-h2 text--primary mb-3">{{this.training.title}}</h1>
+        <h1 class="text-h2 text--primary mb-3">{{this.event.title}}</h1>
         <v-spacer></v-spacer>
         <div class="d-flex align-center">
-          <v-btn color="cctOrange" outlined :to="{ name: 'training-edit', params: { id: this.training.id } }">
+          <v-btn color="cctOrange" outlined :to="{ name: 'event-edit', params: { id: this.event.id } }">
             <v-icon left>
               edit
             </v-icon>
@@ -21,11 +21,11 @@
         <v-col cols="12" md="4" class="px-5">
           <h2 class="text-h4 text--primary mb-3">Allgemeines</h2>
           <p class="text-body-2 text--secondary">
-            Allgemeine Informationen zu diesem Training
+            Allgemeine Informationen zu diesem Event
           </p>
         </v-col>
         <v-col cols="12" md="8" class="px-5">  
-          <v-row v-for="item in trainingDetails" :key="item.name" class="my-3">
+          <v-row v-for="item in eventDetails" :key="item.name" class="my-3">
             <span class="col-xs-12 col-md-6 col-lg-4 col-xl-3 my-0 py-1" style="font-weight: 300; font-size: 0.9rem;">
               {{ item.name }}
             </span>
@@ -41,12 +41,12 @@
         <v-col cols="12" md="4" class="px-5">
           <h2 class="text-h4 text--primary mb-3">Dokumente</h2>
           <p class="text-body-2 text--secondary">
-            Dokumente zu diesem Training
+            Dokumente zu diesem Event
           </p>
         </v-col>
         <v-col cols="12" md="8">  
-          <file-chip-group class="d-flex flex-wrap space-between" v-if="this.training.files">
-            <file-chip :key="file" :filename="file" v-for="file in this.training.files.split(',')"></file-chip>
+          <file-chip-group class="d-flex flex-wrap space-between" v-if="this.event.files">
+            <file-chip :key="file" :filename="file" v-for="file in this.event.files.split(',')"></file-chip>
           </file-chip-group>
         </v-col>
       </v-row>
@@ -60,15 +60,15 @@
             </p>
           </v-col>
           <v-col cols="12" md="8">  
-            <p v-if="this.trainingApplications.length == 0">
+            <p v-if="this.eventApplications.length == 0">
               Noch keine Schulungsanmeldungen
             </p>
             <v-row v-else>
               <v-col cols="12" md="12" lg="6" xl="6" sm="12" class="px-5"
-                     v-for="application in this.trainingApplications"
+                     v-for="application in this.eventApplications"
                      :key="application.id"
               >
-                <training-application-card :application="application" outlined>
+                <event-application-card :application="application" outlined>
                 
                   <template v-slot:actions>
                     <div class="d-flex justify-center flex-column flex-sm-row justify-sm-space-around">
@@ -109,7 +109,7 @@
                       </v-btn>
                     </div>
                   </template>
-                </training-application-card>
+                </event-application-card>
               </v-col>
             </v-row>
           </v-col>
@@ -131,7 +131,7 @@
                      v-for="application in this.waitingApplications"
                      :key="application.id"
               >
-                <training-application-card :application="application" outlined>
+                <event-application-card :application="application" outlined>
                 
                   <template v-slot:actions>
                     <div class="d-flex justify-center flex-column flex-sm-row justify-sm-space-around">
@@ -160,7 +160,7 @@
                       </v-btn>
                     </div>
                   </template>
-                </training-application-card>
+                </event-application-card>
               </v-col>
             </v-row>
           </v-col>
@@ -184,7 +184,7 @@
           <v-list style="background-color: #FAFAFA;">
 
             <v-list-item
-              v-for="trainer in this.training.trainers"
+              v-for="trainer in this.event.trainers"
               :key="trainer.id"
             >
               <employee-profile-picture
@@ -217,7 +217,7 @@
           <v-list style="background-color: #FAFAFA;">
 
             <v-list-item
-              v-for="participant in this.training.participants"
+              v-for="participant in this.event.participants"
               :key="participant.id"
             >
               <employee-profile-picture
@@ -247,32 +247,34 @@ import {
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 import { format } from 'date-fns';
 import EmployeeCard from '@/components/employee/EmployeeCard.vue';
-import { readRouteTraining, readTrainingsApplicationsFor } from '@/store/training/getters';
-import { dispatchGetTrainingApplications, dispatchGetTrainings, dispatchUpdateTrainingApplication } from '@/store/training/actions';
+import { readEventsApplicationsFor, readRouteEvent } from '@/store/event/getters';
+import { dispatchGetEventApplications, dispatchGetEvents, dispatchGetOneEvent, dispatchUpdateEventApplication } from '@/store/event/actions';
 import FileChip from '@/components/file-chip/FileChip.vue';
-import TrainingApplicationCard from '@/components/training-application/TrainingApplicationCard.vue';
+import EventApplicationCard from '@/components/event-application/EventApplicationCard.vue';
 import FileChipGroup from '@/components/file-chip/FileChipGroup.vue';
-import { ITraining, ITrainingApplication, ITrainingApplicationStatus } from '@/interfaces';
+import { IEvent, IEventApplication, IEventApplicationStatus } from '@/interfaces';
 
 
 @Component({
-  components: { EmployeeProfilePicture, EmployeeCard, FileChip, TrainingApplicationCard, FileChipGroup },
+  components: { EmployeeProfilePicture, EmployeeCard, FileChip, EventApplicationCard, FileChipGroup },
 })
 export default class AdminUsers extends Vue {
   public today = new Date();
 
-  get training(): ITraining {
-    return readRouteTraining(this.$store)(this.$route) as ITraining;
+  get event(): IEvent {
+    return readRouteEvent(this.$store)(this.$route) as IEvent;
   }
 
-  public get trainingApplications() {
-    return this.training.applications.filter(application => application.status === 'in progress');
-    // return readTrainingsApplicationsFor(this.$store)(this.training.id);
+  public get eventApplications() {
+    // return this.event.applications.filter(application => application.status === 'in progress');
+    return readEventsApplicationsFor(this.$store)(this.event.id)
+      .filter(application => application.status === 'in progress');
   }
 
   public get waitingApplications() {
-    return this.training.applications.filter(application => application.status === 'waiting');
-    // return readTrainingsApplicationsFor(this.$store)(this.training.id);
+    // return this.event.applications.filter(application => application.status === 'waiting');
+    return readEventsApplicationsFor(this.$store)(this.event.id)
+      .filter(application => application.status === 'waiting');
   }
 
   get user() {
@@ -282,38 +284,40 @@ export default class AdminUsers extends Vue {
   public get isSuperuser() {
     return (
       this.user?.is_superuser ||
-      readUserProfile(this.$store)?.id == this.training?.author.id
+      readUserProfile(this.$store)?.id == this.event?.author.id
     );
   }
 
 
-  public async updateApplication(application: ITrainingApplication, status: ITrainingApplicationStatus) {
-    await dispatchUpdateTrainingApplication(this.$store, { application_id: application.id, application: { status } });
+  public async updateApplication(application: IEventApplication, status: IEventApplicationStatus) {
+    await dispatchUpdateEventApplication(this.$store, { application_id: application.id, application: { status } });
   }
 
   public async mounted() {
-    await dispatchGetTrainings(this.$store);
-    // await dispatchGetTrainingApplications(this.$store, this.training.id);
+    if (+this.$route.params.id) {
+      await dispatchGetOneEvent(this.$store, +this.$route.params.id)
+      await dispatchGetEventApplications(this.$store, +this.$route.params.id);
+    }
   }
 
 
-  get trainingDetails() {
+  get eventDetails() {
     return [
       {
         name: 'Schulungsart',
-        key: this.training?.type,
+        key: this.event?.subtype,
       },
       {
         name: 'Datum',
-        key: format(new Date(String(this.training?.date)), 'dd.MM.yyyy - HH:mm'),
+        key: format(new Date(String(this.event?.date_from)), 'dd.MM.yyyy HH:mm') + ' - ' + format(new Date(String(this.event?.date_to)), 'dd.MM.yyy HH:mm'),
       },
       {
         name: 'Thema',
-        key: this.training?.topic,
+        key: this.event?.topic,
       },
       {
         name: 'Beschreibung',
-        key: this.training?.description,
+        key: this.event?.description,
       },
     ];
   }

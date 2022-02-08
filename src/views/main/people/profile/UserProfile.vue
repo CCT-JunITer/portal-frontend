@@ -72,7 +72,7 @@
           </v-icon>
           Über mich
         </v-tab>
-        <v-tab :ripple="false" :to="{name: 'profile-trainings'}">
+        <v-tab :ripple="false" :to="{name: 'profile-events'}">
           <v-icon left>
             mdi-school
           </v-icon>

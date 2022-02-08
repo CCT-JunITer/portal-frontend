@@ -89,33 +89,38 @@ export interface IUserSettings {
     used_mailaccount_space: number;
 }
 
-export interface ITraining {
+export type IEventType = 'training' | 'meeting';
+
+export interface IEvent {
     title: string;
-    type: string;
-    is_membership_progression: boolean;
+    type: IEventType;
+    subtype: string;
     topic: string;
     description: string;
-    date: string;
+    date_from: string;
+    date_to: string;
     wms_link: string;
-    external_trainers: string;
+    external: string;
     id: number;
     files: string;
     author: IUserProfile;
-    trainers: IUserProfile[];
+    leaders: IUserProfile[];
     participants: IUserProfile[];
-    applications: ITrainingApplication[];
+    applications: IEventApplication[];
 }
-export interface ITrainingCreate {
+export interface IEventCreate {
     title: string;
     type: string;
+    subtype: string;
+    date_from: string;
+    date_to: string;
+    external: string;
     is_membership_progression: boolean;
     topic: string;
     description: string;
-    date: string;
     wms_link: string;
-    external_trainers: string;
     files: string;
-    trainer_ids: number[];
+    leader_ids: number[];
     participant_ids: number[];
 }
 
@@ -183,21 +188,21 @@ export interface Request {
     groups: RequestGroup[];
 }
 
-export type ITrainingApplicationStatus = 'in progress' | 'accepted' | 'denied' | 'waiting'
+export type IEventApplicationStatus = 'in progress' | 'accepted' | 'denied' | 'waiting'
 
-export interface ITrainingApplication {
+export interface IEventApplication {
     id: number;
-    training_id: number;
-    training: ITraining;
+    event_id: number;
+    event: IEvent;
     applicant_id: number;
     applicant: IUserProfile;
     description: string;
-    status: ITrainingApplicationStatus;
+    status: IEventApplicationStatus;
 }
-export interface ITrainingApplicationUpdate {
-    status: ITrainingApplicationStatus;
+export interface IEventApplicationUpdate {
+    status: IEventApplicationStatus;
 }
-export interface ITrainingApplicationCreate {
+export interface IEventApplicationCreate {
     description: string;
 }
 

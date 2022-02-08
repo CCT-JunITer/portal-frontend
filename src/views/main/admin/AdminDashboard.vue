@@ -77,7 +77,7 @@
             <v-card-text>Hier können neue Pflicht- oder Zusatzschulungsformate angelegt werden.</v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn text to="/main/admin/training" color="cctBlue">Anlegen</v-btn>
+              <v-btn text to="/main/admin/event" color="cctBlue">Anlegen</v-btn>
             </v-card-actions>
           </v-card>
         </v-col>

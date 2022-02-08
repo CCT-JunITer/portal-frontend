@@ -41,6 +41,38 @@
         </v-list-item-content>
       </v-list-item>
 
+      <v-list-group group="wms" sub-group style="pa-0" prepend-icon="mdi-folder-open">
+        <template v-slot:activator>
+          <v-list-item-content>
+            <v-list-item-title>Wissensmanagement</v-list-item-title>
+          </v-list-item-content>
+        </template>
+        <v-list-item to="/main/wms/projects" color="cctOrange">
+          <v-list-item-icon>
+            <v-icon>mdi-school</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Projektdokumentation</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item to="/main/wms/meetings" color="cctOrange">
+          <v-list-item-icon>
+            <v-icon>mdi-teacher</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>CCT-Sitzungen</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item to="/main/wms/documents/member-progression" color="cctOrange">
+          <v-list-item-icon>
+            <v-icon>mdi-school</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Mitgliedswerdegang</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list-group>
+
       <v-list-item :to="{ name: 'finance-request'}" color="cctBlue">
         <v-list-item-icon>
           <v-icon>mdi-cash</v-icon>
