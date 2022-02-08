@@ -89,6 +89,20 @@ export interface IUserSettings {
     used_mailaccount_space: number;
 }
 
+export interface VersionedFolder {
+    id: string;
+    effective_files: string[];
+    file_changes: FileChange[];
+}
+
+export interface FileChange {
+    author_id: number;
+    file_id: string;
+    date: Date;
+    old_file_id?: string;
+    mode: 'created' | 'deleted' | 'modified';
+}
+
 export type IEventType = 'training' | 'meeting';
 
 export interface IEvent {

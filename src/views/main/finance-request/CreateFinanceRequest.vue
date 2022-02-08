@@ -176,7 +176,7 @@ export default class CreateFinanceRequest extends Vue {
   public type: null | {name: string; associations: string[]} = null;
   public amount = '';
   public purpose = '';
-  public files: string[] = [];
+  public files = '';
   public association = '';
   public status = '';
   public iban = '';
@@ -216,7 +216,7 @@ export default class CreateFinanceRequest extends Vue {
         amount: +this.amount.replace(',', '.'),
         type: this.type?.name || 'unknown',
         purpose: this.purpose,
-        files: this.files.join('/'),
+        files: this.files,
         
         association: newAssociation,
         iban: this.iban,
@@ -225,7 +225,7 @@ export default class CreateFinanceRequest extends Vue {
         amount: +this.amount.replace(',', '.'),
         type: this.type?.name || 'unknown',
         purpose: this.purpose,
-        files: this.files.join('/'),
+        files: this.files,
         status: this.status as IFinanceRequestStatus, 
         message_file: this.message_file,
         message_request: this.message_request,
@@ -268,7 +268,7 @@ export default class CreateFinanceRequest extends Vue {
       this.amount = this.editFinanceRequest.amount.toFixed(2).replace('.', ',');
       this.type = this.$common.KOSTENART.find(o => o.name === this.editFinanceRequest?.type) || { name: this.editFinanceRequest.type, associations: [] };
       this.purpose = this.editFinanceRequest.purpose;
-      this.files = this.editFinanceRequest.files ? this.editFinanceRequest.files.split('/') : []
+      this.files = this.editFinanceRequest.files;
       this.message_request = this.editFinanceRequest.message_request;
       this.message_file = this.editFinanceRequest.message_file; 
       this.status = this.editFinanceRequest.status;

@@ -88,6 +88,22 @@ export const actions = {
     const response = await apiCall(context, token => api.downloadFile(token, payload.filename));
     return response.data;
   },
+  async actionCreateVersionedFolder(context: MainContext, payload: { fileIds: string[] }) {
+    const response = await apiCall(context, token => api.createVersionedFolder(token, payload.fileIds));
+    return response.data;
+  },
+  async actionAddFileToVersionedFolder(context: MainContext, payload: { folderId: string; fileIds: string[] }) {
+    const response = await apiCall(context, token => api.addFilesToVersionedFolder(token, payload.folderId, payload.fileIds));
+    return response.data;
+  },
+  async actionDeleteFileFromVersionedFolder(context: MainContext, payload: { folderId: string; fileIds: string[] }) {
+    const response = await apiCall(context, token => api.deleteFilesFromVersionedFolder(token, payload.folderId, payload.fileIds));
+    return response.data;
+  },
+  async actionGetVersionedFolder(context: MainContext, payload: { folderId: string }) {
+    const response = await apiCall(context, token => api.getVersionedFolder(token, payload.folderId));
+    return response.data;
+  },
   async actionCheckLoggedIn(context: MainContext) {
     if (!context.state.isLoggedIn) {
       let token = context.state.token;
@@ -267,6 +283,10 @@ export const dispatchRouteLogOut = dispatch(actions.actionRouteLogOut);
 export const dispatchUpdateUserProfile = dispatch(actions.actionUpdateUserProfile);
 export const dispatchUploadFile = dispatch(actions.actionUploadFile);
 export const dispatchDownloadFile = dispatch(actions.actionDownloadFile);
+export const dispatchCreateVersionedFolder = dispatch(actions.actionCreateVersionedFolder);
+export const dispatchAddFileToVersionedFolder = dispatch(actions.actionAddFileToVersionedFolder);
+export const dispatchDeleteFileFromVersionedFolder = dispatch(actions.actionDeleteFileFromVersionedFolder);
+export const dispatchGetVersionedFolder = dispatch(actions.actionGetVersionedFolder);
 export const dispatchDownloadDebitMandate = dispatch(actions.actionDownloadDebitMandate);
 export const dispatchCopyTextToClipboard = dispatch(actions.copyTextToClipboard);
 export const dispatchSaveAsCsv = dispatch(actions.saveAsCsv);

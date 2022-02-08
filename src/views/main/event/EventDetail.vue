@@ -45,9 +45,8 @@
           </p>
         </v-col>
         <v-col cols="12" md="8">  
-          <file-chip-group class="d-flex flex-wrap space-between" v-if="this.event.files">
-            <file-chip :key="file" :filename="file" v-for="file in this.event.files.split(',')"></file-chip>
-          </file-chip-group>
+          <file-manager v-model="this.event.files" :readonly="true">
+          </file-manager>
         </v-col>
       </v-row>
       <div v-if="isSuperuser">
@@ -248,17 +247,17 @@ import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture
 import { format } from 'date-fns';
 import EmployeeCard from '@/components/employee/EmployeeCard.vue';
 import { readEventsApplicationsFor, readRouteEvent } from '@/store/event/getters';
-import { dispatchGetEventApplications, dispatchGetEvents, dispatchGetOneEvent, dispatchUpdateEventApplication } from '@/store/event/actions';
+import { dispatchGetEventApplications, dispatchGetOneEvent, dispatchUpdateEventApplication } from '@/store/event/actions';
 import FileChip from '@/components/file-chip/FileChip.vue';
 import EventApplicationCard from '@/components/event-application/EventApplicationCard.vue';
-import FileChipGroup from '@/components/file-chip/FileChipGroup.vue';
 import { IEvent, IEventApplication, IEventApplicationStatus } from '@/interfaces';
+import FileManager from '@/components/file-manager/FileManager.vue';
 
 
 @Component({
-  components: { EmployeeProfilePicture, EmployeeCard, FileChip, EventApplicationCard, FileChipGroup },
+  components: { EmployeeProfilePicture, EmployeeCard, FileChip, EventApplicationCard, FileManager },
 })
-export default class AdminUsers extends Vue {
+export default class TrainingDetail extends Vue {
   public today = new Date();
 
   get event(): IEvent {

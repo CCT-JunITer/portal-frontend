@@ -3,7 +3,7 @@
     <v-chip 
       v-bind="$attrs" 
       v-on="$listeners" 
-      :color="filename && !error ? 'cctBlue' : 'error'"
+      :color="filename && !error ? color : 'error'"
       outlined
     >
       <v-icon left size="20">
@@ -102,6 +102,9 @@ export default class FileChip extends Vue {
 
   @Prop()
   public filename!: string;
+
+  @Prop({ default: 'cctBlue' }) 
+  public color!: string;
 
   @Emit()
   public deleteFile() {

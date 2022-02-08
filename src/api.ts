@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {apiUrl} from '@/env';
-import { IEvent, IEventCreate, IUserProfile, IUserProfileCreate, IUserProfileUpdate, UserType, RequestCreate, UserInvite, IEventApplicationCreate, IEventApplicationUpdate, IFinanceRequestCreate, IFinanceRequestUpdate, IFinanceRequest, Group, GroupUpdate, IUserSettings, IEventApplication } from './interfaces';
+import { IEvent, IEventCreate, IUserProfile, IUserProfileCreate, IUserProfileUpdate, UserType, RequestCreate, UserInvite, IEventApplicationCreate, IEventApplicationUpdate, IFinanceRequestCreate, IFinanceRequestUpdate, IFinanceRequest, Group, GroupUpdate, IUserSettings, IEventApplication, VersionedFolder } from './interfaces';
 import {dataURItoBlob} from '@/utils';
 
 function authHeaders(token: string, headers = {}) {
@@ -100,6 +100,19 @@ export const api = {
   async downloadFile(token: string, filename: string) {
     const params = { filename };
     return axios.get(`${apiUrl}/api/v1/utils/download-file`, { ...authHeaders(token), params, responseType: 'blob' });
+  },
+  
+  async createVersionedFolder(token: string, file_ids: string[]) {
+    return axios.post<VersionedFolder>(`${apiUrl}/api/v1/versionedfolder/`, { file_ids }, authHeaders(token));
+  },
+  async addFilesToVersionedFolder(token: string, folderId: string, file_ids: string[]) {
+    return axios.put<VersionedFolder>(`${apiUrl}/api/v1/versionedfolder/${folderId}`, { file_ids }, authHeaders(token));
+  },
+  async deleteFilesFromVersionedFolder(token: string, folderId: string, file_ids: string[]) {
+    return axios.delete<VersionedFolder>(`${apiUrl}/api/v1/versionedfolder/${folderId}`, { data: { file_ids: file_ids }, ...authHeaders(token) });
+  },
+  async getVersionedFolder(token: string, folderId: string) {
+    return axios.get<VersionedFolder>(`${apiUrl}/api/v1/versionedfolder/${folderId}`, authHeaders(token));
   },
   async downloadDebitMandate(token: string) {
     return axios.get(`${apiUrl}/api/v1/documents/sepa/me`, { ...authHeaders(token), responseType: 'blob' });

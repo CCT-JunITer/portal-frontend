@@ -3,7 +3,12 @@
     <div class="d-flex my-2">
       <div class="text-overline mb-2">Dateimanager</div>
       <v-spacer></v-spacer>
-
+      <v-btn small text rounded @click="showHistory = !showHistory">
+        <v-icon left>
+          mdi-history
+        </v-icon>
+        Historie
+      </v-btn>
       <upload-button
         v-if="!readonly"
         :loading="this.isUploading"
@@ -62,12 +67,24 @@
       </v-dialog>
     </div>
     <div>
-      <p v-if="!this.value.length">
+      <v-expand-transition>
+        <v-sheet v-show="showHistory" v-if="versionedFolder">
+          <div
+            v-for="(change, i) in versionedFolder.file_changes"
+            :key="i"
+          >
+            <file-change-component
+              :fileChange="change"
+            ></file-change-component>
+          </div>
+        </v-sheet>
+      </v-expand-transition>
+      <p v-if="!this.versionedFolder || !this.versionedFolder.effective_files.length">
         Noch keine Dateien hochgeladen
       </p>
 
       <file-chip-group v-else>
-        <file-chip :key="file" :filename="file" v-for="file in value" @[readonly?null:`delete-file`]="removeFile">
+        <file-chip :key="file" :filename="file" v-for="file in versionedFolder.effective_files" @[readonly?null:`delete-file`]="removeFile">
         </file-chip>
       </file-chip-group>
     </div>
@@ -75,14 +92,16 @@
 </template>
 
 <script lang="ts">
-import { dispatchUploadFile } from '@/store/main/actions';
-import { Vue, Component, Prop, Emit } from 'vue-property-decorator'
+import { VersionedFolder } from '@/interfaces';
+import { dispatchAddFileToVersionedFolder, dispatchCreateVersionedFolder, dispatchDeleteFileFromVersionedFolder, dispatchGetVersionedFolder, dispatchUploadFile } from '@/store/main/actions';
+import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator'
 import FileChip from '../file-chip/FileChip.vue';
 import FileChipGroup from '../file-chip/FileChipGroup.vue';
 import UploadButton from '../UploadButton.vue';
+import FileChangeComponent from './FileChangeComponent.vue';
 
 @Component({
-  components: { FileChipGroup, FileChip, UploadButton }
+  components: { FileChipGroup, FileChip, UploadButton, FileChangeComponent }
 })
 export default class FileManager extends Vue {
 
@@ -90,17 +109,48 @@ export default class FileManager extends Vue {
   public dialog = false;
   public files: { file: File; fileName: string; key: number }[] | null = null;
 
+  public versionedFolder: VersionedFolder | null = null;
+  public showHistory = false;
+
   @Prop({ default: false })
   public multiple!: boolean;
 
   @Prop({ default: false })
   public readonly!: boolean;
 
-  @Prop({ default: [] })
-  public value!: string[];
+  @Prop({ })
+  public value?: string;
+
+  @Watch('value', {immediate: true})
+  public async onValueChange(newValue: string | null, oldValue: string | null) {
+    if (newValue !== oldValue && newValue) {
+      let value = newValue;
+      if (value) {
+        if (Array.isArray(value)) {
+          value = value.join(',');
+        }
+        const isNewFormat = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(value);
+        if (!isNewFormat) {
+          const files = value.split('/').flatMap(v => v.split(',')).filter(i => i)
+          const fileIds: string[] = [];
+          for (const file of files) {
+            fileIds.push(file);
+          }
+          if (fileIds.length) {
+            this.versionedFolder = await dispatchCreateVersionedFolder(this.$store, { fileIds: fileIds });
+            this.input(this.versionedFolder.id);
+          }
+          return;
+        }
+      }
+      if (this.versionedFolder?.id !== newValue) {
+        this.versionedFolder = await dispatchGetVersionedFolder(this.$store, { folderId: newValue });
+      }
+    }
+  }
 
   @Emit()
-  public input(value: string[]) {
+  public input(value: string) {
     return value;
   }
 
@@ -115,21 +165,30 @@ export default class FileManager extends Vue {
     }
     this.isUploading = true;
     this.dialog = false;
+    const fileIds: string[] = [];
+
     for(const { file, fileName } of this.files) {
       const response = await dispatchUploadFile(this.$store, {
         file,
         fileName
       });
       if (response) {
-        this.input([...this.value, response.filename]);
-      }
+        fileIds.push(response.filename)
+      } 
     }
+    if (!this.versionedFolder) {
+      this.versionedFolder = await dispatchCreateVersionedFolder(this.$store, { fileIds: fileIds })
+    } else {
+      this.versionedFolder = await dispatchAddFileToVersionedFolder(this.$store, { folderId: this.versionedFolder.id, fileIds: fileIds})
+    }
+    this.input(this.versionedFolder.id)
     this.isUploading = false;
   }
 
 
-  public removeFile(file: string) {
-    this.input(this.value.filter(f => f !== file))
+  public async removeFile(file: string) {
+    this.versionedFolder = await dispatchDeleteFileFromVersionedFolder(this.$store, { folderId: this.versionedFolder?.id, fileIds: [file] })
+    this.input(this.versionedFolder.id);
   }
 }
 </script>
