@@ -3,14 +3,14 @@
   <div>
     <v-toolbar flat :class="`elevation-2`">
       <v-toolbar-title>
-        Schulungen und Events
+        {{ this.typeName }}
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn color="cctOrange" style="color: white" :to="{name: 'event-create'}">
+      <v-btn color="cctOrange" style="color: white" :to="{name: 'event-create-' + type}">
         <v-icon left>
           mdi-school
         </v-icon>
-        Neue Schulung
+        Neues {{ this.typeName }}
       </v-btn>
     </v-toolbar>
     <v-container>
@@ -215,25 +215,27 @@
   
       </v-data-table>
       
-      <div 
-        :class="`elevation-2`"
-        class="text-field" 
-        v-html="event_text_intro">
-      </div>
-      <div 
-        :class="`elevation-2`"
-        class="text-field" 
-        v-html="event_text_anmedlug_abmeldung">
-      </div>
-      <div 
-        :class="`elevation-2`"
-        class="text-field" 
-        v-html="event_text_schulung_halten">
-      </div>
-      <div 
-        :class="`elevation-2`"
-        class="text-field" 
-        v-html="event_text_nicht_erscheinen">
+      <div v-if="type === 'training'">
+        <div 
+          :class="`elevation-2`"
+          class="text-field" 
+          v-html="event_text_intro">
+        </div>
+        <div 
+          :class="`elevation-2`"
+          class="text-field" 
+          v-html="event_text_anmedlug_abmeldung">
+        </div>
+        <div 
+          :class="`elevation-2`"
+          class="text-field" 
+          v-html="event_text_schulung_halten">
+        </div>
+        <div 
+          :class="`elevation-2`"
+          class="text-field" 
+          v-html="event_text_nicht_erscheinen">
+        </div>
       </div>
 
     </v-container>
@@ -312,7 +314,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { readEvents } from '@/store/event/getters';
 import { dispatchCreateEventApplication, dispatchGetEvents } from '@/store/event/actions';
-import { IEvent } from '@/interfaces';
+import { IEvent, IEventType } from '@/interfaces';
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 import { dispatchGetUserProfile, dispatchGetUsers } from '@/store/main/actions';
 import { readUserProfile, readUsers } from '@/store/main/getters';
@@ -322,6 +324,18 @@ import { isAfter } from 'date-fns';
   components: {EmployeeProfilePicture},
 })
 export default class EventMain extends Vue {
+
+
+  public get type() {
+    return this.$route.meta?.event_type as IEventType;
+  }
+
+  public get typeName() {
+    return {
+      'training': 'Training',
+      'meeting': 'Meeting'
+    }[this.type];
+  }
 
   today = new Date();
 

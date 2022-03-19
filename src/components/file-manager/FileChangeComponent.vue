@@ -2,7 +2,6 @@
   <v-list-group 
     dense 
     :color="color"
-    :value="true" 
     :prepend-icon="{created: 'mdi-plus', deleted: 'mdi-minus', modified: 'mdi-star'}[fileChange.mode]">
     <template v-slot:activator>
       <v-list-item dense>

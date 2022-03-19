@@ -199,7 +199,7 @@
               </template>
             </template>
           </v-autocomplete>
-          <file-manager v-model="event_files" :multiple="true"></file-manager>
+          <file-manager v-model="event.files" :multiple="true"></file-manager>
         </v-form>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -242,7 +242,7 @@ export default class AdminViewEvent extends Vue {
   public event: Partial<IEventCreate> = {}
 
   public get type() {
-    return (this.$route.meta?.event_type || 'training') as IEventType;
+    return (this.$route.meta?.event_type || this.event?.type || 'training') as IEventType;
   }
 
 
@@ -282,7 +282,10 @@ export default class AdminViewEvent extends Vue {
 
   public async submit() {
     if ((this.$refs.form as HTMLFormElement).validate()) {
-      const new_event = this.event as IEventCreate;
+      const new_event = {
+        ...this.event,
+        type: this.type,
+      } as IEventCreate;
 
       let event: IEvent | undefined;
       if (this.editEvent?.id) {

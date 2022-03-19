@@ -137,8 +137,9 @@ export default class FileManager extends Vue {
             fileIds.push(file);
           }
           if (fileIds.length) {
-            this.versionedFolder = await dispatchCreateVersionedFolder(this.$store, { fileIds: fileIds });
-            this.input(this.versionedFolder.id);
+            // this.versionedFolder = await dispatchCreateVersionedFolder(this.$store, { fileIds: fileIds });
+            // this.input(this.versionedFolder.id);
+            this.versionedFolder = { id: '', effective_files: fileIds, file_changes: []}
           }
           return;
         }
@@ -168,16 +169,20 @@ export default class FileManager extends Vue {
     const fileIds: string[] = [];
 
     for(const { file, fileName } of this.files) {
-      const response = await dispatchUploadFile(this.$store, {
-        file,
-        fileName
-      });
-      if (response) {
-        fileIds.push(response.filename)
-      } 
+      try {
+        const response = await dispatchUploadFile(this.$store, {
+          file,
+          fileName
+        });
+        if (response) {
+          fileIds.push(response.filename)
+        } 
+      } catch(e) {
+        continue;
+      }
     }
-    if (!this.versionedFolder) {
-      this.versionedFolder = await dispatchCreateVersionedFolder(this.$store, { fileIds: fileIds })
+    if (!this.versionedFolder?.id) {
+      this.versionedFolder = await dispatchCreateVersionedFolder(this.$store, { fileIds: [...(this.versionedFolder?.effective_files || []), ...fileIds] })
     } else {
       this.versionedFolder = await dispatchAddFileToVersionedFolder(this.$store, { folderId: this.versionedFolder.id, fileIds: fileIds})
     }

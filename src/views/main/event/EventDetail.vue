@@ -172,9 +172,9 @@
 
       <v-row>
         <v-col cols="12" md="4" class="px-5">
-          <h2 class="text-h4 text--primary mb-3">Trainer:innen</h2>
+          <h2 class="text-h4 text--primary mb-3">Sitzungsleiter:innen</h2>
           <p class="text-body-2 text--secondary">
-            Trainer:innen
+            Sizungsleiter:innen
           </p>
         </v-col>
 
@@ -183,18 +183,18 @@
           <v-list style="background-color: #FAFAFA;">
 
             <v-list-item
-              v-for="trainer in this.event.trainers"
-              :key="trainer.id"
+              v-for="leader in this.event.leaders"
+              :key="leader.id"
             >
               <employee-profile-picture
-                :employee="trainer"
+                :employee="leader"
                 component="v-list-item-avatar"
                 size="40"
               ></employee-profile-picture>
 
               <v-list-item-content>
-                <v-list-item-title v-text="trainer.full_name"></v-list-item-title>
-                <v-list-item-subtitle v-text="trainer.ressort"></v-list-item-subtitle>
+                <v-list-item-title v-text="leader.full_name"></v-list-item-title>
+                <v-list-item-subtitle v-text="leader.ressort"></v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>
           </v-list>

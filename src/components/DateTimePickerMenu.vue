@@ -96,10 +96,16 @@ export default class DateTimePickerMenu extends Vue {
   }
 
   get date() {
+    if (!this.value) {
+      return '';
+    }
     return format(new Date(this.value), 'yyyy-MM-dd');
   }
 
   get time() {
+    if (!this.value) {
+      return '';
+    }
     return format(new Date(this.value), 'HH:mm');
   }
 
@@ -113,9 +119,8 @@ export default class DateTimePickerMenu extends Vue {
 
   clearHandler() {
     this.resetPicker()
-    // this.date = DEFAULT_DATE
-    // this.time = DEFAULT_TIME
   }
+
   resetPicker() {
     this.menu = false
     this.activeTab = 0
