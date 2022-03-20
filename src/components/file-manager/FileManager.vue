@@ -1,5 +1,5 @@
 <template>
-  <v-sheet v-bind="$attrs" class="root px-3" color="gray lighten-5">
+  <v-sheet v-bind="$attrs" class="root px-3" color="gray lighten-5" v-if="!noManager">
     <div class="d-flex my-2">
       <div class="text-overline mb-2">Dateimanager</div>
       <v-spacer></v-spacer>
@@ -89,6 +89,12 @@
       </file-chip-group>
     </div>
   </v-sheet>
+  <div v-else>
+    <file-chip-group v-if="versionedFolder">
+      <file-chip :key="file" :filename="file" v-for="file in versionedFolder.effective_files">
+      </file-chip>
+    </file-chip-group>
+  </div>
 </template>
 
 <script lang="ts">
@@ -117,6 +123,9 @@ export default class FileManager extends Vue {
 
   @Prop({ default: false })
   public readonly!: boolean;
+
+  @Prop({ default: false })
+  public noManager!: boolean;
 
   @Prop({ })
   public value?: string;
@@ -192,7 +201,7 @@ export default class FileManager extends Vue {
 
 
   public async removeFile(file: string) {
-    this.versionedFolder = await dispatchDeleteFileFromVersionedFolder(this.$store, { folderId: this.versionedFolder?.id, fileIds: [file] })
+    this.versionedFolder = await dispatchDeleteFileFromVersionedFolder(this.$store, { folderId: this.versionedFolder!.id, fileIds: [file] })
     this.input(this.versionedFolder.id);
   }
 }

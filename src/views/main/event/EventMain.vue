@@ -22,7 +22,7 @@
         <template v-slot:top>
           <v-toolbar flat>
             <v-toolbar-title>
-              Kommende Schulungen
+              Kommende {{ typeName }}s
             </v-toolbar-title>
             
           </v-toolbar>
@@ -33,6 +33,9 @@
         <template v-slot:item.external="{ item }">
           <span v-if="item.external === ''">Keine</span>
           <span v-else>{{item.external}}</span>
+        </template>
+        <template v-slot:item.custom_files="{ item }">
+          <file-manager :value="item.files" :readonly="true" :noManager="true"></file-manager>
         </template>
        
         <template v-slot:item.custom_trainers="{ item }">
@@ -120,7 +123,7 @@
         <template v-slot:top>
           <v-toolbar flat>
             <v-toolbar-title>
-              Vergangene Schulungen
+              Vergangene {{ typeName }}s
             </v-toolbar-title>
           </v-toolbar>
         </template>
@@ -319,9 +322,10 @@ import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture
 import { dispatchGetUserProfile, dispatchGetUsers } from '@/store/main/actions';
 import { readUserProfile, readUsers } from '@/store/main/getters';
 import { isAfter } from 'date-fns';
+import FileManager from '@/components/file-manager/FileManager.vue';
 
 @Component({
-  components: {EmployeeProfilePicture},
+  components: {EmployeeProfilePicture, FileManager },
 })
 export default class EventMain extends Vue {
 
@@ -349,77 +353,82 @@ export default class EventMain extends Vue {
 
   application_text = '';
 
-  public headers = [
-    {
-      text: 'Titel',
-      sortable: true,
-      value: 'custom_title',
-      align: 'left',
-    },
-    {
-      text: 'Schulungstyp',
-      sortable: true,
-      value: 'subtype',
-      align: 'left',
-    },
-    {
-      text: 'Thema',
-      sortable: true,
-      value: 'topic',
-      align: 'left',
-    },
-    // {
-    //   text: 'Beschreibung',
-    //   sortable: false,
-    //   value: 'description',
-    //   align: 'left',
-    // },
-    {
-      text: 'Datum von',
-      sortable: true,
-      value: 'date_from',
-      align: 'left',
-    },
-    {
-      text: 'Datum bis',
-      sortable: true,
-      value: 'date_to',
-      align: 'left',
-    },
-    {
-      text: 'Ext. Trainer:innen',
-      value: 'external',
-      sortable: false,
-    },
-    {
-      text: 'Trainer:innen',
-      value: 'custom_leaders',
-      align: 'center',
-      sortable: false,
-    },
-    {
-      text: 'Anmelden',
-      value: 'custom_register',
-      align: 'center',
-      sortable: false,
-    },
+  public get headers() {
+    return [
+      {
+        text: 'Titel',
+        sortable: true,
+        value: 'custom_title',
+        align: 'left',
+      },
+      {
+        text: 'Schulungstyp',
+        sortable: true,
+        value: 'subtype',
+        align: 'left',
+      },
+      {
+        text: 'Thema',
+        sortable: true,
+        value: 'topic',
+        align: 'left',
+      },
+      // {
+      //   text: 'Beschreibung',
+      //   sortable: false,
+      //   value: 'description',
+      //   align: 'left',
+      // },
+      {
+        text: 'Datum von',
+        sortable: true,
+        value: 'date_from',
+        align: 'left',
+      },
+      {
+        text: 'Datum bis',
+        sortable: true,
+        value: 'date_to',
+        align: 'left',
+      },
+      {
+        text: 'Ext. Trainer:innen',
+        value: 'external',
+        sortable: false,
+      },
+      {
+        text: 'Trainer:innen',
+        value: 'custom_leaders',
+        align: 'center',
+        sortable: false,
+      },
+      {
+        text: 'Anmelden',
+        value: 'custom_register',
+        align: 'center',
+        sortable: false,
+      },
     
-    {
-      text: 'Teilnehmer:innen',
-      value: 'custom_show_participants',
-      align: 'center',
-      sortable: false,
+      {
+        text: 'Teilnehmer:innen',
+        value: 'custom_show_participants',
+        align: 'center',
+        sortable: false,
       
-    },
-    {
-      text: 'Details',
-      value: 'custom_details',
-      align: 'center',
-      sortable: false,
+      },
+      {
+        text: 'Details',
+        value: 'custom_details',
+        align: 'center',
+        sortable: false,
       
-    },
-  ];
-
+      },
+      {
+        text: 'Dateien',
+        value: 'custom_files',
+      }
+    ];
+  }
 
   get futureEvents() {
     return this.events.filter(event => isAfter(new Date(event.date_from), this.today))

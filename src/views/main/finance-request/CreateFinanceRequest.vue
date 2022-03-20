@@ -176,7 +176,7 @@ export default class CreateFinanceRequest extends Vue {
   public type: null | {name: string; associations: string[]} = null;
   public amount = '';
   public purpose = '';
-  public files = '';
+  public files: string | null = null;
   public association = '';
   public status = '';
   public iban = '';

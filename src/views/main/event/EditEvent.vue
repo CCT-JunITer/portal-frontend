@@ -267,11 +267,17 @@ export default class AdminViewEvent extends Vue {
   }
 
   public removeTrainer(item) {
+    if (!this.event.leader_ids) {
+      return;
+    }
     const index = this.event.leader_ids.indexOf(item.id);
     if (index >= 0) this.event.leader_ids.splice(index, 1);
   }
 
   public removeParticipant(item) {
+    if (!this.event.participant_ids) {
+      return;
+    }
     const index = this.event.participant_ids.indexOf(item.id);
     if (index >= 0) this.event.participant_ids.splice(index, 1);
   }

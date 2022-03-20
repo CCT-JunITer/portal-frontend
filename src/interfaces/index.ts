@@ -253,7 +253,7 @@ export interface IFinanceRequestUpdate {
     type: string;
     purpose: string;
     amount: number;
-    files: string;
+    files: string | null;
     message_file: string;
     message_request: string;
     status: IFinanceRequestStatus;
@@ -264,7 +264,7 @@ export interface IFinanceRequestCreate {
     type: string;
     purpose: string;
     amount: number;
-    files: string;
+    files: string | null;
     association: string;
     iban: string;
 }
