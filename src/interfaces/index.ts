@@ -268,3 +268,39 @@ export interface IFinanceRequestCreate {
     association: string;
     iban: string;
 }
+
+export interface IDocument {
+    id: number;
+    title: string;
+    description: string;
+    type: string;
+    categories: string[];
+    date_last_updated: string;
+    author_id: number;
+
+    author: IUserProfile;
+
+    approved: boolean;
+}
+
+export interface IDocumentCreate {
+    title: string;
+    description: string;
+    type: string;
+    categories: string[];
+    date_last_updated: string;
+
+    approved: boolean;
+}
+
+export interface IDocumentUpdate {
+    title: string;
+    description: string;
+    type: string;
+    categories: string[];
+    date_last_updated: string;
+
+    approved: boolean;
+}
+
+export type IDocumentCategorie = 'member-progression' | 'recruiting' | 'archive' | 'public-affairs' | 'quality-management';

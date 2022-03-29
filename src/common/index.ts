@@ -103,3 +103,7 @@ export const isTodayBirthday = (date: Date | string) => {
 
 
 export { format, formatInTimeZone, parseISO, de, utcToZonedTime };
+
+export const DOKUMENT_KATEGORIE = [
+  'Mitgliedswerdegang','Recruiting','Archiv','Öffentlichkeitsarbeit','Quality Management'
+];

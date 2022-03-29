@@ -63,7 +63,7 @@
             <v-list-item-title>CCT-Sitzungen</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item to="/main/wms/documents/member-progression" disabled>
+        <v-list-item to="/main/wms/documents/member-progression">
           <v-list-item-icon>
             <v-icon>mdi-account-arrow-up</v-icon>
           </v-list-item-icon>
@@ -71,7 +71,7 @@
             <v-list-item-title>Mitgliedswerdegang</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item to="/main/wms/documents/member-progression" disabled>
+        <v-list-item to="/main/wms/documents/recruiting">
           <v-list-item-icon>
             <v-icon>mdi-account-arrow-up</v-icon>
           </v-list-item-icon>
@@ -79,7 +79,7 @@
             <v-list-item-title>Recruiting</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item to="/main/wms/documents/member-progression" disabled>
+        <v-list-item to="/main/wms/documents/archive" disabled>
           <v-list-item-icon>
             <v-icon>mdi-account-arrow-up</v-icon>
           </v-list-item-icon>
@@ -87,7 +87,7 @@
             <v-list-item-title>Archiv</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item to="/main/wms/documents/member-progression" disabled>
+        <v-list-item to="/main/wms/documents/public-affairs">
           <v-list-item-icon>
             <v-icon>mdi-account-arrow-up</v-icon>
           </v-list-item-icon>
@@ -95,15 +95,15 @@
             <v-list-item-title>Öffentlichkeitsarbeit</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item to="/main/wms/documents/member-progression" disabled>
+        <v-list-item to="/main/wms/documents/quality-management">
           <v-list-item-icon>
             <v-icon>mdi-account-arrow-up</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
-            <v-list-item-title>QM</v-list-item-title>
+            <v-list-item-title>Quality Management</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item to="/main/wms/documents/member-progression" disabled>
+        <v-list-item to="" disabled>
           <v-list-item-icon>
             <v-icon>mdi-account-arrow-up</v-icon>
           </v-list-item-icon>

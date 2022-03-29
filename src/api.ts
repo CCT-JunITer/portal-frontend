@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {apiUrl} from '@/env';
-import { IEvent, IEventCreate, IUserProfile, IUserProfileCreate, IUserProfileUpdate, UserType, RequestCreate, UserInvite, IEventApplicationCreate, IEventApplicationUpdate, IFinanceRequestCreate, IFinanceRequestUpdate, IFinanceRequest, Group, GroupUpdate, IUserSettings, IEventApplication, VersionedFolder } from './interfaces';
+import { IEvent, IEventCreate, IUserProfile, IUserProfileCreate, IUserProfileUpdate, UserType, RequestCreate, UserInvite, IEventApplicationCreate, IEventApplicationUpdate, IFinanceRequestCreate, IFinanceRequestUpdate, IFinanceRequest, Group, GroupUpdate, IUserSettings, IEventApplication, VersionedFolder, IDocumentCreate, IDocument } from './interfaces';
 import {dataURItoBlob} from '@/utils';
 
 function authHeaders(token: string, headers = {}) {
@@ -237,5 +237,17 @@ export const api = {
   async updateFinanceRequestStateType(token: string, financeId: number, updated_status: string, updated_association: string) {
     return axios.put(`${apiUrl}/api/v1/finance/status/${financeId}`, { updated_status, updated_association }, authHeaders(token));
   },
-  
+  // Documents
+  async getDocuments(token: string, documentCategorie: string) {
+    return axios.get<IDocument[]>(`${apiUrl}/api/v1/document/`, { ...authHeaders(token), params: { document_categorie: documentCategorie } });
+  },
+  async getOneDocument(token: string, documentId: number) {
+    return axios.get<IDocument>(`${apiUrl}/api/v1/document/${documentId}`,  { ...authHeaders(token) });
+  },
+  async updateDocument(token: string, documentId: number, data: IDocumentCreate) {
+    return axios.put<IDocument>(`${apiUrl}/api/v1/document/${documentId}`, data, authHeaders(token));
+  },
+  async createDocument(token: string, data: IDocumentCreate) {
+    return axios.post<IDocument>(`${apiUrl}/api/v1/document/`, data, authHeaders(token));
+  },
 };

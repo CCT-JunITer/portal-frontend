@@ -302,6 +302,66 @@ export default new Router({
                       component: () => import(/* webpackChunkName: "admin-event" */ './views/main/event/EventMain.vue'),
                     },
                   ]
+                }, 
+                {
+                  path: 'documents',
+                  component: RouterComponent,
+                  children: [
+                    {
+                      path: '',
+                      redirect: { name: 'member-progression' }
+                    },
+                    {
+                      path: 'member-progression',
+                      name: 'member-progression',
+                      meta: {
+                        document_categorie: 'member-progression',
+                      },
+                      component: () => import('./views/main/document/DocumentMain.vue')
+                    },
+                    {
+                      path: 'recruiting',
+                      name: 'recruiting',
+                      meta: {
+                        document_categorie: 'recruiting',
+                      },
+                      component: () => import('./views/main/document/DocumentMain.vue')
+                    },
+                    {
+                      path: 'archive',
+                      name: 'archive',
+                      meta: {
+                        document_categorie: 'archive',
+                      },
+                      component: () => import('./views/main/document/DocumentMain.vue')
+                    },
+                    {
+                      path: 'public-affairs',
+                      name: 'public-affairs',
+                      meta: {
+                        document_categorie: 'public-affairs',
+                      },
+                      component: () => import('./views/main/document/DocumentMain.vue')
+                    },
+                    {
+                      path: 'quality-management',
+                      name: 'quality-management',
+                      meta: {
+                        document_categorie: 'quality-management',
+                      },
+                      component: () => import('./views/main/document/DocumentMain.vue')
+                    },
+                    {
+                      path: 'create',
+                      name: 'document-create',
+                      component: () => import('./views/main/document/EditDocument.vue')
+                    },
+                    {
+                      path: 'edit/:id',
+                      name: 'document-edit',
+                      component: () => import('./views/main/document/EditDocument.vue'),
+                    },
+                  ]
                 }
               ]
             },
