@@ -10,8 +10,8 @@ import { apiCall, apiCallNotify } from '../utils';
 type MainContext = ActionContext<DocumentState, State>;
 
 export const actions = {
-  async actionGetDocuments(context: MainContext, documentCategorie: string) {
-    const response = await apiCall(context, token => api.getDocuments(token, documentCategorie));
+  async actionGetDocuments(context: MainContext, documentType: string) {
+    const response = await apiCall(context, token => api.getDocuments(token, documentType));
     commitSetDocuments(context, response.data);
   },
   async actionGetOneDocument(context: MainContext, documentId: number) {

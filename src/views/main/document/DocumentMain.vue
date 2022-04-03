@@ -2,7 +2,7 @@
   <div>
     <v-toolbar>
       <v-toolbar-title>
-        {{ this.categorieName }} Dokumente
+        {{ this.typeName }} Dokumente
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn color="cctOrange" style="color: white" :to="{name: 'document-create'}">
@@ -40,7 +40,7 @@
 </template>
 
 <script lang="ts">
-import { IDocumentCategorie } from '@/interfaces';
+import { IDocumentType } from '@/interfaces';
 import { dispatchGetDocuments } from '@/store/document/actions';
 import { readDocuments } from '@/store/document/getters';
 import { Vue, Component } from 'vue-property-decorator';
@@ -49,25 +49,25 @@ import { Vue, Component } from 'vue-property-decorator';
 export default class DocumentMain extends Vue {
 
   async mounted() {
-    await dispatchGetDocuments(this.$store, this.categorieName);
+    await dispatchGetDocuments(this.$store, this.typeName);
   }
 
   get documents() {
     return readDocuments(this.$store);
   }
 
-  public get categorie() {
-    return this.$route.meta?.document_categorie as IDocumentCategorie;
+  public get type() {
+    return this.$route.meta?.document_type as IDocumentType;
   }
 
-  public get categorieName() {
+  public get typeName() {
     return {
       'member-progression': 'Mitgliedswerdegang',
       'recruiting': 'Recruiting',
       'archive': 'Archiv',
       'public-affairs': 'Öffentlichkeitsarbeit',
       'quality-management': 'Quality Management'
-    }[this.categorie];
+    }[this.type];
   }
 
 

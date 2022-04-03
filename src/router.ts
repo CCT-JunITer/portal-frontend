@@ -315,7 +315,7 @@ export default new Router({
                       path: 'member-progression',
                       name: 'member-progression',
                       meta: {
-                        document_categorie: 'member-progression',
+                        document_type: 'member-progression',
                       },
                       component: () => import('./views/main/document/DocumentMain.vue')
                     },
@@ -323,7 +323,7 @@ export default new Router({
                       path: 'recruiting',
                       name: 'recruiting',
                       meta: {
-                        document_categorie: 'recruiting',
+                        document_type: 'recruiting',
                       },
                       component: () => import('./views/main/document/DocumentMain.vue')
                     },
@@ -331,7 +331,7 @@ export default new Router({
                       path: 'archive',
                       name: 'archive',
                       meta: {
-                        document_categorie: 'archive',
+                        document_type: 'archive',
                       },
                       component: () => import('./views/main/document/DocumentMain.vue')
                     },
@@ -339,7 +339,7 @@ export default new Router({
                       path: 'public-affairs',
                       name: 'public-affairs',
                       meta: {
-                        document_categorie: 'public-affairs',
+                        document_type: 'public-affairs',
                       },
                       component: () => import('./views/main/document/DocumentMain.vue')
                     },
@@ -347,7 +347,7 @@ export default new Router({
                       path: 'quality-management',
                       name: 'quality-management',
                       meta: {
-                        document_categorie: 'quality-management',
+                        document_type: 'quality-management',
                       },
                       component: () => import('./views/main/document/DocumentMain.vue')
                     },

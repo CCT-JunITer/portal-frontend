@@ -238,8 +238,8 @@ export const api = {
     return axios.put(`${apiUrl}/api/v1/finance/status/${financeId}`, { updated_status, updated_association }, authHeaders(token));
   },
   // Documents
-  async getDocuments(token: string, documentCategorie: string) {
-    return axios.get<IDocument[]>(`${apiUrl}/api/v1/document/`, { ...authHeaders(token), params: { document_categorie: documentCategorie } });
+  async getDocuments(token: string, documentType: string) {
+    return axios.get<IDocument[]>(`${apiUrl}/api/v1/document/`, { ...authHeaders(token), params: { document_type: documentType } });
   },
   async getOneDocument(token: string, documentId: number) {
     return axios.get<IDocument>(`${apiUrl}/api/v1/document/${documentId}`,  { ...authHeaders(token) });

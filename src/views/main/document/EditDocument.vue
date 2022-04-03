@@ -3,7 +3,7 @@
     <v-row>
       <v-col cols="12" md="4" class="px-5">
         <h4 class="text-h4 text--primary mb-3">Neues Dokument hinzufügen</h4>
-        <p class="text-body-2 text--secondary">Lorem ipsum</p>
+        <!-- <p class="text-body-2 text--secondary">Hier kannst du ein neues Dokument hinzufügen</p> -->
       </v-col>
 
       <v-col cols="12" md="8" class="px-5">
@@ -29,26 +29,26 @@
             required
             :rules="[$common.required]"
           ></v-text-field>
-          <v-text-field
+          <v-select
             label="Typ"
             v-model="document.type"
             class="input-lg"
             prepend-icon="mdi-collage"
             required
+            :items="$common.DOKUMENT_TYP" 
             :rules="[$common.required]"
-          ></v-text-field>      
-          <v-select
+          ></v-select>      
+          <v-text-field
             label="Kategorie"
             v-model="document.categories"
             class="input-lg"
             prepend-icon="mdi-animation"
             multiple
             required
-            :items="$common.DOKUMENT_KATEGORIE" 
             :rules="[$common.required]"
-          ></v-select>
+          ></v-text-field>
           
-          <!-- <file-manager v-model="document.files" :multiple="true"></file-manager> -->
+          <!-- <file-manager></file-manager> -->
 
         </v-form>
         <v-card-actions>
@@ -115,7 +115,6 @@ export default class EditDocument extends Vue {
     if ((this.$refs.form as HTMLFormElement).validate()) {
       const new_document = {
         ...this.document,
-        // type: this.type,
       } as IDocumentCreate;
 
       let document: IDocument | undefined;
@@ -135,7 +134,7 @@ export default class EditDocument extends Vue {
   get documentDetails() {
     return [
       {
-        name: 'Kategorien',
+        name: 'Kategorie',
         key: this.documentInfo?.categories,
       },
       {

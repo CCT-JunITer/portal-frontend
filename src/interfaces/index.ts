@@ -276,6 +276,7 @@ export interface IDocument {
     type: string;
     categories: string[];
     date_last_updated: string;
+    // files: string;
     author_id: number;
 
     author: IUserProfile;
@@ -289,6 +290,7 @@ export interface IDocumentCreate {
     type: string;
     categories: string[];
     date_last_updated: string;
+    // files: string;
 
     approved: boolean;
 }
@@ -303,4 +305,4 @@ export interface IDocumentUpdate {
     approved: boolean;
 }
 
-export type IDocumentCategorie = 'member-progression' | 'recruiting' | 'archive' | 'public-affairs' | 'quality-management';
+export type IDocumentType = 'member-progression' | 'recruiting' | 'archive' | 'public-affairs' | 'quality-management';
