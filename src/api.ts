@@ -71,7 +71,7 @@ export const api = {
     return axios.get<IUserProfile>(`${apiUrl}/api/v1/users/${userId}`, {...authHeaders(token)});
   },
   async getPersonalEvents(token: string, userId: number) {
-    return axios.get<IEvent[]>(`${apiUrl}/api/v1/event/participants/${userId}`, { ...authHeaders(token)});
+    return axios.get<IEvent[]>(`${apiUrl}/api/v1/event/participants/events/${userId}`, { ...authHeaders(token)});
   },
 
 
@@ -99,7 +99,11 @@ export const api = {
   },
   async downloadFile(token: string, filename: string) {
     const params = { filename };
-    return axios.get(`${apiUrl}/api/v1/utils/download-file`, { ...authHeaders(token), params, responseType: 'blob' });
+    return fetch(`${apiUrl}/api/v1/utils/download-file?${new URLSearchParams(params)}`,
+      {
+        ...authHeaders(token),
+        method: 'GET',
+      }).then(response => response.blob())
   },
   
   async createVersionedFolder(token: string, file_ids: string[]) {

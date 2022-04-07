@@ -274,7 +274,6 @@ export interface IDocument {
     title: string;
     description: string;
     type: string;
-    categories: string[];
     date_last_updated: string;
     // files: string;
     author_id: number;
@@ -288,7 +287,6 @@ export interface IDocumentCreate {
     title: string;
     description: string;
     type: string;
-    categories: string[];
     date_last_updated: string;
     // files: string;
 
@@ -299,7 +297,6 @@ export interface IDocumentUpdate {
     title: string;
     description: string;
     type: string;
-    categories: string[];
     date_last_updated: string;
 
     approved: boolean;

@@ -2,9 +2,12 @@ import { Route } from 'vue-router';
 import { DocumentState } from './state';
 import { getStoreAccessors } from 'typesafe-vuex';
 import { State } from '../state';
+import { IDocumentType } from '@/interfaces';
 
 export const getters = {
-  documents: (state: DocumentState) => state.documents,
+  documents: (state: DocumentState) => (documentType: IDocumentType) => {
+    return state.documents.filter((document) => document.type === documentType);
+  },
   oneDocument: (state: DocumentState) => (documentId: number) => {
     const filteredDocuments = state.documents.filter((document) => document.id === documentId);
     if (filteredDocuments.length > 0) {

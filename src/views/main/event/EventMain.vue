@@ -38,7 +38,7 @@
           <file-manager :value="item.files" :readonly="true" :noManager="true"></file-manager>
         </template>
        
-        <template v-slot:item.custom_trainers="{ item }">
+        <template v-slot:item.custom_leaders="{ item }">
           <v-chip
             class="trainer-chip"
             v-for="leader in item.leaders"
@@ -361,24 +361,24 @@ export default class EventMain extends Vue {
         value: 'custom_title',
         align: 'left',
       },
-      {
+      this.type === 'training' && {
         text: 'Schulungstyp',
         sortable: true,
         value: 'subtype',
         align: 'left',
       },
-      {
+      this.type === 'training' && {
         text: 'Thema',
         sortable: true,
         value: 'topic',
         align: 'left',
       },
-      // {
-      //   text: 'Beschreibung',
-      //   sortable: false,
-      //   value: 'description',
-      //   align: 'left',
-      // },
+      {
+        text: 'Beschreibung',
+        sortable: false,
+        value: 'description',
+        align: 'left',
+      },
       {
         text: 'Datum von',
         sortable: true,
@@ -397,7 +397,7 @@ export default class EventMain extends Vue {
         sortable: false,
       },
       {
-        text: 'Trainer:innen',
+        text: 'Sitzungsleiter:innen',
         value: 'custom_leaders',
         align: 'center',
         sortable: false,
@@ -427,7 +427,7 @@ export default class EventMain extends Vue {
         text: 'Dateien',
         value: 'custom_files',
       }
-    ];
+    ].filter(v => v);
   }
 
   get futureEvents() {

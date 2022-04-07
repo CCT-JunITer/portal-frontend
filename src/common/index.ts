@@ -104,6 +104,25 @@ export const isTodayBirthday = (date: Date | string) => {
 
 export { format, formatInTimeZone, parseISO, de, utcToZonedTime };
 
-export const DOKUMENT_TYP = [
-  'Mitgliedswerdegang','Recruiting','Archiv','Öffentlichkeitsarbeit','Quality Management'
-];
+export const DOCUMENT_TYPES = [
+  {
+    name: 'Mitgliedswerdegang',
+    value: 'member-progression',
+  }, 
+  {
+    name: 'Recruiting',
+    value: 'recruiting',
+  }, 
+  {
+    name: 'Archiv',
+    value: 'archive',
+  },
+  {
+    name: 'Öffentlichkeitsarbeit',
+    value: 'public-affairs',
+  },
+  {
+    name: 'Quality Management',
+    value: 'quality-management',
+  }
+]

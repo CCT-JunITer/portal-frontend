@@ -29,27 +29,32 @@
             required
             :rules="[$common.required]"
           ></v-text-field>
+          <v-checkbox
+            v-model="document.approved"
+            label="Bestätigt"
+            class="input-lg"
+            prepend-icon="mdi-check-decagram"
+            hint="Durch das Qualitätsmanagement bestätigt"
+            persistent-hint
+            required
+          >
+          </v-checkbox>
           <v-select
             label="Typ"
             v-model="document.type"
             class="input-lg"
             prepend-icon="mdi-collage"
             required
-            :items="$common.DOKUMENT_TYP" 
+            item-value="value"
+            item-text="name"
+            :items="$common.DOCUMENT_TYPES" 
             :rules="[$common.required]"
-          ></v-select>      
-          <v-text-field
-            label="Kategorie"
-            v-model="document.categories"
-            class="input-lg"
-            prepend-icon="mdi-animation"
-            multiple
-            required
-            :rules="[$common.required]"
-          ></v-text-field>
+          ></v-select>
           
-          <!-- <file-manager></file-manager> -->
-
+          <file-manager 
+            :folder="document.versioned_folder" 
+            v-model="document.files">
+          </file-manager>
         </v-form>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -57,9 +62,9 @@
           <v-btn
             @click="submit"
             color="cctGreen"
-            style="color: #ffffff"
+            dark
           >
-            Schulung speichern
+            Dokument speichern
           </v-btn>
         </v-card-actions>
       </v-col>
@@ -91,21 +96,22 @@ export default class EditDocument extends Vue {
     return readRouteDocument(this.$store)(this.$route) as IDocument;
   }
 
-  /* @Watch('$route', {immediate: true})
+  @Watch('$route', {immediate: true})
   public async onRouteChange(newRoute?: Route, oldRoute?: Route) {
     if (newRoute?.params.id !== oldRoute?.params.id) {
       await dispatchGetOneDocument(this.$store, +this.$route.params.id)
       this.reset();
     }
-  } */
+  }
 
-  /* public reset() {
+  public reset() {
     if(this.editDocument) {
       this.document = {
         ...this.editDocument, 
 
       };
-  } */
+    }
+  }
 
   public cancel() {
     this.$router.back();
@@ -131,37 +137,8 @@ export default class EditDocument extends Vue {
     return readOneDocument(this.$store)(+this.$router.currentRoute.params.id);
   }
 
-  get documentDetails() {
-    return [
-      {
-        name: 'Kategorie',
-        key: this.documentInfo?.categories,
-      },
-      {
-        name: 'Typ',
-        key: this.documentInfo?.type,
-      },
-      {
-        name: 'Datum',
-        key: format(new Date(String(this.documentInfo?.date_last_updated)), 'dd.MM.yyyy HH:mm'),
-      },
-      {
-        name: 'Titel',
-        key: this.documentInfo?.title,
-      },
-      {
-        name: 'Beschreibung',
-        key: this.documentInfo?.description,
-      },
-    ];
-  }
 }
 </script>
 
 <style lang="sass" scoped>
-@import '~vuetify/src/styles/styles.sass'
-
-@media #{map-get($display-breakpoints, 'md-and-up')}
-  .input-lg
-    max-width: 340px!important
 </style>

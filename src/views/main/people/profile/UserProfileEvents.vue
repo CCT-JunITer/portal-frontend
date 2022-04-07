@@ -63,9 +63,9 @@
           :key="event.id"
         >
           <v-expansion-panel-header>
-            {{ event.title }} - {{ formatDate(event.date) }}
+            {{ event.title }} - {{ formatDate(event.date_from) }}
             <template v-slot:actions>
-              <v-icon v-if="(eventIsDone(event.date))" color="green">
+              <v-icon v-if="(eventIsDone(event.date_from))" color="green">
                 mdi-check
               </v-icon>
               <v-icon v-else color="cctGrey">
@@ -85,7 +85,7 @@
             </v-icon>
             Trainer:innen:
             <span>
-              {{ event.trainers.map(trainer => trainer.full_name).join(', ') }}
+              {{ event.leaders.map(trainer => trainer.full_name).join(', ') }}
             </span> 
             <br />
             <v-icon>

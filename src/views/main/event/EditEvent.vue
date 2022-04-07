@@ -106,6 +106,27 @@
             persistent-hint
           ></v-text-field>
 
+          <v-checkbox
+            v-model="event.approved"
+            label="Bestätigt"
+            class="input-lg"
+            prepend-icon="mdi-check-decagram"
+            hint="Durch das Qualitätsmanagement bestätigt"
+            persistent-hint
+            required
+          >
+          </v-checkbox>
+
+          <v-checkbox
+            v-model="event.application_possible"
+            label="Anmeldung möglich"
+            class="input-lg"
+            prepend-icon="mdi-account-plus"
+            hint="Anmeldung möglich"
+            persistent-hint
+            required
+          >
+          </v-checkbox>
 
           <v-autocomplete
             v-model="event.leader_ids"

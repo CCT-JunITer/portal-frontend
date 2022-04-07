@@ -130,8 +130,21 @@ export default class FileManager extends Vue {
   @Prop({ })
   public value?: string;
 
-  @Watch('value', {immediate: true})
+  @Prop({ required: false })
+  public folder?: VersionedFolder;
+
+  @Watch('folder', { immediate: true })
+  public onFolderChange(newFolder?: VersionedFolder, oldFolder?: VersionedFolder) {
+    if (newFolder?.id !== oldFolder?.id && newFolder) {
+      this.versionedFolder = newFolder;
+    }
+  }
+
+  @Watch('value', { immediate: true })
   public async onValueChange(newValue: string | null, oldValue: string | null) {
+    if (this.folder) {
+      return;
+    }
     if (newValue !== oldValue && newValue) {
       let value = newValue;
       if (value) {

@@ -19,6 +19,10 @@
         :items-per-page="5"
         class="elevation-1"
       >
+        <template v-slot:item.title="{ item }">
+          <v-icon v-if="item.approved" color="cctGreen" small>mdi-check-decagram</v-icon>
+          {{ item.title }}
+        </template>
         <template v-slot:item.date_last_updated="{ item }">
           {{ $common.format(new Date(item.date_last_updated), 'dd.MM.yyyy HH:mm') }}
         </template>
@@ -33,6 +37,27 @@
             </v-icon>
           </v-btn>
         </template>
+        <template v-slot:item.custom_last_updated_by="{ item }">
+          <v-chip
+            class="trainer-chip"
+            color="lightgrey"
+          >
+            <v-avatar left>
+              <employee-profile-picture
+                :employee="item.last_updated_by"
+              ></employee-profile-picture>
+            </v-avatar>
+            {{ item.last_updated_by.full_name }}
+          </v-chip>
+        </template>
+        <template v-slot:item.custom_files="{ item }">
+          <file-manager 
+            :value="item.files"
+            :folder="item.versioned_folder" 
+            :readonly="true" 
+            :noManager="true">
+          </file-manager>
+        </template>
       </v-data-table>
 
     </v-container>
@@ -40,20 +65,26 @@
 </template>
 
 <script lang="ts">
+import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
+import FileManager from '@/components/file-manager/FileManager.vue';
 import { IDocumentType } from '@/interfaces';
 import { dispatchGetDocuments } from '@/store/document/actions';
 import { readDocuments } from '@/store/document/getters';
-import { Vue, Component } from 'vue-property-decorator';
+import { Vue, Component, Watch } from 'vue-property-decorator';
+import { Route } from 'vue-router';
 
-@Component({})
+@Component({ components: { FileManager, EmployeeProfilePicture }})
 export default class DocumentMain extends Vue {
 
-  async mounted() {
-    await dispatchGetDocuments(this.$store, this.typeName);
+  @Watch('$route', {immediate: true})
+  public async onRouteChange(newRoute?: Route, oldRoute?: Route) {
+    if (newRoute?.meta?.document_type !== oldRoute?.meta?.document_type) {
+      await dispatchGetDocuments(this.$store, this.type);
+    }
   }
 
   get documents() {
-    return readDocuments(this.$store);
+    return readDocuments(this.$store)(this.type);
   }
 
   public get type() {
@@ -83,16 +114,16 @@ export default class DocumentMain extends Vue {
       sortable: false 
     },
     { 
-      text: 'Typ', 
-      value: 'type'
-    },
-    { 
-      text: 'Kategorie', 
-      value: 'categories' 
-    },
-    { 
       text: 'Letzte Änderung', 
       value: 'date_last_updated'
+    },
+    { 
+      text: 'Letzte Änderung von', 
+      value: 'custom_last_updated_by'
+    },
+    { 
+      text: 'Dateien', 
+      value: 'custom_files'
     },
     {
       text: 'Details',
