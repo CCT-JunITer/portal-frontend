@@ -33,7 +33,7 @@ export const actions = {
   },
   async actionDeleteEvent(context: MainContext, payload: number) {
     await apiCallNotify(context, token => api.deleteEvent(token, payload), { successText: 'Event erfolgreich gelöscht' });
-    await dispatchGetEvents(context);
+    // await dispatchGetEvents(context);
   },
   async actionUpdateEvent(context: MainContext, payload: { id: number; event: IEventCreate }) {
     const response = await apiCallNotify(context, token => api.updateEvent(token, payload.id, payload.event), { successText: 'Änderung erfolgreich' });

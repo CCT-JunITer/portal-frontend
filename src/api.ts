@@ -99,11 +99,7 @@ export const api = {
   },
   async downloadFile(token: string, filename: string) {
     const params = { filename };
-    return fetch(`${apiUrl}/api/v1/utils/download-file?${new URLSearchParams(params)}`,
-      {
-        ...authHeaders(token),
-        method: 'GET',
-      }).then(response => response.blob())
+    return axios.get(`${apiUrl}/api/v1/utils/download-file`, { ...authHeaders(token), params, responseType: 'blob' });
   },
   
   async createVersionedFolder(token: string, file_ids: string[]) {
