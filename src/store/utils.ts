@@ -1,8 +1,9 @@
 import { AxiosError, AxiosResponse } from 'axios';
 import { ActionContext } from 'vuex';
+import { CalendarState } from './calendar/state';
 import { dispatchCheckApiError } from './main/actions';
 import { commitAddNotification, commitRemoveNotification } from './main/mutations';
-import { AppNotification } from './main/state';
+import { AppNotification, MainState } from './main/state';
 import { State } from './state';
 
 export const replace = <T extends {id: number}>(array: T[], payload: T): T[] => {
@@ -47,3 +48,8 @@ export const apiCall = async <T>(context: ActionContext<unknown, State>, apicall
     throw error;
   }
 };
+
+export const getCalendarById = function(state: CalendarState, calendarId: string) {
+  if (!state.calendars) return undefined
+  return state.calendars.find(x => x.uid == calendarId)
+}

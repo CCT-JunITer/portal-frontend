@@ -3,6 +3,7 @@ import { FinanceRequestState } from './finance_request/state';
 import { MainState } from './main/state';
 import { EventState } from './event/state';
 import { DocumentState } from './document/state';
+import { CalendarState } from './calendar/state';
 
 export interface State {
     main: MainState;
@@ -10,4 +11,5 @@ export interface State {
     finance_reqeust: FinanceRequestState;
     admin: AdminState;
     document: DocumentState;
+    calendar: CalendarState;
 }
