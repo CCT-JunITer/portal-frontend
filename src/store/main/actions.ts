@@ -11,6 +11,7 @@ import { State } from '../state';
 import {
   commitAddNotification,
   commitRemoveNotification,
+  commitSetAuthenticationURL,
   commitSetGroups,
   commitSetLoggedIn,
   commitSetLogInError,
@@ -264,6 +265,11 @@ export const actions = {
     const response = await apiCall(context, api.getGroups);
     commitSetGroups(context, response.data);
   },
+
+  async actionAuthenticateNextcloud(context: MainContext) {
+    const response = await apiCall(context, api.requestAuthenticationURL);
+    commitSetAuthenticationURL(context, response.data)
+  },
 };
 
 const { dispatch } = getStoreAccessors<MainState | any, State>('');
@@ -300,6 +306,7 @@ export const dispatchGetMyRequests = dispatch(actions.actionGetMyRequests);
 export const dispatchAddRequestMe = dispatch(actions.actionAddRequestMe); 
 export const dispatchGetGroups = dispatch(actions.actionGetGroups); 
 export const dispatchSetPrimaryGroupMe = dispatch(actions.actionSetPrimaryGroupMe)
+export const dispatchActionAuthenticateNextcloud = dispatch(actions.actionAuthenticateNextcloud)
 
 
 

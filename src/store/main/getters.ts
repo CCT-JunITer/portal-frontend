@@ -56,6 +56,7 @@ export const getters = {
   firstNotification: (state: MainState) => state.notifications.length > 0 && state.notifications[0],
   myRequests: (state: MainState) => state.myRequests,
   groups: (state: MainState) => state.groups,
+  authenticationURL: (state: MainState) => state.authenticationURL,
 };
 
 const {read} = getStoreAccessors<MainState, State>('');
@@ -78,5 +79,6 @@ export const readIsMe = read(getters.isMe);
 export const readRouteUser = read(getters.routeUser);
 export const readMyRequests = read(getters.myRequests);
 export const readGroups = read(getters.groups);
+export const readAuthenticationURL = read(getters.authenticationURL);
 
 

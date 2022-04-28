@@ -89,8 +89,6 @@ export default {
     },
     
     calendar: function() {
-      console.log(this.calendarId)
-      console.log(this.calendars)
       return this.calendars.find(x => x.uid == this.calendarId)
     }
   },

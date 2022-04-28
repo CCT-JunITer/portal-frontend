@@ -26,7 +26,6 @@
           <v-text-field
             v-model="selectedEventInternal.name"
             flat
-            full-width
           ></v-text-field>
         </v-toolbar-title>
         <v-spacer></v-spacer>
@@ -116,7 +115,7 @@ export default {
 
   },
 
-  emits: ['clickEditEvent', 'close'],
+  emits: ['clickEditEvent', 'close', 'changed'],
 
   data() {
     return {
@@ -155,16 +154,17 @@ export default {
     async save() {
       // TODO: maybe do both in one function
       commitUpdateSelectedEvent(this.$store, this.selectedEventInternal)
-      commitAddEventToCalendar(this.$store, this.selectedEvent)
+      // commitAddEventToCalendar(this.$store, this.selectedEvent)
       delete this.selectedEventInternal.color
 
       await dispatchUpdateCalendarEvent(this.$store, this.selectedEventInternal)
+      this.$emit('changed')
       this.close()
     },
 
     async deleteEvent() {
-      console.log('deleted')
       const response = await dispatchRemoveEvent(this.$store, this.selectedEvent)
+      this.$emit('changed')
       this.close()
     },
   },

@@ -37,8 +37,13 @@ export const actions = {
     }
   },
 
-  async actionFetchCalendars(context: MainContext) {
-    const response = await apiCallNotify(context, token => api.getCalendar(token, undefined, undefined, undefined), {successText: 'Kalender aktualisiert'})
+  async actionFetchCalendars(context: MainContext, notify: boolean) {
+    let response;
+    if (notify) {
+      response = await apiCallNotify(context, token => api.getCalendar(token, undefined, undefined, undefined), {successText: 'Kalender aktualisiert'})
+    } else {
+      response = await apiCall(context, token => api.getCalendar(token, undefined, undefined, undefined))
+    }
     commitSetCalendars(context, response.data)
   },
 

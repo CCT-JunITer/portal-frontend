@@ -48,6 +48,9 @@ export const mutations = {
   setGroups(state: MainState, payload: Group[]) {
     state.groups = payload;
   },
+  setAuthenticationURL(state: MainState, url: string) {
+    state.authenticationURL = url;
+  }
 };
 
 const {commit} = getStoreAccessors<MainState | any, State>('');
@@ -66,4 +69,5 @@ export const commitSetUser = commit(mutations.setUser);
 export const commitSetUsers = commit(mutations.setUsers);
 export const commitSetMyRequests = commit(mutations.setMyRequests);
 export const commitSetGroups = commit(mutations.setGroups);
+export const commitSetAuthenticationURL = commit(mutations.setAuthenticationURL);
 

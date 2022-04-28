@@ -19,4 +19,5 @@ export interface MainState {
     users: IUserProfile[];
     myRequests: Request[];
     groups: Group[];
+    authenticationURL: string|undefined;
 }

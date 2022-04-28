@@ -16,6 +16,7 @@ const defaultState: MainState = {
   users: [],
   myRequests: [],
   groups: [],
+  authenticationURL: undefined,
 };
 
 export const mainModule = {

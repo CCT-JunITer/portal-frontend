@@ -39,14 +39,14 @@ export class CalendarEvent {
   calendarId?: string;
   color?: string;
   eventColor?: string;
-  uiEvents?: [] = [];
+  // uiEvents?: [] = [];
 
-  toICalendarEvent() {
-    const event = Object.assign({}, this)
-    if (event.uiEvents) delete event.uiEvents
+  // toICalendarEvent() {
+  //   const event = Object.assign({}, this)
+  //   if (event.uiEvents) delete event.uiEvents
 
-    return event
-  }
+  //   return event
+  // }
 
   toUIEvent() {
     return {

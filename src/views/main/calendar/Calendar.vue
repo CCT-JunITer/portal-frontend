@@ -131,12 +131,16 @@
         <calendar-event-popup 
           ref="calendarEventPopup" 
           @clickEditEvent="showEventEditor"
-          @close="getEvents({start:undefined, end:undefined})">
+          @changed="update(false)">
         </calendar-event-popup>
       </v-sheet>
 
       
-      <create-event-view ref="CreateEventView" :initiallyVisible="false">
+      <create-event-view 
+        ref="CreateEventView" 
+        :initiallyVisible="false"
+        @changed="update(false)"
+      >
       </create-event-view>
     </div>
   </div>
@@ -154,6 +158,7 @@ import { commitSetSelectedEvent } from '@/store/calendar/mutations';
 import { dispatchFetchCalendars } from '@/store/calendar/actions';
 import { readCalendars } from '@/store/calendar/getters';
 import { CalendarEvent } from './CalendarEvent';
+import { readAuthenticationURL } from '@/store/main/getters';
 
 export default {
   components: {
@@ -163,9 +168,7 @@ export default {
   },
 
   async created() {
-    await dispatchFetchCalendars(this.$store)
-    this.$refs.calendarSelectorPanel.toggle()
-    this.getEvents({start:undefined, end:undefined})
+    this.update(true);
   },
 
   data: () => ({
@@ -212,7 +215,7 @@ export default {
       // console.log(end_d.toISOString())
 
       // const calendars = await this.dateSearch(start_d, end_d)
-      console.log(this.$refs)
+      console.log(this.calendars)
       for (let i = 0; i < this.calendars.length; i++) {
         const activeCalendar = this.calendars[i];
         if (activeCalendar.active === undefined) activeCalendar.active = true;
@@ -300,6 +303,12 @@ export default {
       //   })
       // }
       this.events = events
+    },
+
+    async update(notify) {
+      await dispatchFetchCalendars(this.$store, notify)
+      await this.getEvents({start:undefined, end:undefined})
+      if (this.$refs.calendarSelectorPanel) this.$refs.calendarSelectorPanel.isActive = true;
     },
 
     // async dateSearch(start=undefined, end=undefined, calendars=undefined) {
@@ -467,8 +476,20 @@ export default {
 
     calendars: function ()  {
       return readCalendars(this.$store)
+    },
+
+    authenticationURL: function() {
+      return readAuthenticationURL(this.$store);
     }
 
+  },
+
+  watch: {
+    authenticationURL(val) {
+      if (!val) {
+        this.update(true)
+      }
+    }
   }
 }
 </script>

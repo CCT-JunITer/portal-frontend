@@ -286,4 +286,12 @@ export const api = {
     }
     return axios.get(url, authHeaders(token));
   },
+
+  async requestAuthenticationURL(token: string) {
+    return axios.get(`${apiUrl}/api/v1/calendar/requestAuthenticationURL`, authHeaders(token));
+  },
+  
+  async checkNextcloudAuthentication(token: string) {
+    return axios.get(`${apiUrl}/api/v1/calendar/checkAuthenticationStatus`, authHeaders(token));
+  }
 };
