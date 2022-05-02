@@ -46,6 +46,14 @@
       <!-- <v-divider class="my-2"></v-divider> -->
 
       <div style="height:100%;"></div>
+
+      <v-btn
+        style="width=100%"
+        :href="`https://cloud.cct-ev.de/apps/calendar/timeGridWeek/${this.value.toISOString().substring(0,10)}`" 
+        target="_blank"
+      >
+        <v-icon class="mr-2">mdi-open-in-new</v-icon> In der Nextcloud bearbeiten
+      </v-btn>
       
     </div>
 
@@ -501,7 +509,7 @@ export default {
     display: flex;
     position:fixed;
     flex-direction: row;
-    height:100%;
+    height:calc(100% - 64px);
     width:100%;
     background-color:#EEEEEE;
   }
@@ -509,25 +517,21 @@ export default {
 .calendarSidebar {
   background-color:#EEEEEE;
   color:#757575;
-  height:100%;
+  height:calc(100%);
   width:350px;
   display:flex;
   align-items:flex-start;
   flex-direction: column;
   flex-basis:auto;
-  overflow-y: hidden;
 }
 
 .calendarMainView {
-  padding-left:5px;
   width:100%;
   height: 100%;
-  /* overflow-y:scroll; */
-  /* overflow-x:hidden; */
 }
 
 .VCalendarView {
-  height:calc(100% - 125px);
+  height:calc(100% - 64px);
 }
 
 </style>
