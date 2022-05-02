@@ -9,7 +9,6 @@
         :type="pickerType"
         scrollable
         color="primary"
-        style="min-width: 50px;"
       >
       </v-date-picker>
       <v-btn
@@ -111,7 +110,7 @@
           </v-btn-toggle>
         </v-toolbar>
       </v-sheet>
-      <v-sheet height="100%" width="100%" >
+      <div class ="VCalendarView">
         <v-calendar
           ref="calendar"
           v-model="value"
@@ -125,7 +124,6 @@
           @change="getEvents"
           @click:date="viewDay"
           
-          
         ></v-calendar>
         
         <calendar-event-popup 
@@ -133,7 +131,7 @@
           @clickEditEvent="showEventEditor"
           @changed="update(false)">
         </calendar-event-popup>
-      </v-sheet>
+      </div>
 
       
       <create-event-view 
@@ -501,6 +499,7 @@ export default {
 
   .calendarContainer {
     display: flex;
+    position:fixed;
     flex-direction: row;
     height:100%;
     width:100%;
@@ -511,6 +510,7 @@ export default {
   background-color:#EEEEEE;
   color:#757575;
   height:100%;
+  width:350px;
   display:flex;
   align-items:flex-start;
   flex-direction: column;
@@ -522,8 +522,12 @@ export default {
   padding-left:5px;
   width:100%;
   height: 100%;
-  overflow-y:scroll;
-  overflow-x:hidden
+  /* overflow-y:scroll; */
+  /* overflow-x:hidden; */
+}
+
+.VCalendarView {
+  height:calc(100% - 125px);
 }
 
 </style>
