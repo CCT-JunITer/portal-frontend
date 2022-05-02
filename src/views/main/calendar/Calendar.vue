@@ -49,7 +49,7 @@
 
       <v-btn
         style="width=100%"
-        :href="`https://cloud.cct-ev.de/apps/calendar/timeGridWeek/${this.value.toISOString().substring(0,10)}`" 
+        :href="`https://cloud.cct-ev.de/apps/calendar/${this.nextcloudViewTypes[this.type]}/${this.value.toISOString().substring(0,10)}`" 
         target="_blank"
       >
         <v-icon class="mr-2">mdi-open-in-new</v-icon> In der Nextcloud bearbeiten
@@ -193,6 +193,7 @@ export default {
     events: [],
     colors: ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1'],
     names: ['Meeting', 'Holiday', 'PTO', 'Travel', 'Event', 'Birthday', 'Conference', 'Party'],
+    nextcloudViewTypes: {'day':'timeGridDay', 'week':'timeGridWeek', 'month':'dayGridMonth'},
 
     overlay: true,
     newEvent: null,
