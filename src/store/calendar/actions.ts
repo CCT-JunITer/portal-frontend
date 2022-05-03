@@ -37,6 +37,11 @@ export const actions = {
     }
   },
 
+  async actionUpdateCalendar(context: MainContext, calendar) {
+    const response = await apiCall(context, token => api.updateCalendar(token, calendar))
+    return response.data
+  },
+
   async actionFetchCalendars(context: MainContext, notify: boolean) {
     let response;
     if (notify) {
@@ -61,3 +66,4 @@ export const dispatchRemoveEvent = dispatch(actions.actionRemoveEvent);
 export const dispatchFetchCalendars = dispatch(actions.actionFetchCalendars);
 export const dispatchUpdateCalendarEvent = dispatch(actions.actionUpdateCalendarEvent);
 export const dispatchDeleteCalendar = dispatch(actions.actionDeleteCalendar);
+export const dispatchUpdateCalendar = dispatch(actions.actionUpdateCalendar);

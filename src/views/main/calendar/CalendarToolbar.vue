@@ -5,7 +5,7 @@
       :color="calendar.color"
       ripple
       :label="calendar.name"
-      @change="$emit('change')"
+      @change="clicked"
     >
     </v-checkbox>
     
@@ -66,7 +66,7 @@
 
 <script>
 import { readCalendars } from '@/store/calendar/getters'
-import { dispatchDeleteCalendar } from '@/store/calendar/actions'
+import { dispatchDeleteCalendar, dispatchUpdateCalendar } from '@/store/calendar/actions'
 
 export default {
 
@@ -103,6 +103,10 @@ export default {
 
     editColor() {
       this.editName()
+    },
+    clicked() {
+      dispatchUpdateCalendar(this.$store, this.calendar);
+      this.$emit('change');
     }
   }
   

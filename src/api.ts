@@ -255,6 +255,12 @@ export const api = {
     return axios.delete<ICalendarEvent>(`${apiUrl}/api/v1/calendar?calendarId=${encodeURI(calendarId)}`, authHeaders(token));
   },
 
+  async updateCalendar(token: string, calendar) {
+    const calendar_send = Object.assign({}, calendar);
+    delete calendar_send.events
+    return axios.put<ICalendarEvent>(`${apiUrl}/api/v1/calendar`, calendar_send, authHeaders(token));
+  },
+
   async updateCalendarEvent(token: string, event) {
     return axios.put<ICalendarEvent>(`${apiUrl}/api/v1/calendar/events`, event, authHeaders(token));
   },
