@@ -123,7 +123,7 @@ export default class SearchBar extends Vue {
     this.fetch();
   }
 
-  public fetch = this.$common.debounce(this.fetchResults, 200);
+  public fetch = this.$common.debounce(this.fetchResults, 400, true);
 
   public async fetchResults() {
     this.isLoading = true;

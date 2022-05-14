@@ -1,13 +1,16 @@
 
 
-export function debounce<T>(fn: (...args: T[]) => void, delay = 1000) {
-  let timeoutID: null | NodeJS.Timeout = null
-  return function (...args: T[]) {
-    timeoutID && clearTimeout(timeoutID)
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const that = this;
-    timeoutID = setTimeout(function () {
-      fn.apply(that, args);
-    }, delay)
+export const debounce = (fn: (...params: any[]) => any, delay = 1000, immed = false) => {
+  let timer: NodeJS.Timeout | null = null;
+  return function (this: any, ...args: any[]) {
+    if (timer === null && immed) {
+      fn.apply(this, args);
+    }
+    timer && clearTimeout(timer);
+    timer = setTimeout(() => { 
+      fn.apply(this, args)
+      timer = null
+    }, delay);
+    return timer;
   }
-}
+};
