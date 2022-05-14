@@ -48,6 +48,10 @@
             <v-icon left>mdi-human-male-board</v-icon>
             Meeting
           </v-btn>
+          <v-btn value="document">
+            <v-icon left>mdi-folder</v-icon>
+            Dokumente
+          </v-btn>
         </v-btn-toggle>
       </v-list-item>
     </template>
@@ -61,6 +65,12 @@
         </v-list-item-content>
       </template>
       <template v-if="item.searchType === 'training' || item.searchType === 'meeting'">
+        <v-list-item-content>
+          <v-list-item-title v-text="item.target.title"></v-list-item-title>
+          <v-list-item-subtitle v-text="item.target.description"></v-list-item-subtitle>
+        </v-list-item-content>
+      </template>
+      <template v-if="item.searchType === 'document'">
         <v-list-item-content>
           <v-list-item-title v-text="item.target.title"></v-list-item-title>
           <v-list-item-subtitle v-text="item.target.description"></v-list-item-subtitle>
@@ -92,11 +102,15 @@ export default class SearchBar extends Vue {
     },
     {
       type: 'meeting',
-      name: 'Meetings'
+      name: 'Meetings',
     }, 
     {
       type: 'training',
-      name: 'Schulungen'
+      name: 'Schulungen',
+    },
+    {
+      type: 'document',
+      name: 'Dokumente',
     }
   ]
   
@@ -157,11 +171,15 @@ export default class SearchBar extends Vue {
   public goToProfile(e) {
     this.clearInput();
     if (e?.searchType === 'user') {
-      this.$router.push({ path: '/main/people/profile/view/' + e.id })
+      return this.$router.push({ path: '/main/people/profile/view/' + e.id })
     }
     if (e?.searchType === 'training' || e?.searchType === 'meeting') {
-      this.$router.push({ path: '/main/events/' + e.id })
+      return this.$router.push({ path: '/main/events/' + e.id })
     }
+    if (e?.searchType === 'document') {
+      return this.$router.push({ path: '/main/wms/documents/edit/' + e.id })
+    }
+    console.error(`unhandled searchtype '${e.searchType}'`);
   }
 
   public goToSearch() {

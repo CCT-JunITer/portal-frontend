@@ -79,7 +79,7 @@
             <v-list-item-title>Recruiting</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item to="/main/wms/documents/archive" disabled class="ml-2">
+        <v-list-item to="/main/wms/documents/archive" class="ml-2" v-if="hasAnyPermission(['portal.documents.admin'])">
           <v-list-item-icon>
             <v-icon>mdi-archive</v-icon>
           </v-list-item-icon>
@@ -262,6 +262,7 @@ import { env } from '@/env';
 import {
   readDashboardShowDrawer,
   readHasAdminAccess,
+  readHasAnyPermission,
   readUserProfile
 } from '@/store/main/getters';
 import {
@@ -273,6 +274,8 @@ import {
 } from 'vue-property-decorator'
 import PortalButton from './PortalButton.vue';
 
+
+
 @Component({
   components: {
     EmployeeProfilePicture,
@@ -282,6 +285,7 @@ import PortalButton from './PortalButton.vue';
 export default class NavigationDrawer extends Vue {
 
   public env = env;
+  public hasAnyPermission = readHasAnyPermission(this.$store);
 
   public get hasAdminAccess() {
     return readHasAdminAccess(this.$store);

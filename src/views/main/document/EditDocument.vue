@@ -129,7 +129,7 @@ export default class EditDocument extends Vue {
       } else {
         document = await dispatchCreateDocument(this.$store, new_document);
       }
-      this.$router.push('/main/wms/documents');
+      this.$router.push(`/main/wms/documents/${document.type}`);
     }
   }
 
