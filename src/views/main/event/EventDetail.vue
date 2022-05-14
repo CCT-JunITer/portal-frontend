@@ -209,6 +209,9 @@
           <p class="text-body-2 text--secondary">
             Teilnehmer:innen
           </p>
+          <v-container v-if="isSuperuser">
+            <qrcode-vue :value="link" :size="225" level="H" />
+          </v-container>
         </v-col>
 
         <v-col cols="12" md="8">  
@@ -253,13 +256,16 @@ import EventApplicationCard from '@/components/event-application/EventApplicatio
 import { IEvent, IEventApplication, IEventApplicationStatus } from '@/interfaces';
 import FileManager from '@/components/file-manager/FileManager.vue';
 import { Route } from 'vue-router';
+import QrcodeVue from 'qrcode.vue'
+import { api } from '@/api';
 
 
 @Component({
-  components: { EmployeeProfilePicture, EmployeeCard, FileChip, EventApplicationCard, FileManager },
+  components: { EmployeeProfilePicture, EmployeeCard, FileChip, EventApplicationCard, FileManager, QrcodeVue },
 })
 export default class TrainingDetail extends Vue {
   public today = new Date();
+  public otp: string | null = null;
 
   get event(): IEvent {
     return readRouteEvent(this.$store)(this.$route) as IEvent;
@@ -270,6 +276,21 @@ export default class TrainingDetail extends Vue {
     return readEventsApplicationsFor(this.$store)(this.event.id)
       .filter(application => application.status === 'in progress');
   }
+
+  get link() {
+    return `https://portal.cct-ev.de/main/events/check-in/${this.event.id}?otp=${this.otp}`
+  }
+
+  public async getTOTP() {
+    const response = await api.getTOTP(this.$store.state.main.token, +this.$route.params.id);
+    const { totp, time_remaining } = response.data;
+    this.otp = totp;
+    console.log(totp, time_remaining);
+    setTimeout(() => {
+      this.getTOTP();
+    }, time_remaining * 1000);
+  }
+
 
   public get waitingApplications() {
     // return this.event.applications.filter(application => application.status === 'waiting');
@@ -298,6 +319,7 @@ export default class TrainingDetail extends Vue {
     if (newRoute?.params.id !== oldRoute?.params.id && +newRoute.params.id) {
       await dispatchGetOneEvent(this.$store, +newRoute.params.id)
       await dispatchGetEventApplications(this.$store, +newRoute.params.id);
+      await this.getTOTP();
     }
   }
 

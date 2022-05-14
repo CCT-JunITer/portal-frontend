@@ -412,6 +412,12 @@ export default new Router({
                   component: () => import(
                   /* webpackChunkName: "event-detail" */ './views/main/event/EventDetail.vue'),
                 },
+                {
+                  path: 'check-in/:id',
+                  name: 'check-in',
+                  component: () => import(
+                    /* webpackChunkName: "event-detail" */ './views/main/event/EventCheckin.vue'),
+                },
               ]
             },
             {

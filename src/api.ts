@@ -255,4 +255,11 @@ export const api = {
     return axios.get(`${apiUrl}/api/v1/search/`, { ...authHeaders(token), params: { text: searchText } });
   },
   
+  //Tracking
+  async getTOTP(token: string, eventId: number) {
+    return axios.get(`${apiUrl}/api/v1/tracking/event/${eventId}`, authHeaders(token)); 
+  },
+  async updateParticipants(token: string, eventId: number, totp: number) {
+    return axios.put(`${apiUrl}/api/v1/tracking/event/${eventId}`, { totp }, authHeaders(token));
+  },
 };
