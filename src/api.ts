@@ -250,4 +250,9 @@ export const api = {
   async createDocument(token: string, data: IDocumentCreate) {
     return axios.post<IDocument>(`${apiUrl}/api/v1/document/`, data, authHeaders(token));
   },
+  // Search
+  async getSearchResults(token: string, searchText: string) {
+    return axios.get(`${apiUrl}/api/v1/search/`, { ...authHeaders(token), params: { text: searchText } });
+  },
+  
 };

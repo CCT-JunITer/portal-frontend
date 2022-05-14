@@ -1,80 +1,154 @@
 <template>
 
   <v-autocomplete
-    v-if="!this.$route.meta.disableSearchBar"
     class="mx-4"
     v-model="model"
     ref="autocomplete"
-    :items="employees"
+    :items="items"
     @change="goToProfile"
-    @keydown.enter="goToSearch"
-    @click="fetchData"
+    @click="fetchResults"
+    :no-filter="true"
     :loading="isLoading"
     :search-input.sync="searchText"
     return-object
     clearable
     hide-details
-    item-text="full_name"
-    item-value="id"
+    item-text="searchType"
+    item-value="searchId"
     label="Suche"
     solo-inverted
     flat
     dense
     dark
     prepend-inner-icon="mdi-magnify"
+    :menu-props="{
+      closeOnClick: false,
+      closeOnContentClick: false,
+      disableKeys: true,
+      openOnClick: false,
+      offsetY: true,
+      offsetOverflow: true,
+      transition: 'slide-y-transition',
+      maxHeight: '500px'
+    }"
   >
-    <template v-slot:no-data>
-      <v-list-item
-        @click="goToSearch"
-        color="primary"
-        ripple>
-        <v-list-item-title>
-          Weitere Benutzer finden
-        </v-list-item-title>
+
+    <template v-slot:prepend-item>
+      <v-list-item dense>
+        <v-btn-toggle v-model="filter" dense color="deep-purple accent-3">
+          <v-btn value="user">
+            <v-icon left>people</v-icon>
+            Mitglieder
+          </v-btn>
+          <v-btn value="training">
+            <v-icon left>mdi-school</v-icon>
+            Training
+          </v-btn>
+          <v-btn value="meeting">
+            <v-icon left>mdi-human-male-board</v-icon>
+            Meeting
+          </v-btn>
+        </v-btn-toggle>
       </v-list-item>
     </template>
-
+    
     <template v-slot:item="{ item }">
-
-      <employee-profile-picture :employee="item" component="v-list-item-avatar" small></employee-profile-picture>
-      <v-list-item-content>
-        <v-list-item-title v-text="item.full_name"></v-list-item-title>
-        <v-list-item-subtitle v-text="item.ressort"></v-list-item-subtitle>
-      </v-list-item-content>
+      <template v-if="item.searchType === 'user'">
+        <employee-profile-picture :employee="item.target" component="v-list-item-avatar" small></employee-profile-picture>
+        <v-list-item-content>
+          <v-list-item-title v-text="item.target.full_name"></v-list-item-title>
+          <v-list-item-subtitle v-text="item.target.ressort"></v-list-item-subtitle>
+        </v-list-item-content>
+      </template>
+      <template v-if="item.searchType === 'training' || item.searchType === 'meeting'">
+        <v-list-item-content>
+          <v-list-item-title v-text="item.target.title"></v-list-item-title>
+          <v-list-item-subtitle v-text="item.target.description"></v-list-item-subtitle>
+        </v-list-item-content>
+      </template>
     </template>
   </v-autocomplete>
 </template>
 
 <script lang="ts">
-import { IUserProfile } from '@/interfaces';
-import { readUsers } from '@/store/main/getters';
-import { Vue, Component } from 'vue-property-decorator'
+import { Vue, Component, Watch } from 'vue-property-decorator'
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
-import { dispatchGetUsers } from '@/store/main/actions';
-
+import { api } from '@/api';
 @Component({
   components: { EmployeeProfilePicture }
 })
 export default class SearchBar extends Vue {
 
+  public results: any[] | null = null;
   public model = {};
   public searchText = '';
+  public filter = '';
   public isLoading = false;
 
-  public async fetchData() {
-    if (readUsers(this.$store).length) {
-      return;
+  public sections = [
+    {
+      type: 'user',
+      name: 'Mitglieder',
+    },
+    {
+      type: 'meeting',
+      name: 'Meetings'
+    }, 
+    {
+      type: 'training',
+      name: 'Schulungen'
     }
+  ]
+  
+  @Watch('searchText')
+  public async search(newVal?: string, oldVal?: string) {
+    if (newVal === oldVal) {
+      return;
+    } 
     this.isLoading = true;
-    await dispatchGetUsers(this.$store);
+    this.fetch();
+  }
+
+  public fetch = this.$common.debounce(this.fetchResults, 200);
+
+  public async fetchResults() {
+    this.isLoading = true;
+    const searchText = this.searchText || '';
+    const response = await api.getSearchResults(this.$store.state.main.token, searchText)
+    this.results = response.data.results;
     this.isLoading = false;
   }
 
-  get employees(): IUserProfile[] {
-    return readUsers(this.$store)
-      .filter(user => user.full_name);
+  public get items() {
+    if (!this.results) {
+      return [];
+    }
+    const arr: any[] = [];
+    const sections = this.sections.filter(section => !this.filter || section.type === this.filter)
+    for (let i = 0 ; i < sections.length; i++) {
+      const section = sections[i];
+      const items = this.results[section.type].map((obj) => ({
+        target: obj,
+        searchType: section.type,
+        searchId: `${section.type}-${obj.id}`,
+        id: obj.id
+      }));
+      if (items.length) {
+        arr.push({ section, items});
+      }
+    }
+    const array: any[] = [];
+    for (let i = 0 ; i < arr.length ; i++) {
+      const { section, items } = arr[i];
+      array.push({ header: section.name });
+      array.push(...items);
+      if (i + 1 !== arr.length) {
+        array.push({ divider: true });
+      }
+    }
+    return array;
   }
-
+  
   public clearInput() {
     this.model = {};
     (this.$refs.autocomplete as HTMLElement).blur();
@@ -82,8 +156,11 @@ export default class SearchBar extends Vue {
 
   public goToProfile(e) {
     this.clearInput();
-    if (e?.id) {
+    if (e?.searchType === 'user') {
       this.$router.push({ path: '/main/people/profile/view/' + e.id })
+    }
+    if (e?.searchType === 'training' || e?.searchType === 'meeting') {
+      this.$router.push({ path: '/main/events/' + e.id })
     }
   }
 
@@ -93,6 +170,7 @@ export default class SearchBar extends Vue {
     }
     this.clearInput();
   }
+
 }
 </script>
 

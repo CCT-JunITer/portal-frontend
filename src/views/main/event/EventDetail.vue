@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container v-if="this.event">
     <div>
 
       <div class="d-flex">
@@ -239,7 +239,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import {
   readUserProfile,
 } from '@/store/main/getters';
@@ -252,6 +252,7 @@ import FileChip from '@/components/file-chip/FileChip.vue';
 import EventApplicationCard from '@/components/event-application/EventApplicationCard.vue';
 import { IEvent, IEventApplication, IEventApplicationStatus } from '@/interfaces';
 import FileManager from '@/components/file-manager/FileManager.vue';
+import { Route } from 'vue-router';
 
 
 @Component({
@@ -292,10 +293,11 @@ export default class TrainingDetail extends Vue {
     await dispatchUpdateEventApplication(this.$store, { application_id: application.id, application: { status } });
   }
 
-  public async mounted() {
-    if (+this.$route.params.id) {
-      await dispatchGetOneEvent(this.$store, +this.$route.params.id)
-      await dispatchGetEventApplications(this.$store, +this.$route.params.id);
+  @Watch('$route', { immediate: true} )
+  public async onRouteChange(newRoute: Route, oldRoute?: Route) {
+    if (newRoute?.params.id !== oldRoute?.params.id && +newRoute.params.id) {
+      await dispatchGetOneEvent(this.$store, +newRoute.params.id)
+      await dispatchGetEventApplications(this.$store, +newRoute.params.id);
     }
   }
 
