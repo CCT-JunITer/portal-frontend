@@ -7,7 +7,7 @@
   >
     <v-card
       color="grey lighten-4"
-      min-width="350px"
+      min-width="500px"
       flat
     >
       <v-toolbar
@@ -67,6 +67,22 @@
           outlined
           disabled
         ></v-select>
+
+        <div style="display:flex">
+          <calendar-date-selector
+            v-model="selectedEventInternal.start"
+            label="Start"
+            icon="event"
+          >
+          </calendar-date-selector>
+
+          <calendar-date-selector
+            v-model="selectedEventInternal.end"
+            label="Ende"
+            icon="event"
+          >
+          </calendar-date-selector>
+        </div>
       
         <v-text-field
           v-model="selectedEventInternal.location"
@@ -109,10 +125,15 @@ import { dispatchRemoveEvent, dispatchUpdateCalendarEvent } from '@/store/calend
 import { commitAddEventToCalendar, commitSetSelectedEvent, commitUpdateSelectedEvent } from '@/store/calendar/mutations'
 import { readCalendarById, readCalendars, readSelectedElement } from '@/store/calendar/getters'
 import { getCalendarById } from '@/store/utils'
+import  CalendarDateSelector from '@/views/main/calendar/CalendarDateSelector.vue'
 
 export default {
   props: {
 
+  },
+
+  components: {
+    CalendarDateSelector
   },
 
   emits: ['clickEditEvent', 'close', 'changed'],
@@ -120,9 +141,9 @@ export default {
   data() {
     return {
       selectedElement: null,
-      selectedOpen: false,
+      selectedOpen: true,
 
-      selectedEventInternal:{calendar:{name:''}}
+      selectedEventInternal:{calendar:{name:''}, start:new Date(), end:new Date()}
     }
   },
 
@@ -143,6 +164,7 @@ export default {
     show() {
       this.selectedOpen = true
       this.selectedEventInternal = Object.assign({}, this.selectedEvent)
+
     },
 
     close() {
