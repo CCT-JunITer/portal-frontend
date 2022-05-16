@@ -519,7 +519,7 @@ export default {
   background-color:#EEEEEE;
   color:#757575;
   height:calc(100%);
-  width:350px;
+  width:300px;
   display:flex;
   align-items:flex-start;
   flex-direction: column;
