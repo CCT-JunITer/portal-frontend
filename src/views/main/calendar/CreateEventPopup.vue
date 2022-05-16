@@ -26,6 +26,7 @@
           <v-text-field
             v-model="selectedEventInternal.name"
             flat
+            full-width
           ></v-text-field>
         </v-toolbar-title>
         <v-spacer></v-spacer>
@@ -62,15 +63,22 @@
       <v-card-text>
         <v-select
           :items="calendarNames"
-          v-model="calendar.name"
+          v-model="calendar"
           label="Kalender"
           outlined
-          disabled
         ></v-select>
       
+        <!-- <calendar-event-location-component
+          v-model="selectedEventInternal.location"
+          @change="location => this.selectedEventInternal=location"
+        > 
+        </calendar-event-location-component> -->
+
         <v-text-field
           v-model="selectedEventInternal.location"
           label="Ort"
+          full-width
+          prepend-icon="mdi-map-marker"
         >
         </v-text-field>
 
@@ -109,8 +117,10 @@ import { dispatchRemoveEvent, dispatchUpdateCalendarEvent } from '@/store/calend
 import { commitAddEventToCalendar, commitSetSelectedEvent, commitUpdateSelectedEvent } from '@/store/calendar/mutations'
 import { readCalendarById, readCalendars, readSelectedElement } from '@/store/calendar/getters'
 import { getCalendarById } from '@/store/utils'
+// import CalendarEventLocationComponent from './components/CalendarEventLocationComponent.vue'
 
 export default {
+  // components: { CalendarEventLocationComponent },
   props: {
 
   },
@@ -122,7 +132,10 @@ export default {
       selectedElement: null,
       selectedOpen: false,
 
-      selectedEventInternal:{calendar:{name:''}}
+      selectedEventInternal:{calendar:{name:''}},
+      calendar: undefined,
+
+      cctLocations: ['Tower', 'CCTelefon']
     }
   },
 
@@ -143,6 +156,8 @@ export default {
     show() {
       this.selectedOpen = true
       this.selectedEventInternal = Object.assign({}, this.selectedEvent)
+      this.calendar = this.calendars.find(x => x.uid == this.selectedEventInternal.calendarId)
+      console.log(this. selectedEventInternal)
     },
 
     close() {
@@ -156,7 +171,9 @@ export default {
       commitUpdateSelectedEvent(this.$store, this.selectedEventInternal)
       // commitAddEventToCalendar(this.$store, this.selectedEvent)
       delete this.selectedEventInternal.color
-
+      if (this.calendar.uid != this.selectedEventInternal.calendarId) {
+        await dispatchRemoveEvent(this.$store, this.selectedEventInternal)
+      }
       await dispatchUpdateCalendarEvent(this.$store, this.selectedEventInternal)
       this.$emit('changed')
       this.close()
@@ -171,7 +188,12 @@ export default {
 
   computed: {
     calendars: function ()  {
-      return readCalendars(this.$store)
+      const calendars = readCalendars(this.$store)
+      
+      calendars.forEach(e => {
+        e.text = e.name
+      })
+      return calendars
     },
 
     calendarNames: function() {
@@ -190,11 +212,11 @@ export default {
       return {}
     },
 
-    calendar: function () {
-      const calendar = this.calendars.find(x => x.uid == this.selectedEventInternal.calendarId)
-      if (!calendar) return {name:''}
-      return calendar
-    }
+    // calendar: function () {
+    //   const calendar = this.calendars.find(x => x.uid == this.selectedEventInternal.calendarId)
+    //   if (!calendar) return {name:''}
+    //   return calendar
+    // }
     
   }
 }
