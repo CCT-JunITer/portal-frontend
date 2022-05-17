@@ -105,9 +105,6 @@ export default new Router({
                 {
                   path: 'search',
                   component: () => import(/* webpackChunkName: "main-search" */ './views/main/people/search/SearchView.vue'),
-                  meta: {
-                    disableSearchBar: true
-                  }
                 },
                 {
                   path: 'profile',
