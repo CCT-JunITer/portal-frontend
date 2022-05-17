@@ -12,7 +12,7 @@
     <template v-slot:activator="{ on, attrs }">
       <slot 
         name="activator" 
-        v-bind:on="{...on, change: onInputChange}" 
+        v-bind:on="{...on, input: onInputChange, change: onInputChange}" 
         v-bind:attrs="{...attrs, value: dateFormatted}">
       </slot>
     </template>
@@ -63,7 +63,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
-import { format, parse } from 'date-fns'
+import { format, formatISO, parse } from 'date-fns'
 
 @Component({})
 export default class DateTimePickerMenu extends Vue {
@@ -92,7 +92,7 @@ export default class DateTimePickerMenu extends Vue {
 
 
   set date(value) {
-    this.$emit('input', value + ' ' + this.time);
+    this.$emit('input', this.toISO(value + ' ' + this.time));
   }
 
   get date() {
@@ -110,7 +110,16 @@ export default class DateTimePickerMenu extends Vue {
   }
 
   set time(value) {
-    this.$emit('input', this.date + ' ' + value);
+    this.$emit('input', this.toISO(this.date + ' ' + value));
+  }
+
+  toISO(value: string) {
+    try {
+      const date = parse(value, 'yyyy-MM-dd HH:mm', new Date())
+      return formatISO(date);
+    } catch(e) {
+      return value;
+    }
   }
 
   okHandler() {
@@ -131,9 +140,9 @@ export default class DateTimePickerMenu extends Vue {
   onInputChange(value: string) {
     try {
       const date = parse(value, 'dd.MM.yyyy HH:mm', new Date());
-      this.$emit('input', format(date, 'yyyy-MM-dd HH:mm'));
+      this.$emit('input', this.toISO(format(date, 'yyyy-MM-dd HH:mm')));
     } catch(e) {
-      this.$emit('input', null);
+      // this.$emit('input', null);
     }
   }
 
