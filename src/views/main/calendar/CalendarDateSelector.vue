@@ -40,6 +40,8 @@
           no-title
           scrollabe
           @input="tab = 1"
+          :min="minDateString"
+          :max="maxDateString"
         ></v-date-picker>
       </v-tab-item>
       <v-tab-item>
@@ -52,6 +54,8 @@
           no-title
           first-day-of-week="1"
           @click:minute="close"
+          :min="minTimeString"
+          :max="maxTimeString"
         >
         </v-time-picker>
       </v-tab-item>
@@ -63,6 +67,8 @@
       scrollabe
       first-day-of-week="1"
       @input="close"
+      :min="minDateString"
+      :max="maxDateString"
     ></v-date-picker>
   </v-menu>
 </template>
@@ -108,12 +114,24 @@ export default {
     }
   },
   computed: {
-    // minString() {
-    //   return (this.min) ? this.min.toISOString() : ''
-    // },
-    // maxString() {
-    //   return (this.max) ? this.max.toISOString() : ''
-    // },
+    minDateString() {
+      if (!this.min) return ''
+      const parts = dateToParts(this.min)
+      return parts.year + '-' + parts.month + '-' + parts.day
+    },
+    maxDateString() {
+      if (!this.max) return ''
+      const parts = dateToParts(this.max)
+      return parts.year + '-' + parts.month + '-' + parts.day
+    },
+    minTimeString() {
+      if (!this.min || this.minDateString != this.date) return ''
+      return dateToTimeString(this.min)
+    },
+    maxTimeString() {
+      if (!this.max || this.maxDateString != this.date) return ''
+      return dateToTimeString(this.max)
+    },
     // minTimeString() {
     //   if (!this.min) return ''
     //   const date = new Date(this.min)
