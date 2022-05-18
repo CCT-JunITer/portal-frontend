@@ -7,7 +7,7 @@
   >
     <v-card
       color="grey lighten-4"
-      min-width="500px"
+      min-width="400px"
       flat
     >
       <v-toolbar
@@ -26,6 +26,7 @@
           <v-text-field
             v-model="selectedEventInternal.name"
             flat
+            full-width
           ></v-text-field>
         </v-toolbar-title>
         <v-spacer></v-spacer>
@@ -72,18 +73,31 @@
           <calendar-date-selector
             v-model="selectedEventInternal.start"
             label="Start"
-            icon="event"
+            prepend-icon="event"
+            :timed="selectedEventInternal.timed"
+            :max="selectedEventInternal.end"
           >
           </calendar-date-selector>
+
+          <v-divider vertical inset class="mx-2"></v-divider>
 
           <calendar-date-selector
             v-model="selectedEventInternal.end"
             label="Ende"
-            icon="event"
+            append-icon="event"
+            :timed="selectedEventInternal.timed"
+            :min="selectedEventInternal.start"
           >
           </calendar-date-selector>
         </div>
-      
+
+        <!--TODO: changing this does not work right now in the backend-->
+        <!-- <v-checkbox 
+          :value="!selectedEventInternal.timed"
+          @change="timedChanged"
+          label="ganztägig"
+        ></v-checkbox> -->
+
         <v-text-field
           v-model="selectedEventInternal.location"
           label="Ort"
@@ -111,6 +125,7 @@
         <v-btn
           color="success"
           @click="save"
+          :loading="loading"
         >
           Speichern
         </v-btn>
@@ -141,13 +156,21 @@ export default {
   data() {
     return {
       selectedElement: null,
-      selectedOpen: true,
+      selectedOpen: false,
 
-      selectedEventInternal:{calendar:{name:''}, start:new Date(), end:new Date()}
+      selectedEventInternal:{calendar:{name:''}, start:new Date(), end:new Date()},
+      loading:false,
     }
   },
 
   methods: {
+    timedChanged(fullday) {
+      if (fullday) {
+        this.selectedEventInternal.start = new Date(this.selectedEventInternal.start.toDateString())
+        this.selectedEventInternal.end = new Date(this.selectedEventInternal.end.toDateString())
+      }
+      this.selectedEventInternal.timed = !fullday;
+    },
     setSelectedElement(selectedElement) {
       this.selectedElement = selectedElement
     },
@@ -161,25 +184,42 @@ export default {
       this.close()
     },
 
-    show() {
-      this.selectedOpen = true
+    initSelectedEventInternal() {
       this.selectedEventInternal = Object.assign({}, this.selectedEvent)
+      if (!this.selectedEventInternal.timed) { // this is for allday events, for which the end property is a limit
+        const end = new Date(this.selectedEventInternal.end)
+        end.setDate(end.getDate()-1)
+        this.selectedEventInternal.end = end
+      }
+    },
 
+    show(selectedEvent=undefined) {
+      // if (!selectedEvent) selectedEvent = this.selectedEvent
+      this.loading = false;
+      this.selectedOpen = true
+      this.initSelectedEventInternal()
     },
 
     close() {
+      this.loading = false;
       this.selectedOpen = false
-      this.selectedEventInternal = Object.assign({}, this.selectedEvent)
+      this.initSelectedEventInternal()
       this.$emit('close')
     },
 
     async save() {
+      this.loading = true;
+      const savedEvent = Object.assign({},this.selectedEventInternal)
+      if (!savedEvent.timed) {
+        const end = new Date(savedEvent.end)
+        end.setDate(end.getDate()+1)
+        savedEvent.end = end
+      }
       // TODO: maybe do both in one function
-      commitUpdateSelectedEvent(this.$store, this.selectedEventInternal)
+      commitUpdateSelectedEvent(this.$store, savedEvent)
       // commitAddEventToCalendar(this.$store, this.selectedEvent)
-      delete this.selectedEventInternal.color
-
-      await dispatchUpdateCalendarEvent(this.$store, this.selectedEventInternal)
+      // delete this.selectedEventInternal.color
+      await dispatchUpdateCalendarEvent(this.$store, savedEvent)
       this.$emit('changed')
       this.close()
     },

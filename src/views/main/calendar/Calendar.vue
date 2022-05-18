@@ -137,7 +137,7 @@
         <calendar-event-popup 
           ref="calendarEventPopup" 
           @clickEditEvent="showEventEditor"
-          @changed="update(false)">
+          @changed="update(true)">
         </calendar-event-popup>
       </div>
 
@@ -165,6 +165,30 @@ import { dispatchFetchCalendars } from '@/store/calendar/actions';
 import { readCalendars } from '@/store/calendar/getters';
 import { CalendarEvent } from './CalendarEvent';
 import { readAuthenticationURL } from '@/store/main/getters';
+
+function constructUIEvent(event, calendar, iteration=0) {
+  let event_color = (calendar.color) ? calendar.color : 'blue';
+  if (event.eventColor) {
+    const rgb = keyword.rgb(event.eventColor)
+    event_color = 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')'
+  }
+
+  const event_start = new Date(event.start)
+  const event_end = new Date(event.end)
+  if (!event.timed) {
+    event_end.setDate(event_end.getDate()-1)
+    // event_start.setDate(event_start.getDate()+1)
+  }
+  return {
+    name:event.name,
+    start:event_start,
+    end:event_end,
+    color:event_color,
+    timed:event.timed,
+    event:event,
+    iteration:iteration
+  }
+}
 
 export default {
   components: {
@@ -231,22 +255,22 @@ export default {
           for (let j = 0; j < activeCalendar.events.length; j++) {
             // TODO: those conversions should be done in create
             // TODO: create somewhere a Event Class
-            const activeEvent = activeCalendar.events[j];
-            // activeEvent.uiEvents = []
+            // const activeEvent = activeCalendar.events[j];
+            // // activeEvent.uiEvents = []
 
-            const event_start = new Date(activeEvent.start)
-            const event_end = new Date(activeEvent.end)
-            if (!activeEvent.timed) event_end.setDate(event_end.getDate()-1)
+            // const event_start = new Date(activeEvent.start)
+            // const event_end = new Date(activeEvent.end)
+            // if (!activeEvent.timed) event_end.setDate(event_end.getDate()-1)
             
-            let event_color = (activeCalendar.color) ? activeCalendar.color : this.colors[i];
-            if (activeEvent.eventColor) {
-              const rgb = keyword.rgb(activeEvent.eventColor)
-              event_color = 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')'
-              // event_color = this.colors[i]
-            }
-            activeEvent.start = event_start
-            activeEvent.end = event_end
-            activeEvent.color = event_color
+            // let event_color = (activeCalendar.color) ? activeCalendar.color : this.colors[i];
+            // if (activeEvent.eventColor) {
+            //   const rgb = keyword.rgb(activeEvent.eventColor)
+            //   event_color = 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')'
+            //   // event_color = this.colors[i]
+            // }
+            // activeEvent.start = event_start
+            // activeEvent.end = event_end
+            // activeEvent.color = event_color
 
 
             // let new_event = {
@@ -258,6 +282,7 @@ export default {
             //   event: activeEvent
             // }
             // activeEvent.uiEvents.push(new_event)
+            const activeEvent = constructUIEvent(activeCalendar.events[j], activeCalendar);
             events.push(activeEvent)
 
             // if (activeEvent.rrule) {
@@ -377,7 +402,7 @@ export default {
 
     showEvent ({ nativeEvent, event }) {
       const open = () => {
-        commitSetSelectedEvent(this.$store, event)
+        commitSetSelectedEvent(this.$store, event.event)
         this.$refs.calendarEventPopup.setSelectedElement(nativeEvent.target)
         requestAnimationFrame(() => requestAnimationFrame(() => this.$refs.calendarEventPopup.show()))
       }

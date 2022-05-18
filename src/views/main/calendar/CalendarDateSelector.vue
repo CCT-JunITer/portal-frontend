@@ -1,23 +1,29 @@
 <template>
   <v-menu
+    ref="menu"
     v-model="pickerVisible"
     :close-on-content-click="false"
     :nudge-right="40"
+    :return-value.sync="test"
     transition="scale-transition"
     offset-y
     max-width="290px"
     min-width="290px"
+    @input="tab=0"
   >
-    <template v-slot:activator="{ on }">
+    <template v-slot:activator="{ on, attrs }">
       <v-text-field
         :label="label"
-        :prepend-icon="icon"
+        :prepend-icon="prependIcon"
+        :append-icon="appendIcon"
         readonly
-        :value="dateStringGerman + ' um ' + time"
+        :value="dateString"
         v-on="on"
+        v-bind="attrs"
       ></v-text-field>
     </template>
     <v-tabs
+      v-if="timed"
       fixed-tabs
       v-model="tab"
     >
@@ -27,7 +33,7 @@
       <v-tab>Zeit</v-tab>
     </v-tabs>
 
-    <v-tabs-items v-model="tab">
+    <v-tabs-items v-model="tab" v-if="timed">
       <v-tab-item>
         <v-date-picker
           v-model="date"
@@ -38,21 +44,48 @@
       </v-tab-item>
       <v-tab-item>
         <v-time-picker
+          v-if="tab==1"
           ref="timePicker"
           v-model="time"
           format="24hr"
           scrollable
           no-title
+          first-day-of-week="1"
           @click:minute="close"
         >
         </v-time-picker>
       </v-tab-item>
     </v-tabs-items>
+    <v-date-picker
+      v-if="!timed"
+      v-model="date"
+      no-title
+      scrollabe
+      first-day-of-week="1"
+      @input="close"
+    ></v-date-picker>
   </v-menu>
 </template>
 <script>
+
+function dateToTimeString(date) {
+  const parts = dateToParts(date)
+  return parts.hour + ':' + parts.minute
+}
+
+function dateToParts(date, timed=true) {
+  const dateCopy = new Date(date)
+  return {
+    year : ('000' + dateCopy.getFullYear()).slice(-4),
+    month : ('0' + (dateCopy.getMonth()+1)).slice(-2),
+    day : ('0' + dateCopy.getDate()).slice(-2),
+    hour : (('0' + dateCopy.getHours()).slice(-2)),
+    minute : ('0' + dateCopy.getMinutes()).slice(-2)
+  }
+}
+
 export default {
-  props: ['label', 'icon', 'value'],
+  props: ['label', 'prependIcon', 'appendIcon', 'value', 'timed', 'min', 'max'],
 
   model: {
     prop: 'value',
@@ -63,7 +96,8 @@ export default {
     return {
       pickerVisible: false,
       tab:0,
-      timeView:false
+      timeView:false,
+      test:null
     };
   },
 
@@ -74,14 +108,24 @@ export default {
     }
   },
   computed: {
+    // minString() {
+    //   return (this.min) ? this.min.toISOString() : ''
+    // },
+    // maxString() {
+    //   return (this.max) ? this.max.toISOString() : ''
+    // },
+    // minTimeString() {
+    //   if (!this.min) return ''
+    //   const date = new Date(this.min)
+    //   date.setMinutes(date.getMinutes()+1)
+    //   return date.toISOString()
+    // },
+
+
     dateString: {
       get() {
-        let str = '';
-        if (this.content) {
-          str =  this.content.toISOString().split('T')
-          str = str[0] + ' ' + str[1].substring(0,5)
-        }
-        return this.date + ' ' + this.time
+        if (!this.timed) return this.dateStringGerman
+        return this.dateStringGerman + ' um ' + this.time
       },
       set(value) {
         this.content = new Date(value)
@@ -89,20 +133,16 @@ export default {
     },
 
     dateStringGerman() {
-      const year = ('000' + this.content.getFullYear()).slice(-4)
-      const month = ('0' + (this.content.getMonth()+1)).slice(-2)
-      const day = ('0' + (this.content.getDate()+1)).slice(-2)
-      return day + '.' + month + '.' + year
+      const parts = dateToParts(this.content, this.timed)
+      return parts.day + '.' + parts.month + '.' + parts.year
     },
 
     date: {
       get() {
         let str = ''
         if (this.content) {
-          const year = ('000' + this.content.getFullYear()).slice(-4)
-          const month = ('0' + (this.content.getMonth()+1)).slice(-2)
-          const day = ('0' + (this.content.getDate()+1)).slice(-2)
-          str =  year + '-' + month + '-' + day
+          const parts = dateToParts(this.content, this.timed)
+          str = parts.year + '-' + parts.month + '-' + parts.day
         }
         return str
       },
@@ -110,7 +150,7 @@ export default {
         const splitted = value.split('-')
         const year = parseInt(splitted[0])
         const month = parseInt(splitted[1])-1
-        const day = parseInt(splitted[2])-1
+        const day = parseInt(splitted[2])
         const newDate = new Date(this.content)
         newDate.setFullYear(year)
         newDate.setMonth(month)
@@ -123,7 +163,7 @@ export default {
       get() {
         let str = ''
         if (this.content) {
-          str = ('0' + this.content.getHours()).slice(-2) + ':' + ('0' + this.content.getMinutes()).slice(-2)
+          str = dateToTimeString(this.content)
         }
         return str
       }, 
@@ -144,7 +184,6 @@ export default {
       },
       set(value) {
         this.$emit('input', value)
-        console.log(this.$refs)
       }
     }
   },

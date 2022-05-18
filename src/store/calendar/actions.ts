@@ -31,14 +31,16 @@ export const actions = {
       // const e = {name:event.name, uid:event.uid, calendarId:event.calendarId}
       // console.log(e)
       // console.log(event_copied)
-      const response = await apiCallNotify(context, token => api.updateCalendarEvent(token, event), { successText: 'Änderung erfolgreich' })
+      const response = await apiCall(context, token => api.updateCalendarEvent(token, event))
       event.uid = response.data.uid
       return response.data
     }
   },
 
   async actionUpdateCalendar(context: MainContext, calendar) {
-    const response = await apiCall(context, token => api.updateCalendar(token, calendar))
+    const calendarCopy = Object.assign({}, calendar);
+    delete calendarCopy.text
+    const response = await apiCall(context, token => api.updateCalendar(token, calendarCopy))
     return response.data
   },
 
@@ -49,7 +51,15 @@ export const actions = {
     } else {
       response = await apiCall(context, token => api.getCalendar(token, undefined, undefined, undefined))
     }
-    commitSetCalendars(context, response.data)
+    const calendars = response.data
+    for (let i = 0; i < calendars.length; i++) { // initing the events correctly. Dates are not parsed
+      for(let j = 0; j < calendars[i].events.length; j++) {
+        const event = calendars[i].events[j]
+        event.start = new Date(event.start)
+        event.end = new Date(event.end)
+      }
+    }
+    commitSetCalendars(context, calendars)
   },
 
   async actionDeleteCalendar(context: MainContext, calendarId: string) {
