@@ -41,6 +41,7 @@
           scrollabe
           @input="tab = 1"
           :min="minDateString"
+          first-day-of-week="1"
           :max="maxDateString"
         ></v-date-picker>
       </v-tab-item>

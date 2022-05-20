@@ -52,7 +52,7 @@
         :href="`https://cloud.cct-ev.de/apps/calendar/${this.nextcloudViewTypes[this.type]}/${this.value.toISOString().substring(0,10)}`" 
         target="_blank"
       >
-        <v-icon class="mr-2">mdi-open-in-new</v-icon> In der Nextcloud bearbeiten
+        <v-icon>mdi-open-in-new</v-icon> In der Nextcloud bearbeiten
       </v-btn>
       
     </div>
@@ -166,28 +166,79 @@ import { readCalendars } from '@/store/calendar/getters';
 import { CalendarEvent } from './CalendarEvent';
 import { readAuthenticationURL } from '@/store/main/getters';
 
-function constructUIEvent(event, calendar, iteration=0) {
+
+const FREQUENCIES = {'SECONDLY':1000, 'MINUTELY':60000, 'HOURLY':3600000, 'DAILY':86400000, 'WEEKLY':604800000}
+function constructUIEvents(event, calendar) {
+  const events = []
   let event_color = (calendar.color) ? calendar.color : 'blue';
   if (event.eventColor) {
     const rgb = keyword.rgb(event.eventColor)
     event_color = 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')'
   }
 
-  const event_start = new Date(event.start)
-  const event_end = new Date(event.end)
-  if (!event.timed) {
-    event_end.setDate(event_end.getDate()-1)
-    // event_start.setDate(event_start.getDate()+1)
+  const rrule = event.rrule
+  let condition;
+  if (rrule) {
+    if (rrule.endtype == 'COUNT') {
+      rrule.end = parseInt(rrule.end)
+      condition = (i, date) => {return i < rrule.end};
+    } else if (rrule.endtype == 'UNTIL') {
+      const end = new Date(rrule.end)
+      condition = (i, date) => {return date < end};
+    } else {
+      console.error('The type ' + rrule.endtype + ' is not known!')
+    }
+  } else {
+    condition = (i, date) => {return i < 1};
   }
-  return {
-    name:event.name,
-    start:event_start,
-    end:event_end,
-    color:event_color,
-    timed:event.timed,
-    event:event,
-    iteration:iteration
+  let event_start = event.start;
+  let event_end = event.end;
+  if (event.name == 'Test allday') {
+    console.log(event)
   }
+  for (let i = 0; condition(i, event_start); i++) {
+    event_start = new Date(event.start)
+    event_end = new Date(event.end)
+
+    if (rrule) {
+      if (rrule.freq == 'MONTHLY') {
+        event_start.setMonth(event_start.getMonth()+i)
+        event_end.setMonth(event_end.getMonth()+i)
+      } else if (rrule.freq == 'YEARLY') {
+        event_start.setFullYear(event_start.getFullYear()+i)
+        event_end.setFullYear(event_end.getFullYear()+i)
+      } else {
+        if (rrule.freq in FREQUENCIES) {
+          event_start = new Date(event_start - (FREQUENCIES[rrule.freq]*-i))
+          event_end = new Date(event_end - (FREQUENCIES[rrule.freq]*-i))
+        }
+      }
+
+      
+
+      if (rrule.exdate.find(element => new Date(element).toISOString() == event_start.toISOString())) {
+        continue;
+      }
+    }
+
+    if (!event.timed) {
+      event_end.setDate(event_end.getDate()-1)
+    }
+    events.push({
+      name:event.name,
+      start:event_start,
+      end:event_end,
+      color:event_color,
+      timed:event.timed,
+      event:event,
+      iteration:i
+    })
+  }
+
+
+
+
+  return events
 }
 
 export default {
@@ -304,8 +355,8 @@ export default {
             //   event: activeEvent
             // }
             // activeEvent.uiEvents.push(new_event)
-            const activeEvent = constructUIEvent(activeCalendar.events[j], activeCalendar);
-            events.push(activeEvent)
+            const activeEvent = constructUIEvents(activeCalendar.events[j], activeCalendar);
+            events.push(...activeEvent)
 
             // if (activeEvent.rrule) {
             //   if (activeEvent.rrule.endtype == 'COUNT') {
@@ -424,7 +475,11 @@ export default {
 
     showEvent ({ nativeEvent, event }) {
       const open = () => {
-        commitSetSelectedEvent(this.$store, event.event)
+        const eventCopy = Object.assign({}, event.event)
+        eventCopy.start = new Date(event.start)
+        eventCopy.end = new Date(event.end)
+        console.log(eventCopy)
+        commitSetSelectedEvent(this.$store, eventCopy)
         this.$refs.calendarEventPopup.setSelectedElement(nativeEvent.target)
         requestAnimationFrame(() => requestAnimationFrame(() => this.$refs.calendarEventPopup.show()))
       }
@@ -497,8 +552,8 @@ export default {
       event.calendarId = calendar.uid
 
       // this.addEventToView(this.newEvent)
-      const uiEvent = constructUIEvent(event, calendar);
-      this.events.push(uiEvent);
+      const uiEvent = constructUIEvents(event, calendar);
+      this.events.push(...uiEvent);
 
       return this.newEvent
     },

@@ -131,13 +131,21 @@
         </v-btn>
 
         <v-spacer></v-spacer>
-
         <v-btn
+          v-if="selectedEventInternal.rrule"
           color="success"
+          @click="saveExdate"
+          :loading="loadingExdate"
+          disabled
+        >
+          Dieses aktualisieren
+        </v-btn>
+        <v-btn
+          :color="(selectedEventInternal.rrule) ? '' : 'success'"
           @click="save"
           :loading="loading"
         >
-          Speichern
+          {{(selectedEventInternal.rrule) ? 'Alle aktualisieren' : 'Speichern'}}
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -148,7 +156,7 @@
 
 import { dispatchRemoveEvent, dispatchUpdateCalendarEvent } from '@/store/calendar/actions'
 import { commitAddEventToCalendar, commitSetSelectedEvent, commitRemoveCalendarEvent, commitUpdateSelectedEvent } from '@/store/calendar/mutations'
-import { readCalendarById, readCalendars, readSelectedElement } from '@/store/calendar/getters'
+import { readCalendarById, readCalendars, readSelectedElement, readEventByUID} from '@/store/calendar/getters'
 import { getCalendarById } from '@/store/utils'
 // import CalendarEventLocationComponent from './components/CalendarEventLocationComponent.vue'
 import  CalendarDateSelector from '@/views/main/calendar/CalendarDateSelector.vue'
@@ -175,6 +183,7 @@ export default {
       cctLocations: ['Tower', 'CCTelefon'],
       selectedEventInternal:{calendar:{name:''}, start:new Date(), end:new Date()},
       loading:false,
+      loadingExdate:false
     }
   },
 
@@ -211,6 +220,7 @@ export default {
 
     show(selectedEvent=undefined) {
       // if (!selectedEvent) selectedEvent = this.selectedEvent
+      this.loadingExdate = false
       this.loading = false;
       this.selectedOpen = true
       this.initSelectedEventInternal()
@@ -218,13 +228,31 @@ export default {
 
     close() {
       this.loading = false;
+      this.loadingExdate = false
       this.selectedOpen = false
       this.initSelectedEventInternal()
       this.$emit('close')
     },
 
-    async save() {
-      this.loading = true;
+    async saveExdate() {
+      // TODO: finish this function
+      this.loadingExdate = true
+      const event = this.selectedEvent
+      // console.log(event)
+      // if (!event) return;
+      if (!event.rrule.exdate) event.rrule.exdate = []
+      event.rrule.exdate.push(new Date(event.start).toISOString().split('T')[0])
+      await dispatchUpdateCalendarEvent(this.$store, {uid:event.uid, calendarId:event.calendarId, rrule:event.rrule})
+
+      delete this.selectedEventInternal.uid
+      delete this.selectedEventInternal.rrule
+      this.selectedEventInternal.calendarId = this.calendar.uid
+      // this.save(false)
+      this.close()
+    },
+
+    async save(mouseEvent=undefined, loading=true) {
+      this.loading = loading;
       const savedEvent = Object.assign({},this.selectedEventInternal)
       if (!savedEvent.timed) {
         const end = new Date(savedEvent.end)
@@ -274,8 +302,6 @@ export default {
           })
         });
       }
-      console.log(calendarNames)
-
       return calendarNames
     },
 
