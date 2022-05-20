@@ -214,6 +214,8 @@ export default {
       { text: 'Mon, Wed, Fri', value: [1, 3, 5] },
     ],
     value: new Date(),
+    viewStart:undefined,
+    viewEnd:undefined,
     events: [],
     colors: ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1'],
     names: ['Meeting', 'Holiday', 'PTO', 'Travel', 'Event', 'Birthday', 'Conference', 'Party'],
@@ -232,7 +234,27 @@ export default {
     dragDiv: null,
   }),
   methods: {
-    async getEvents ({ start, end }) {
+    async getEvents (payload, notify=true, fetch=false) {
+      const {start, end} = this.getDateTimespan()
+      // if (start && end.date) {
+      //   if (start.date) start = new Date(start.date + 'T' + start.time)
+      // }
+      // if (end && end.date) {
+      //   if (end.date) end = new Date(end.date + 'T' + end.time)
+      // }
+
+      if (start && end && !fetch) {
+        if (this.viewStart > start || end > this.viewEnd) {
+          fetch = true
+        }
+      }
+
+      if (fetch) {
+        this.viewStart = start
+        this.viewEnd = end
+        
+        await dispatchFetchCalendars(this.$store, {notify:notify, start:start, end:end})
+      }
       // if (!this.calendars) {
       //   this.calendars = await this.dateSearch()
       // }
@@ -338,8 +360,8 @@ export default {
     },
 
     async update(notify) {
-      await dispatchFetchCalendars(this.$store, notify)
-      await this.getEvents({start:undefined, end:undefined})
+      const {start, end} = this.getDateTimespan()
+      await this.getEvents({start:start, end:end}, notify, true)
       if (this.$refs.calendarSelectorPanel) this.$refs.calendarSelectorPanel.isActive = true;
     },
 
@@ -417,37 +439,37 @@ export default {
       nativeEvent.stopPropagation()
     },
 
-    // getDateTimespan() {
-    //   if (this.type == 'month') {
-    //     const start_of_month = new Date(this.value.getFullYear(), this.value.getMonth())
-    //     const end_of_month = this.getLastDayOfMonth(this.value)
-    //     return {start: this.getMonday(start_of_month), end: this.getSunday(end_of_month)}
-    //   } else if (this.type == 'week') {
-    //     const monday = this.getMonday(this.value);
-    //     const sunday = this.getSunday(this.value);
-    //     return {start: monday, end: sunday}
-    //   } else if (this.type == 'day') {
-    //     return {start: this.value, end: this.value}
-    //   }
-    // },
+    getDateTimespan() {
+      if (this.type == 'month') {
+        const start_of_month = new Date(this.value.getFullYear(), this.value.getMonth())
+        const end_of_month = this.getLastDayOfMonth(this.value)
+        return {start: this.getMonday(start_of_month), end: this.getSunday(end_of_month)}
+      } else if (this.type == 'week') {
+        const monday = this.getMonday(this.value);
+        const sunday = this.getSunday(this.value);
+        return {start: monday, end: sunday}
+      } else if (this.type == 'day') {
+        return {start: this.value, end: this.value}
+      }
+    },
 
-    // getMonday(d) {
-    //   d = new Date(d);
-    //   const day = d.getDay()
-    //   const diff = d.getDate() - day + (day == 0 ? -6:1); // adjust when day is sunday
-    //   return new Date(d.setDate(diff));
-    // },
+    getMonday(d) {
+      d = new Date(d);
+      const day = d.getDay()
+      const diff = d.getDate() - day + (day == 0 ? -6:1); // adjust when day is sunday
+      return new Date(d.setDate(diff));
+    },
 
-    // getSunday(d) {
-    //   d = new Date(d);
-    //   const day = d.getDay()
-    //   const diff = d.getDate() + (7-day) + (day == 0 ? -7:0); // adjust when day is sunday
-    //   return new Date(d.setDate(diff));
-    // },
+    getSunday(d) {
+      d = new Date(d);
+      const day = d.getDay()
+      const diff = d.getDate() + (7-day) + (day == 0 ? -7:0); // adjust when day is sunday
+      return new Date(d.setDate(diff));
+    },
 
-    // getLastDayOfMonth(d) {
-    //   return new Date(d.getFullYear(), d.getMonth() + 1, 0);
-    // },
+    getLastDayOfMonth(d) {
+      return new Date(d.getFullYear(), d.getMonth() + 1, 0);
+    },
 
     // getCalendarByName(name) {
     //   this.calendars.forEach(element => {

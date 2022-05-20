@@ -49,12 +49,12 @@ export const actions = {
     return response.data
   },
 
-  async actionFetchCalendars(context: MainContext, notify: boolean) {
+  async actionFetchCalendars(context: MainContext, payload: {notify: boolean; start?: Date; end?: Date}) {
     let response;
-    if (notify) {
-      response = await apiCallNotify(context, token => api.getCalendar(token, undefined, undefined, undefined), {successText: 'Kalender aktualisiert'})
+    if (payload.notify) {
+      response = await apiCallNotify(context, token => api.getCalendar(token, payload.start, payload.end, undefined), {successText: 'Kalender aktualisiert'})
     } else {
-      response = await apiCall(context, token => api.getCalendar(token, undefined, undefined, undefined))
+      response = await apiCall(context, token => api.getCalendar(token, payload.start, payload.end, undefined))
     }
     const calendars = response.data
     for (let i = 0; i < calendars.length; i++) { // initing the events correctly. Dates are not parsed
