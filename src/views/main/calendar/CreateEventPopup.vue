@@ -7,7 +7,7 @@
   >
     <v-card
       color="grey lighten-4"
-      min-width="350px"
+      min-width="400px"
       flat
     >
       <v-toolbar
@@ -62,8 +62,11 @@
       </v-toolbar>
       <v-card-text>
         <v-select
-          :items="calendarNames"
+          :items="calendars"
           v-model="calendar"
+          item-text="name"
+          item-value="uid"
+          return-object
           label="Kalender"
           outlined
         ></v-select>
@@ -73,6 +76,35 @@
           @change="location => this.selectedEventInternal=location"
         > 
         </calendar-event-location-component> -->
+
+        <div style="display:flex">
+          <calendar-date-selector
+            v-model="selectedEventInternal.start"
+            label="Start"
+            prepend-icon="event"
+            :timed="selectedEventInternal.timed"
+            :max="selectedEventInternal.end"
+          >
+          </calendar-date-selector>
+
+          <v-divider vertical inset class="mx-2"></v-divider>
+
+          <calendar-date-selector
+            v-model="selectedEventInternal.end"
+            label="Ende"
+            append-icon="event"
+            :timed="selectedEventInternal.timed"
+            :min="selectedEventInternal.start"
+          >
+          </calendar-date-selector>
+        </div>
+
+        <!--TODO: changing this does not work right now in the backend-->
+        <!-- <v-checkbox 
+          :value="!selectedEventInternal.timed"
+          @change="timedChanged"
+          label="ganztägig"
+        ></v-checkbox> -->
 
         <v-text-field
           v-model="selectedEventInternal.location"
@@ -103,6 +135,7 @@
         <v-btn
           color="success"
           @click="save"
+          :loading="loading"
         >
           Speichern
         </v-btn>
@@ -114,15 +147,20 @@
 <script>
 
 import { dispatchRemoveEvent, dispatchUpdateCalendarEvent } from '@/store/calendar/actions'
-import { commitAddEventToCalendar, commitSetSelectedEvent, commitUpdateSelectedEvent } from '@/store/calendar/mutations'
+import { commitAddEventToCalendar, commitSetSelectedEvent, commitRemoveCalendarEvent, commitUpdateSelectedEvent } from '@/store/calendar/mutations'
 import { readCalendarById, readCalendars, readSelectedElement } from '@/store/calendar/getters'
 import { getCalendarById } from '@/store/utils'
 // import CalendarEventLocationComponent from './components/CalendarEventLocationComponent.vue'
+import  CalendarDateSelector from '@/views/main/calendar/CalendarDateSelector.vue'
 
 export default {
   // components: { CalendarEventLocationComponent },
   props: {
 
+  },
+
+  components: {
+    CalendarDateSelector
   },
 
   emits: ['clickEditEvent', 'close', 'changed'],
@@ -132,14 +170,22 @@ export default {
       selectedElement: null,
       selectedOpen: false,
 
-      selectedEventInternal:{calendar:{name:''}},
       calendar: undefined,
 
-      cctLocations: ['Tower', 'CCTelefon']
+      cctLocations: ['Tower', 'CCTelefon'],
+      selectedEventInternal:{calendar:{name:''}, start:new Date(), end:new Date()},
+      loading:false,
     }
   },
 
   methods: {
+    timedChanged(fullday) {
+      if (fullday) {
+        this.selectedEventInternal.start = new Date(this.selectedEventInternal.start.toDateString())
+        this.selectedEventInternal.end = new Date(this.selectedEventInternal.end.toDateString())
+      }
+      this.selectedEventInternal.timed = !fullday;
+    },
     setSelectedElement(selectedElement) {
       this.selectedElement = selectedElement
     },
@@ -153,34 +199,55 @@ export default {
       this.close()
     },
 
-    show() {
-      this.selectedOpen = true
+    initSelectedEventInternal() {
       this.selectedEventInternal = Object.assign({}, this.selectedEvent)
       this.calendar = this.calendars.find(x => x.uid == this.selectedEventInternal.calendarId)
-      console.log(this. selectedEventInternal)
+      if (!this.selectedEventInternal.timed) { // this is for allday events, for which the end property is a limit
+        const end = new Date(this.selectedEventInternal.end)
+        end.setDate(end.getDate()-1)
+        this.selectedEventInternal.end = end
+      }
+    },
+
+    show(selectedEvent=undefined) {
+      // if (!selectedEvent) selectedEvent = this.selectedEvent
+      this.loading = false;
+      this.selectedOpen = true
+      this.initSelectedEventInternal()
     },
 
     close() {
+      this.loading = false;
       this.selectedOpen = false
-      this.selectedEventInternal = Object.assign({}, this.selectedEvent)
+      this.initSelectedEventInternal()
       this.$emit('close')
     },
 
     async save() {
-      // TODO: maybe do both in one function
-      commitUpdateSelectedEvent(this.$store, this.selectedEventInternal)
-      // commitAddEventToCalendar(this.$store, this.selectedEvent)
-      delete this.selectedEventInternal.color
-      if (this.calendar.uid != this.selectedEventInternal.calendarId) {
-        await dispatchRemoveEvent(this.$store, this.selectedEventInternal)
+      this.loading = true;
+      const savedEvent = Object.assign({},this.selectedEventInternal)
+      if (!savedEvent.timed) {
+        const end = new Date(savedEvent.end)
+        end.setDate(end.getDate()+1)
+        savedEvent.end = end
       }
-      await dispatchUpdateCalendarEvent(this.$store, this.selectedEventInternal)
+
+      if (this.calendar.uid != savedEvent.calendarId) {
+        await dispatchRemoveEvent(this.$store, {uid:savedEvent.uid, calendarId:savedEvent.calendarId}, false)
+        savedEvent.calendarId = this.calendar.uid
+        delete savedEvent.uid
+      }
+
+      commitUpdateSelectedEvent(this.$store, savedEvent)
+      await dispatchUpdateCalendarEvent(this.$store, savedEvent)
       this.$emit('changed')
       this.close()
     },
 
     async deleteEvent() {
-      const response = await dispatchRemoveEvent(this.$store, this.selectedEvent)
+      this.loading = true
+      commitRemoveCalendarEvent(this.$store, this.selectedEventInternal);
+      const response = await dispatchRemoveEvent(this.$store, this.selectedEventInternal, false)
       this.$emit('changed')
       this.close()
     },
@@ -196,13 +263,19 @@ export default {
       return calendars
     },
 
-    calendarNames: function() {
+    uiCalendars() {
       const calendarNames = []
       if (this.calendars.forEach) {
+        console.log(this.calendars)
         this.calendars.forEach(element => {
-          calendarNames.push(element.name)
+          calendarNames.push({
+            text:element.name,
+            element:element
+          })
         });
       }
+      console.log(calendarNames)
+
       return calendarNames
     },
 

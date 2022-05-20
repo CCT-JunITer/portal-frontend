@@ -7,7 +7,7 @@ import { getCalendarById } from '../utils';
 
 export const mutations = {
 
-  removeCalendarEvent(state: CalendarState, event: ICalendarEvent) {
+  removeCalendarEvent(state: CalendarState, event: {calendarId: string; uid: string}) {
     if (!event) return;
 
     const calendar = getCalendarById(state, event.calendarId)
