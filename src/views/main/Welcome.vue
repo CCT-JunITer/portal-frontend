@@ -16,6 +16,10 @@
       <div class="text-center slide-y-after">
         <h2 class="text-h2 mb-1" v-if="userProfile">Hallo, {{ userProfile.full_name }}</h2>
         <h4 class="text-overline mb-4">Willkommen im Company Consulting Team e.V.</h4>
+        <h4 class="text-overline">weitere Schritte</h4>
+        <video src="https://cloud.cct-ev.de/s/gBE6of7yFLJ2q99/download" width="85%" controls class="video-container mb-4">
+          <source src="https://cloud.cct-ev.de/s/gBE6of7yFLJ2q99/download" type="video/mp4">
+        </video>
         <div class="container">
           <v-btn x-large color="cctGreen" dark to="/main">
             <v-icon left>people</v-icon>
@@ -54,6 +58,10 @@ export default class Welcome extends Vue {
 </script>
 
 <style lang="scss" scoped>
+
+.video-container {
+  padding: 8px 0px;
+}
 
 .root {
   height: 100%;

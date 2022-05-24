@@ -90,6 +90,7 @@
             required
           ></v-text-field>
           <v-text-field
+            disabled
             label="E-mail"
             type="email"
             v-model="email"
