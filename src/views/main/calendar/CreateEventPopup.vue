@@ -70,12 +70,6 @@
           label="Kalender"
           outlined
         ></v-select>
-      
-        <!-- <calendar-event-location-component
-          v-model="selectedEventInternal.location"
-          @change="location => this.selectedEventInternal=location"
-        > 
-        </calendar-event-location-component> -->
 
         <div style="display:flex">
           <calendar-date-selector
@@ -106,13 +100,19 @@
           label="ganztägig"
         ></v-checkbox> -->
 
-        <v-text-field
+        <calendar-event-location-component
+          v-if="selectedOpen"
+          v-model="selectedEventInternal"
+        > 
+        </calendar-event-location-component>
+
+        <!-- <v-text-field
           v-model="selectedEventInternal.location"
           label="Ort"
           full-width
           prepend-icon="mdi-map-marker"
         >
-        </v-text-field>
+        </v-text-field> -->
 
         <v-textarea
           v-model="selectedEventInternal.description"
@@ -158,17 +158,17 @@ import { dispatchRemoveEvent, dispatchUpdateCalendarEvent } from '@/store/calend
 import { commitAddEventToCalendar, commitSetSelectedEvent, commitRemoveCalendarEvent, commitUpdateSelectedEvent } from '@/store/calendar/mutations'
 import { readCalendarById, readCalendars, readSelectedElement, readEventByUID} from '@/store/calendar/getters'
 import { getCalendarById } from '@/store/utils'
-// import CalendarEventLocationComponent from './components/CalendarEventLocationComponent.vue'
+import CalendarEventLocationComponent from './components/CalendarEventLocationComponent.vue'
 import  CalendarDateSelector from '@/views/main/calendar/CalendarDateSelector.vue'
 
 export default {
-  // components: { CalendarEventLocationComponent },
   props: {
 
   },
 
   components: {
-    CalendarDateSelector
+    CalendarDateSelector,
+    CalendarEventLocationComponent
   },
 
   emits: ['clickEditEvent', 'close', 'changed'],
@@ -261,10 +261,12 @@ export default {
       }
 
       if (this.calendar.uid != savedEvent.calendarId) {
-        await dispatchRemoveEvent(this.$store, {uid:savedEvent.uid, calendarId:savedEvent.calendarId}, false)
+        // TODO: disable notifications for remove event
+        await dispatchRemoveEvent(this.$store, {uid:savedEvent.uid, calendarId:savedEvent.calendarId, notify:false})
         savedEvent.calendarId = this.calendar.uid
         delete savedEvent.uid
       }
+      console.log(savedEvent);
 
       commitUpdateSelectedEvent(this.$store, savedEvent)
       await dispatchUpdateCalendarEvent(this.$store, savedEvent)

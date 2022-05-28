@@ -12,14 +12,15 @@ type MainContext = ActionContext<CalendarState, State>;
 
 export const actions = {
 
-  async actionRemoveEvent(context: MainContext, event: {calendarId: string; uid: string}, notify=true) {
+  async actionRemoveEvent(context: MainContext, event: {calendarId: string; uid: string; notify: boolean}) {
     const selected = context.state.selectedEvent
+    event.notify = !event.notify
     
     if (selected) {
       commitRemoveCalendarEvent(context, selected)
       if (event.calendarId && event.uid) {
         let response;
-        if (notify) {
+        if (event.notify) {
           response = await apiCallNotify(context, token => api.deleteCalendarEvent(token, event.calendarId, event.uid), { successText: 'Event erfolgreich gelöscht' });
         } else {
           response = await apiCall(context, token => api.deleteCalendarEvent(token, event.calendarId, event.uid));
