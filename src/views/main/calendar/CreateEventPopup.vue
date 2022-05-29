@@ -1,9 +1,12 @@
 <template>
-  <v-menu
+  <component
+    :is="fullscreen ? 'v-dialog' : 'v-menu'"
     v-model="selectedOpen"
     :close-on-content-click="false"
     :activator="selectedElement"
+    :transition="fullscreen ? 'dialog-bottom-transition' : undefined"
     offset-x
+    fullscreen
   >
     <v-card
       color="grey lighten-4"
@@ -16,7 +19,7 @@
       >
         <v-btn 
           icon
-          @click="showEventEditor"
+          @click="fullscreen = !fullscreen"
         >
           <v-icon>
             mdi-pencil
@@ -78,25 +81,44 @@
         </calendar-event-location-component> -->
 
         <div style="display:flex">
-          <calendar-date-selector
-            v-model="selectedEventInternal.start"
-            label="Start"
-            prepend-icon="event"
-            :timed="selectedEventInternal.timed"
-            :max="selectedEventInternal.end"
+          <date-time-picker-menu
+            v-model ="startDate"
+            defaultPicker="DATE"
+            :pickerProps="{}"
           >
-          </calendar-date-selector>
+            <template v-slot:activator="{ on, attrs, }">
+              <v-text-field
+                label="Datum von"
+                class="input-lg"
+                v-bind="attrs"
+                v-on="on"
+                prepend-icon="mdi-calendar-range"
+                required
+                :rules="[$common.required]"
+              ></v-text-field>
+            </template>
+          </date-time-picker-menu>
+          
 
           <v-divider vertical inset class="mx-2"></v-divider>
 
-          <calendar-date-selector
-            v-model="selectedEventInternal.end"
-            label="Ende"
-            append-icon="event"
-            :timed="selectedEventInternal.timed"
-            :min="selectedEventInternal.start"
+          <date-time-picker-menu
+            v-model ="endDate"
+            defaultPicker="DATE"
+            :pickerProps="{}"
           >
-          </calendar-date-selector>
+            <template v-slot:activator="{ on, attrs, }">
+              <v-text-field
+                label="Datum bis"
+                class="input-lg"
+                v-bind="attrs"
+                v-on="on"
+                prepend-icon="mdi-calendar-range"
+                required
+                :rules="[$common.required]"
+              ></v-text-field>
+            </template>
+          </date-time-picker-menu>
         </div>
 
         <!--TODO: changing this does not work right now in the backend-->
@@ -121,6 +143,7 @@
         ></v-textarea>
 
       </v-card-text>
+      <v-spacer></v-spacer>
       <v-card-actions>
         <v-btn
           text
@@ -149,7 +172,7 @@
         </v-btn>
       </v-card-actions>
     </v-card>
-  </v-menu>
+  </component>
 </template>
 
 <script>
@@ -159,7 +182,12 @@ import { commitAddEventToCalendar, commitSetSelectedEvent, commitRemoveCalendarE
 import { readCalendarById, readCalendars, readSelectedElement, readEventByUID} from '@/store/calendar/getters'
 import { getCalendarById } from '@/store/utils'
 // import CalendarEventLocationComponent from './components/CalendarEventLocationComponent.vue'
-import  CalendarDateSelector from '@/views/main/calendar/CalendarDateSelector.vue'
+import DateTimePickerMenu from '@/components/DateTimePickerMenu.vue'
+import isAfter from 'date-fns/isAfter'
+import intervalToDuration from 'date-fns/intervalToDuration'
+import add from 'date-fns/add'
+import sub from 'date-fns/sub'
+
 
 export default {
   // components: { CalendarEventLocationComponent },
@@ -168,7 +196,7 @@ export default {
   },
 
   components: {
-    CalendarDateSelector
+    DateTimePickerMenu,
   },
 
   emits: ['clickEditEvent', 'close', 'changed'],
@@ -177,6 +205,7 @@ export default {
     return {
       selectedElement: null,
       selectedOpen: false,
+      fullscreen: false,
 
       calendar: undefined,
 
@@ -223,6 +252,7 @@ export default {
       this.loadingExdate = false
       this.loading = false;
       this.selectedOpen = true
+      this.fullscreen = false;
       this.initSelectedEventInternal()
     },
 
@@ -282,6 +312,44 @@ export default {
   },
 
   computed: {
+    startDate: {
+      get() {
+        return this.selectedEventInternal.start;
+      },
+      set(value) {
+        let start = new Date(this.selectedEventInternal.start);
+        const end = new Date(this.selectedEventInternal.end);
+        const duration = intervalToDuration({
+          start,
+          end
+        })
+        start = new Date(value);
+        this.selectedEventInternal.start = value;
+        if (isAfter(start, end)) {
+          // new start is after end
+          this.selectedEventInternal.end = add(start, duration);
+        }
+      },
+    },
+    endDate: {
+      get() {
+        return this.selectedEventInternal.end;
+      },
+      set(value) {
+        const start = new Date(this.selectedEventInternal.start);
+        let end = new Date(this.selectedEventInternal.end);
+        const duration = intervalToDuration({
+          start,
+          end
+        })
+        end = new Date(value);
+        this.selectedEventInternal.end = value;
+        if (isAfter(start, end)) {
+          // new start is after end
+          this.selectedEventInternal.start = sub(end, duration);
+        }
+      },
+    },
     calendars: function ()  {
       const calendars = readCalendars(this.$store)
       
@@ -320,3 +388,15 @@ export default {
   }
 }
 </script>
+<style scoped lang="scss">
+
+.menu-fullscreen {
+  top: 0!important;
+  left: 0!important;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  max-width: 100%;
+}
+
+</style>
