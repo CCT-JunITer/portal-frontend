@@ -3,7 +3,7 @@
     <v-chip 
       v-bind="$attrs" 
       v-on="$listeners" 
-      :color="filename && !error ? color : 'error'"
+      :color="file && !error ? color : 'error'"
       outlined
     >
       <v-icon left size="20">
@@ -17,7 +17,10 @@
           indeterminate
         ></v-progress-circular>
       </v-avatar>
-      <span class="text-truncate">
+      <span class="text-truncate file-chip__label" v-if="file.label && !noLabel">
+        {{ file.label + '/'}}
+      </span>
+      <span class="text-truncate file-chip__displayname">
         {{ displayName }}
       </span>
       <v-avatar right>
@@ -89,6 +92,7 @@
 </template>
 
 <script lang="ts">
+import { LabelledFile } from '@/interfaces';
 import { dispatchDownloadFile } from '@/store/main/actions';
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator'
 
@@ -100,25 +104,29 @@ export default class FileChip extends Vue {
   public fileUrl: string | null = null;
   public error = false;
 
+  @Prop({ default: false })
+  public noLabel!: boolean;
+
   @Prop()
-  public filename!: string;
+  public file!: LabelledFile;
+
 
   @Prop({ default: 'cctBlue' }) 
   public color!: string;
 
   @Emit()
   public deleteFile() {
-    return this.filename;
+    return this.file;
   }
 
   public get displayName() {
-    const split = this.filename.indexOf('.')
-    return this.filename.substring(split + 1);
+    const split = this.file.file_id.indexOf('.')
+    return this.file.file_id.substring(split + 1);
   }
 
 
   public get fileIcon() {
-    switch(this.filename.split('.')[this.filename.split('.').length-1]) {
+    switch(this.file.file_id.split('.')[this.file.file_id.split('.').length-1]) {
     case 'pdf':
       return 'mdi-file-document';
     case 'ppt':
@@ -162,7 +170,7 @@ export default class FileChip extends Vue {
     this.isDownloading = true;
     this.error = false;
     try {
-      const fileBlob = await dispatchDownloadFile(this.$store, { filename: this.filename });
+      const fileBlob = await dispatchDownloadFile(this.$store, { filename: this.file.file_id });
       if(!fileBlob) {
         this.isDownloading = false;
         return;
@@ -188,6 +196,14 @@ export default class FileChip extends Vue {
 .file-chip__preview {
   outline: none;
   border: none;
+}
+.file-chip__displayname {
+  font-size: 14px;
+}
+
+.file-chip__label {
+  font-size: 11px;
+  font-weight: bolder;
 }
 
 </style>

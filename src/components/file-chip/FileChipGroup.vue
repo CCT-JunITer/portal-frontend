@@ -1,6 +1,14 @@
 <template>
-  <div class="file-chip-group">
-    <slot></slot>
+  <div>
+    <div class="file-chip-group">
+      <span v-if="label" class="text-overline">
+        <v-icon small>
+          mdi-label
+        </v-icon>
+        {{ label }}
+      </span>
+      <slot></slot>
+    </div>
   </div>
 </template>
 
@@ -10,6 +18,9 @@ import { Vue, Component, Prop } from 'vue-property-decorator'
 @Component({})
 export default class FileChipGroup extends Vue {
 
+  @Prop({default: null})
+  public label!: string | null;
+
 }
 </script>
 
@@ -18,7 +29,7 @@ export default class FileChipGroup extends Vue {
 .file-chip-group {
 
   & > * {
-    margin: 8px;
+    margin: 2px 8px;
   }
 }
 

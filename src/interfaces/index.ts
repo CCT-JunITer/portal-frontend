@@ -91,15 +91,20 @@ export interface IUserSettings {
 
 export interface VersionedFolder {
     id: string;
-    effective_files: string[];
+    effective_files: LabelledFile[];
     file_changes: FileChange[];
+}
+
+export interface LabelledFile {
+    file_id: string;
+    label?: string;
 }
 
 export interface FileChange {
     author_id: number;
-    file_id: string;
     date: Date;
-    old_file_id?: string;
+    file: LabelledFile;
+    old_file?: LabelledFile;
     mode: 'created' | 'deleted' | 'modified';
 }
 
