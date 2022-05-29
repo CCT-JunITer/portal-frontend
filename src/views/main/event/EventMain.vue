@@ -202,6 +202,14 @@
             </v-icon>
           </v-btn>
         </template>
+        <template v-slot:item.custom_files="{ item }">
+          <file-manager 
+            :value="item.files"
+            :folder="item.versioned_folder" 
+            :readonly="true" 
+            :noManager="true">
+          </file-manager>
+        </template>
 
         <template v-slot:item.custom_details="{ item }">
           <v-btn
@@ -391,7 +399,7 @@ export default class EventMain extends Vue {
         value: 'date_to',
         align: 'left',
       },
-      {
+      this.type === 'training' && {
         text: 'Ext. Trainer:innen',
         value: 'external',
         sortable: false,

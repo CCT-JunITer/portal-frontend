@@ -114,16 +114,16 @@ export default class DocumentMain extends Vue {
       sortable: false 
     },
     { 
-      text: 'Letzte Änderung', 
+      text: 'Dateien', 
+      value: 'custom_files'
+    },
+    { 
+      text: 'letztes Änderungsdatum', 
       value: 'date_last_updated'
     },
     { 
-      text: 'Letzte Änderung von', 
+      text: 'Autor:in letzte Änderung', 
       value: 'custom_last_updated_by'
-    },
-    { 
-      text: 'Dateien', 
-      value: 'custom_files'
     },
     {
       text: 'Details',

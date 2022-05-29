@@ -105,9 +105,6 @@ export default new Router({
                 {
                   path: 'search',
                   component: () => import(/* webpackChunkName: "main-search" */ './views/main/people/search/SearchView.vue'),
-                  meta: {
-                    disableSearchBar: true
-                  }
                 },
                 {
                   path: 'profile',
@@ -411,6 +408,12 @@ export default new Router({
                   name: 'events-details',
                   component: () => import(
                   /* webpackChunkName: "event-detail" */ './views/main/event/EventDetail.vue'),
+                },
+                {
+                  path: 'check-in/:id',
+                  name: 'check-in',
+                  component: () => import(
+                    /* webpackChunkName: "event-detail" */ './views/main/event/EventCheckin.vue'),
                 },
               ]
             },
