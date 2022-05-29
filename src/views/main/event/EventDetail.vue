@@ -39,6 +39,22 @@
       <v-divider class="my-5"></v-divider>
       <v-row>
         <v-col cols="12" md="4" class="px-5">
+          <h2 class="text-h4 text--primary mb-3">Agenda</h2>
+          <p class="text-body-2 text--secondary">
+            Agenda zu diesem Event
+          </p>
+        </v-col>
+        <v-col cols="12" md="8">
+
+          <!--
+            AGENDA
+          -->
+          
+        </v-col>
+      </v-row>
+      <v-divider class="my-5"></v-divider>
+      <v-row>
+        <v-col cols="12" md="4" class="px-5">
           <h2 class="text-h4 text--primary mb-3">Dokumente</h2>
           <p class="text-body-2 text--secondary">
             Dokumente zu diesem Event
@@ -258,10 +274,11 @@ import FileManager from '@/components/file-manager/FileManager.vue';
 import { Route } from 'vue-router';
 import QrcodeVue from 'qrcode.vue'
 import { api } from '@/api';
+import Draggable from 'vuedraggable'
 
 
 @Component({
-  components: { EmployeeProfilePicture, EmployeeCard, FileChip, EventApplicationCard, FileManager, QrcodeVue },
+  components: { EmployeeProfilePicture, EmployeeCard, FileChip, EventApplicationCard, FileManager, QrcodeVue, Draggable },
 })
 export default class TrainingDetail extends Vue {
   public today = new Date();
@@ -348,6 +365,5 @@ export default class TrainingDetail extends Vue {
 </script>
 
 <style scoped>
-
 
 </style>
