@@ -35,7 +35,17 @@
             prepend-icon="mdi-animation"
             :items="$common.SCHULUNGSART"
             :rules="[$common.required]"
-          ></v-select>    
+          ></v-select>
+          <v-select
+            label="Meetingart"
+            v-if="type === 'meeting'"
+            v-model ="event.subtype"
+            class="input-lg"
+            required
+            prepend-icon="mdi-animation"
+            :items="$common.MEETINGART"
+            :rules="[$common.required]"
+          ></v-select>
           <v-select
             label="Schulungsthema"
             v-if="type === 'training'"
@@ -45,7 +55,7 @@
             class="input-lg"
             required
             :rules="[$common.required]"
-          ></v-select>         
+          ></v-select>
           <v-textarea
             label="Beschreibung"
             v-model="event.description"
@@ -55,6 +65,9 @@
             required
             :rules="[$common.required]"
           ></v-textarea>
+
+          <agenda-component v-model="event.agenda" class="input-lg">
+          </agenda-component>
 
           <date-time-picker-menu
             v-model ="event.date_from"
@@ -251,16 +264,17 @@ import { dispatchCreateEvent, dispatchGetOneEvent, dispatchUpdateEvent } from '@
 import FileManager from '@/components/file-manager/FileManager.vue';
 import DateTimePickerMenu from '@/components/DateTimePickerMenu.vue';
 import { Route } from 'vue-router';
-
+import AgendaComponent from '@/components/agenda/AgendaComponent.vue';
 
 @Component({
-  components: {VueTelInputVuetify, UploadButton, DateTimePickerMenu, EmployeeProfilePicture, FileManager},
+  components: {VueTelInputVuetify, UploadButton, DateTimePickerMenu, EmployeeProfilePicture, FileManager, AgendaComponent },
 })
 export default class AdminViewEvent extends Vue {
 
   public time_menu = false;
   public valid = false;
   public event: Partial<IEventCreate> = {}
+
 
   public get type() {
     return (this.$route.meta?.event_type || this.event?.type || 'training') as IEventType;
@@ -278,8 +292,6 @@ export default class AdminViewEvent extends Vue {
       this.reset();
     }
   }
-
-
 
 
   public async mounted() {

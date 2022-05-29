@@ -134,6 +134,7 @@ export interface IEventCreate {
     date_from: string;
     date_to: string;
     external: string;
+    agenda: string[];
     is_membership_progression: boolean;
     topic: string;
     description: string;
