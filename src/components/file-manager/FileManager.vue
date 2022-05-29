@@ -251,7 +251,7 @@ export default class FileManager extends Vue {
   }
 
 
-  public async removeFile(file: string) {
+  public async removeFile(file: LabelledFile) {
     this.versionedFolder = await dispatchDeleteFileFromVersionedFolder(this.$store, { folderId: this.versionedFolder!.id, files: [file] })
     this.input(this.versionedFolder.id);
   }
