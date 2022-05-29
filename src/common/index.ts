@@ -1,7 +1,10 @@
 import { getDayOfYear, parseISO } from 'date-fns';
 import { format, utcToZonedTime, formatInTimeZone } from 'date-fns-tz';
 import de from 'date-fns/locale/de';
+import { debounce } from './utils';
 
+export { debounce }
+export { format, formatInTimeZone, parseISO, de, utcToZonedTime };
 
 export const RESSORTS = [
   'Kein Ressort', 'Juniter','Public Affairs','Human Resources', 'Quality Management', 'International Networks','Board','Vorstand','Projektmanager'
@@ -101,8 +104,6 @@ export const isTodayBirthday = (date: Date | string) => {
   return getDayOfYear(date) === getDayOfYear(now);
 }
 
-
-export { format, formatInTimeZone, parseISO, de, utcToZonedTime };
 
 export const DOCUMENT_TYPES = [
   {
