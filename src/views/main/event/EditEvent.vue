@@ -56,6 +56,39 @@
             :rules="[$common.required]"
           ></v-textarea>
 
+          <div class="input-lg rounded mb-4" style="border: 1px solid #999; padding: 10px">
+            <div class="text-overline">Agenda</div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <v-text-field
+                @keydown.enter="addToAgenda"
+                label="Neuer Agendapunkt"               
+                v-model="newAgenda"
+                prepend-icon="mdi-format-title"            
+              ></v-text-field>
+              <v-btn x-large icon color="cctOrange" @click="addToAgenda">
+                <v-icon> mdi-plus-circle</v-icon>
+              </v-btn>
+            </div>
+            <draggable v-model="agendaList" group="people" @start="drag=true" @end="drag=false">
+              <div 
+                v-for="(element, index) in agendaList" 
+                :key="index"
+                class="agenda-item rounded my-2"
+                style="background: #eee; padding-left: 10px"
+              >
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <b>{{ index + 1 }}</b> {{ element }}
+                  </div>
+                  <v-btn large icon color="cctGrey" @click="removeItemFromAgenda(index)">
+                    <v-icon> mdi-minus-circle</v-icon>
+                  </v-btn>
+                </div>
+              </div>
+            </draggable>
+            <small><v-icon size="17px">mdi-information-outline</v-icon> Agendapunkte können per Drag and Drop verschoben werden</small>
+          </div>
+
           <date-time-picker-menu
             v-model ="event.date_from"
             defaultPicker="MONTH"
@@ -251,16 +284,21 @@ import { dispatchCreateEvent, dispatchGetOneEvent, dispatchUpdateEvent } from '@
 import FileManager from '@/components/file-manager/FileManager.vue';
 import DateTimePickerMenu from '@/components/DateTimePickerMenu.vue';
 import { Route } from 'vue-router';
+import Draggable from 'vuedraggable'
 
 
 @Component({
-  components: {VueTelInputVuetify, UploadButton, DateTimePickerMenu, EmployeeProfilePicture, FileManager},
+  components: {VueTelInputVuetify, UploadButton, DateTimePickerMenu, EmployeeProfilePicture, FileManager, Draggable},
 })
 export default class AdminViewEvent extends Vue {
 
   public time_menu = false;
   public valid = false;
   public event: Partial<IEventCreate> = {}
+  public agendaList: string[] = [];
+  public drag = false;
+  public newAgenda = '';
+
 
   public get type() {
     return (this.$route.meta?.event_type || this.event?.type || 'training') as IEventType;
@@ -281,6 +319,16 @@ export default class AdminViewEvent extends Vue {
 
 
 
+  public addToAgenda() {
+    if (this.newAgenda.length > 0) {
+      this.agendaList.push(this.newAgenda);
+      this.newAgenda = '';
+    }  
+  }
+
+  public removeItemFromAgenda(index) {
+    this.agendaList.splice(index, 1)
+  }
 
   public async mounted() {
     await dispatchGetUsers(this.$store);
