@@ -96,14 +96,14 @@ export default class DateTimePickerMenu extends Vue {
   }
 
   get date() {
-    if (!this.value) {
+    if (this.value === null) {
       return '';
     }
     return format(new Date(this.value), 'yyyy-MM-dd');
   }
 
   get time() {
-    if (!this.value) {
+    if (this.value === null) {
       return '';
     }
     return format(new Date(this.value), 'HH:mm');

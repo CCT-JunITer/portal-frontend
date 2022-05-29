@@ -1,7 +1,7 @@
 import { removeLocalUserStatus, saveLocalUserStatus, getLocalUserStatus, copyTextToClipboard } from './../../utils';
 import { api } from '@/api';
 import { 
-  IUserProfileCreate, IUserProfileUpdate, IUserSettings, RequestCreate } from '@/interfaces';
+  IUserProfileCreate, IUserProfileUpdate, IUserSettings, LabelledFile, RequestCreate } from '@/interfaces';
 import router from '@/router';
 import { getLocalToken, removeLocalToken, saveLocalToken } from '@/utils';
 import { AxiosError } from 'axios';
@@ -88,16 +88,16 @@ export const actions = {
     const response = await apiCall(context, token => api.downloadFile(token, payload.filename));
     return response.data;
   },
-  async actionCreateVersionedFolder(context: MainContext, payload: { fileIds: string[] }) {
-    const response = await apiCall(context, token => api.createVersionedFolder(token, payload.fileIds));
+  async actionCreateVersionedFolder(context: MainContext, payload: { files: LabelledFile[] }) {
+    const response = await apiCall(context, token => api.createVersionedFolder(token, payload.files));
     return response.data;
   },
-  async actionAddFileToVersionedFolder(context: MainContext, payload: { folderId: string; fileIds: string[] }) {
-    const response = await apiCall(context, token => api.addFilesToVersionedFolder(token, payload.folderId, payload.fileIds));
+  async actionAddFileToVersionedFolder(context: MainContext, payload: { folderId: string; files: LabelledFile[] }) {
+    const response = await apiCall(context, token => api.addFilesToVersionedFolder(token, payload.folderId, payload.files));
     return response.data;
   },
-  async actionDeleteFileFromVersionedFolder(context: MainContext, payload: { folderId: string; fileIds: string[] }) {
-    const response = await apiCall(context, token => api.deleteFilesFromVersionedFolder(token, payload.folderId, payload.fileIds));
+  async actionDeleteFileFromVersionedFolder(context: MainContext, payload: { folderId: string; files: LabelledFile[] }) {
+    const response = await apiCall(context, token => api.deleteFilesFromVersionedFolder(token, payload.folderId, payload.files));
     return response.data;
   },
   async actionGetVersionedFolder(context: MainContext, payload: { folderId: string }) {
