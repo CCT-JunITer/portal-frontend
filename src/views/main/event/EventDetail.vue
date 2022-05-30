@@ -46,9 +46,17 @@
         </v-col>
         <v-col cols="12" md="8">
 
-          <!--
-            AGENDA
-          -->
+          <div 
+            v-for="(element, index) in event.agenda"
+            :key="index"
+            class="rounded my-2"
+          >
+            <div class="flex-center">
+              <span class="agenda-item rounded">
+                <b>{{ index + 1 }}</b> {{ element }}
+              </span>
+            </div>
+          </div>
           
         </v-col>
       </v-row>
@@ -364,6 +372,21 @@ export default class TrainingDetail extends Vue {
 }
 </script>
 
-<style scoped>
+<style lang="sass" scoped>
+@import '~vuetify/src/styles/styles.sass'
+
+.agenda-wrapper 
+  border: 1px solid #999
+  padding: 10px
+
+.agenda-item
+  padding: 7px 25px
+  background: #eee
+  padding-left: 10px
+
+.flex-center
+  display: flex
+  justify-content: space-between
+  align-items: center
 
 </style>

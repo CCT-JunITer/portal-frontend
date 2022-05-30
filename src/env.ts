@@ -5,11 +5,11 @@ export const env = process.env.VUE_APP_ENV;
 let envApiUrl = '';
 
 if (env === 'production') {
-  envApiUrl = `https://${process.env.VUE_APP_DOMAIN_PROD}`;
+  envApiUrl = 'https://stag.api.cct-ev.de';
 } else if (env === 'staging') {
-  envApiUrl = `https://${process.env.VUE_APP_DOMAIN_STAG}`;
+  envApiUrl = 'https://stag.api.cct-ev.de';
 } else {
-  envApiUrl = `http://${process.env.VUE_APP_DOMAIN_DEV}`;
+  envApiUrl = 'https://stag.api.cct-ev.de';
 }
 
 export const apiUrl = envApiUrl;
