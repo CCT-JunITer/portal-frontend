@@ -111,6 +111,7 @@ export interface IEvent {
     subtype: string;
     topic: string;
     description: string;
+    agenda: string[];
     date_from: string;
     date_to: string;
     wms_link: string;
@@ -132,6 +133,7 @@ export interface IEventCreate {
     is_membership_progression: boolean;
     topic: string;
     description: string;
+    agenda: string[];
     wms_link: string;
     files: string;
     leader_ids: number[];
