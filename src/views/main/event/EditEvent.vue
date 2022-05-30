@@ -56,13 +56,13 @@
             :rules="[$common.required]"
           ></v-textarea>
 
-          <div class="input-lg rounded mb-4" style="border: 1px solid #999; padding: 10px">
+          <div class="input-lg rounded mb-4 agenda-wrapper">
             <div class="text-overline">Agenda</div>
-            <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="flex-center">
               <v-text-field
                 @keydown.enter="addToAgenda"
                 label="Neuer Agendapunkt"               
-                v-model="newAgenda"
+                v-model="newAgendaItem"
                 prepend-icon="mdi-format-title"            
               ></v-text-field>
               <v-btn x-large icon color="cctOrange" @click="addToAgenda">
@@ -74,9 +74,8 @@
                 v-for="(element, index) in agendaList" 
                 :key="index"
                 class="agenda-item rounded my-2"
-                style="background: #eee; padding-left: 10px"
               >
-                <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="flex-center">
                   <div>
                     <b>{{ index + 1 }}</b> {{ element }}
                   </div>
@@ -297,7 +296,7 @@ export default class AdminViewEvent extends Vue {
   public event: Partial<IEventCreate> = {}
   public agendaList: string[] = [];
   public drag = false;
-  public newAgenda = '';
+  public newAgendaItem = '';
 
 
   public get type() {
@@ -320,9 +319,9 @@ export default class AdminViewEvent extends Vue {
 
 
   public addToAgenda() {
-    if (this.newAgenda.length > 0) {
-      this.agendaList.push(this.newAgenda);
-      this.newAgenda = '';
+    if (this.newAgendaItem.length > 0) {
+      this.agendaList.push(this.newAgendaItem);
+      this.newAgendaItem = '';
     }  
   }
 
@@ -360,6 +359,7 @@ export default class AdminViewEvent extends Vue {
       const new_event = {
         ...this.event,
         type: this.type,
+        agenda: this.agendaList,
       } as IEventCreate;
 
       let event: IEvent | undefined;
@@ -383,6 +383,8 @@ export default class AdminViewEvent extends Vue {
         participant_ids: this.editEvent.participants.map(u => u.id),
         leader_ids: this.editEvent.leaders.map(u => u.id),
       };
+      if(this.editEvent.agenda != null && this.editEvent.agenda != undefined)
+        this.agendaList = this.editEvent.agenda;
 
       // const trainer_ids: number[] = this.editEvent.leaders.map(trainer => trainer.id);
       // const participant_ids: number[] = this.editEvent.participants.map(participant => participant.id);
@@ -407,6 +409,19 @@ export default class AdminViewEvent extends Vue {
 
 <style lang="sass" scoped>
 @import '~vuetify/src/styles/styles.sass'
+
+.agenda-wrapper
+  border: 1px solid #999
+  padding: 10px
+
+.agenda-item
+  background: #eee
+  padding-left: 10px
+
+.flex-center
+  display: flex
+  justify-content: space-between
+  align-items: center
 
 @media #{map-get($display-breakpoints, 'md-and-up')}
   .input-lg
