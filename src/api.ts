@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {apiUrl} from '@/env';
-import { ITraining, ITrainingCreate, IUserProfile, IUserProfileCreate, IUserProfileUpdate, UserType, RequestCreate, UserInvite, ITrainingApplicationCreate, ITrainingApplicationUpdate, IFinanceRequestCreate, IFinanceRequestUpdate, IFinanceRequest, Group, GroupUpdate, IUserSettings } from './interfaces';
+import { IEvent, IEventCreate, IUserProfile, IUserProfileCreate, IUserProfileUpdate, UserType, RequestCreate, UserInvite, IEventApplicationCreate, IEventApplicationUpdate, IFinanceRequestCreate, IFinanceRequestUpdate, IFinanceRequest, Group, GroupUpdate, IUserSettings, IEventApplication, VersionedFolder, IDocumentCreate, IDocument, LabelledFile } from './interfaces';
 import {dataURItoBlob} from '@/utils';
 
 function authHeaders(token: string, headers = {}) {
@@ -70,8 +70,8 @@ export const api = {
   async getUser(token: string, userId: number) {
     return axios.get<IUserProfile>(`${apiUrl}/api/v1/users/${userId}`, {...authHeaders(token)});
   },
-  async getPersonalTrainings(token: string, userId: number) {
-    return axios.get<ITraining[]>(`${apiUrl}/api/v1/training/participants/${userId}`, { ...authHeaders(token)});
+  async getPersonalEvents(token: string, userId: number) {
+    return axios.get<IEvent[]>(`${apiUrl}/api/v1/event/participants/events/${userId}`, { ...authHeaders(token)});
   },
 
 
@@ -101,6 +101,19 @@ export const api = {
     const params = { filename };
     return axios.get(`${apiUrl}/api/v1/utils/download-file`, { ...authHeaders(token), params, responseType: 'blob' });
   },
+  
+  async createVersionedFolder(token: string, files: LabelledFile[]) {
+    return axios.post<VersionedFolder>(`${apiUrl}/api/v1/versionedfolder/`, { files }, authHeaders(token));
+  },
+  async addFilesToVersionedFolder(token: string, folderId: string, files: LabelledFile[]) {
+    return axios.put<VersionedFolder>(`${apiUrl}/api/v1/versionedfolder/${folderId}`, { files }, authHeaders(token));
+  },
+  async deleteFilesFromVersionedFolder(token: string, folderId: string, files: LabelledFile[]) {
+    return axios.delete<VersionedFolder>(`${apiUrl}/api/v1/versionedfolder/${folderId}`, { data: { files: files }, ...authHeaders(token) });
+  },
+  async getVersionedFolder(token: string, folderId: string) {
+    return axios.get<VersionedFolder>(`${apiUrl}/api/v1/versionedfolder/${folderId}`, authHeaders(token));
+  },
   async downloadDebitMandate(token: string) {
     return axios.get(`${apiUrl}/api/v1/documents/sepa/me`, { ...authHeaders(token), responseType: 'blob' });
   },
@@ -110,8 +123,8 @@ export const api = {
   async updateUser(token: string, userId: number, data: IUserProfileUpdate) {
     return axios.put(`${apiUrl}/api/v1/users/${userId}`, data, authHeaders(token));
   },
-  async updateTraining(token: string, trainingId: number, data: ITrainingCreate) {
-    return axios.put<ITraining>(`${apiUrl}/api/v1/training/${trainingId}`, data, authHeaders(token));
+  async updateEvent(token: string, eventId: number, data: IEventCreate) {
+    return axios.put<IEvent>(`${apiUrl}/api/v1/event/${eventId}`, data, authHeaders(token));
   },
   async sendInvites(token: string, data: UserInvite[]) {
     return axios.post(`${apiUrl}/api/v1/users/send-invites`, data, authHeaders(token))
@@ -119,14 +132,17 @@ export const api = {
   async createUser(token: string, data: IUserProfileCreate) {
     return axios.post(`${apiUrl}/api/v1/users/`, data, authHeaders(token));
   },
-  async createTraining(token: string, data: ITrainingCreate) {
-    return axios.post<ITraining>(`${apiUrl}/api/v1/training/`, data, authHeaders(token));
+  async createEvent(token: string, data: IEventCreate) {
+    return axios.post<IEvent>(`${apiUrl}/api/v1/event/`, data, authHeaders(token));
   },
-  async getTrainings(token: string) {
-    return axios.get<ITraining[]>(`${apiUrl}/api/v1/training/`, { ...authHeaders(token)});
+  async getEvents(token: string, eventType: string) {
+    return axios.get<IEvent[]>(`${apiUrl}/api/v1/event/`, { ...authHeaders(token), params: { event_type: eventType } });
   },
-  async deleteTraining(token: string, trainingId: number,) {
-    return axios.delete(`${apiUrl}/api/v1/training/${trainingId}`, { ...authHeaders(token)});
+  async getOneEvent(token: string, eventId: number) {
+    return axios.get<IEvent>(`${apiUrl}/api/v1/event/${eventId}`, { ...authHeaders(token) });
+  },
+  async deleteEvent(token: string, eventId: number,) {
+    return axios.delete(`${apiUrl}/api/v1/event/${eventId}`, { ...authHeaders(token)});
   },
   async createUserOpen(token: string, data: IUserProfileCreate) {
     return axios.post(`${apiUrl}/api/v1/users/open`, data, {params: {token}});
@@ -180,14 +196,14 @@ export const api = {
   async getGroups(token: string) {
     return axios.get(`${apiUrl}/api/v1/groups/`, authHeaders(token));
   },
-  async getTrainingApplications(token: string, trainingId: number) {
-    return axios.get(`${apiUrl}/api/v1/training/application/${trainingId}`, authHeaders(token));
+  async getEventApplications(token: string, eventId: number) {
+    return axios.get(`${apiUrl}/api/v1/event/application/${eventId}`, authHeaders(token));
   },
-  async createTrainingApplication(token: string, trainingId: number, application: ITrainingApplicationCreate) {
-    return axios.post(`${apiUrl}/api/v1/training/application/${trainingId}`, application, authHeaders(token));
+  async createEventApplication(token: string, eventId: number, application: IEventApplicationCreate) {
+    return axios.post(`${apiUrl}/api/v1/event/application/${eventId}`, application, authHeaders(token));
   },
-  async updateTrainingApplication(token: string, applicationId: number, application: ITrainingApplicationUpdate) {
-    return axios.put(`${apiUrl}/api/v1/training/application/${applicationId}`, application, authHeaders(token));
+  async updateEventApplication(token: string, applicationId: number, application: IEventApplicationUpdate) {
+    return axios.put<IEventApplication>(`${apiUrl}/api/v1/event/application/${applicationId}`, application, authHeaders(token));
   },
   // Finance Request
   async createFinanceRequest(token: string, request: IFinanceRequestCreate) {
@@ -221,5 +237,29 @@ export const api = {
   async updateFinanceRequestStateType(token: string, financeId: number, updated_status: string, updated_association: string) {
     return axios.put(`${apiUrl}/api/v1/finance/status/${financeId}`, { updated_status, updated_association }, authHeaders(token));
   },
+  // Documents
+  async getDocuments(token: string, documentType: string) {
+    return axios.get<IDocument[]>(`${apiUrl}/api/v1/document/`, { ...authHeaders(token), params: { document_type: documentType } });
+  },
+  async getOneDocument(token: string, documentId: number) {
+    return axios.get<IDocument>(`${apiUrl}/api/v1/document/${documentId}`,  { ...authHeaders(token) });
+  },
+  async updateDocument(token: string, documentId: number, data: IDocumentCreate) {
+    return axios.put<IDocument>(`${apiUrl}/api/v1/document/${documentId}`, data, authHeaders(token));
+  },
+  async createDocument(token: string, data: IDocumentCreate) {
+    return axios.post<IDocument>(`${apiUrl}/api/v1/document/`, data, authHeaders(token));
+  },
+  // Search
+  async getSearchResults(token: string, searchText: string) {
+    return axios.get(`${apiUrl}/api/v1/search/`, { ...authHeaders(token), params: { text: searchText } });
+  },
   
+  //Tracking
+  async getTOTP(token: string, eventId: number) {
+    return axios.get(`${apiUrl}/api/v1/tracking/event/${eventId}`, authHeaders(token)); 
+  },
+  async updateParticipants(token: string, eventId: number, totp: number) {
+    return axios.put(`${apiUrl}/api/v1/tracking/event/${eventId}`, { totp }, authHeaders(token));
+  },
 };

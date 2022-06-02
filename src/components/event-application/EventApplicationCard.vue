@@ -22,17 +22,17 @@
 </template>
 
 <script lang="ts">
-import { ITrainingApplication } from '@/interfaces';
+import { IEventApplication } from '@/interfaces';
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import EmployeeProfilePicture from '../employee/EmployeeProfilePicture.vue'
 
 @Component({ 
   components: { EmployeeProfilePicture }
 })
-export default class TrainingApplicationCard extends Vue {
+export default class EventApplicationCard extends Vue {
 
   @Prop()
-  public application!: ITrainingApplication;
+  public application!: IEventApplication;
 }
 </script>
 

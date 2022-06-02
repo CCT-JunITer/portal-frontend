@@ -1,7 +1,7 @@
 import { removeLocalUserStatus, saveLocalUserStatus, getLocalUserStatus, copyTextToClipboard } from './../../utils';
 import { api } from '@/api';
 import { 
-  IUserProfileCreate, IUserProfileUpdate, IUserSettings, RequestCreate } from '@/interfaces';
+  IUserProfileCreate, IUserProfileUpdate, IUserSettings, LabelledFile, RequestCreate } from '@/interfaces';
 import router from '@/router';
 import { getLocalToken, removeLocalToken, saveLocalToken } from '@/utils';
 import { AxiosError } from 'axios';
@@ -86,6 +86,22 @@ export const actions = {
   },
   async actionDownloadFile(context: MainContext, payload: { filename: string }) {
     const response = await apiCall(context, token => api.downloadFile(token, payload.filename));
+    return response.data;
+  },
+  async actionCreateVersionedFolder(context: MainContext, payload: { files: LabelledFile[] }) {
+    const response = await apiCall(context, token => api.createVersionedFolder(token, payload.files));
+    return response.data;
+  },
+  async actionAddFileToVersionedFolder(context: MainContext, payload: { folderId: string; files: LabelledFile[] }) {
+    const response = await apiCall(context, token => api.addFilesToVersionedFolder(token, payload.folderId, payload.files));
+    return response.data;
+  },
+  async actionDeleteFileFromVersionedFolder(context: MainContext, payload: { folderId: string; files: LabelledFile[] }) {
+    const response = await apiCall(context, token => api.deleteFilesFromVersionedFolder(token, payload.folderId, payload.files));
+    return response.data;
+  },
+  async actionGetVersionedFolder(context: MainContext, payload: { folderId: string }) {
+    const response = await apiCall(context, token => api.getVersionedFolder(token, payload.folderId));
     return response.data;
   },
   async actionCheckLoggedIn(context: MainContext) {
@@ -267,6 +283,10 @@ export const dispatchRouteLogOut = dispatch(actions.actionRouteLogOut);
 export const dispatchUpdateUserProfile = dispatch(actions.actionUpdateUserProfile);
 export const dispatchUploadFile = dispatch(actions.actionUploadFile);
 export const dispatchDownloadFile = dispatch(actions.actionDownloadFile);
+export const dispatchCreateVersionedFolder = dispatch(actions.actionCreateVersionedFolder);
+export const dispatchAddFileToVersionedFolder = dispatch(actions.actionAddFileToVersionedFolder);
+export const dispatchDeleteFileFromVersionedFolder = dispatch(actions.actionDeleteFileFromVersionedFolder);
+export const dispatchGetVersionedFolder = dispatch(actions.actionGetVersionedFolder);
 export const dispatchDownloadDebitMandate = dispatch(actions.actionDownloadDebitMandate);
 export const dispatchCopyTextToClipboard = dispatch(actions.copyTextToClipboard);
 export const dispatchSaveAsCsv = dispatch(actions.saveAsCsv);

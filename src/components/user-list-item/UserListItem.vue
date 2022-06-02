@@ -1,5 +1,5 @@
 <template>
-  <v-list-item :to="`/main/people/profile/view/${user.id}`">
+  <v-list-item :to="`/main/people/profile/view/${user.id}`" v-bind="$attrs" v-on="$listeners">
     <employee-profile-picture
       :employee="user"
       component="v-list-item-avatar"

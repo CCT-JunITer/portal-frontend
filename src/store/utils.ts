@@ -5,7 +5,10 @@ import { commitAddNotification, commitRemoveNotification } from './main/mutation
 import { AppNotification } from './main/state';
 import { State } from './state';
 
-export const replace = <T extends {id: number}>(array: T[], payload: T): T[] => {
+export const replace = <T extends {id: number}>(array: T[] | null, payload: T): T[] => {
+  if (!array) {
+    return [payload];
+  }
   const replaced = array.map(item => item.id !== payload.id ? item : payload)
   if(!replaced.find(item => item.id === payload.id)) {
     replaced.push(payload);

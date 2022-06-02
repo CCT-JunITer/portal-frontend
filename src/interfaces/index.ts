@@ -89,33 +89,61 @@ export interface IUserSettings {
     used_mailaccount_space: number;
 }
 
-export interface ITraining {
+export interface VersionedFolder {
+    id: string;
+    effective_files: LabelledFile[];
+    file_changes: FileChange[];
+}
+
+export interface LabelledFile {
+    file_id: string;
+    label?: string;
+}
+
+export interface FileChange {
+    author_id: number;
+    date: Date;
+    file: LabelledFile;
+    old_file?: LabelledFile;
+    mode: 'created' | 'deleted' | 'modified';
+}
+
+export type IEventType = 'training' | 'meeting';
+
+export interface IEvent {
     title: string;
-    type: string;
-    is_membership_progression: boolean;
+    type: IEventType;
+    subtype: string;
     topic: string;
     description: string;
-    date: string;
+    agenda: string[];
+    date_from: string;
+    date_to: string;
+    date_checkin_from: string;
+    date_checkin_to: string;
     wms_link: string;
-    external_trainers: string;
+    external: string;
     id: number;
     files: string;
     author: IUserProfile;
-    trainers: IUserProfile[];
+    leaders: IUserProfile[];
     participants: IUserProfile[];
-    applications: ITrainingApplication[];
+    applications: IEventApplication[];
 }
-export interface ITrainingCreate {
+export interface IEventCreate {
     title: string;
     type: string;
+    subtype: string;
+    date_from: string;
+    date_to: string;
+    external: string;
+    agenda: string[];
     is_membership_progression: boolean;
     topic: string;
     description: string;
-    date: string;
     wms_link: string;
-    external_trainers: string;
     files: string;
-    trainer_ids: number[];
+    leader_ids: number[];
     participant_ids: number[];
 }
 
@@ -183,21 +211,21 @@ export interface Request {
     groups: RequestGroup[];
 }
 
-export type ITrainingApplicationStatus = 'in progress' | 'accepted' | 'denied' | 'waiting'
+export type IEventApplicationStatus = 'in progress' | 'accepted' | 'denied' | 'waiting'
 
-export interface ITrainingApplication {
+export interface IEventApplication {
     id: number;
-    training_id: number;
-    training: ITraining;
+    event_id: number;
+    event: IEvent;
     applicant_id: number;
     applicant: IUserProfile;
     description: string;
-    status: ITrainingApplicationStatus;
+    status: IEventApplicationStatus;
 }
-export interface ITrainingApplicationUpdate {
-    status: ITrainingApplicationStatus;
+export interface IEventApplicationUpdate {
+    status: IEventApplicationStatus;
 }
-export interface ITrainingApplicationCreate {
+export interface IEventApplicationCreate {
     description: string;
 }
 
@@ -234,7 +262,7 @@ export interface IFinanceRequestUpdate {
     type: string;
     purpose: string;
     amount: number;
-    files: string;
+    files: string | null;
     message_file: string;
     message_request: string;
     status: IFinanceRequestStatus;
@@ -245,7 +273,42 @@ export interface IFinanceRequestCreate {
     type: string;
     purpose: string;
     amount: number;
-    files: string;
+    files: string | null;
     association: string;
     iban: string;
 }
+
+export interface IDocument {
+    id: number;
+    title: string;
+    description: string;
+    type: string;
+    date_last_updated: string;
+    // files: string;
+    author_id: number;
+
+    author: IUserProfile;
+
+    approved: boolean;
+}
+
+export interface IDocumentCreate {
+    title: string;
+    description: string;
+    type: string;
+    date_last_updated: string;
+    // files: string;
+
+    approved: boolean;
+}
+
+export interface IDocumentUpdate {
+    title: string;
+    description: string;
+    type: string;
+    date_last_updated: string;
+
+    approved: boolean;
+}
+
+export type IDocumentType = 'member-progression' | 'recruiting' | 'archive' | 'public-affairs' | 'quality-management';

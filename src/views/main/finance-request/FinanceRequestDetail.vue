@@ -386,7 +386,7 @@ export default class AdminUsers extends Vue {
   public message_request = '';
   public isAccepted = true;
   public isUploading = false;
-  public files: string[] = [];
+  public files: string | null = null;
   
 
   get financeRequest() {
@@ -399,7 +399,7 @@ export default class AdminUsers extends Vue {
   }
 
   get currentFiles() {
-    return this.financeRequest.files ? this.financeRequest.files.split('/') : []
+    return this.financeRequest.files;
   }
 
   public get isMyFinanceRequest() {
@@ -420,7 +420,7 @@ export default class AdminUsers extends Vue {
 
   public async changeStatusRequestAccepted() {
     const newStatus = 'file_uploaded';
-    await dispatchUpdateFinanceRequestStateFile(this.$store, {financeId: this.financeRequest.id, updated_status: newStatus, updated_receipt: this.files.join('/') });
+    await dispatchUpdateFinanceRequestStateFile(this.$store, {financeId: this.financeRequest.id, updated_status: newStatus, updated_receipt: this.files });
     await this.loadFinanceRequests();
   }
 
@@ -434,7 +434,7 @@ export default class AdminUsers extends Vue {
   
   public async changeStatusFileRejected() {
     const newStatus = 'file_uploaded';
-    await dispatchUpdateFinanceRequestStateFile(this.$store, {financeId: this.financeRequest.id, updated_status: newStatus, updated_receipt: this.files.join('/') });
+    await dispatchUpdateFinanceRequestStateFile(this.$store, {financeId: this.financeRequest.id, updated_status: newStatus, updated_receipt: this.files });
     await this.loadFinanceRequests();
   }
   

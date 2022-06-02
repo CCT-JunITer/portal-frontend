@@ -8,9 +8,11 @@ import '@fontsource/roboto/300.css';
 import Vuetify from 'vuetify';
 import CCTIcon from '@/common/icons/cctIcon.vue';
 import de from 'vuetify/lib/locale/de'
+import DatetimePicker from 'vuetify-datetime-picker'
 
 
 Vue.use(Vuetify);
+Vue.use(DatetimePicker)
 
 export default new Vuetify({
   lang: {

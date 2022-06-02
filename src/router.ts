@@ -105,9 +105,6 @@ export default new Router({
                 {
                   path: 'search',
                   component: () => import(/* webpackChunkName: "main-search" */ './views/main/people/search/SearchView.vue'),
-                  meta: {
-                    disableSearchBar: true
-                  }
                 },
                 {
                   path: 'profile',
@@ -136,10 +133,20 @@ export default new Router({
                           redirect: (to) => ({ name: 'profile-about', params: { id: to.params?.id || 'me' } })
                         },
                         {
+                          path: 'meetings',
+                          name: 'profile-meetings',
+                          meta: {
+                            event_type: 'meeting',
+                          },
+                          component: () => import(/* webpackChunkName: "main-profile-events" */ './views/main/people/profile/UserProfileEvents.vue'),
+                        },
+                        {
                           path: 'trainings',
                           name: 'profile-trainings',
-                          component: () => import(
-                          /* webpackChunkName: "main-profile-trainings" */ './views/main/people/profile/UserProfileTrainings.vue')
+                          meta: {
+                            event_type: 'training',
+                          },
+                          component: () => import(/* webpackChunkName: "main-profile-events" */ './views/main/people/profile/UserProfileEvents.vue'),
                         },
                         {
                           path: 'skills',
@@ -278,28 +285,145 @@ export default new Router({
             },
             {
               path: 'trainings',
-              name: 'trainings-all',
+              name: 'trainings',
+              meta: {
+                event_type: 'training',
+              },
+              component: () => import(/* webpackChunkName: "admin-event" */ './views/main/event/EventMain.vue'),
+            },
+            {
+              path: 'wms',
+              name: 'wms',
+              component: RouterComponent,
+              children: [
+                {
+                  path: 'meetings',
+                  name: 'meetings',
+                  component: RouterComponent,
+                  children: [
+                    {
+                      meta: {
+                        event_type: 'meeting',
+                      },
+                      path: '',
+                      component: () => import(/* webpackChunkName: "admin-event" */ './views/main/event/EventMain.vue'),
+                    },
+                  ]
+                }, 
+                {
+                  path: 'documents',
+                  component: RouterComponent,
+                  children: [
+                    {
+                      path: '',
+                      redirect: { name: 'member-progression' }
+                    },
+                    {
+                      path: 'member-progression',
+                      name: 'member-progression',
+                      meta: {
+                        document_type: 'member-progression',
+                      },
+                      component: () => import('./views/main/document/DocumentMain.vue')
+                    },
+                    {
+                      path: 'recruiting',
+                      name: 'recruiting',
+                      meta: {
+                        document_type: 'recruiting',
+                      },
+                      component: () => import('./views/main/document/DocumentMain.vue')
+                    },
+                    {
+                      path: 'archive',
+                      name: 'archive',
+                      meta: {
+                        document_type: 'archive',
+                      },
+                      component: () => import('./views/main/document/DocumentMain.vue')
+                    },
+                    {
+                      path: 'public-affairs',
+                      name: 'public-affairs',
+                      meta: {
+                        document_type: 'public-affairs',
+                      },
+                      component: () => import('./views/main/document/DocumentMain.vue')
+                    },
+                    {
+                      path: 'quality-management',
+                      name: 'quality-management',
+                      meta: {
+                        document_type: 'quality-management',
+                      },
+                      component: () => import('./views/main/document/DocumentMain.vue')
+                    },
+                    {
+                      path: 'create',
+                      name: 'document-create',
+                      component: () => import('./views/main/document/EditDocument.vue')
+                    },
+                    {
+                      path: 'edit/:id',
+                      name: 'document-edit',
+                      component: () => import('./views/main/document/EditDocument.vue'),
+                    },
+                  ]
+                }
+              ]
+            },
+            {
+              path: 'events',
+              name: 'events-all',
               component: RouterComponent,
               children: [
                 {
                   path: '',
-                  component: () => import(/* webpackChunkName: "admin-training" */ './views/main/training/TrainingMain.vue'),
-                },
-                {
-                  path: 'create',
-                  name: 'training-create',
-                  component: () => import(/* webpackChunkName: "admin-training-create" */ './views/main/training/EditTraining.vue'),
+                  redirect: { name: 'trainings' }
                 },
                 {
                   path: 'edit/:id',
-                  name: 'training-edit',
-                  component: () => import(/* webpackChunkName: "admin-training-edit" */ './views/main/training/EditTraining.vue'),
+                  name: 'event-edit',
+                  component: () => import(/* webpackChunkName: "admin-event-edit" */ './views/main/event/EditEvent.vue'),
+                },
+                {
+                  path: 'create',
+                  name: 'event-create',
+                  component: () => import(/* webpackChunkName: "admin-event-create-entry" */ './views/main/event/EditEventEntry.vue'),
+                  children: [
+                    {
+                      path: '',
+                      redirect: () => ({ name: 'event-create-training' })
+                    },
+                    {
+                      meta: {
+                        event_type: 'training',
+                      },
+                      path: 'training',
+                      name: 'event-create-training',
+                      component: () => import(/* webpackChunkName: "admin-event-create" */ './views/main/event/EditEvent.vue'),
+                    },
+                    {
+                      meta: {
+                        event_type: 'meeting',
+                      },
+                      path: 'meeting',
+                      name: 'event-create-meeting',
+                      component: () => import(/* webpackChunkName: "admin-event-create" */ './views/main/event/EditEvent.vue'),
+                    },
+                  ]
                 },
                 {
                   path: ':id',
-                  name: 'trainings-details',
+                  name: 'events-details',
                   component: () => import(
-                  /* webpackChunkName: "training-detail" */ './views/main/training/TrainingDetail.vue'),
+                  /* webpackChunkName: "event-detail" */ './views/main/event/EventDetail.vue'),
+                },
+                {
+                  path: 'check-in/:id',
+                  name: 'check-in',
+                  component: () => import(
+                    /* webpackChunkName: "event-detail" */ './views/main/event/EventCheckin.vue'),
                 },
               ]
             },

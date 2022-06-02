@@ -67,7 +67,7 @@ export const actions = {
       await dispatchCheckApiError(context, error);
     }
   },
-  async actionUpdateFinanceRequestStateFile(context: MainContext, payload: {financeId: number; updated_status: string; updated_receipt: string}) { // ; ...
+  async actionUpdateFinanceRequestStateFile(context: MainContext, payload: {financeId: number; updated_status: string; updated_receipt: string | null}) { // ; ...
     try {
       const loadingNotification = { content: 'saving', showProgress: true };
       commitAddNotification(context, loadingNotification);

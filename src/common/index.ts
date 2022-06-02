@@ -1,5 +1,10 @@
-import { format, getDayOfYear } from 'date-fns';
+import { getDayOfYear, parseISO } from 'date-fns';
+import { format, utcToZonedTime, formatInTimeZone } from 'date-fns-tz';
+import de from 'date-fns/locale/de';
+import { debounce } from './utils';
 
+export { debounce }
+export { format, formatInTimeZone, parseISO, de, utcToZonedTime };
 
 export const RESSORTS = [
   'Kein Ressort', 'Juniter','Public Affairs','Human Resources', 'Quality Management', 'International Networks','Board','Vorstand','Projektmanager'
@@ -28,6 +33,9 @@ export const UNIVERSITIES = [
 
 export const SCHULUNGSART = [
   'Pflichtschulung', 'Zusatzschulung', 'Allgemeine Schulung'
+];
+export const MEETINGART = [
+  'Donnerstagssitzung', 'Mitgliederversammlung', 'Ressortsitzung', 'Workingsession'
 ];
 
 export const KOSTENART = [
@@ -99,4 +107,26 @@ export const isTodayBirthday = (date: Date | string) => {
   return getDayOfYear(date) === getDayOfYear(now);
 }
 
-export { format };
+
+export const DOCUMENT_TYPES = [
+  {
+    name: 'Mitgliedswerdegang',
+    value: 'member-progression',
+  }, 
+  {
+    name: 'Recruiting',
+    value: 'recruiting',
+  }, 
+  {
+    name: 'Archiv',
+    value: 'archive',
+  },
+  {
+    name: 'Öffentlichkeitsarbeit',
+    value: 'public-affairs',
+  },
+  {
+    name: 'Quality Management',
+    value: 'quality-management',
+  }
+]

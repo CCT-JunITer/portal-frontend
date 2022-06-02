@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer temporary v-model="showDrawer" fixed>
+  <v-navigation-drawer temporary v-model="showDrawer" fixed width="300px">
     <template v-slot:prepend>
       <v-app-bar dark :color="env === 'production' ? 'cctBlue' : 'cctOrange darken-3'" class="flex-grow-0">
         <v-app-bar-nav-icon default @click.stop="switchShowDrawer"></v-app-bar-nav-icon>
@@ -40,6 +40,78 @@
           <v-list-item-title>Schulungen</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
+
+      <v-list-group group="wms" style="pa-0" prepend-icon="mdi-folder-open">
+        <template v-slot:activator>
+          <v-list-item-content>
+            <v-list-item-title>Wissensmanagement</v-list-item-title>
+          </v-list-item-content>
+        </template>
+        <v-list-item to="/main/wms/projects" disabled class="ml-2">
+          <v-list-item-icon>
+            <v-icon>mdi-account-tie</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Projektdokumentation</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item to="/main/wms/meetings" color="cctGreen" class="ml-2">
+          <v-list-item-icon>
+            <v-icon>mdi-human-male-board</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>CCT-Sitzungen</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item to="/main/wms/documents/member-progression" class="ml-2">
+          <v-list-item-icon>
+            <v-icon>mdi-account-arrow-up</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Mitgliedswerdegang</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item to="/main/wms/documents/recruiting" class="ml-2">
+          <v-list-item-icon>
+            <v-icon>mdi-human-greeting</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Recruiting</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item to="/main/wms/documents/archive" class="ml-2" v-if="hasAnyPermission(['portal.documents.admin'])">
+          <v-list-item-icon>
+            <v-icon>mdi-archive</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Archiv</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item to="/main/wms/documents/public-affairs" class="ml-2">
+          <v-list-item-icon>
+            <v-icon>mdi-earth</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Öffentlichkeitsarbeit</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item to="/main/wms/documents/quality-management" class="ml-2">
+          <v-list-item-icon>
+            <v-icon>mdi-check-decagram</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Quality Management</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item to="" disabled class="ml-2">
+          <v-list-item-icon>
+            <v-icon>mdi-crown</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Vorstand</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list-group>
 
       <v-list-item :to="{ name: 'finance-request'}" color="cctBlue">
         <v-list-item-icon>
@@ -190,6 +262,7 @@ import { env } from '@/env';
 import {
   readDashboardShowDrawer,
   readHasAdminAccess,
+  readHasAnyPermission,
   readUserProfile
 } from '@/store/main/getters';
 import {
@@ -201,6 +274,8 @@ import {
 } from 'vue-property-decorator'
 import PortalButton from './PortalButton.vue';
 
+
+
 @Component({
   components: {
     EmployeeProfilePicture,
@@ -210,6 +285,7 @@ import PortalButton from './PortalButton.vue';
 export default class NavigationDrawer extends Vue {
 
   public env = env;
+  public hasAnyPermission = readHasAnyPermission(this.$store);
 
   public get hasAdminAccess() {
     return readHasAdminAccess(this.$store);

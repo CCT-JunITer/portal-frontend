@@ -1,4 +1,4 @@
-import { Group, IUserProfile, Request, ITraining, ITrainingApplication, IFinanceRequest, IUserSettings } from '@/interfaces';
+import { Group, IUserProfile, Request, IEvent, IEventApplication, IFinanceRequest, IUserSettings } from '@/interfaces';
 
 export interface AppNotification {
     content: string;
