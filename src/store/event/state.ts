@@ -1,8 +1,10 @@
-import { IEvent, IEventApplication } from '@/interfaces';
+import { IEvent, IEventApplication, IEventType } from '@/interfaces';
 
 
 export interface EventState {
     eventsParticipants: { [key: number]: IEvent[] };
-    events: IEvent[];
+    events: {
+        [k in IEventType]: IEvent[] | null;
+    };
     eventApplications: { [key: number]: IEventApplication[] };
 }

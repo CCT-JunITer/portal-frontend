@@ -116,8 +116,11 @@ export interface IEvent {
     subtype: string;
     topic: string;
     description: string;
+    agenda: string[];
     date_from: string;
     date_to: string;
+    date_checkin_from: string;
+    date_checkin_to: string;
     wms_link: string;
     external: string;
     id: number;

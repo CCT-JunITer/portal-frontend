@@ -38,21 +38,69 @@
             <span class="text-h5">Datei umbenennen</span>
           </v-card-title>
           <v-card-text>
-            <div
-              v-for="file in this.files"
-              :key="file.key"
-            >
-              <v-text-field
-                label="Label"
-                v-model="file.label"
+            <file-chip-group>
+
+              <div
+                v-for="file in this.files"
+                :key="file.key"
               >
-              </v-text-field>
-              <v-text-field
-                label="Dateiname"
-                v-model="file.fileName"
-                required
-              ></v-text-field>
-            </div>
+                <v-menu
+                  :close-on-content-click="false"
+                  v-model="file.menu"
+                  bottom
+                  right
+                  transition="scale-transition"
+                  offset-y
+                >
+                  <template v-slot:activator="{ on, attrs}">
+                    <v-chip 
+                      v-bind="attrs"
+                      v-on="on"
+                      color="cctBlue"
+                      outlined
+                    >
+                      <v-icon left size="20">
+                        mdi-file
+                      </v-icon>
+                      <span class="text-truncate file-chip__label" v-if="file.label">
+                        {{ file.label + '/'}}
+                      </span>
+                      <span class="text-truncate file-chip__displayname">
+                        {{ file.fileName }}
+                      </span>
+                    </v-chip>
+                  </template>
+                  <v-card>
+                    <v-card-text>
+                      <v-select
+                        label="Label"
+                        v-model="file.label"
+                        :items="labels"
+                      >
+                      </v-select>
+                      <v-text-field
+                        label="Name"
+                        v-model="file.fileName"
+                      >
+                      </v-text-field>
+                    </v-card-text>
+                    <v-card-actions>
+                      <v-spacer></v-spacer>
+                      <v-btn icon @click="files = files.filter(f => f.key !== file.key)" color="red">
+                        <v-icon>mdi-delete</v-icon>
+                      </v-btn>
+                      <v-btn
+                        color="primary"
+                        text
+                        @click="file.menu = false"
+                      >
+                        Speichern
+                      </v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </v-menu>
+              </div>
+            </file-chip-group>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
@@ -61,14 +109,14 @@
               text
               @click="dialog = false"
             >
-              Close
+              Abbrechen
             </v-btn>
             <v-btn
               color="blue darken-1"
               text
               @click="uploadFiles"
             >
-              Save
+              Hochladen
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -137,9 +185,13 @@ export default class FileManager extends Vue {
 
   get effectiveFiles(): { [k: string]: LabelledFile[] } {
     return this.versionedFolder?.effective_files.reduce((prev, curr) => {
-      const files = prev[curr.label || ''] || []
+      if (this.labels && !this.labels.includes(curr.label || '')) {
+        return prev;
+      }
+      const label = curr.label || 'Sonstige'
+      const files = prev[label] || []
       files.push(curr)
-      prev[curr.label || ''] = files
+      prev[label] = files
       return prev;
     }, {}) || {}
   }
@@ -156,6 +208,12 @@ export default class FileManager extends Vue {
 
   @Prop({ default: false })
   public readonly!: boolean;
+
+  @Prop({})
+  public labels?: string[];
+
+  @Prop()
+  public allowNoLabel!: boolean;
 
   @Prop({ default: false })
   public noManager!: boolean;
@@ -216,7 +274,7 @@ export default class FileManager extends Vue {
   }
 
   public onFileChanged(files: File[]) {
-    this.files = files.map((file, i) => ({ file, fileName: file.name, key: i }));
+    this.files = files.map((file, i) => ({ file, fileName: file.name, key: i, label: this.labels ? this.labels[0] : '' }));
     this.dialog = true;
   }
 

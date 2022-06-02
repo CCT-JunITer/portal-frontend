@@ -15,7 +15,7 @@
     </v-toolbar>
     <v-container>
       
-      <event-table :items="futureEvents">
+      <event-table :items="futureEvents" :type="type">
         <template v-slot:top>
           <v-toolbar flat>
             <v-toolbar-title>
@@ -24,7 +24,7 @@
           </v-toolbar>
         </template>
       </event-table>
-      <event-table :items="pastEvents">
+      <event-table :items="pastEvents" :type="type">
         <template v-slot:top>
           <v-toolbar flat>
             <v-toolbar-title>
@@ -135,10 +135,16 @@ export default class EventMain extends Vue {
 
 
   get futureEvents() {
+    if(!this.events) {
+      return null;
+    }
     return this.events.filter(event => isAfter(new Date(event.date_from), this.today))
   }
 
   get pastEvents() {
+    if(!this.events) {
+      return null;
+    }
     return this.events.filter(event => isAfter(this.today, new Date(event.date_from)))
   }
   
@@ -150,7 +156,7 @@ export default class EventMain extends Vue {
     return readUsers(this.$store);
   }
   get events() {
-    return readEvents(this.$store)
+    return readEvents(this.$store)(this.type);
   }
   public async mounted() {
     await dispatchGetUsers(this.$store);

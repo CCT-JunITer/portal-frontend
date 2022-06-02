@@ -1,4 +1,4 @@
-import { IEvent, IEventApplication } from '@/interfaces';
+import { IEvent, IEventApplication, IEventType } from '@/interfaces';
 import { EventState } from './state';
 import { getStoreAccessors } from 'typesafe-vuex';
 import { State } from '../state';
@@ -12,11 +12,11 @@ export const mutations = {
   setEventsFor(state: EventState, payload: { userId: number; payload: IEvent[] }) {
     state.eventsParticipants = { ...state.eventsParticipants, [payload.userId]: payload.payload };
   },
-  setEvents(state: EventState, payload: IEvent[]) {
-    state.events = payload;
+  setEvents(state: EventState, payload: { type: IEventType; payload: IEvent[]}) {
+    state.events[payload.type] = payload.payload;
   },
   setEvent(state: EventState, payload: IEvent) {
-    state.events = replace(state.events, payload);
+    state.events[payload.type] = replace(state.events[payload.type], payload);
   },
 };
 

@@ -1,19 +1,24 @@
 <template>
   <div>
     <show-user-dialog
-      :value="!!showUsers"
-      @input="showUsers = $event"
-      :users="showUsers && showUsers.participants"
-      :title="`Teilnehmerliste ${showUsers && showUsers.title}`"
+      :value="!!displayUsersFor"
+      @input="displayUsersFor = $event"
+      :users="displayUsersFor && displayUsersFor.participants"
+      :title="`Teilnehmerliste ${displayUsersFor && displayUsersFor.title}`"
       subtitle="Teilnehmer:innen"
     ></show-user-dialog>
     <v-data-table
       :class="`elevation-2 my-5`"
       :headers="headers" 
-      :items="items"
+      :items="items || []"
+      :loading="!items"
     >
       <template v-slot:top>
         <slot name="top"></slot>
+      </template>
+      <template v-slot:item.title="{ item }">
+        <v-icon v-if="item.approved" color="cctGreen" small>mdi-check-decagram</v-icon>
+        {{ item.title }}
       </template>
       <template v-slot:item.custom_agenda="{ item }">
         <ul>
@@ -24,9 +29,6 @@
           >
           </li>
         </ul>
-      </template>
-      <template v-slot:item.custom_title="{ item }">
-        <span style="font-weight: 500;">{{ item.title }}</span>
       </template>
       <template v-slot:item.external="{ item }">
         <span v-if="item.external === ''">Keine</span>
@@ -55,7 +57,7 @@
         <v-btn
           color="cctBlue"
           style="color: #fff; margin: 10px;"
-          @click="showUsers = item"
+          @click="showUsers(item)"
         >
           <v-icon>
             mdi-account-supervisor
@@ -104,6 +106,8 @@ import FileManager from '@/components/file-manager/FileManager.vue';
 import ShowUserDialog from '@/components/show-user-dialog/ShowUserDialog.vue';
 import UserChip from '@/components/user-chip/UserChip.vue';
 import { IEvent, IEventType } from '@/interfaces';
+import { dispatchGetOneEvent } from '@/store/event/actions';
+import { readOneEvent } from '@/store/event/getters';
 import { readUserProfile } from '@/store/main/getters';
 import { Vue, Component, Prop } from 'vue-property-decorator'
 
@@ -117,12 +121,17 @@ import { Vue, Component, Prop } from 'vue-property-decorator'
 export default class EventTable extends Vue {
 
   @Prop()
-  public items!: IEvent[];
+  public items!: IEvent[] | null;
 
-  public showUsers: IEvent | null = null;
+  @Prop()
+  public type!: IEventType;
 
-  public get type() {
-    return this.$route.meta?.event_type as IEventType;
+  public displayUsersFor: IEvent | null = null;
+
+
+  public async showUsers(event: IEvent) {
+    await dispatchGetOneEvent(this.$store, event.id);
+    this.displayUsersFor = readOneEvent(this.$store)(event.id) || null;        
   }
 
   public get typeName() {
@@ -136,16 +145,12 @@ export default class EventTable extends Vue {
     return readUserProfile(this.$store);
   }
 
-  public isParticipant(item: IEvent): boolean {
-    return item.participants.some(participant => participant.id == this.userProfile?.id);
-  }
-
   public get headers() {
     return [
       {
         text: 'Titel',
         sortable: true,
-        value: 'custom_title',
+        value: 'title',
         align: 'left',
       },
       this.type === 'meeting' && {
@@ -200,13 +205,6 @@ export default class EventTable extends Vue {
         align: 'center',
         sortable: false,
       },
-      {
-        text: 'Anmelden',
-        value: 'custom_register',
-        align: 'center',
-        sortable: false,
-      },
-    
       {
         text: 'Teilnehmer:innen',
         value: 'custom_show_participants',

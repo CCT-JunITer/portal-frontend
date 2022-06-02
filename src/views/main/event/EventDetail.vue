@@ -3,14 +3,17 @@
     <div>
 
       <div class="d-flex">
-        <h1 class="text-h2 text--primary mb-3">{{this.event.title}}</h1>
+        <h1 class="text-h2 text--primary mb-3">
+          <v-icon v-if="this.event.approved" color="cctGreen" x-large>mdi-check-decagram</v-icon>
+          {{this.event.title}}
+        </h1>
         <v-spacer></v-spacer>
         <div class="d-flex align-center">
           <v-btn color="cctOrange" outlined :to="{ name: 'event-edit', params: { id: this.event.id } }">
             <v-icon left>
               edit
             </v-icon>
-            Schulung bearbeiten
+            Event bearbeiten
           </v-btn>
         </div>
       </div>
@@ -23,6 +26,7 @@
           <p class="text-body-2 text--secondary">
             Allgemeine Informationen zu diesem Event
           </p>
+          <event-code-display :event="event"></event-code-display>
         </v-col>
         <v-col cols="12" md="8" class="px-5">  
           <v-row v-for="item in eventDetails" :key="item.name" class="my-3">
@@ -34,24 +38,34 @@
               {{ item.key }}
             </span>
           </v-row>
-        </v-col>
-      </v-row>
-      <v-divider class="my-5"></v-divider>
-      <v-row>
-        <v-col cols="12" md="4" class="px-5">
-          <h2 class="text-h4 text--primary mb-3">Agenda</h2>
-          <p class="text-body-2 text--secondary">
-            Agenda zu diesem Event
-          </p>
-        </v-col>
-        <v-col cols="12" md="8">
-          <ul>
-            <li
-              v-for="(item, index) in event.agenda"
-              :key="index"
-              v-text="item"
-            ></li>
-          </ul>
+          <v-row class="my-3" v-if="event.wms_link">
+            <span class="col-xs-12 col-md-6 col-lg-4 col-xl-3 my-0 py-1" style="font-weight: 300; font-size: 0.9rem;">
+              WMS-Link
+            </span>
+
+            <a class="col-xs-12 col-md-6 col-lg-8 col-xl-9 my-0 py-1" :href="event.wms_link">
+              {{ event.wms_link }}
+            </a>
+          </v-row>
+          <v-row>
+            <span class="col-xs-12 col-md-6 col-lg-4 col-xl-3 my-0 py-1" style="font-weight: 300; font-size: 0.9rem;">
+              Agenda
+            </span>
+
+            <span class="col-xs-12 col-md-6 col-lg-8 col-xl-9 my-0 py-1">
+              <div 
+                v-for="(element, index) in event.agenda"
+                :key="index"
+                class="rounded my-2"
+              >
+                <div class="flex-center">
+                  <span class="agenda-item rounded">
+                    <b>{{ index + 1 }}</b> {{ element }}
+                  </span>
+                </div>
+              </div>
+            </span>
+          </v-row>
         </v-col>
       </v-row>
       <v-divider class="my-5"></v-divider>
@@ -67,8 +81,8 @@
           </file-manager>
         </v-col>
       </v-row>
+      <v-divider class="my-5"></v-divider>
       <div v-if="isSuperuser">
-        <v-divider class="my-5"></v-divider>
         <v-row>
           <v-col cols="12" md="4" class="px-5">
             <h2 class="text-h4 text--primary mb-3">Anmeldungen</h2>
@@ -78,7 +92,7 @@
           </v-col>
           <v-col cols="12" md="8">  
             <p v-if="this.eventApplications.length == 0">
-              Noch keine Schulungsanmeldungen
+              Noch keine Anmeldungen
             </p>
             <v-row v-else>
               <v-col cols="12" md="12" lg="6" xl="6" sm="12" class="px-5"
@@ -227,9 +241,6 @@
           <p class="text-body-2 text--secondary">
             Teilnehmer:innen
           </p>
-          <v-container v-if="isSuperuser">
-            <qrcode-vue :value="link" :size="225" level="H" />
-          </v-container>
         </v-col>
 
         <v-col cols="12" md="8">  
@@ -274,17 +285,13 @@ import EventApplicationCard from '@/components/event-application/EventApplicatio
 import { IEvent, IEventApplication, IEventApplicationStatus } from '@/interfaces';
 import FileManager from '@/components/file-manager/FileManager.vue';
 import { Route } from 'vue-router';
-import QrcodeVue from 'qrcode.vue'
-import { api } from '@/api';
-import Draggable from 'vuedraggable'
-
+import EventCodeDisplay from './EventCodeDisplay.vue';
 
 @Component({
-  components: { EmployeeProfilePicture, EmployeeCard, FileChip, EventApplicationCard, FileManager, QrcodeVue, Draggable },
+  components: { EmployeeProfilePicture, EmployeeCard, FileChip, EventApplicationCard, FileManager, EventCodeDisplay },
 })
 export default class TrainingDetail extends Vue {
   public today = new Date();
-  public otp: string | null = null;
 
   get event(): IEvent {
     return readRouteEvent(this.$store)(this.$route) as IEvent;
@@ -296,19 +303,6 @@ export default class TrainingDetail extends Vue {
       .filter(application => application.status === 'in progress');
   }
 
-  get link() {
-    return `https://portal.cct-ev.de/main/events/check-in/${this.event.id}?otp=${this.otp}`
-  }
-
-  public async getTOTP() {
-    const response = await api.getTOTP(this.$store.state.main.token, +this.$route.params.id);
-    const { totp, time_remaining } = response.data;
-    this.otp = totp;
-    console.log(totp, time_remaining);
-    setTimeout(() => {
-      this.getTOTP();
-    }, time_remaining * 1000);
-  }
 
 
   public get waitingApplications() {
@@ -338,7 +332,6 @@ export default class TrainingDetail extends Vue {
     if (newRoute?.params.id !== oldRoute?.params.id && +newRoute.params.id) {
       await dispatchGetOneEvent(this.$store, +newRoute.params.id)
       await dispatchGetEventApplications(this.$store, +newRoute.params.id);
-      await this.getTOTP();
     }
   }
 
@@ -346,14 +339,14 @@ export default class TrainingDetail extends Vue {
   get eventDetails() {
     return [
       {
-        name: 'Schulungsart',
+        name: 'Art',
         key: this.event?.subtype,
       },
       {
         name: 'Datum',
         key: format(new Date(String(this.event?.date_from)), 'dd.MM.yyyy HH:mm') + ' - ' + format(new Date(String(this.event?.date_to)), 'dd.MM.yyy HH:mm'),
       },
-      {
+      this.event.type === 'training' && {
         name: 'Thema',
         key: this.event?.topic,
       },
@@ -361,11 +354,26 @@ export default class TrainingDetail extends Vue {
         name: 'Beschreibung',
         key: this.event?.description,
       },
-    ];
+    ].filter(c => c);
   }
 }
 </script>
 
-<style scoped>
+<style lang="sass" scoped>
+@import '~vuetify/src/styles/styles.sass'
+
+.agenda-wrapper 
+  border: 1px solid #999
+  padding: 10px
+
+.agenda-item
+  padding: 7px 25px
+  background: #eee
+  padding-left: 10px
+
+.flex-center
+  display: flex
+  justify-content: space-between
+  align-items: center
 
 </style>

@@ -233,7 +233,7 @@
               </template>
             </template>
           </v-autocomplete>
-          <file-manager v-model="event.files" :multiple="true"></file-manager>
+          <file-manager v-model="event.files" :multiple="true" :labels="fileLabels"></file-manager>
         </v-form>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -276,8 +276,17 @@ export default class AdminViewEvent extends Vue {
   public event: Partial<IEventCreate> = {}
 
 
+
   public get type() {
     return (this.$route.meta?.event_type || this.event?.type || 'training') as IEventType;
+  }
+
+  get fileLabels() {
+    if (this.type === 'training') {
+      return ['SEB-Auswertung', 'Präsentation', 'Teilnehmerliste', '']
+    } else if(this.type === 'meeting') {
+      return ['Präsentation', 'Anhang'];
+    }
   }
 
 
@@ -371,6 +380,19 @@ export default class AdminViewEvent extends Vue {
 
 <style lang="sass" scoped>
 @import '~vuetify/src/styles/styles.sass'
+
+.agenda-wrapper
+  border: 1px solid #999
+  padding: 10px
+
+.agenda-item
+  background: #eee
+  padding-left: 10px
+
+.flex-center
+  display: flex
+  justify-content: space-between
+  align-items: center
 
 @media #{map-get($display-breakpoints, 'md-and-up')}
   .input-lg

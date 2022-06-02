@@ -1,136 +1,44 @@
 <template>
-  <div>
-    <v-card outlined v-if="userProfile">
-      <v-card-title>
-        Pflichtschulungen
-      </v-card-title>
-      <v-expansion-panels>
-        <v-expansion-panel
-          v-for="event in this.mandatoryEvents"
-          :key="event.id"
-        >
-          <v-expansion-panel-header>
-            {{ event.title }} - {{ formatDate(event.date) }}
-            <template v-slot:actions>
-              <v-icon v-if="(eventIsDone(event.date))" color="green">
-                mdi-check
-              </v-icon>
-              <v-icon v-else color="cctGrey">
-                mdi-calendar
-              </v-icon>
-            </template>
-          </v-expansion-panel-header>
-          <v-expansion-panel-content>
-            <v-icon>
-              mdi-text
-            </v-icon>
-            Beschreibung: {{ event.description }}
-            <br/>
-            <br/>
-            <v-icon>
-              mdi-school
-            </v-icon>
-            Trainer:innen:
-            <span>
-              {{ event.trainers.map(trainer => trainer.full_name).join(', ') }}
-            </span> 
-            <br />
-            <v-icon>
-              mdi-account-supervisor
-            </v-icon>
-            
-            Teilnehmer:innen: 
-            <span>
-              {{ event.participants.map(participant => participant.full_name).join(', ') }}
-            </span>  
-            <br/>
-            <br/>
-            <v-spacer></v-spacer>
-          </v-expansion-panel-content>
-        </v-expansion-panel>
-        
+  <div v-if="userProfile">
+    <event-table :items="filterredEvents" :type="type">
+      <template v-slot:top>
+        <v-toolbar flat>
+          <v-toolbar-title>
+            Besuchte {{ typeName }}s
+          </v-toolbar-title>
+        </v-toolbar>
+      </template>
+    </event-table>      
 
-
-      </v-expansion-panels>
-    </v-card>
-    <v-card outlined v-if="userProfile">
-      <v-card-title>
-        Zusatzschulungen
-      </v-card-title>
-      <v-expansion-panels>
-        <v-expansion-panel
-          v-for="event in this.optionalEvents"
-          :key="event.id"
-        >
-          <v-expansion-panel-header>
-            {{ event.title }} - {{ formatDate(event.date_from) }}
-            <template v-slot:actions>
-              <v-icon v-if="(eventIsDone(event.date_from))" color="green">
-                mdi-check
-              </v-icon>
-              <v-icon v-else color="cctGrey">
-                mdi-calendar
-              </v-icon>
-            </template>
-          </v-expansion-panel-header>
-          <v-expansion-panel-content>
-            <v-icon>
-              mdi-text
-            </v-icon>
-            Beschreibung: {{ event.description }}
-            <br/>
-            <br/>
-            <v-icon>
-              mdi-school
-            </v-icon>
-            Trainer:innen:
-            <span>
-              {{ event.leaders.map(trainer => trainer.full_name).join(', ') }}
-            </span> 
-            <br />
-            <v-icon>
-              mdi-account-supervisor
-            </v-icon>
-            
-            Teilnehmer:innen: 
-            <span>
-              {{ event.participants.map(participant => participant.full_name).join(', ') }}
-            </span>  
-            <br/>
-            <br/>
-            <v-spacer></v-spacer>
-          </v-expansion-panel-content>
-        </v-expansion-panel>
-        
-        
-
-
-      </v-expansion-panels>
-    </v-card>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { readRouteUser } from '@/store/main/getters';
-import { format, isAfter } from 'date-fns';
 import { readEventsForRoute } from '@/store/event/getters';
 import { dispatchGetEventsFor } from '@/store/event/actions';
+import EventTable from '../../event/EventTable.vue';
+import { IEventType } from '@/interfaces';
 
-@Component({})
+
+@Component({
+  components: { EventTable }
+})
 export default class UserProfileEvents extends Vue {
-
-  public eventIsDone(dateTimeStr: string) {
-    const event_date = new Date(dateTimeStr);
-    return isAfter(event_date, new Date());
+  public get type() {
+    return this.$route.meta?.event_type as IEventType;
   }
 
-  get mandatoryEvents() {
-    return this.events.filter(event => event.subtype == 'Pflichtschulung');
+  public get typeName() {
+    return {
+      'training': 'Training',
+      'meeting': 'Meeting'
+    }[this.type];
   }
 
-  get optionalEvents() {
-    return this.events.filter(event => event.subtype != 'Pflichtschulung');
+  get filterredEvents() {
+    return this.events.filter(event => event.type === this.type);
   }
 
   get events() {
@@ -139,10 +47,6 @@ export default class UserProfileEvents extends Vue {
 
   async mounted() {
     await dispatchGetEventsFor(this.$store, Number(this.userProfile?.id));
-  }
-
-  public formatDate(date: string) {
-    return format(new Date(date), 'dd.MM.yyyy HH:mm')
   }
 
 

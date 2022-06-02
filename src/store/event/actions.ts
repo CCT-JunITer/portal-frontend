@@ -9,7 +9,7 @@ import {
   commitSetEvent,
 } from './mutations';
 import { EventState } from './state';
-import { IEventApplicationCreate, IEventApplicationUpdate, IEventCreate } from '@/interfaces';
+import { IEventApplicationCreate, IEventApplicationUpdate, IEventCreate, IEventType } from '@/interfaces';
 import { apiCall, apiCallNotify } from '../utils';
 
 type MainContext = ActionContext<EventState, State>;
@@ -19,9 +19,9 @@ export const actions = {
     const response = await apiCall(context, token => api.getPersonalEvents(token, userId));
     commitSetEventsFor(context, {userId: userId, payload: response.data});
   },
-  async actionGetEvents(context: MainContext, eventType: string) {
+  async actionGetEvents(context: MainContext, eventType: IEventType) {
     const response = await apiCall(context, (token) => api.getEvents(token, eventType));
-    commitSetEvents(context, response.data);
+    commitSetEvents(context, { payload: response.data, type: eventType });
   },
   async actionGetOneEvent(context: MainContext, eventId: number) {
     const response = await apiCall(context, (token) => api.getOneEvent(token, eventId));

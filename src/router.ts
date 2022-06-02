@@ -133,10 +133,20 @@ export default new Router({
                           redirect: (to) => ({ name: 'profile-about', params: { id: to.params?.id || 'me' } })
                         },
                         {
-                          path: 'events',
-                          name: 'profile-events',
-                          component: () => import(
-                          /* webpackChunkName: "main-profile-events" */ './views/main/people/profile/UserProfileEvents.vue')
+                          path: 'meetings',
+                          name: 'profile-meetings',
+                          meta: {
+                            event_type: 'meeting',
+                          },
+                          component: () => import(/* webpackChunkName: "main-profile-events" */ './views/main/people/profile/UserProfileEvents.vue'),
+                        },
+                        {
+                          path: 'trainings',
+                          name: 'profile-trainings',
+                          meta: {
+                            event_type: 'training',
+                          },
+                          component: () => import(/* webpackChunkName: "main-profile-events" */ './views/main/people/profile/UserProfileEvents.vue'),
                         },
                         {
                           path: 'skills',

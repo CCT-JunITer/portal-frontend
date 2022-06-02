@@ -3,6 +3,7 @@
     color="lightgrey"
     v-bind="$attrs"
     v-on="$listeners"
+    v-if="user"
   >
     <v-avatar left>
       <employee-profile-picture
