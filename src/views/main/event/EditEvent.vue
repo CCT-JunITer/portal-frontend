@@ -35,7 +35,17 @@
             prepend-icon="mdi-animation"
             :items="$common.SCHULUNGSART"
             :rules="[$common.required]"
-          ></v-select>    
+          ></v-select>
+          <v-select
+            label="Meetingart"
+            v-if="type === 'meeting'"
+            v-model ="event.subtype"
+            class="input-lg"
+            required
+            prepend-icon="mdi-animation"
+            :items="$common.MEETINGART"
+            :rules="[$common.required]"
+          ></v-select>
           <v-select
             label="Schulungsthema"
             v-if="type === 'training'"
@@ -45,7 +55,7 @@
             class="input-lg"
             required
             :rules="[$common.required]"
-          ></v-select>         
+          ></v-select>
           <v-textarea
             label="Beschreibung"
             v-model="event.description"
@@ -55,6 +65,9 @@
             required
             :rules="[$common.required]"
           ></v-textarea>
+
+          <agenda-component v-model="event.agenda" class="input-lg">
+          </agenda-component>
 
           <date-time-picker-menu
             v-model ="event.date_from"
@@ -220,7 +233,7 @@
               </template>
             </template>
           </v-autocomplete>
-          <file-manager v-model="event.files" :multiple="true"></file-manager>
+          <file-manager v-model="event.files" :multiple="true" :labels="fileLabels"></file-manager>
         </v-form>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -251,10 +264,10 @@ import { dispatchCreateEvent, dispatchGetOneEvent, dispatchUpdateEvent } from '@
 import FileManager from '@/components/file-manager/FileManager.vue';
 import DateTimePickerMenu from '@/components/DateTimePickerMenu.vue';
 import { Route } from 'vue-router';
-
+import AgendaComponent from '@/components/agenda/AgendaComponent.vue';
 
 @Component({
-  components: {VueTelInputVuetify, UploadButton, DateTimePickerMenu, EmployeeProfilePicture, FileManager},
+  components: {VueTelInputVuetify, UploadButton, DateTimePickerMenu, EmployeeProfilePicture, FileManager, AgendaComponent },
 })
 export default class AdminViewEvent extends Vue {
 
@@ -262,8 +275,18 @@ export default class AdminViewEvent extends Vue {
   public valid = false;
   public event: Partial<IEventCreate> = {}
 
+
+
   public get type() {
     return (this.$route.meta?.event_type || this.event?.type || 'training') as IEventType;
+  }
+
+  get fileLabels() {
+    if (this.type === 'training') {
+      return ['SEB-Auswertung', 'Präsentation', 'Teilnehmerliste', '']
+    } else if(this.type === 'meeting') {
+      return ['Präsentation', 'Anhang'];
+    }
   }
 
 
@@ -278,8 +301,6 @@ export default class AdminViewEvent extends Vue {
       this.reset();
     }
   }
-
-
 
 
   public async mounted() {
@@ -359,6 +380,19 @@ export default class AdminViewEvent extends Vue {
 
 <style lang="sass" scoped>
 @import '~vuetify/src/styles/styles.sass'
+
+.agenda-wrapper
+  border: 1px solid #999
+  padding: 10px
+
+.agenda-item
+  background: #eee
+  padding-left: 10px
+
+.flex-center
+  display: flex
+  justify-content: space-between
+  align-items: center
 
 @media #{map-get($display-breakpoints, 'md-and-up')}
   .input-lg

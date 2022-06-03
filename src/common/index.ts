@@ -34,6 +34,9 @@ export const UNIVERSITIES = [
 export const SCHULUNGSART = [
   'Pflichtschulung', 'Zusatzschulung', 'Allgemeine Schulung'
 ];
+export const MEETINGART = [
+  'Donnerstagssitzung', 'Mitgliederversammlung', 'Ressortsitzung', 'Workingsession'
+];
 
 export const KOSTENART = [
   { name: 'Topf Mitgliederförderung', associations: [] },

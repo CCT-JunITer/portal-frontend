@@ -91,15 +91,20 @@ export interface IUserSettings {
 
 export interface VersionedFolder {
     id: string;
-    effective_files: string[];
+    effective_files: LabelledFile[];
     file_changes: FileChange[];
+}
+
+export interface LabelledFile {
+    file_id: string;
+    label?: string;
 }
 
 export interface FileChange {
     author_id: number;
-    file_id: string;
     date: Date;
-    old_file_id?: string;
+    file: LabelledFile;
+    old_file?: LabelledFile;
     mode: 'created' | 'deleted' | 'modified';
 }
 
@@ -111,8 +116,11 @@ export interface IEvent {
     subtype: string;
     topic: string;
     description: string;
+    agenda: string[];
     date_from: string;
     date_to: string;
+    date_checkin_from: string;
+    date_checkin_to: string;
     wms_link: string;
     external: string;
     id: number;
@@ -129,6 +137,7 @@ export interface IEventCreate {
     date_from: string;
     date_to: string;
     external: string;
+    agenda: string[];
     is_membership_progression: boolean;
     topic: string;
     description: string;

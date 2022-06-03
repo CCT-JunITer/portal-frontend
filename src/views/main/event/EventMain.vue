@@ -14,112 +14,17 @@
       </v-btn>
     </v-toolbar>
     <v-container>
-      <v-data-table
-        :class="`elevation-2`"
-        :headers="headers" 
-        :items="futureEvents"
-      >
+      
+      <event-table :items="futureEvents" :type="type">
         <template v-slot:top>
           <v-toolbar flat>
             <v-toolbar-title>
               Kommende {{ typeName }}s
             </v-toolbar-title>
-            
           </v-toolbar>
         </template>
-        <template v-slot:item.custom_title="{ item }">
-          <span style="font-weight: 500;">{{ item.title }}</span>
-        </template>
-        <template v-slot:item.external="{ item }">
-          <span v-if="item.external === ''">Keine</span>
-          <span v-else>{{item.external}}</span>
-        </template>
-        <template v-slot:item.custom_files="{ item }">
-          <file-manager :value="item.files" :readonly="true" :noManager="true"></file-manager>
-        </template>
-       
-        <template v-slot:item.custom_leaders="{ item }">
-          <v-chip
-            class="trainer-chip"
-            v-for="leader in item.leaders"
-            :key="leader.id"
-            color="lightgrey"
-          >
-            <v-avatar left>
-              <employee-profile-picture
-                :employee="leader"
-              ></employee-profile-picture>
-            </v-avatar>
-            {{ leader.full_name }}
-          </v-chip>
-        </template>
-        <template v-slot:item.wms_link="{ item }">
-          <a :href="item.wms_link"> {{ item.wms_link }}</a>
-        </template>
-        <template v-slot:item.date_from="{ item }">
-          {{ $common.format(new Date(item.date_from), 'dd.MM.yyyy HH:mm') }}
-        </template>
-        <template v-slot:item.date_to="{ item }">
-          {{ $common.format(new Date(item.date_to), 'dd.MM.yyyy HH:mm') }}
-        </template>
-
-        
-        <template v-slot:item.custom_show_participants="{ item }">
-          <v-btn
-            color="cctBlue"
-            style="color: #fff; margin: 10px;"
-            @click="showParticipants(item)"
-          >
-            <v-icon>
-              mdi-account-supervisor
-            </v-icon>
-          </v-btn>
-        </template>
-        <template v-slot:item.custom_register="{ item }">
-          <v-btn
-            v-if="isParticipant(item)"
-            disabled
-            style="margin: 10px;"
-          >
-            <v-icon>
-              mdi-account-check
-            </v-icon>
-          </v-btn>
-          <v-btn
-            v-else
-            color="cctGreen"
-            style="color: #fff; margin: 10px;"
-            @click="openRegisterEvent(item)"
-          >
-            <v-icon>
-              mdi-account-plus
-            </v-icon>
-          </v-btn>
-        </template>
-
-        <template v-slot:item.custom_details="{ item }">
-          <v-btn
-            color="cctGrey"
-            :to="{name: 'events-details', params: {id: item.id}}"
-            style="color:#fff;"
-          >
-            <v-icon>
-              mdi-text
-            </v-icon>
-          </v-btn>
-        </template>
-
-
-
-      </v-data-table>
-
-
-      <v-data-table 
-        :class="`elevation-2`"
-        id="second-table"
-        :headers="headers" 
-        :items="pastEvents"
-      >
+      </event-table>
+      <event-table :items="pastEvents" :type="type">
         <template v-slot:top>
           <v-toolbar flat>
             <v-toolbar-title>
@@ -127,104 +32,7 @@
             </v-toolbar-title>
           </v-toolbar>
         </template>
-        <template v-slot:item.custom_title="{ item }">
-          <span style="font-weight: 500;">{{ item.title }}</span>
-        </template>
-        <template v-slot:item.external="{ item }">
-          <span v-if="item.external === ''">Keine</span>
-          <span v-else>{{item.external}}</span>
-        </template>
-       
-        <template v-slot:item.custom_leaders="{ item }">
-          <v-chip
-            class="trainer-chip"
-            v-for="leader in item.leaders"
-            :key="leader.id"
-            color="lightgrey"
-          >
-            <v-avatar left>
-              <employee-profile-picture
-                :employee="leader"
-              ></employee-profile-picture>
-            </v-avatar>
-            {{ leader.full_name }}
-          </v-chip>
-        </template>
-        <template v-slot:item.date_from="{ item }">
-          {{ $common.format(new Date(item.date_from), 'dd.MM.yyyy HH:mm') }}
-        </template>
-        <template v-slot:item.date_to="{ item }">
-          {{ $common.format(new Date(item.date_to), 'dd.MM.yyyy HH:mm') }}
-        </template>
-
-        <template v-slot:item.custom_delete="{ item }">
-          <v-icon
-            @click="deleteItem(item)"
-          >
-            mdi-delete
-          </v-icon>
-        </template>
-        <template v-slot:item.custom_edit="{ item }">
-          <v-icon
-            @click="deleteItem(item)"
-          >
-            mdi-pencil
-          </v-icon>
-        </template>
-        <template v-slot:item.custom_show_participants="{ item }">
-          <v-btn
-            color="cctBlue"
-            style="color: #fff; margin: 10px;"
-            @click="showParticipants(item)"
-          >
-            <v-icon>
-              mdi-account-supervisor
-            </v-icon>
-          </v-btn>
-        </template>
-        <template v-slot:item.custom_register="{ item }">
-          <v-btn
-            v-if="isParticipant(item)"
-            disabled
-            style="margin: 10px;"
-          >
-            <v-icon>
-              mdi-account-check
-            </v-icon>
-          </v-btn>
-          <v-btn
-            v-else
-            disabled
-            style="margin: 10px;"
-          >
-            <v-icon>
-              mdi-account-cancel
-            </v-icon>
-          </v-btn>
-        </template>
-        <template v-slot:item.custom_files="{ item }">
-          <file-manager 
-            :value="item.files"
-            :folder="item.versioned_folder" 
-            :readonly="true" 
-            :noManager="true">
-          </file-manager>
-        </template>
-
-        <template v-slot:item.custom_details="{ item }">
-          <v-btn
-            color="cctGrey"
-            :to="{name: 'events-details', params: {id: item.id}}"
-            style="color:#fff;"
-          >
-            <v-icon>
-              mdi-text
-            </v-icon>
-          </v-btn>
-        </template>
-
-  
-      </v-data-table>
+      </event-table>
       
       <div v-if="type === 'training'">
         <div 
@@ -251,44 +59,7 @@
 
     </v-container>
 
-    <v-dialog 
-      v-model="dialog_participants" 
-      max-width="450px"
-      v-if="this.event_details"
-    >
-      <v-card>
-        <v-card-title class="text-h5">Teilnehmerliste: {{ this.event_details.title }}</v-card-title>
-        <v-card-text>
-          <div>
-            <v-list subheader>
-              <v-subheader>Teilnehmer:innen</v-subheader>
-
-              <v-list-item
-                v-for="participant in this.event_details.participants"
-                :key="participant.id"
-              >
-                <employee-profile-picture
-                  :employee="participant"
-                  component="v-list-item-avatar"
-                  size="40"
-                ></employee-profile-picture>
-
-                <v-list-item-content>
-                  <v-list-item-title v-text="participant.full_name"></v-list-item-title>
-                  <v-list-item-subtitle v-text="participant.ressort"></v-list-item-subtitle>
-                </v-list-item-content>
-
-              </v-list-item>
-            </v-list>
-          </div>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="cctBlue" text @click="closeShowParticipants">Schließen</v-btn>
-          <v-spacer></v-spacer>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    
 
 
     <v-dialog 
@@ -331,9 +102,10 @@ import { dispatchGetUserProfile, dispatchGetUsers } from '@/store/main/actions';
 import { readUserProfile, readUsers } from '@/store/main/getters';
 import { isAfter } from 'date-fns';
 import FileManager from '@/components/file-manager/FileManager.vue';
+import EventTable from './EventTable.vue';
 
 @Component({
-  components: {EmployeeProfilePicture, FileManager },
+  components: {EmployeeProfilePicture, FileManager, EventTable },
 })
 export default class EventMain extends Vue {
 
@@ -361,88 +133,18 @@ export default class EventMain extends Vue {
 
   application_text = '';
 
-  public get headers() {
-    return [
-      {
-        text: 'Titel',
-        sortable: true,
-        value: 'custom_title',
-        align: 'left',
-      },
-      this.type === 'training' && {
-        text: 'Schulungstyp',
-        sortable: true,
-        value: 'subtype',
-        align: 'left',
-      },
-      this.type === 'training' && {
-        text: 'Thema',
-        sortable: true,
-        value: 'topic',
-        align: 'left',
-      },
-      {
-        text: 'Beschreibung',
-        sortable: false,
-        value: 'description',
-        align: 'left',
-      },
-      {
-        text: 'Datum von',
-        sortable: true,
-        value: 'date_from',
-        align: 'left',
-      },
-      {
-        text: 'Datum bis',
-        sortable: true,
-        value: 'date_to',
-        align: 'left',
-      },
-      this.type === 'training' && {
-        text: 'Ext. Trainer:innen',
-        value: 'external',
-        sortable: false,
-      },
-      {
-        text: 'Sitzungsleiter:innen',
-        value: 'custom_leaders',
-        align: 'center',
-        sortable: false,
-      },
-      {
-        text: 'Anmelden',
-        value: 'custom_register',
-        align: 'center',
-        sortable: false,
-      },
-    
-      {
-        text: 'Teilnehmer:innen',
-        value: 'custom_show_participants',
-        align: 'center',
-        sortable: false,
-      
-      },
-      {
-        text: 'Details',
-        value: 'custom_details',
-        align: 'center',
-        sortable: false,
-      
-      },
-      {
-        text: 'Dateien',
-        value: 'custom_files',
-      }
-    ].filter(v => v);
-  }
 
   get futureEvents() {
+    if(!this.events) {
+      return null;
+    }
     return this.events.filter(event => isAfter(new Date(event.date_from), this.today))
   }
 
   get pastEvents() {
+    if(!this.events) {
+      return null;
+    }
     return this.events.filter(event => isAfter(this.today, new Date(event.date_from)))
   }
   
@@ -454,7 +156,7 @@ export default class EventMain extends Vue {
     return readUsers(this.$store);
   }
   get events() {
-    return readEvents(this.$store)
+    return readEvents(this.$store)(this.type);
   }
   public async mounted() {
     await dispatchGetUsers(this.$store);
@@ -474,10 +176,6 @@ export default class EventMain extends Vue {
   }
 
 
-  public isParticipant(item: IEvent): boolean {
-    console.log(this.userProfile?.id);
-    return item.participants.some(participant => participant.id == this.userProfile?.id);
-  }
 
   public closeRegisterEvent(): void {
     this.dialog_register = false;

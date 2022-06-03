@@ -5,21 +5,14 @@
     :prepend-icon="{created: 'mdi-plus', deleted: 'mdi-minus', modified: 'mdi-star'}[fileChange.mode]">
     <template v-slot:activator>
       <v-list-item dense>
-        <employee-profile-picture
-          :employee="userProfile"
-          component="v-list-item-avatar"
-          size="24"
-        ></employee-profile-picture>
-        <v-list-item-icon>
-          <v-icon :color="color">{{
-          }}</v-icon>
-        </v-list-item-icon>
         <v-list-item-content>
           <v-list-item-title>
+            <user-chip :user="userProfile" dense>
+            </user-chip>
             {{ fileChange.mode }}
           </v-list-item-title>
           <v-list-item-subtitle>
-            {{ $common.format($common.parseISO(fileChange.date), 'HH:mm dd.MM.yyyy') }}
+            {{ $common.format(new Date(fileChange.date), 'dd.MM.yyyy HH:mm') }}
           </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
@@ -27,18 +20,15 @@
 
     <v-list-item class="FileChange" dense>
       <v-list-item-content>
-        <v-list-item-subtitle>
-          <file-chip 
-            :filename="fileChange.file_id"
-            color="cctGreen">
-          </file-chip>
-          <file-chip 
-            v-if="fileChange.old_file_id" 
-            :filename="fileChange.old_file_id" 
-            color="cctOrange">
-          </file-chip>
-        </v-list-item-subtitle>
-      <!-- <file-chip :filename="fileChange.file_id"></file-chip> -->
+        <file-chip 
+          :file="fileChange.file"
+          color="cctGreen">
+        </file-chip>
+        <file-chip 
+          v-if="fileChange.old_file" 
+          :file="fileChange.old_file" 
+          color="cctOrange">
+        </file-chip>
       </v-list-item-content>
     </v-list-item>
   </v-list-group>
@@ -50,9 +40,10 @@ import { readOneUser } from '@/store/main/getters';
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import EmployeeProfilePicture from '../employee/EmployeeProfilePicture.vue';
 import FileChip from '../file-chip/FileChip.vue';
+import UserChip from '../user-chip/UserChip.vue';
 
 @Component({
-  components: { FileChip, EmployeeProfilePicture }
+  components: { FileChip, EmployeeProfilePicture, UserChip }
 })
 export default class FileChangeComponent extends Vue {
 

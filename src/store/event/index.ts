@@ -5,7 +5,10 @@ import { EventState } from './state';
 
 const defaultState: EventState = {
   eventsParticipants: {},
-  events: [],
+  events: {
+    training: null,
+    meeting: null,
+  },
   eventApplications: {},
 };
 

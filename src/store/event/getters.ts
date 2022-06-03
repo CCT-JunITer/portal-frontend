@@ -2,12 +2,13 @@ import { Route } from 'vue-router';
 import { EventState } from './state';
 import { getStoreAccessors } from 'typesafe-vuex';
 import { State } from '../state';
+import { IEventType } from '@/interfaces';
 
 export const getters = {
   routeEvent: (state: EventState) => (route: Route) => {
     const id = route.params.id;
     const numberId = parseInt(id);
-    return state.events.find(event => event.id === numberId);
+    return Object.values(state.events).flatMap(c => c || []).find(event => event.id === numberId);
   },
   eventApplicationsFor: (state: EventState) => (eventId: number) => {
     return state.eventApplications[eventId] || [];
@@ -20,12 +21,9 @@ export const getters = {
     return state.eventsParticipants[user.id] || [];
   },
   oneEvent: (state: EventState) => (eventId: number) => {
-    const filteredEvents = state.events.filter((trainig) => trainig.id === eventId);
-    if (filteredEvents.length > 0) {
-      return { ...filteredEvents[0] };
-    }
+    return Object.values(state.events).flatMap(c => c || []).find(event => event.id === eventId);
   },
-  events: (state: EventState) => state.events,
+  events: (state: EventState) => (type: IEventType) => state.events[type],
 };
 
 const {read} = getStoreAccessors<EventState, State>('');
