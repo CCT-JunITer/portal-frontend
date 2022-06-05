@@ -356,5 +356,6 @@ export interface ICalendar {
     events: ICalendarEvent[];
     color?: string;
     active?: boolean;
-    uid?: string
+    uid?: string;
+    rights: number;
 }

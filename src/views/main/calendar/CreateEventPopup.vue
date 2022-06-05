@@ -156,7 +156,7 @@
 
 import { dispatchRemoveEvent, dispatchUpdateCalendarEvent } from '@/store/calendar/actions'
 import { commitAddEventToCalendar, commitSetSelectedEvent, commitRemoveCalendarEvent, commitUpdateSelectedEvent } from '@/store/calendar/mutations'
-import { readCalendarById, readCalendars, readSelectedElement, readEventByUID} from '@/store/calendar/getters'
+import { readCalendarById, readCalendars, readSelectedElement, readEventByUID, readCalendarByUID} from '@/store/calendar/getters'
 import { getCalendarById } from '@/store/utils'
 import CalendarEventLocationComponent from './components/CalendarEventLocationComponent.vue'
 import  CalendarDateSelector from '@/views/main/calendar/CalendarDateSelector.vue'
@@ -210,7 +210,7 @@ export default {
 
     initSelectedEventInternal() {
       this.selectedEventInternal = Object.assign({}, this.selectedEvent)
-      this.calendar = this.calendars.find(x => x.uid == this.selectedEventInternal.calendarId)
+      this.calendar = readCalendarByUID(this.$store, this.selectedEventInternal.uid)
       if (!this.selectedEventInternal.timed) { // this is for allday events, for which the end property is a limit
         const end = new Date(this.selectedEventInternal.end)
         end.setDate(end.getDate()-1)

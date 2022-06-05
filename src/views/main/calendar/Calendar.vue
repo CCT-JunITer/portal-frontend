@@ -132,7 +132,29 @@
           @change="getEvents"
           @click:date="viewDay"
           
-        ></v-calendar>
+        >
+          <template v-slot:day-header="{}">
+            <v-icon>mdi-chess-rook</v-icon>
+          </template>
+          <template v-slot:interval="{minutesToPixels, hour, day, month, year}">
+            <div 
+              v-if="getIntervalTowerEvents(hour, day, month-1, year).length > 0"
+              :style="'margin-top:'+0+';height:'+minutesToPixels(60)+'px;background-color:black;width:30px'"
+              @click="(event) => showEvent({nativeEvent:event, event:getIntervalTowerEvents(hour, day, month-1, year)[0]})"
+            >
+              <div
+              >
+
+              </div>
+            </div>
+            <!-- <div :style="'height:'+minutesToPixels(60)+'px;'">
+              {{date+"T"+time}} 
+            </div> -->
+          </template>
+          <!-- <template v-slot:event="{event, timeSummary, eventSummary}">
+            <div class="ml-1">{{timeSummary()}} <v-icon v-if="event.event.tower">mdi-chess-rook</v-icon>{{eventSummary()}}</div>
+          </template> -->
+        </v-calendar>
         
         <calendar-event-popup 
           ref="calendarEventPopup" 
@@ -162,7 +184,7 @@ import CalendarEventPopup from './CreateEventPopup.vue'
 import CalendarToolbar from './CalendarToolbar.vue';
 import { commitSetSelectedEvent } from '@/store/calendar/mutations';
 import { dispatchFetchCalendars } from '@/store/calendar/actions';
-import { readCalendars } from '@/store/calendar/getters';
+import { readCalendars, readTowerCalendar } from '@/store/calendar/getters';
 import { CalendarEvent } from './CalendarEvent';
 import { readAuthenticationURL } from '@/store/main/getters';
 
@@ -293,6 +315,8 @@ export default {
       // if (end && end.date) {
       //   if (end.date) end = new Date(end.date + 'T' + end.time)
       // }
+
+      
 
       if (start && end && !fetch) {
         if (this.viewStart > start || end > this.viewEnd) {
@@ -541,6 +565,9 @@ export default {
       // for (const key in this.newEvent) {
       //   delete this.newEvent[key]
       // }
+      console.log(this.createDate(16, 3, 5, 2022))
+      console.log(this.getIntervalTowerEvents(16, 3, 5, 2022));
+      console.log(this.getIntervalTowerEvents(16, 3, 5, 2022).length >  0);
 
       const calendar = this.calendars[0]
       const end = new Date(this.value)
@@ -554,6 +581,8 @@ export default {
       // this.addEventToView(this.newEvent)
       const uiEvent = constructUIEvents(event, calendar);
       this.events.push(...uiEvent);
+      commitSetSelectedEvent(this.$store, event)
+      this.$refs.calendarEventPopup.show()
 
       return this.newEvent
     },
@@ -563,6 +592,71 @@ export default {
       if (!event.uiEvents) event.uiEvents = []
       event.uiEvents.push(uiEvent)
       this.events.push(uiEvent);
+    },
+
+    createDate(hour, day, month, year) {
+      const d = new Date()
+      d.setTime(0)
+      d.setFullYear(year);
+      d.setDate(day);
+      d.setMonth(month);
+      d.setHours(hour);
+      return d
+    },
+
+    isTowerInterval(hour, day, month, year) {
+      const intervalStart = this.createDate(hour, day, month, year)
+      const intervalEnd = this.createDate(hour+1, day, month, year)
+    },
+
+    isInInterval(hour, day, month, year, event) {
+      const intervalStart = this.createDate(hour, day, month, year)
+      const intervalEnd = this.createDate(hour+1, day, month, year)
+      return (event.start < intervalEnd && event.end > intervalStart)
+    },
+
+    getIntervalEventStart(hour, day, month, year, event) {
+      const intervalStart = this.createDate(hour, day, month, year)
+      const start = (event.start < intervalStart) ? intervalStart : event.start
+      return start
+    },
+
+    getIntervalEventLength(hour, day, month, year, event) {
+      const intervalStart = this.createDate(hour, day, month, year)
+      const intervalEnd = this.createDate(hour+1, day, month, year)
+      const start = (event.start < intervalStart) ? intervalStart : event.start
+      const end = (event.end > intervalEnd) ? intervalEnd : event.end
+      return (event.end-event.start)/1000/60
+    },
+
+    getIntervalEventEnd(hour, day, month, year, event) {
+      const intervalEnd = this.createDate(hour+1, day, month, year)
+      const end = (event.end > intervalEnd) ? intervalEnd : event.end
+      return end
+    },
+
+    getIntervalTowerEvents(hour, day, month, year) {
+      const intervalStart = this.createDate(hour, day, month, year)
+      const intervalEnd = this.createDate(hour+1, day, month, year)
+      const intervals = []
+      if (this.towerCalendar) {
+        this.towerCalendar.events.forEach((event) => {
+          // console.log(event)
+          console.log(intervalStart.toISOString() + '    ' + intervalEnd.toISOString())
+          if (event.start < intervalEnd && event.end > intervalStart) {
+            const start = (event.start < intervalStart) ? intervalStart : event.start
+            const end = (event.end > intervalEnd) ? intervalEnd : event.end
+            intervals.push({
+              event:event,
+              start:start,
+              end:end,
+              length:(event.end-event.start)/1000/60
+            });
+          }
+        })
+        // console.log(intervals)
+      }
+      return intervals;
     }
   },
 
@@ -590,9 +684,14 @@ export default {
 
     authenticationURL: function() {
       return readAuthenticationURL(this.$store);
-    }
+    },
+
+    towerCalendar: function() {
+      return readTowerCalendar(this.$store);
+    },
 
   },
+
 
   watch: {
     authenticationURL(val) {

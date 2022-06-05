@@ -5,6 +5,9 @@ import { getStoreAccessors } from 'typesafe-vuex';
 import { State } from '../state';
 import { getCalendarById } from '../utils';
 
+const TowerCalendarIDs = new Set(['tower_shared_by_CalendarBot']);
+const Replacements = [' (Calendar Bot)', ' (calendarbot)']
+
 export const mutations = {
 
   removeCalendarEvent(state: CalendarState, event: {calendarId: string; uid: string}) {
@@ -41,7 +44,20 @@ export const mutations = {
   },
 
   setCalendars(state: CalendarState, calendars: ICalendar[]) {
-    state.calendars = calendars
+    state.calendars = []
+    calendars.forEach((c) => {
+      Replacements.forEach((ss) => {
+        c.name = c.name.replace(ss, '')
+      })
+      
+      console.log(c.uid)
+      if (c.uid && TowerCalendarIDs.has(c.uid)) {
+        state.towerCalendar = c;
+      } else {
+        state.calendars.push(c)
+      }
+    })
+    // state.calendars = calendars
   },
 
   deleteCalendar(state: CalendarState, calendarId: string) {
