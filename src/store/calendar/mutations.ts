@@ -15,6 +15,7 @@ export const mutations = {
 
     const calendar = getCalendarById(state, event.calendarId)
     if (calendar) {
+      console.log(calendar)
       calendar.events = calendar.events.filter(x => x.uid != event.uid)
     }
   },
@@ -43,18 +44,40 @@ export const mutations = {
     calendar?.events.push(event)
   },
 
-  setCalendars(state: CalendarState, calendars: ICalendar[]) {
-    state.calendars = []
-    calendars.forEach((c) => {
+  updateEvent(state: CalendarState, event: ICalendarEvent) {
+    const calendarEvent: ICalendarEvent|undefined = getters.getEventByUID(state, event.uid)
+    if (calendarEvent) {
+      Object.assign(calendarEvent, event)
+    } else { // if event does not exist
+      const calendar: ICalendar|undefined = getters.getCalendarByUID(state, event.calendarId)
+      if (calendar) {
+        calendar.events.push(event)
+      } else {
+        console.error('saving event at calendar "' + event.calendarId + '", but this id does not exist!')
+      }
+    }
+  },
+
+  updateCalendars(state: CalendarState, payload: {calendars: ICalendar[]; start?: Date; end?: Date}) {
+    payload.calendars.forEach((c) => {
       Replacements.forEach((ss) => {
         c.name = c.name.replace(ss, '')
       })
       
-      console.log(c.uid)
       if (c.uid && TowerCalendarIDs.has(c.uid)) {
         state.towerCalendar = c;
       } else {
-        state.calendars.push(c)
+        const calendarObject: ICalendar|undefined = (c.uid) ? getters.getCalendarByUID(state, c.uid) : undefined
+        if (calendarObject) {
+          calendarObject.events.forEach(event => {
+            if (payload.start && payload.end && (event.end < payload.start || event.start > payload.end)) {
+              c?.events.push(event)
+            }
+          })
+          Object.assign(calendarObject, c)
+        } else {
+          state.calendars.push(c)
+        }
       }
     })
     // state.calendars = calendars
@@ -70,7 +93,8 @@ const {commit} = getStoreAccessors<CalendarState | any, State>('');
 
 export const commitSetSelectedEvent = commit(mutations.setSelectedEvent)
 export const commitRemoveCalendarEvent = commit(mutations.removeCalendarEvent)
-export const commitSetCalendars = commit(mutations.setCalendars)
+export const commitUpdateCalendars = commit(mutations.updateCalendars)
 export const commitUpdateSelectedEvent = commit(mutations.updateSelectedEvent)
+export const commitUpdateEvent = commit(mutations.updateEvent)
 export const commitDeleteCalendar = commit(mutations.deleteCalendar)
 export const commitAddEventToCalendar = commit(mutations.addEventToCalendar)

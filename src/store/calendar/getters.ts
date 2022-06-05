@@ -29,8 +29,9 @@ export const getters = {
     return r
   },
 
+
   getCalendarByUID(state: CalendarState, uid: string) {
-    if (state.towerCalendar?.uid == uid) return state.towerCalendar
+    if (state.towerCalendar && state.towerCalendar.uid == uid) return state.towerCalendar
     
     const calendar = state.calendars.find(x => x.uid == uid)
     return calendar
@@ -41,7 +42,7 @@ export const getters = {
 const {read} = getStoreAccessors<CalendarState, State>('');
 
 export const readCalendars = read(getters.getCalendars);
-export const readSelectedElement = read(getters.getSelectedEvent);
+export const readSelectedEvent = read(getters.getSelectedEvent);
 export const readTowerCalendar = read(getters.getTowerCalendar);
 export const readEventByUID = read(getters.getEventByUID);
 export const readCalendarByUID = read(getters.getCalendarByUID);

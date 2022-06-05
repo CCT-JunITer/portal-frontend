@@ -137,29 +137,30 @@
             <v-icon>mdi-chess-rook</v-icon>
           </template>
           <template v-slot:interval="{minutesToPixels, hour, day, month, year}">
-            <div 
-              v-if="getIntervalTowerEvents(hour, day, month-1, year).length > 0"
-              :style="'margin-top:'+0+';height:'+minutesToPixels(60)+'px;background-color:black;width:30px'"
-              @click="(event) => showEvent({nativeEvent:event, event:getIntervalTowerEvents(hour, day, month-1, year)[0]})"
+            <template
+              v-for="event in getIntervalTowerEvents({minute:0, hour:hour, day:day, month:month-1, year:year})"
             >
-              <div
+              <div 
+                :style="'margin-top:'+minutesToPixels(getIntervalEventStart(hour,day,month-1,year,event).getMinutes())+'px;height:'+minutesToPixels(getIntervalEventLength(hour,day,month-1,year,event))+'px;background-color:black;width:20px;z-index:30;position:absolute'"
+                @click="(nativeEvent) => showEvent({nativeEvent:nativeEvent, event:event})"
+                :key="event.uid"
               >
-
               </div>
-            </div>
-            <!-- <div :style="'height:'+minutesToPixels(60)+'px;'">
-              {{date+"T"+time}} 
-            </div> -->
+            </template>
           </template>
-          <!-- <template v-slot:event="{event, timeSummary, eventSummary}">
-            <div class="ml-1">{{timeSummary()}} <v-icon v-if="event.event.tower">mdi-chess-rook</v-icon>{{eventSummary()}}</div>
-          </template> -->
+          <template v-slot:event="{event, timeSummary}">
+            <div v-if="type=='month'" class="ml-1"><strong v-if="event.event.timed" v-html="timeSummary()"></strong> <v-icon v-if="event.event.tower">mdi-chess-rook</v-icon>{{event.name}}</div>
+            <div v-else :style="'padding-left:'+ ((getIntervalTowerEvents({minute:event.start.getMinutes(), hour:event.start.getHours(), day:event.start.getDate(), month:event.start.getMonth(), year:event.start.getFullYear()}).length > 0) ? '25' : '5') +'px'">
+              <strong>{{event.name}} <v-icon v-if="event.event.tower">mdi-chess-rook</v-icon> </strong><div v-if="event.event.timed" ><div v-html="timeSummary()"></div></div>
+            </div>
+          </template>
         </v-calendar>
         
         <calendar-event-popup 
           ref="calendarEventPopup" 
           @clickEditEvent="showEventEditor"
-          @changed="update(true)">
+          @changed="update(false, false)"
+        >
         </calendar-event-popup>
       </div>
 
@@ -176,7 +177,7 @@ import CalendarEventPopup from './CreateEventPopup.vue'
 import CalendarToolbar from './CalendarToolbar.vue';
 import { commitSetSelectedEvent } from '@/store/calendar/mutations';
 import { dispatchFetchCalendars } from '@/store/calendar/actions';
-import { readCalendars, readTowerCalendar } from '@/store/calendar/getters';
+import { readCalendars, readSelectedEvent, readTowerCalendar } from '@/store/calendar/getters';
 import { CalendarEvent } from './CalendarEvent';
 import { readAuthenticationURL } from '@/store/main/getters';
 
@@ -277,6 +278,8 @@ export default {
       { text: 'Mon - Fri', value: [1, 2, 3, 4, 5] },
       { text: 'Mon, Wed, Fri', value: [1, 3, 5] },
     ],
+    towerIndicatorIntervals:[0,15,30,45],
+    towerIndicatorIntervalLength:1000*60*15, // 15 minutes
     value: new Date(),
     viewStart:undefined,
     viewEnd:undefined,
@@ -298,7 +301,7 @@ export default {
     dragDiv: null,
   }),
   methods: {
-    async getEvents (payload, notify=true, fetch=false) {
+    async getEvents (payload, notify=true, fetch=false, calendarIds=undefined) {
       const {start, end} = this.getDateTimespan()
       // if (start && end.date) {
       //   if (start.date) start = new Date(start.date + 'T' + start.time)
@@ -316,10 +319,14 @@ export default {
       }
 
       if (fetch) {
-        this.viewStart = start
-        this.viewEnd = end
+        if (!this.viewStart || this.viewStart > start) {
+          this.viewStart = start
+        }
+        if (!this.viewEnd || this.viewEnd < end) {
+          this.viewEnd = end
+        }
         
-        await dispatchFetchCalendars(this.$store, {notify:notify, start:start, end:end})
+        await dispatchFetchCalendars(this.$store, {notify:notify, start:start, end:end, calendarIds:calendarIds})
       }
       // if (!this.calendars) {
       //   this.calendars = await this.dateSearch()
@@ -425,9 +432,8 @@ export default {
       this.events = events
     },
 
-    async update(notify) {
-      const {start, end} = this.getDateTimespan()
-      await this.getEvents({start:start, end:end}, notify, true)
+    async update(notify, fetch=true, calendarIds=undefined) {
+      await this.getEvents({}, notify, fetch, calendarIds)
       if (this.$refs.calendarSelectorPanel) this.$refs.calendarSelectorPanel.isActive = true;
     },
 
@@ -519,7 +525,9 @@ export default {
         const sunday = this.getSunday(this.value);
         return {start: monday, end: sunday}
       } else if (this.type == 'day') {
-        return {start: this.value, end: this.value}
+        const end = new Date(this.value)
+        end.setDate(end.getDate()+1)
+        return {start: this.value, end: end}
       }
     },
 
@@ -556,9 +564,6 @@ export default {
       // for (const key in this.newEvent) {
       //   delete this.newEvent[key]
       // }
-      console.log(this.createDate(16, 3, 5, 2022))
-      console.log(this.getIntervalTowerEvents(16, 3, 5, 2022));
-      console.log(this.getIntervalTowerEvents(16, 3, 5, 2022).length >  0);
 
       const calendar = this.calendars[0]
       const end = new Date(this.value)
@@ -585,13 +590,14 @@ export default {
       this.events.push(uiEvent);
     },
 
-    createDate(hour, day, month, year) {
+    createDate(minutes=0, hour, day, month, year) {
       const d = new Date()
       d.setTime(0)
       d.setFullYear(year);
       d.setDate(day);
       d.setMonth(month);
       d.setHours(hour);
+      d.setMinutes(minutes);
       return d
     },
 
@@ -607,33 +613,33 @@ export default {
     },
 
     getIntervalEventStart(hour, day, month, year, event) {
-      const intervalStart = this.createDate(hour, day, month, year)
+      const intervalStart = this.createDate(0, hour, day, month, year)
       const start = (event.start < intervalStart) ? intervalStart : event.start
       return start
     },
 
     getIntervalEventLength(hour, day, month, year, event) {
-      const intervalStart = this.createDate(hour, day, month, year)
-      const intervalEnd = this.createDate(hour+1, day, month, year)
+      const intervalStart = this.createDate(0, hour, day, month, year)
+      const intervalEnd = this.createDate(0, hour+1, day, month, year)
       const start = (event.start < intervalStart) ? intervalStart : event.start
       const end = (event.end > intervalEnd) ? intervalEnd : event.end
       return (event.end-event.start)/1000/60
     },
 
     getIntervalEventEnd(hour, day, month, year, event) {
-      const intervalEnd = this.createDate(hour+1, day, month, year)
+      const intervalEnd = this.createDate(0, hour+1, day, month, year)
       const end = (event.end > intervalEnd) ? intervalEnd : event.end
       return end
     },
 
-    getIntervalTowerEvents(hour, day, month, year) {
-      const intervalStart = this.createDate(hour, day, month, year)
-      const intervalEnd = this.createDate(hour+1, day, month, year)
+    getIntervalTowerEvents({minutes, hour, day, month, year}, length=1000*60*60) {
+      const intervalStart = this.createDate(minutes, hour, day, month, year)
+      const intervalEnd = this.createDate(minutes, hour, day, month, year)
+      intervalEnd.setTime(intervalEnd.getTime()+length)
+
       const intervals = []
       if (this.towerCalendar) {
         this.towerCalendar.events.forEach((event) => {
-          // console.log(event)
-          console.log(intervalStart.toISOString() + '    ' + intervalEnd.toISOString())
           if (event.start < intervalEnd && event.end > intervalStart) {
             const start = (event.start < intervalStart) ? intervalStart : event.start
             const end = (event.end > intervalEnd) ? intervalEnd : event.end
@@ -645,7 +651,6 @@ export default {
             });
           }
         })
-        // console.log(intervals)
       }
       return intervals;
     }
@@ -679,6 +684,10 @@ export default {
 
     towerCalendar: function() {
       return readTowerCalendar(this.$store);
+    },
+
+    selectedEvent: function() {
+      return readSelectedEvent(this.$store)
     },
 
   },

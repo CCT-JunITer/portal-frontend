@@ -1,11 +1,13 @@
 import { api } from '@/api';
 import { ICalendarEvent } from '@/interfaces';
 import { CalendarEvent } from '@/views/main/calendar/CalendarEvent';
+import { endOfDay, startOfDay } from 'date-fns';
 import { getStoreAccessors } from 'typesafe-vuex';
 import { ActionContext } from 'vuex';
 import { State } from '../state';
 import { apiCall, apiCallNotify } from '../utils';
-import { commitDeleteCalendar, commitRemoveCalendarEvent, commitSetCalendars } from './mutations';
+import { readCalendars } from './getters';
+import { commitDeleteCalendar, commitRemoveCalendarEvent, commitUpdateCalendars, commitUpdateEvent } from './mutations';
 import { CalendarState } from './state';
 
 type MainContext = ActionContext<CalendarState, State>;
@@ -30,15 +32,20 @@ export const actions = {
     }
   },
 
-  async actionUpdateCalendarEvent(context: MainContext, event) {
-    if (event) {
+  async actionUpdateCalendarEvent(context: MainContext, payload: {event: ICalendarEvent; notify?: boolean}) {
+    if (payload.event) {
       // const event_copied = Object.assign({}, event)
       // delete event_copied.uiEvents
       // const e = {name:event.name, uid:event.uid, calendarId:event.calendarId}
       // console.log(e)
       // console.log(event_copied)
-      const response = await apiCall(context, token => api.updateCalendarEvent(token, event))
-      event.uid = response.data.uid
+      let response: any = undefined
+      if (payload.notify) {
+        response = await apiCallNotify(context, token => api.updateCalendarEvent(token, payload.event), {successText: 'Event aktualisiert'})
+      } else {
+        response = await apiCall(context, token => api.updateCalendarEvent(token, payload.event))
+      }
+      commitUpdateEvent(context, response.data)
       return response.data
     }
   },
@@ -50,22 +57,28 @@ export const actions = {
     return response.data
   },
 
-  async actionFetchCalendars(context: MainContext, payload: {notify: boolean; start?: Date; end?: Date}) {
+  async actionFetchCalendars(context: MainContext, payload: {notify: boolean; start?: Date; end?: Date; calendarIds?: string[]}) {
     let response;
-    if (payload.notify) {
-      response = await apiCallNotify(context, token => api.getCalendar(token, payload.start, payload.end, undefined), {successText: 'Kalender aktualisiert'})
-    } else {
-      response = await apiCall(context, token => api.getCalendar(token, payload.start, payload.end, undefined))
+    let calendarIdsString: undefined|string = undefined
+    if (payload.calendarIds) {
+      calendarIdsString = payload.calendarIds.join(',')
     }
+
+    if (payload.notify) {
+      response = await apiCallNotify(context, token => api.getCalendar(token, payload.start, payload.end, calendarIdsString), {successText: 'Kalender aktualisiert'})
+    } else {
+      response = await apiCall(context, token => api.getCalendar(token, payload.start, payload.end, calendarIdsString))
+    }
+
     const calendars = response.data
-    for (let i = 0; i < calendars.length; i++) { // initing the events correctly. Dates are not parsed
-      for(let j = 0; j < calendars[i].events.length; j++) {
-        const event = calendars[i].events[j]
+    // initing the events correctly. Dates are not parsed
+    calendars.forEach(calendar => {
+      calendar.events.forEach(event => {
         event.start = new Date(event.start)
         event.end = new Date(event.end)
-      }
-    }
-    commitSetCalendars(context, calendars)
+      });
+    });
+    commitUpdateCalendars(context, {calendars:calendars, start:payload.start, end:payload.end})
   },
 
   async actionDeleteCalendar(context: MainContext, calendarId: string) {
