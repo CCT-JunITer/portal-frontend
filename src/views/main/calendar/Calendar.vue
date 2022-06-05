@@ -163,13 +163,6 @@
         </calendar-event-popup>
       </div>
 
-      
-      <create-event-view 
-        ref="CreateEventView" 
-        :initiallyVisible="false"
-        @changed="update(false)"
-      >
-      </create-event-view>
     </div>
   </div>
 </template>
@@ -179,7 +172,6 @@
 import {api} from '@/api';
 import { parseJSON } from 'date-fns';
 import { keyword } from 'color-convert';
-import CreateEventView from './CreateEventView.vue';
 import CalendarEventPopup from './CreateEventPopup.vue'
 import CalendarToolbar from './CalendarToolbar.vue';
 import { commitSetSelectedEvent } from '@/store/calendar/mutations';
@@ -265,7 +257,6 @@ function constructUIEvents(event, calendar) {
 
 export default {
   components: {
-    CreateEventView,
     CalendarToolbar,
     CalendarEventPopup
   },

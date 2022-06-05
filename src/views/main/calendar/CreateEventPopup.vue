@@ -1,9 +1,12 @@
 <template>
-  <v-menu
+  <component
+    :is="fullscreen ? 'v-dialog' : 'v-menu'"
     v-model="selectedOpen"
     :close-on-content-click="false"
     :activator="selectedElement"
+    :transition="fullscreen ? 'dialog-bottom-transition' : undefined"
     offset-x
+    fullscreen
   >
     <v-card
       color="grey lighten-4"
@@ -16,10 +19,13 @@
       >
         <v-btn 
           icon
-          @click="showEventEditor"
+          @click="fullscreen = !fullscreen"
         >
-          <v-icon>
-            mdi-pencil
+          <v-icon v-if="!fullscreen">
+            mdi-fullscreen
+          </v-icon>
+          <v-icon v-else>
+            mdi-fullscreen-exit
           </v-icon>
         </v-btn>
         <v-toolbar-title>
@@ -72,25 +78,44 @@
         ></v-select>
 
         <div style="display:flex">
-          <calendar-date-selector
-            v-model="selectedEventInternal.start"
-            label="Start"
-            prepend-icon="event"
-            :timed="selectedEventInternal.timed"
-            :max="selectedEventInternal.end"
+          <date-time-picker-menu
+            v-model ="startDate"
+            defaultPicker="DATE"
+            :pickerProps="{}"
           >
-          </calendar-date-selector>
+            <template v-slot:activator="{ on, attrs, }">
+              <v-text-field
+                label="Datum von"
+                class="input-lg"
+                v-bind="attrs"
+                v-on="on"
+                prepend-icon="mdi-calendar-range"
+                required
+                :rules="[$common.required]"
+              ></v-text-field>
+            </template>
+          </date-time-picker-menu>
+          
 
           <v-divider vertical inset class="mx-2"></v-divider>
 
-          <calendar-date-selector
-            v-model="selectedEventInternal.end"
-            label="Ende"
-            append-icon="event"
-            :timed="selectedEventInternal.timed"
-            :min="selectedEventInternal.start"
+          <date-time-picker-menu
+            v-model ="endDate"
+            defaultPicker="DATE"
+            :pickerProps="{}"
           >
-          </calendar-date-selector>
+            <template v-slot:activator="{ on, attrs, }">
+              <v-text-field
+                label="Datum bis"
+                class="input-lg"
+                v-bind="attrs"
+                v-on="on"
+                prepend-icon="mdi-calendar-range"
+                required
+                :rules="[$common.required]"
+              ></v-text-field>
+            </template>
+          </date-time-picker-menu>
         </div>
 
         <!--TODO: changing this does not work right now in the backend-->
@@ -121,6 +146,7 @@
         ></v-textarea>
 
       </v-card-text>
+      <v-spacer></v-spacer>
       <v-card-actions>
         <v-btn
           text
@@ -149,17 +175,22 @@
         </v-btn>
       </v-card-actions>
     </v-card>
-  </v-menu>
+  </component>
 </template>
 
 <script>
 
 import { dispatchRemoveEvent, dispatchUpdateCalendarEvent } from '@/store/calendar/actions'
-import { commitAddEventToCalendar, commitSetSelectedEvent, commitRemoveCalendarEvent, commitUpdateSelectedEvent } from '@/store/calendar/mutations'
-import { readCalendarById, readCalendars, readSelectedElement, readEventByUID, readCalendarByUID} from '@/store/calendar/getters'
+import { commitAddEventToCalendar, commitSetSelectedEvent, commitRemoveCalendarEvent, commitUpdateSelectedEvent, commitUpdateEvent } from '@/store/calendar/mutations'
+import { readCalendarById, readCalendars, readSelectedEvent, readEventByUID, readCalendarByUID, readTowerCalendar} from '@/store/calendar/getters'
 import { getCalendarById } from '@/store/utils'
 import CalendarEventLocationComponent from './components/CalendarEventLocationComponent.vue'
-import  CalendarDateSelector from '@/views/main/calendar/CalendarDateSelector.vue'
+import DateTimePickerMenu from '@/components/DateTimePickerMenu.vue'
+import isAfter from 'date-fns/isAfter'
+import intervalToDuration from 'date-fns/intervalToDuration'
+import add from 'date-fns/add'
+import sub from 'date-fns/sub'
+
 
 export default {
   props: {
@@ -167,8 +198,8 @@ export default {
   },
 
   components: {
-    CalendarDateSelector,
-    CalendarEventLocationComponent
+    CalendarEventLocationComponent,
+    DateTimePickerMenu,
   },
 
   emits: ['clickEditEvent', 'close', 'changed'],
@@ -177,6 +208,7 @@ export default {
     return {
       selectedElement: null,
       selectedOpen: false,
+      fullscreen: false,
 
       calendar: undefined,
 
@@ -210,7 +242,7 @@ export default {
 
     initSelectedEventInternal() {
       this.selectedEventInternal = Object.assign({}, this.selectedEvent)
-      this.calendar = readCalendarByUID(this.$store, this.selectedEventInternal.uid)
+      this.calendar = this.getCalendarByUID(this.selectedEventInternal.calendarId)
       if (!this.selectedEventInternal.timed) { // this is for allday events, for which the end property is a limit
         const end = new Date(this.selectedEventInternal.end)
         end.setDate(end.getDate()-1)
@@ -223,6 +255,7 @@ export default {
       this.loadingExdate = false
       this.loading = false;
       this.selectedOpen = true
+      this.fullscreen = false;
       this.initSelectedEventInternal()
     },
 
@@ -268,8 +301,8 @@ export default {
       }
       console.log(savedEvent);
 
-      commitUpdateSelectedEvent(this.$store, savedEvent)
-      await dispatchUpdateCalendarEvent(this.$store, savedEvent)
+      // commitUpdateEvent(this.$store, savedEvent)
+      await dispatchUpdateCalendarEvent(this.$store, {event:savedEvent, notify:true})
       this.$emit('changed')
       this.close()
     },
@@ -281,9 +314,59 @@ export default {
       this.$emit('changed')
       this.close()
     },
+
+    getCalendarByUID(uid) {
+      if (this.towerCalendar && this.towerCalendar.uid == uid) return this.towerCalendar
+      
+      const calendar = this.calendars.find(x => x.uid == uid)
+      return calendar
+    }
   },
 
   computed: {
+    startDate: {
+      get() {
+        return this.selectedEventInternal.start;
+      },
+      set(value) {
+        let start = new Date(this.selectedEventInternal.start);
+        const end = new Date(this.selectedEventInternal.end);
+        const duration = intervalToDuration({
+          start,
+          end
+        })
+        start = new Date(value);
+        this.selectedEventInternal.start = value;
+        if (isAfter(start, end)) {
+          // new start is after end
+          this.selectedEventInternal.end = add(start, duration);
+        }
+      },
+    },
+    endDate: {
+      get() {
+        return this.selectedEventInternal.end;
+      },
+      set(value) {
+        const start = new Date(this.selectedEventInternal.start);
+        let end = new Date(this.selectedEventInternal.end);
+        const duration = intervalToDuration({
+          start,
+          end
+        })
+        end = new Date(value);
+        this.selectedEventInternal.end = value;
+        if (isAfter(start, end)) {
+          // new start is after end
+          this.selectedEventInternal.start = sub(end, duration);
+        }
+      },
+    },
+
+    towerCalendar: function() {
+      return readTowerCalendar(this.$store)
+    },
+
     calendars: function ()  {
       const calendars = readCalendars(this.$store)
       
@@ -308,7 +391,7 @@ export default {
     },
 
     selectedEvent: function () {
-      const selected = readSelectedElement(this.$store)
+      const selected = readSelectedEvent(this.$store)
       if (selected) return selected
       return {}
     },
@@ -322,3 +405,15 @@ export default {
   }
 }
 </script>
+<style scoped lang="scss">
+
+.menu-fullscreen {
+  top: 0!important;
+  left: 0!important;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  max-width: 100%;
+}
+
+</style>
