@@ -70,7 +70,7 @@ export const mutations = {
         const calendarObject: ICalendar|undefined = (c.uid) ? getters.getCalendarByUID(state, c.uid) : undefined
         if (calendarObject) {
           calendarObject.events.forEach(event => {
-            if (payload.start && payload.end && (event.end < payload.start || event.start > payload.end)) {
+            if (payload.start && payload.end && (event.end <= payload.start || event.start >= payload.end)) {
               c?.events.push(event)
             }
           })
