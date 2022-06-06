@@ -536,21 +536,21 @@ export default {
         const sunday = this.getSunday(this.value);
         return {start: monday, end: sunday}
       } else if (this.type == 'day') {
-        const end = new Date(this.value)
+        const end = new Date(this.value.toDateString())
         end.setDate(end.getDate()+1)
         return {start: this.value, end: end}
       }
     },
 
     getMonday(d) {
-      d = new Date(d);
+      d = new Date(d.toDateString());
       const day = d.getDay()
       const diff = d.getDate() - day + (day == 0 ? -6:1); // adjust when day is sunday
       return new Date(d.setDate(diff));
     },
 
     getSunday(d) {
-      d = new Date(d);
+      d = new Date(d.toDateString());
       const day = d.getDay()
       const diff = d.getDate() + (7-day) + (day == 0 ? -7:0); // adjust when day is sunday
       return new Date(d.setDate(diff));
