@@ -263,6 +263,17 @@ export default {
   },
 
   async created() {
+    if (this.$route.params['viewType'] != 'default') {
+      this.type = this.$route.params['viewType']
+    }
+    if (this.$route.params['viewDate'] != 'default') {
+      if (this.$route.params['viewDate'].toLowerCase() == 'today') {
+        this.value = new Date()
+      } else {
+        this.value = new Date(this.$route.params['viewDate'])
+      }
+    }
+
     this.update(true);
   },
 

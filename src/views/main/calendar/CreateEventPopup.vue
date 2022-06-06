@@ -302,7 +302,16 @@ export default {
       console.log(savedEvent);
 
       // commitUpdateEvent(this.$store, savedEvent)
-      await dispatchUpdateCalendarEvent(this.$store, {event:savedEvent, notify:true})
+      try {
+        await dispatchUpdateCalendarEvent(this.$store, {event:savedEvent, notify:true})
+      } catch(e) {
+        if (e.response.status != 403) {
+          throw e
+        } else {
+          this.loading = false;
+          return;
+        }
+      }
       this.$emit('changed')
       this.close()
     },

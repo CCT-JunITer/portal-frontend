@@ -454,7 +454,12 @@ export default new Router({
               ]
             },
             {
-              path: 'calendar',
+              path:'calendar',
+              redirect: 'calendar/week/today'
+              // component: () => import('./views/main/calendar/Calendar.vue')
+            },
+            {
+              path: 'calendar/:viewType/:viewDate',
               component: () => import('./views/main/calendar/Calendar.vue')
             },
             {
