@@ -78,7 +78,8 @@
         ></v-select>
 
         <div style="display:flex">
-          <date-time-picker-menu
+          <component
+            :is="selectedEventInternal.timed ? 'date-time-picker-menu' : 'date-picker-menu'"
             v-model ="startDate"
             defaultPicker="DATE"
             :pickerProps="{}"
@@ -94,12 +95,13 @@
                 :rules="[$common.required]"
               ></v-text-field>
             </template>
-          </date-time-picker-menu>
+          </component>
           
 
           <v-divider vertical inset class="mx-2"></v-divider>
 
-          <date-time-picker-menu
+          <component
+            :is="selectedEventInternal.timed ? 'date-time-picker-menu' : 'date-picker-menu'"
             v-model ="endDate"
             defaultPicker="DATE"
             :pickerProps="{}"
@@ -115,7 +117,7 @@
                 :rules="[$common.required]"
               ></v-text-field>
             </template>
-          </date-time-picker-menu>
+          </component>
         </div>
 
         <!--TODO: changing this does not work right now in the backend-->
@@ -186,11 +188,11 @@ import { readCalendarById, readCalendars, readSelectedEvent, readEventByUID, rea
 import { getCalendarById } from '@/store/utils'
 import CalendarEventLocationComponent from './components/CalendarEventLocationComponent.vue'
 import DateTimePickerMenu from '@/components/DateTimePickerMenu.vue'
+import DatePickerMenu from '@/components/DatePickerMenu.vue'
 import isAfter from 'date-fns/isAfter'
 import intervalToDuration from 'date-fns/intervalToDuration'
 import add from 'date-fns/add'
 import sub from 'date-fns/sub'
-
 
 export default {
   props: {
@@ -200,6 +202,7 @@ export default {
   components: {
     CalendarEventLocationComponent,
     DateTimePickerMenu,
+    DatePickerMenu,
   },
 
   emits: ['clickEditEvent', 'close', 'changed'],
