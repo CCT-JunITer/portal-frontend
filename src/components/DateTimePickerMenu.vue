@@ -2,6 +2,7 @@
   <v-menu
     ref="menu"
     v-model="menu"
+    :open-on-click="false"
     :close-on-content-click="false"
     transition="scale-transition"
     nudge-right="40"
@@ -13,8 +14,8 @@
     <template v-slot:activator="{ on, attrs }">
       <slot 
         name="activator" 
-        v-bind:on="{...on, input: onInputChange, change: onInputChange}" 
-        v-bind:attrs="{...attrs, value: dateFormatted}">
+        v-bind:on="{...on, input: onInputChange, change: onInputChange, 'click:append': () => menu = true}" 
+        v-bind:attrs="{...attrs, value: dateFormatted, 'append-icon': 'mdi-calendar'}">
       </slot>
     </template>
     <v-card tile>
@@ -33,6 +34,7 @@
       <v-tabs-items v-model="activeTab">
         <v-tab-item key="calendar" eager>
           <v-date-picker
+            :active-picker="defaultPicker"
             color="cctBlue"
             v-model="date" 
             ref="picker"
@@ -63,7 +65,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
+import { Vue, Component, Prop } from 'vue-property-decorator'
 import { format, formatISO, parse } from 'date-fns'
 
 @Component({})
@@ -71,15 +73,6 @@ export default class DateTimePickerMenu extends Vue {
 
   public menu = false;
   public activeTab = 0;
-
-  @Watch('menu')
-  public onMenuOpen(menu: boolean) {
-    if (menu && this.defaultPicker) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      setTimeout(() => (this.$refs.picker as any).activePicker = this.defaultPicker);
-    }
-  }
-
   // https://github.com/vuetifyjs/vuetify/blob/master/packages/vuetify/src/components/VDatePicker/VDatePicker.ts#L407
   @Prop({ required: false })
   public defaultPicker?: 'YEAR' | 'MONTH' | 'DATE';
