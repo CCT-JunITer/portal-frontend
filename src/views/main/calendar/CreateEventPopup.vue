@@ -36,9 +36,6 @@
           ></v-text-field>
         </v-toolbar-title>
         <v-spacer></v-spacer>
-        <!-- <v-btn icon>
-          <v-icon>mdi-heart</v-icon>
-        </v-btn> -->
         <v-menu offset-y>
           <template v-slot:activator="{attrs, on }">
             <v-btn 
@@ -118,12 +115,13 @@
           </date-time-picker-menu>
         </div>
 
-        <!--TODO: changing this does not work right now in the backend-->
-        <!-- <v-checkbox 
+        <v-checkbox 
+          style="padding:0;margin:0"
           :value="!selectedEventInternal.timed"
+          :input-value="!selectedEventInternal.timed"
           @change="timedChanged"
           label="ganztägig"
-        ></v-checkbox> -->
+        ></v-checkbox>
 
         <calendar-event-location-component
           v-if="selectedOpen"
@@ -213,18 +211,14 @@ export default {
       calendar: undefined,
 
       cctLocations: ['Tower', 'CCTelefon'],
-      selectedEventInternal:{calendar:{name:''}, start:new Date(), end:new Date()},
+      selectedEventInternal:{calendar:{name:''}, start:new Date(), end:new Date(), timed:true},
       loading:false,
-      loadingExdate:false
+      loadingExdate:false,
     }
   },
 
   methods: {
     timedChanged(fullday) {
-      if (fullday) {
-        this.selectedEventInternal.start = new Date(this.selectedEventInternal.start.toDateString())
-        this.selectedEventInternal.end = new Date(this.selectedEventInternal.end.toDateString())
-      }
       this.selectedEventInternal.timed = !fullday;
     },
     setSelectedElement(selectedElement) {
@@ -243,11 +237,6 @@ export default {
     initSelectedEventInternal() {
       this.selectedEventInternal = Object.assign({}, this.selectedEvent)
       this.calendar = this.getCalendarByUID(this.selectedEventInternal.calendarId)
-      if (!this.selectedEventInternal.timed) { // this is for allday events, for which the end property is a limit
-        const end = new Date(this.selectedEventInternal.end)
-        end.setDate(end.getDate()-1)
-        this.selectedEventInternal.end = end
-      }
     },
 
     show(selectedEvent=undefined) {
@@ -287,12 +276,6 @@ export default {
     async save(mouseEvent=undefined, loading=true) {
       this.loading = loading;
       const savedEvent = Object.assign({},this.selectedEventInternal)
-      if (!savedEvent.timed) {
-        const end = new Date(savedEvent.end)
-        end.setDate(end.getDate()+1)
-        savedEvent.end = end
-      }
-
       if (this.calendar.uid != savedEvent.calendarId) {
         // TODO: disable notifications for remove event
         await dispatchRemoveEvent(this.$store, {uid:savedEvent.uid, calendarId:savedEvent.calendarId, notify:false})
@@ -301,7 +284,6 @@ export default {
       }
       console.log(savedEvent);
 
-      // commitUpdateEvent(this.$store, savedEvent)
       try {
         await dispatchUpdateCalendarEvent(this.$store, {event:savedEvent, notify:true})
       } catch(e) {
@@ -312,6 +294,7 @@ export default {
           return;
         }
       }
+      commitUpdateSelectedEvent(this.$store, savedEvent)
       this.$emit('changed')
       this.close()
     },

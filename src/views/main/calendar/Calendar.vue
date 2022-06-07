@@ -208,9 +208,6 @@ function constructUIEvents(event, calendar) {
   }
   let event_start = event.start;
   let event_end = event.end;
-  if (event.name == 'Test allday') {
-    console.log(event)
-  }
   for (let i = 0; condition(i, event_start); i++) {
     event_start = new Date(event.start)
     event_end = new Date(event.end)
@@ -236,9 +233,6 @@ function constructUIEvents(event, calendar) {
       }
     }
 
-    if (!event.timed) {
-      event_end.setDate(event_end.getDate()-1)
-    }
     events.push({
       name:event.name,
       start:event_start,
