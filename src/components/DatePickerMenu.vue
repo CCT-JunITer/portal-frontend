@@ -75,7 +75,7 @@ export default class DatePickerMenu extends Vue {
       const date = parse(value, 'dd.MM.yyyy', new Date());
       this.date = format(date, 'yyyy-MM-dd');
     } catch(e) {
-      this.date = null;
+      this.date = '';
     }
   }
 

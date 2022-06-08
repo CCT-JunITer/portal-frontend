@@ -524,10 +524,13 @@ export default {
       if (this.type == 'month') {
         const start_of_month = new Date(this.value.getFullYear(), this.value.getMonth())
         const end_of_month = this.getLastDayOfMonth(this.value)
-        return {start: this.getMonday(start_of_month), end: this.getSunday(end_of_month)}
+        const end = this.getSunday(end_of_month)
+        end.setDate(end.getDate()+1)
+        return {start: this.getMonday(start_of_month), end: end}
       } else if (this.type == 'week') {
         const monday = this.getMonday(this.value);
         const sunday = this.getSunday(this.value);
+        sunday.setDate(sunday.getDate()+1)
         return {start: monday, end: sunday}
       } else if (this.type == 'day') {
         const end = new Date(this.value.toDateString())
@@ -539,7 +542,7 @@ export default {
     getMonday(d) {
       d = new Date(d.toDateString());
       const day = d.getDay()
-      const diff = d.getDate() - day + (day == 0 ? -6:1); // adjust when day is sunday
+      const diff = d.getDate() - (day == 0 ? -6:day-1); // adjust when day is sunday
       return new Date(d.setDate(diff));
     },
 
