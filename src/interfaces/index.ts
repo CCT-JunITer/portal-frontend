@@ -125,10 +125,16 @@ export interface IEvent {
     external: string;
     id: number;
     files: string;
-    author: IUserProfile;
     leaders: IUserProfile[];
     participants: IUserProfile[];
     applications: IEventApplication[];
+    last_updated_id: number;
+    last_updated_by: IUserProfile;
+    date_last_updated: string;
+    author_id: number;
+    author: IUserProfile;
+    protocol_id: number;
+    protocol: IUserProfile;
 }
 export interface IEventCreate {
     title: string;
@@ -145,6 +151,9 @@ export interface IEventCreate {
     files: string;
     leader_ids: number[];
     participant_ids: number[];
+    last_updated_id: number;
+    author_id: number;
+    protocol_id: number;
 }
 
 export type UserType = 'alumni' | 'all' | 'members';

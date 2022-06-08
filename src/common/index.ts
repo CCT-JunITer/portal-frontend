@@ -31,9 +31,12 @@ export const UNIVERSITIES = [
   'Technische Universität Berlin', 'Freie Universität Berlin', 'Humboldt-Universität zu Berlin', 'Beuth Hochschule für Technik Berlin', 'Charité', 'Hochschule für Wirtschaft und Recht Berlin', 'Sonstiges'
 ];
 
-export const SCHULUNGSART = [
-  'Pflichtschulung', 'Zusatzschulung', 'Allgemeine Schulung'
+export const SCHULUNGSMAPPING = [
+  { type: 'Pflichtschulung', topics: ['BDSU-Schulung', 'Corporate Design', 'Finanzen & Recht', 'Internes Schulung', 'Präsentationstechniken', 'Projektschulung', 'Qualitätsmanagement'] },
+  { type: 'Zusatzschulung', topics: ['Human Resources','Information Technology','Marketing & Strategy','Quality & Operations','Softskills','EDV-Fertigkeiten','Diversity','Sustainability'] },
+  { type: 'Organisatorische Schulung', topics: ['MP-Schulungen', 'Sonstige', 'AC-Schulung'] },
 ];
+
 export const MEETINGART = [
   'Donnerstagssitzung', 'Mitgliederversammlung', 'Ressortsitzung', 'Workingsession'
 ];
@@ -52,9 +55,6 @@ export const KOSTENART = [
   { name: 'Andere', associations: [] },
 ];
 
-export const SCHULUNGSTHEMA = [
-  'Angebotsschulung', 'BDSU Schulung', 'Corporate Design', 'Externe Schulungs', 'Finanzen und Recht', 'Internes', 'Präsentationstechniken', 'Projektmanagement', 'Quilatitätsmanagement', 'MP-Projektcontroller','ZVG','Zusatzschulung','Sonstiges'   
-];
 export const GENDER = [
   'männlich', 'weiblich', 'nicht binär', 'keine Angabe'
 ]

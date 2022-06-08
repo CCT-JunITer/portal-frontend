@@ -13,7 +13,7 @@
         Neues {{ this.typeName }}
       </v-btn>
     </v-toolbar>
-    <v-container>
+    <div class="px-1">
       
       <event-table :items="futureEvents" :type="type">
         <template v-slot:top>
@@ -57,7 +57,7 @@
         </div>
       </div>
 
-    </v-container>
+    </div>
 
     
 

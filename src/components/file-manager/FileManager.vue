@@ -76,6 +76,7 @@
                         label="Label"
                         v-model="file.label"
                         :items="labels"
+                        v-if="labels && labels.length"
                       >
                       </v-select>
                       <v-text-field
@@ -209,11 +210,8 @@ export default class FileManager extends Vue {
   @Prop({ default: false })
   public readonly!: boolean;
 
-  @Prop({})
+  @Prop({ required: false })
   public labels?: string[];
-
-  @Prop()
-  public allowNoLabel!: boolean;
 
   @Prop({ default: false })
   public noManager!: boolean;

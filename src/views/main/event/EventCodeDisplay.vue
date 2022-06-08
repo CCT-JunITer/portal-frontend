@@ -120,7 +120,7 @@ export default class EventCodeDisplay extends Vue {
   }
 
   isRunning() {
-    if (!this.event) {
+    if (!this.event || !this.event.date_checkin_from) {
       return false;
     }
     return isWithinInterval(new Date(), {

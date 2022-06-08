@@ -12,6 +12,8 @@
       :headers="headers" 
       :items="items || []"
       :loading="!items"
+      :mobile-breakpoint="0"
+      fixed-header
     >
       <template v-slot:top>
         <slot name="top"></slot>
