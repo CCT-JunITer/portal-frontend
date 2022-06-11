@@ -349,6 +349,7 @@ export interface ICalendarEvent {
     rrule: ICalendarRRule;
     uid: string;
     calendarId: string;
+    dates: [];
 }
 
 export interface ICalendar {
@@ -357,5 +358,5 @@ export interface ICalendar {
     color?: string;
     active?: boolean;
     uid?: string;
-    rights: number;
+    rights: string; // this String can contain ['r', 'e', 'd', 'a'] (read, edit, delete, add)
 }

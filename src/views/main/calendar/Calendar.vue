@@ -27,7 +27,9 @@
         tile
         ref="calendarSelector"
       >
-        <v-expansion-panel ref="calendarSelectorPanel">
+        <v-expansion-panel 
+          ref="calendarSelectorPanel"
+        >
           <v-expansion-panel-header>
             <div style="color:#757575">Deine Kalender</div>
           </v-expansion-panel-header>
@@ -38,6 +40,12 @@
               :key="i"
             >
               <calendar-toolbar :calendarId="calendar.uid" @change="getEvents({start:undefined, end:undefined})">
+              </calendar-toolbar>
+            </v-list-item>
+            <v-list-item 
+              v-if="towernutzung&&towerCalendar"
+            >
+              <calendar-toolbar :calendarId="towerCalendar.uid" :tower="true" @change="getEvents({start:undefined, end:undefined})">
               </calendar-toolbar>
             </v-list-item>
           </v-expansion-panel-content>
@@ -134,9 +142,12 @@
           
         >
           <template v-slot:day-header="{}">
-            <v-icon>mdi-chess-rook</v-icon>
+            <v-icon v-if="!towernutzung">mdi-chess-rook</v-icon>
           </template>
-          <template v-slot:interval="{minutesToPixels, hour, day, month, year}">
+          <template 
+            v-if="!towernutzung"
+            v-slot:interval="{minutesToPixels, hour, day, month, year}"
+          >
             <template
               v-for="event in getIntervalTowerEvents({minute:0, hour:hour, day:day, month:month-1, year:year})"
             >
@@ -149,9 +160,11 @@
             </template>
           </template>
           <template v-slot:event="{event, timeSummary}">
-            <div v-if="type=='month'" class="ml-1"><strong v-if="event.event.timed" v-html="timeSummary()"></strong> <v-icon v-if="event.event.tower">mdi-chess-rook</v-icon>{{event.name}}</div>
-            <div v-else :style="'padding-left:'+ ((getIntervalTowerEvents({minute:event.start.getMinutes(), hour:event.start.getHours(), day:event.start.getDate(), month:event.start.getMonth(), year:event.start.getFullYear()}).length > 0) ? '25' : '5') +'px'">
-              <strong>{{event.name}} <v-icon v-if="event.event.tower">mdi-chess-rook</v-icon> </strong><div v-if="event.event.timed" ><div v-html="timeSummary()"></div></div>
+            <div v-if="type=='month'" class="ml-1">
+              <strong v-if="event.event.timed" v-html="timeSummary()"></strong> <v-icon v-if="event.event.tower&&!towernutzung">mdi-chess-rook</v-icon>{{event.name}}
+            </div>
+            <div v-else :style="'padding-left:'+ ((getIntervalTowerEvents({minute:event.start.getMinutes(), hour:event.start.getHours(), day:event.start.getDate(), month:event.start.getMonth(), year:event.start.getFullYear()}).length > 0 && !towernutzung) ? '25' : '5') +'px'">
+              <strong>{{event.name}} <v-icon v-if="event.event.tower&&!towernutzung">mdi-chess-rook</v-icon> </strong><div v-if="event.event.timed" ><div v-html="timeSummary()"></div></div>
             </div>
           </template>
         </v-calendar>
@@ -250,6 +263,28 @@ function constructUIEvents(event, calendar) {
   return events
 }
 
+function constructUIEventsFromDates(event, calendar) {
+  const events = []
+  let event_color = (calendar.color) ? calendar.color : 'blue';
+  if (event.eventColor) {
+    const rgb = keyword.rgb(event.eventColor)
+    event_color = 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')'
+  }
+
+  event.dates.forEach((d, i, array) => {
+    events.push({
+      name:event.name,
+      start:new Date(d[0]),
+      end:new Date(d[1]),
+      color:event_color,
+      timed:event.timed,
+      event:event,
+      iteration:i
+    })
+  })
+  return events
+}
+
 export default {
   components: {
     CalendarToolbar,
@@ -308,14 +343,6 @@ export default {
   methods: {
     async getEvents (payload, notify=true, fetch=false, calendarIds=undefined) {
       const {start, end} = this.getDateTimespan()
-      // if (start && end.date) {
-      //   if (start.date) start = new Date(start.date + 'T' + start.time)
-      // }
-      // if (end && end.date) {
-      //   if (end.date) end = new Date(end.date + 'T' + end.time)
-      // }
-
-      
 
       if (start && end && !fetch) {
         if (this.viewStart > start || end > this.viewEnd) {
@@ -333,19 +360,10 @@ export default {
         
         await dispatchFetchCalendars(this.$store, {notify:notify, start:start, end:end, calendarIds:calendarIds})
       }
-      // if (!this.calendars) {
-      //   this.calendars = await this.dateSearch()
-      // }
 
-      // TODO: finish the reading of the events
       const events = []
-      // const interval = this.getDateTimespan()
-      // const start_d = interval.start
-      // const end_d = interval.end
-      // console.log(start_d.toISOString())
-      // console.log(end_d.toISOString())
+      const towerIds = new Set()
 
-      // const calendars = await this.dateSearch(start_d, end_d)
       console.log(this.calendars)
       for (let i = 0; i < this.calendars.length; i++) {
         const activeCalendar = this.calendars[i];
@@ -353,87 +371,27 @@ export default {
 
         if (activeCalendar.active) {
           for (let j = 0; j < activeCalendar.events.length; j++) {
-            // TODO: those conversions should be done in create
-            // TODO: create somewhere a Event Class
-            // const activeEvent = activeCalendar.events[j];
-            // // activeEvent.uiEvents = []
+            const event = activeCalendar.events[j]
 
-            // const event_start = new Date(activeEvent.start)
-            // const event_end = new Date(activeEvent.end)
-            // if (!activeEvent.timed) event_end.setDate(event_end.getDate()-1)
-            
-            // let event_color = (activeCalendar.color) ? activeCalendar.color : this.colors[i];
-            // if (activeEvent.eventColor) {
-            //   const rgb = keyword.rgb(activeEvent.eventColor)
-            //   event_color = 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')'
-            //   // event_color = this.colors[i]
-            // }
-            // activeEvent.start = event_start
-            // activeEvent.end = event_end
-            // activeEvent.color = event_color
-
-
-            // let new_event = {
-            //   name: activeEvent.name,
-            //   start: event_start,
-            //   end: event_end,
-            //   color: event_color,
-            //   timed: activeEvent.timed,
-            //   event: activeEvent
-            // }
-            // activeEvent.uiEvents.push(new_event)
-            const activeEvent = constructUIEvents(activeCalendar.events[j], activeCalendar);
-            events.push(...activeEvent)
-
-            // if (activeEvent.rrule) {
-            //   if (activeEvent.rrule.endtype == 'COUNT') {
-            //     for (let k = 1; k <= activeEvent.rrule.end; k++) {
-            //       event_start = new Date(activeEvent.start)
-            //       event_end = new Date(activeEvent.end)
-            //       if (activeEvent.rrule.freq == 'DAILY') {
-            //         event_start.setDate(event_start.getDate()+k)
-            //         event_end.setDate(event_end.getDate()+k)
-            //       } else {
-            //         break
-            //       }
-            //       new_event = {
-            //         name: activeEvent.name,
-            //         start: event_start,
-            //         end: event_end,
-            //         color: event_color,
-            //         timed: activeEvent.timed,
-            //         event: activeEvent
-            //       }
-            //       activeEvent.uiEvents.push(new_event)
-            //       events.push(new_event)
-
-            //     }
-            //   }
-            // }
+            if (!(this.towernutzung && !event.tower)) { // only tower events are displayed if towernutzung
+              const uiEvents = constructUIEventsFromDates(event, activeCalendar);
+              events.push(...uiEvents)
+              towerIds.add(event.towerId)
+            }
           }
         }
       }
-      // if (this.newEvent) events.push(this.newEvent)
-      // const min = new Date(`${start.date}T00:00:00`)
-      // const max = new Date(`${end.date}T23:59:59`)
-      // const days = (max.getTime() - min.getTime()) / 86400000
-      // const eventCount = this.rnd(days, days + 20)
 
-      // for (let i = 0; i < eventCount; i++) {
-      //   const allDay = this.rnd(0, 3) === 0
-      //   const firstTimestamp = this.rnd(min.getTime(), max.getTime())
-      //   const first = new Date(firstTimestamp - (firstTimestamp % 900000))
-      //   const secondTimestamp = this.rnd(2, allDay ? 288 : 8) * 900000
-      //   const second = new Date(first.getTime() + secondTimestamp)
+      // adding tower events for towernutzung
+      if (this.towernutzung && this.towerCalendar) {
+        this.towerCalendar.events.forEach(event => {
+          if (!towerIds.has(event.uid)) {
+            const uiEvents = constructUIEventsFromDates(event, this.towerCalendar);
+            events.push(...uiEvents)
+          }
+        })
+      }
 
-      //   events.push({
-      //     name: this.names[this.rnd(0, this.names.length - 1)],
-      //     start: first,
-      //     end: second,
-      //     color: this.colors[this.rnd(0, this.colors.length - 1)],
-      //     timed: !allDay,
-      //   })
-      // }
       this.events = events
     },
 
@@ -581,9 +539,10 @@ export default {
       event.start = new Date(this.value),
       event.end = end,
       event.calendarId = calendar.uid
+      event.tower = true
 
       // this.addEventToView(this.newEvent)
-      const uiEvent = constructUIEvents(event, calendar);
+      const uiEvent = constructUIEventsFromDates(event, calendar);
       this.events.push(...uiEvent);
       commitSetSelectedEvent(this.$store, event)
       this.$refs.calendarEventPopup.show()
@@ -682,8 +641,18 @@ export default {
       }
     },
 
+    towernutzung: function() {
+      const val = this.$route.query.towernutzung;
+      console.log(val)
+      if (val) {
+        return this.$route.query.towernutzung.toLowerCase() == 'true' || this.$route.query.towernutzung.toLowerCase() == '1'
+      }
+      return false
+    },
+
     calendars: function ()  {
-      return readCalendars(this.$store)
+      const calendars = readCalendars(this.$store)
+      return calendars
     },
 
     authenticationURL: function() {

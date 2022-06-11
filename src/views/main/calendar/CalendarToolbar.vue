@@ -79,7 +79,7 @@
 </template>
 
 <script>
-import { readCalendars } from '@/store/calendar/getters'
+import { readCalendars, readTowerCalendar } from '@/store/calendar/getters'
 import { dispatchDeleteCalendar, dispatchUpdateCalendar } from '@/store/calendar/actions'
 
 export default {
@@ -88,6 +88,9 @@ export default {
     calendarId: {
       required:true
     },
+    tower: {
+      default: false
+    }
   },
   emits:['change'],
 
@@ -101,8 +104,13 @@ export default {
     calendars: function ()  {
       return readCalendars(this.$store)
     },
+
+    towerCalendar: function() {
+      return readTowerCalendar(this.$store)
+    },
     
     calendar: function() {
+      if (this.tower) return this.towerCalendar
       return this.calendars.find(x => x.uid == this.calendarId)
     }
   },
