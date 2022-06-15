@@ -180,7 +180,7 @@
 
 <script>
 
-import { dispatchRemoveEvent, dispatchUpdateCalendarEvent } from '@/store/calendar/actions'
+import { dispatchFetchCalendars, dispatchRemoveEvent, dispatchUpdateCalendarEvent } from '@/store/calendar/actions'
 import { commitAddEventToCalendar, commitSetSelectedEvent, commitRemoveCalendarEvent, commitUpdateSelectedEvent, commitUpdateEvent } from '@/store/calendar/mutations'
 import { readCalendarById, readCalendars, readSelectedEvent, readEventByUID, readCalendarByUID, readTowerCalendar} from '@/store/calendar/getters'
 import { getCalendarById } from '@/store/utils'
@@ -191,6 +191,7 @@ import isAfter from 'date-fns/isAfter'
 import intervalToDuration from 'date-fns/intervalToDuration'
 import add from 'date-fns/add'
 import sub from 'date-fns/sub'
+import { dispatchUpdateEvent } from '@/store/event/actions'
 
 export default {
   props: {
@@ -287,6 +288,13 @@ export default {
       }
       console.log(savedEvent);
 
+      // fullday events need an end date that is at least one day later than the start date
+      if (!savedEvent.timed) {
+        // savedEvent.end.setDate(savedEvent.end.getDate()+1)
+      }
+
+      const updateTower = savedEvent.tower || this.selectedEvent.tower;
+
       try {
         await dispatchUpdateCalendarEvent(this.$store, {event:savedEvent, notify:true})
       } catch(e) {
@@ -297,7 +305,12 @@ export default {
           return;
         }
       }
-      commitUpdateSelectedEvent(this.$store, savedEvent)
+
+      if (updateTower && this.towerCalendar.uid) { // update tower calendar if tower event was changed
+        dispatchFetchCalendars(this.$store, {notify:false, start:savedEvent.start, end:savedEvent.end, calendarIds:[this.towerCalendar.uid]})
+      }
+
+      // commitUpdateSelectedEvent(this.$store, savedEvent)
       this.$emit('changed')
       this.close()
     },

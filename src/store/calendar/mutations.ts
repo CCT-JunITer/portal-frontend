@@ -64,17 +64,19 @@ export const mutations = {
         c.name = c.name.replace(ss, '')
       })
       
-      if (c.uid && TowerCalendarIDs.has(c.uid)) {
-        state.towerCalendar = c;
+      // console.log('updating from ' + payload.start?.toISOString() + ' to ' + payload.end?.toISOString() + ' at calendar "' + c.uid + '"')
+      // console.log(payload.calendars)
+      const calendarObject: ICalendar|undefined = (c.uid) ? getters.getCalendarByUID(state, c.uid) : undefined
+      if (calendarObject) {
+        calendarObject.events.forEach(event => {
+          if (payload.start && payload.end && (event.end <= payload.start || event.start >= payload.end)) {
+            c?.events.push(event)
+          }
+        })
+        Object.assign(calendarObject, c)
       } else {
-        const calendarObject: ICalendar|undefined = (c.uid) ? getters.getCalendarByUID(state, c.uid) : undefined
-        if (calendarObject) {
-          calendarObject.events.forEach(event => {
-            if (payload.start && payload.end && (event.end <= payload.start || event.start >= payload.end)) {
-              c?.events.push(event)
-            }
-          })
-          Object.assign(calendarObject, c)
+        if (c.uid && TowerCalendarIDs.has(c.uid)) {
+          state.towerCalendar = c;
         } else {
           state.calendars.push(c)
         }

@@ -57,7 +57,7 @@
 
       <v-btn
         style="width=100%"
-        :href="`https://cloud.cct-ev.de/apps/calendar/${this.nextcloudViewTypes[this.type]}/${this.value.toISOString().substring(0,10)}`" 
+        :href="`https://cloud.cct-ev.de/apps/calendar/${this.nextcloudViewTypes[this.type]}/${toUTCDateString(this.value)}`" 
         target="_blank"
       >
         <v-icon>mdi-open-in-new</v-icon> In der Nextcloud bearbeiten
@@ -76,7 +76,7 @@
             outlined
             class="mr-4"
             color="grey darken-2"
-            @click="() => this.value = new Date()"
+            @click="() => this.value = 'today'"
           >
             Heute
           </v-btn>
@@ -153,7 +153,6 @@
             >
               <div 
                 :style="'margin-top:'+minutesToPixels(getIntervalEventStart(hour,day,month-1,year,event).getMinutes())+'px;height:'+minutesToPixels(getIntervalEventLength(hour,day,month-1,year,event))+'px;background-color:black;width:20px;z-index:30;position:absolute'"
-                @click="(nativeEvent) => showEvent({nativeEvent:nativeEvent, event:event})"
                 :key="event.uid"
               >
               </div>
@@ -292,22 +291,22 @@ export default {
   },
 
   async created() {
-    if (this.$route.params['viewType'] != 'default') {
-      this.type = this.$route.params['viewType']
-    }
-    if (this.$route.params['viewDate'] != 'default') {
-      if (this.$route.params['viewDate'].toLowerCase() == 'today') {
-        this.value = new Date()
-      } else {
-        this.value = new Date(this.$route.params['viewDate'])
-      }
-    }
+    // if (this.$route.params['viewType'] != 'default') {
+    //   this.type = this.$route.params['viewType']
+    // }
+    // if (this.$route.params['viewDate'] != 'default') {
+    //   if (this.$route.params['viewDate'].toLowerCase() == 'today') {
+    //     this.value = new Date()
+    //   } else {
+    //     this.value = new Date(this.$route.params['viewDate'])
+    //   }
+    // }
 
     this.update(true);
   },
 
   data: () => ({
-    type: 'month',
+    // type: 'month',
     types: ['month', 'week', 'day'],
     mode: 'stack',
     modes: ['stack', 'column'],
@@ -320,9 +319,7 @@ export default {
     ],
     towerIndicatorIntervals:[0,15,30,45],
     towerIndicatorIntervalLength:1000*60*15, // 15 minutes
-    value: new Date(),
-    viewStart:undefined,
-    viewEnd:undefined,
+    // value: new Date(),
     events: [],
     colors: ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1'],
     names: ['Meeting', 'Holiday', 'PTO', 'Travel', 'Event', 'Birthday', 'Conference', 'Party'],
@@ -364,7 +361,8 @@ export default {
       const events = []
       const towerIds = new Set()
 
-      console.log(this.calendars)
+      console.log([...this.calendars, this.towerCalendar])
+      const towernutzung = this.towernutzung
       for (let i = 0; i < this.calendars.length; i++) {
         const activeCalendar = this.calendars[i];
         if (activeCalendar.active === undefined) activeCalendar.active = true;
@@ -373,7 +371,7 @@ export default {
           for (let j = 0; j < activeCalendar.events.length; j++) {
             const event = activeCalendar.events[j]
 
-            if (!(this.towernutzung && !event.tower)) { // only tower events are displayed if towernutzung
+            if (!towernutzung || event.tower) { // only tower events are displayed if towernutzung
               const uiEvents = constructUIEventsFromDates(event, activeCalendar);
               events.push(...uiEvents)
               towerIds.add(event.towerId)
@@ -383,7 +381,7 @@ export default {
       }
 
       // adding tower events for towernutzung
-      if (this.towernutzung && this.towerCalendar) {
+      if (towernutzung && this.towerCalendar) {
         this.towerCalendar.events.forEach(event => {
           if (!towerIds.has(event.uid)) {
             const uiEvents = constructUIEventsFromDates(event, this.towerCalendar);
@@ -400,61 +398,18 @@ export default {
       if (this.$refs.calendarSelectorPanel) this.$refs.calendarSelectorPanel.isActive = true;
     },
 
-    // async dateSearch(start=undefined, end=undefined, calendars=undefined) {
-    //   const response = await api.getCalendar(this.$store.state.main.token, start, end, calendars)
-    //   // const events = JSON.parse(response.data)
-    //   return response.data
-    // },
-
     showEventEditor(selectedEvent) {
       this.$refs.CreateEventView.show(selectedEvent)
     },
-
-    // rnd (a, b) {
-    //   return Math.floor((b - a + 1) * Math.random()) + a
-    // },
-    // rndElement (arr) {
-    //   return arr[this.rnd(0, arr.length - 1)]
-    // },
 
     datePickerChanged(date) {
       const newDate = new Date(date)
       if (this.type == 'month')this.value = new Date(this.value.setFullYear(newDate.getFullYear(), newDate.getMonth()))
       else this.value = new Date(this.value.setFullYear(newDate.getFullYear(), newDate.getMonth(), newDate.getDate()))
     },
-    // async setToday() {
-    //   // const test = await api.getCalendar(this.$store.state.main.token)
-    //   // console.log(test.data)
-    //   this.value = new Date()
-    // },
-    // prev() {
-    //   const offset = -1
-    //   if (this.type == 'month') {
-    //     this.value = new Date(this.value.setMonth(this.value.getMonth()+ offset))
-    //   } else if (this.type == 'week') {
-    //     this.value = new Date(this.value.setDate(this.value.getDate()+ (offset*7)))
-    //   } else if (this.type == 'day') {
-    //     this.value = new Date(this.value.setDate(this.value.getDate()+ offset))
-    //   } else {
-    //     throw new Error('The type ' + this.type + ' is not defined!');
-    //   }
-    // },
-    // next() {
-    //   const offset = 1
-    //   if (this.type == 'month') {
-    //     this.value = new Date(this.value.setMonth(this.value.getMonth()+ offset))
-    //   } else if (this.type == 'week') {
-    //     this.value = new Date(this.value.setDate(this.value.getDate()+ (offset*7)))
-    //   } else if (this.type == 'day') {
-    //     this.value = new Date(this.value.setDate(this.value.getDate()+ offset))
-    //   } else {
-    //     throw new Error('The type ' + this.type + ' is not defined!');
-    //   }
-    // },
 
     viewDay ({ date }) {
-      this.type = 'day'
-      this.value = new Date(date)
+      this.$router.replace({params: {...this.$route.params, viewType:'day', viewDate:this.toUTCDateString(new Date(date))}, query:this.$route.query}).catch((err)=>err)
     },
 
     showEvent ({ nativeEvent, event }) {
@@ -532,14 +487,16 @@ export default {
       // }
 
       const calendar = this.calendars[0]
-      const end = new Date(this.value)
-      end.setHours(end.getHours()+2)
       const event = new CalendarEvent()
       event.name = 'Neues Event'
-      event.start = new Date(this.value),
-      event.end = end,
+      event.start = new Date(this.value)
+      event.start.setHours(new Date().getHours())
+      event.start.setMinutes(0)
+      event.end = new Date(event.start)
+      event.end.setHours(event.end.getHours()+2)
       event.calendarId = calendar.uid
-      event.tower = true
+      if (this.towernutzung) event.tower = true
+      event.dates = [[event.start, event.end]]
 
       // this.addEventToView(this.newEvent)
       const uiEvent = constructUIEventsFromDates(event, calendar);
@@ -566,6 +523,10 @@ export default {
       d.setHours(hour);
       d.setMinutes(minutes);
       return d
+    },
+
+    toUTCDateString(date) {
+      return `${date.getFullYear().toString().padStart(4,'0')}-${(date.getMonth()+1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')}`
     },
 
     isTowerInterval(hour, day, month, year) {
@@ -620,13 +581,14 @@ export default {
         })
       }
       return intervals;
-    }
+    },
+
   },
 
   computed: {
     picker: {
       get: function() {
-        const val = this.value.toISOString()
+        const val = this.toUTCDateString(this.value)
         if (this.type == 'month') return val.substring(0,7)
         return val.substring(0,10)
       },
@@ -641,13 +603,51 @@ export default {
       }
     },
 
-    towernutzung: function() {
-      const val = this.$route.query.towernutzung;
-      console.log(val)
-      if (val) {
-        return this.$route.query.towernutzung.toLowerCase() == 'true' || this.$route.query.towernutzung.toLowerCase() == '1'
+    type: {
+      set(value) {
+        this.$router.replace({params: {...this.$route.params, viewType:value}, query:this.$route.query}).catch((err)=>err)
+      },
+      get() {
+        const param = this.$route.params['viewType']
+        if (param == 'default') return 'week'
+        return param
       }
-      return false
+    },
+
+    value: {
+      set(value) {
+        let date;
+        if (['default', 'today', 'now'].includes(value)) date = new Date(new Date().toDateString())
+        else {
+          date = new Date(new Date(value).toDateString())
+          value = this.toUTCDateString(date)
+        }
+        if (date != this.value) {
+          this.$router.replace({params: {...this.$route.params, viewDate:value}, query:this.$route.query}).catch((err)=>err)
+        }
+      },
+      get() {
+        const param = this.$route.params['viewDate']
+        if (param === undefined || param == 'today' || param == 'default' || param == 'now') {
+          const now = new Date(new Date().toDateString())
+          return now
+        }
+        return new Date(param)
+      }
+    },
+
+    towernutzung: {
+      get() {
+        const tower = this.$route.query.towernutzung;
+        if(tower === undefined){
+          return false;
+        }
+        return tower.toLowerCase() == 'true' || tower.toLowerCase() == '1';
+      },
+
+      set(value) {
+        this.$router.replace({params:this.route.params, query: { ...this.$route.query, towernutzung: value }});
+      }
     },
 
     calendars: function ()  {

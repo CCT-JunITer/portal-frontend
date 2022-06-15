@@ -463,10 +463,6 @@ export default new Router({
               component: () => import('./views/main/calendar/Calendar.vue')
             },
             {
-              path: 'tower',
-              redirect: 'calendar/week/today?towernutzung=true'
-            },
-            {
               path: 'shop',
               component: () => import('./views/main/shop/Shop.vue')
             },

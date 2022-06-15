@@ -36,15 +36,54 @@
         </template>
 
         <v-list>
-          <v-list-item
-            link
-            @click="editName"
+          <!-- <v-dialog
+            v-model="nameDialog"
+            persistent
+            max-width="600px"
           >
-            <v-list-item-icon>
-              <v-icon>mdi-pencil</v-icon>
-            </v-list-item-icon>
-            <v-list-item-title>Name bearbeiten</v-list-item-title>
-          </v-list-item>
+            <template v-slot:activator="{ on, attrs }">
+              <v-list-item
+                link
+                v-on="on"
+                v-bind="attrs"
+              >
+                <v-list-item-icon>
+                  <v-icon>mdi-pencil</v-icon>
+                </v-list-item-icon>
+                <v-list-item-title>Name bearbeiten</v-list-item-title>
+
+
+              </v-list-item>
+            </template>
+            <v-card>
+              <v-card-title>
+                <span class="text-h5">Kalender Name bearbeiten</span>
+              </v-card-title>
+              <v-card-text>
+                <v-text-field
+                  label="Name"
+                  required
+                ></v-text-field>
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn
+                  color="blue darken-1"
+                  text
+                  @click="nameDialog = false"
+                >
+                  Close
+                </v-btn>
+                <v-btn
+                  color="blue darken-1"
+                  text
+                  @click="nameDialog = false"
+                >
+                  Save
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
 
           <v-list-item
             link
@@ -54,7 +93,7 @@
               <v-icon>mdi-pencil</v-icon>
             </v-list-item-icon>
             <v-list-item-title>Farbe bearbeiten</v-list-item-title>
-          </v-list-item>
+          </v-list-item> -->
 
           <v-list-item
             link
@@ -80,7 +119,8 @@
 
 <script>
 import { readCalendars, readTowerCalendar } from '@/store/calendar/getters'
-import { dispatchDeleteCalendar, dispatchUpdateCalendar } from '@/store/calendar/actions'
+import { dispatchDeleteCalendar, dispatchFetchCalendars, dispatchUpdateCalendar } from '@/store/calendar/actions'
+import { commitUpdateCalendars } from '@/store/calendar/mutations'
 
 export default {
 
@@ -96,7 +136,8 @@ export default {
 
   data() {
     return {
-      editable:false
+      editable:false,
+      nameDialog: false,
     }
   },
 
@@ -109,14 +150,27 @@ export default {
       return readTowerCalendar(this.$store)
     },
     
-    calendar: function() {
-      if (this.tower) return this.towerCalendar
-      return this.calendars.find(x => x.uid == this.calendarId)
+    calendar: {
+      get() {
+        if (this.tower) return this.towerCalendar
+        return this.calendars.find(x => x.uid == this.calendarId)
+      },
+      set(object) {
+        commitUpdateCalendars(this.$store, [object])
+      }
     }
   },
   methods: {
+    nameChanged() {
+      this.nameDialog = false
+      this.save()
+    },
     deleteCalendar() {
       dispatchDeleteCalendar(this.$store, this.calendarId)
+    },
+
+    save() {
+      dispatchUpdateCalendar(this.$store, this.calendar)
     },
 
     editName() {
