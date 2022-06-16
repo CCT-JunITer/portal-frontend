@@ -10,27 +10,42 @@
       Start loading
     </v-btn> -->
     <v-dialog :value="dialog" persistent width="500">
-      <v-card color="primary" dark>
+      <v-card>
+        <v-toolbar
+          color="primary"
+          dark
+        >
+          Authentifizierung
+        </v-toolbar>
         <v-card-text>
-          Das Portal hat noch keinen Zugriff auf die Nextcloud. Bitte öffne folgenden Link und logge dich einmalig bei der Nextcloud ein.
+          <div class="text-body-1 pa-4">
+            Das Portal hat noch keinen Zugriff auf die Nextcloud. Bitte öffne folgenden Link und logge dich einmalig bei der Nextcloud ein.
+          </div>
 
-          <p><b>{{this.authenticationURL}}</b></p>
-          <v-btn
-            :link="true"
-            :href="authenticationURL"
-          >
-            Link
-          </v-btn>
+          <!-- <p><b>{{this.authenticationURL}}</b></p> -->
+          <div class="text-center">
+            <v-btn
+              :href="authenticationURL"
+              target="_blank"
+              color="primary"
+              class="ma-5"
+            >
+              Hier Klicken zum Anmelden
+            </v-btn>
+          </div>
           <v-progress-linear
             indeterminate
-            color="white"
+            color="primary"
             class="mb-0"
           ></v-progress-linear>
         </v-card-text>
 
         <v-card-actions>
+          <v-spacer></v-spacer>
           <v-btn 
             @click="close"
+            text
+            color="secondary"
           >
             Abbrechen
           </v-btn>
