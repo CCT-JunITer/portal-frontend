@@ -3,7 +3,6 @@ import { CalendarState } from './state';
 import {getters} from './getters';
 import { getStoreAccessors } from 'typesafe-vuex';
 import { State } from '../state';
-import { getCalendarById } from '../utils';
 
 const TowerCalendarIDs = new Set(['tower_shared_by_CalendarBot']);
 const Replacements = [' (Calendar Bot)', ' (calendarbot)']
@@ -13,9 +12,8 @@ export const mutations = {
   removeCalendarEvent(state: CalendarState, event: {calendarId: string; uid: string}) {
     if (!event) return;
 
-    const calendar = getCalendarById(state, event.calendarId)
+    const calendar = getters.getCalendarByUID(state, event.calendarId)
     if (calendar) {
-      console.log(calendar)
       calendar.events = calendar.events.filter(x => x.uid != event.uid)
     }
   },

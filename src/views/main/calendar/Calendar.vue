@@ -15,7 +15,7 @@
         class=""
         block
         color="primary"
-        @click="createNewEvent"
+        @click="() => createNewEvent()"
       >
         Event erstellen
       </v-btn>
@@ -139,7 +139,11 @@
           @click:event="showEvent"
           @change="getEvents"
           @click:date="viewDay"
-          
+          @mousedown:event="startDrag"
+          @mousedown:time="startTime"
+          @mousemove:time="mouseMove"
+          @mouseup:time="endDrag"
+          @mouseleave.native="cancelDrag"
         >
           <template v-slot:day-header="{}">
             <v-icon v-if="!towernutzung">mdi-chess-rook</v-icon>
@@ -158,13 +162,19 @@
               </div>
             </template>
           </template>
-          <template v-slot:event="{event, timeSummary}">
-            <div v-if="type=='month'" class="ml-1">
+          <template v-slot:event="{event, timed, timeSummary}">
+            <div v-if="type=='month'" class="ml-1 disable-select">
               <strong v-if="event.event.timed" v-html="timeSummary()"></strong> <v-icon v-if="event.event.tower&&!towernutzung">mdi-chess-rook</v-icon>{{event.name}}
             </div>
-            <div v-else :style="'padding-left:'+ ((getIntervalTowerEvents({minute:event.start.getMinutes(), hour:event.start.getHours(), day:event.start.getDate(), month:event.start.getMonth(), year:event.start.getFullYear()}).length > 0 && !towernutzung) ? '25' : '5') +'px'">
+            <div v-else class="disable-select" :style="'padding-left:'+ 
+              ((getIntervalTowerEvents({minute:event.start.getMinutes(), hour:event.start.getHours(), day:event.start.getDate(), month:event.start.getMonth(), year:event.start.getFullYear()}).length > 0 && !towernutzung) ? '25' : '5') +'px'">
               <strong>{{event.name}} <v-icon v-if="event.event.tower&&!towernutzung">mdi-chess-rook</v-icon> </strong><div v-if="event.event.timed" ><div v-html="timeSummary()"></div></div>
             </div>
+            <div
+              v-if="timed"
+              class="v-event-drag-bottom"
+              @mousedown.stop="extendBottom(event)"
+            ></div>
           </template>
         </v-calendar>
         
@@ -193,76 +203,10 @@ import { readCalendars, readSelectedEvent, readTowerCalendar } from '@/store/cal
 import { CalendarEvent } from './CalendarEvent';
 import { readAuthenticationURL } from '@/store/main/getters';
 
-
-const FREQUENCIES = {'SECONDLY':1000, 'MINUTELY':60000, 'HOURLY':3600000, 'DAILY':86400000, 'WEEKLY':604800000}
-function constructUIEvents(event, calendar) {
-  const events = []
-  let event_color = (calendar.color) ? calendar.color : 'blue';
-  if (event.eventColor) {
-    const rgb = keyword.rgb(event.eventColor)
-    event_color = 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')'
-  }
-
-  const rrule = event.rrule
-  let condition;
-  if (rrule) {
-    if (rrule.endtype == 'COUNT') {
-      rrule.end = parseInt(rrule.end)
-      condition = (i, date) => {return i < rrule.end};
-    } else if (rrule.endtype == 'UNTIL') {
-      const end = new Date(rrule.end)
-      condition = (i, date) => {return date < end};
-    } else {
-      console.error('The type ' + rrule.endtype + ' is not known!')
-    }
-  } else {
-    condition = (i, date) => {return i < 1};
-  }
-  let event_start = event.start;
-  let event_end = event.end;
-  for (let i = 0; condition(i, event_start); i++) {
-    event_start = new Date(event.start)
-    event_end = new Date(event.end)
-
-    if (rrule) {
-      if (rrule.freq == 'MONTHLY') {
-        event_start.setMonth(event_start.getMonth()+i)
-        event_end.setMonth(event_end.getMonth()+i)
-      } else if (rrule.freq == 'YEARLY') {
-        event_start.setFullYear(event_start.getFullYear()+i)
-        event_end.setFullYear(event_end.getFullYear()+i)
-      } else {
-        if (rrule.freq in FREQUENCIES) {
-          event_start = new Date(event_start - (FREQUENCIES[rrule.freq]*-i))
-          event_end = new Date(event_end - (FREQUENCIES[rrule.freq]*-i))
-        }
-      }
-
-      
-
-      if (rrule.exdate.find(element => new Date(element).toISOString() == event_start.toISOString())) {
-        continue;
-      }
-    }
-
-    events.push({
-      name:event.name,
-      start:event_start,
-      end:event_end,
-      color:event_color,
-      timed:event.timed,
-      event:event,
-      iteration:i
-    })
-  }
-
-
-
-
-  return events
-}
-
-function constructUIEventsFromDates(event, calendar) {
+/*
+  this function generates all ui events from a given event. There can be more ui events due to recurring events. The backend generates the date intervals for this according to the standard
+*/
+function constructUIEventsFromDates(event, calendar) { 
   const events = []
   let event_color = (calendar.color) ? calendar.color : 'blue';
   if (event.eventColor) {
@@ -291,43 +235,17 @@ export default {
   },
 
   async created() {
-    // if (this.$route.params['viewType'] != 'default') {
-    //   this.type = this.$route.params['viewType']
-    // }
-    // if (this.$route.params['viewDate'] != 'default') {
-    //   if (this.$route.params['viewDate'].toLowerCase() == 'today') {
-    //     this.value = new Date()
-    //   } else {
-    //     this.value = new Date(this.$route.params['viewDate'])
-    //   }
-    // }
-
     this.update(true);
   },
 
   data: () => ({
-    // type: 'month',
-    types: ['month', 'week', 'day'],
     mode: 'stack',
-    modes: ['stack', 'column'],
-    weekday: [1, 2, 3, 4, 5, 6, 0],
-    weekdays: [
-      { text: 'Sun - Sat', value: [0, 1, 2, 3, 4, 5, 6] },
-      { text: 'Mon - Sun', value: [1, 2, 3, 4, 5, 6, 0] },
-      { text: 'Mon - Fri', value: [1, 2, 3, 4, 5] },
-      { text: 'Mon, Wed, Fri', value: [1, 3, 5] },
-    ],
     towerIndicatorIntervals:[0,15,30,45],
     towerIndicatorIntervalLength:1000*60*15, // 15 minutes
-    // value: new Date(),
     events: [],
-    colors: ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1'],
-    names: ['Meeting', 'Holiday', 'PTO', 'Travel', 'Event', 'Birthday', 'Conference', 'Party'],
     nextcloudViewTypes: {'day':'timeGridDay', 'week':'timeGridWeek', 'month':'dayGridMonth'},
 
-    overlay: true,
-    newEvent: null,
-    newEventDiv: null,
+    newEvent: undefined,
 
     // for drag and drop
     dragEvent: null,
@@ -477,41 +395,44 @@ export default {
     //   return null
     // },
 
-    createNewEvent() {
-      // if (!this.newEvent) {
-      //   this.newEvent = new Event()
-      //   this.events.push(this.newEvent)
-      // }
-      // for (const key in this.newEvent) {
-      //   delete this.newEvent[key]
-      // }
-
+    createNewEvent(start=undefined, end=undefined) {
       const calendar = this.calendars[0]
-      const event = new CalendarEvent()
-      event.name = 'Neues Event'
-      event.start = new Date(this.value)
-      event.start.setHours(new Date().getHours())
-      event.start.setMinutes(0)
-      event.end = new Date(event.start)
-      event.end.setHours(event.end.getHours()+2)
-      event.calendarId = calendar.uid
-      if (this.towernutzung) event.tower = true
-      event.dates = [[event.start, event.end]]
+      if (!start) {
+        start = new Date(this.value)
+        start.setHours(new Date().getHours())
+        start.setMinutes(0)
+      }
 
-      // this.addEventToView(this.newEvent)
-      const uiEvent = constructUIEventsFromDates(event, calendar);
-      this.events.push(...uiEvent);
-      commitSetSelectedEvent(this.$store, event)
-      this.$refs.calendarEventPopup.show()
+      if (!end) {
+        end = new Date(start)
+        end.setHours(end.getHours()+2)
+      }
+      let event = undefined
+      if (!this.newEvent || this.newEvent.event.uid) {
+        console.log('creating new Event')
+        console.log(this.newEvent)
+        event = new CalendarEvent()
+        event.name = 'Neues Event'
+        event.start = start
+        event.end = end
+        event.calendarId = calendar.uid
+        if (this.towernutzung) event.tower = true
+        event.dates = [[event.start, event.end]]
+
+        const uiEvent = constructUIEventsFromDates(event, calendar);
+        this.events.push(...uiEvent);
+        commitSetSelectedEvent(this.$store, event)
+        this.newEvent = uiEvent[0]
+      } else {
+        event = this.newEvent.event
+        event.start = start
+        event.end = end
+        this.newEvent.start = start
+        this.newEvent.end = end
+      }
+      console.log(event)
 
       return this.newEvent
-    },
-
-    addEventToView(event) {
-      const uiEvent = this.newEvent.toUIEvent()
-      if (!event.uiEvents) event.uiEvents = []
-      event.uiEvents.push(uiEvent)
-      this.events.push(uiEvent);
     },
 
     createDate(minutes=0, hour, day, month, year) {
@@ -583,6 +504,96 @@ export default {
       return intervals;
     },
 
+    // Start: Drag and drop methods
+
+    startDrag ({ event, timed }) {
+      if (event && timed) {
+        this.dragEvent = event
+        this.dragTime = null
+        this.extendOriginal = null
+      }
+    },
+    startTime (tms) {
+      const mouse = this.toTime(tms)
+
+      if (this.dragEvent && this.dragTime === null) {
+        const start = this.dragEvent.start
+
+        this.dragTime = mouse - start
+      } else {
+        this.createStart = new Date(this.roundTime(mouse))
+        this.createEvent = this.createNewEvent(this.createStart, this.createStart)
+      }
+    },
+    roundTime (time, down = true) {
+      const roundTo = 15 // minutes
+      const roundDownTime = roundTo * 60 * 1000
+
+      return down
+        ? time - time % roundDownTime
+        : time + (roundDownTime - (time % roundDownTime))
+    },
+    toTime (tms) {
+      return new Date(tms.year, tms.month - 1, tms.day, tms.hour, tms.minute).getTime()
+    },
+    rnd (a, b) {
+      return Math.floor((b - a + 1) * Math.random()) + a
+    },
+    rndElement (arr) {
+      return arr[this.rnd(0, arr.length - 1)]
+    },
+    extendBottom (event) {
+      this.createEvent = event
+      this.createStart = event.start
+      this.extendOriginal = event.end
+    },
+    mouseMove (tms) {
+      const mouse = this.toTime(tms)
+
+      if (this.dragEvent && this.dragTime !== null) {
+        const start = this.dragEvent.start
+        const end = this.dragEvent.end
+        const duration = end - start
+        const newStartTime = mouse - this.dragTime
+        const newStart = this.roundTime(newStartTime)
+        const newEnd = newStart + duration
+
+        this.dragEvent.start = new Date(newStart)
+        this.dragEvent.end = new Date(newEnd)
+      } else if (this.createEvent && this.createStart !== null) {
+        const mouseRounded = new Date(this.roundTime(mouse, false))
+        const min = (mouseRounded < this.createStart) ? mouseRounded : this.createStart
+        const max = (mouseRounded < this.createStart) ? this.createStart : mouseRounded
+
+        this.createEvent.start = min
+        this.createEvent.end = max
+      }
+    },
+    endDrag () {
+      this.dragTime = null
+      this.dragEvent = null
+      this.createEvent = null
+      this.createStart = null
+      this.extendOriginal = null
+    },
+    cancelDrag () {
+      if (this.createEvent) {
+        if (this.extendOriginal) {
+          this.createEvent.end = this.extendOriginal
+        } else {
+          const i = this.events.indexOf(this.createEvent)
+          if (i !== -1) {
+            this.events.splice(i, 1)
+          }
+        }
+      }
+
+      this.createEvent = null
+      this.createStart = null
+      this.dragTime = null
+      this.dragEvent = null
+    },
+  // End: Drag and Drop methods
   },
 
   computed: {
@@ -671,6 +682,10 @@ export default {
 
 
   watch: {
+    towernutzung(val) {
+      this.update(false)
+    },
+
     authenticationURL(val) {
       if (!val) {
         this.update(true)
@@ -680,7 +695,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
   :root {
     --calendarSidebar: #A2A2A1FF;
   }
@@ -714,11 +729,41 @@ export default {
   height:calc(100% - 64px);
 }
 
+.disable-select {
+  -webkit-user-select: none;  
+  -moz-user-select: none;    
+  -ms-user-select: none;      
+  user-select: none;
+}
+
+.v-event-drag-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 4px;
+  height: 4px;
+  cursor: ns-resize;
+
+  &::after {
+    display: none;
+    position: absolute;
+    left: 50%;
+    height: 4px;
+    border-top: 1px solid white;
+    border-bottom: 1px solid white;
+    width: 16px;
+    margin-left: -8px;
+    opacity: 0.8;
+    content: '';
+  }
+
+  &:hover::after {
+    display: block;
+  }
+}
 </style>
 
 <style>
-
-
 .v-date-picker-table {
   background: #EEEEEE;
 }

@@ -59,8 +59,8 @@ export default {
   data() {
     const cctLocations = [
       {name: 'custom', location: '', tower:false, textfieldDisabled:false},
-      {name: 'Tower', location: 'Towerlocation', tower:true, textfieldDisabled:true},
-      {name: 'CCTelefon', location: 'zoom link...', tower:false, textfieldDisabled:true}
+      {name: 'Tower', location: 'Erweiterungsbau der TU Berlin, Str. des 17. Juni 145, 10623 Berlin, Raum 512', tower:true, textfieldDisabled:true},
+      {name: 'CCTelefon', location: 'https://zoom.us/j/2814954064?pwd=ME1GbWNjV3ptemVHL3Y3cGE2VWRHQT09', tower:false, textfieldDisabled:true}
     ]
     return {
       selectedItem: cctLocations[0],

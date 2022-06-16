@@ -61,8 +61,3 @@ export const apiCall = async <T>(context: ActionContext<unknown, State>, apicall
     }
   }
 };
-
-export const getCalendarById = function(state: CalendarState, calendarId: string) {
-  if (!state.calendars) return undefined
-  return state.calendars.find(x => x.uid == calendarId)
-}

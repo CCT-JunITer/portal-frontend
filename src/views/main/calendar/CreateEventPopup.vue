@@ -293,7 +293,7 @@ export default {
         // savedEvent.end.setDate(savedEvent.end.getDate()+1)
       }
 
-      const updateTower = savedEvent.tower || this.selectedEvent.tower;
+      const wasTowerEvent = this.selectedEvent.tower
 
       try {
         await dispatchUpdateCalendarEvent(this.$store, {event:savedEvent, notify:true})
@@ -306,7 +306,8 @@ export default {
         }
       }
 
-      if (updateTower && this.towerCalendar.uid) { // update tower calendar if tower event was changed
+      if ((wasTowerEvent || savedEvent.tower) && this.towerCalendar.uid) { // update tower calendar if tower event was changed
+        if (savedEvent.towerId) commitRemoveCalendarEvent(this.$store, {calendarId: this.towerCalendar.uid, uid:savedEvent.towerId})
         dispatchFetchCalendars(this.$store, {notify:false, start:savedEvent.start, end:savedEvent.end, calendarIds:[this.towerCalendar.uid]})
       }
 
