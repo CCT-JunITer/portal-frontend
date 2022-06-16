@@ -1,23 +1,28 @@
 <template>
   <v-container v-if="this.event">
     <div>
-
-      <div class="d-flex">
-        <h1 class="text-h2 text--primary mb-3">
-          <v-icon v-if="this.event.approved" color="cctGreen" x-large>mdi-check-decagram</v-icon>
-          {{this.event.title}}
-        </h1>
-        <v-spacer></v-spacer>
-        <div class="d-flex align-center">
-          <v-btn color="cctOrange" outlined :to="{ name: 'event-edit', params: { id: this.event.id } }">
-            <v-icon left>
-              edit
-            </v-icon>
-            Event bearbeiten
-          </v-btn>
+      <h1 class="text-h2 text--primary mb-3">
+        <v-icon v-if="this.event.approved" color="cctGreen" x-large>mdi-check-decagram</v-icon>
+        {{this.event.title}}
+      </h1>
+      <v-divider class="my-5"></v-divider>
+      <div class="d-flex align-center">
+        <div>
+          <div class="text-caption mb-2">
+            erstellt von <user-chip :user="event.author" small></user-chip>
+          </div>
+          <div class="text-caption" v-if="event.last_updated_by">
+            zuletzt bearbeitet von <user-chip :user="event.last_updated_by" small></user-chip> {{ $common.format(new Date(event.date_last_updated), `'am' dd.MM.yyyy 'um' HH:mm`) }}
+          </div>
         </div>
-      </div>
-      
+        <v-spacer></v-spacer>
+        <v-btn color="cctOrange" outlined :to="{ name: 'event-edit', params: { id: this.event.id } }">
+          <v-icon left>
+            edit
+          </v-icon>
+          Event bearbeiten
+        </v-btn>
+      </div> 
 
       <v-divider class="my-5"></v-divider>
       <v-row>
@@ -37,6 +42,15 @@
             <span class="col-xs-12 col-md-6 col-lg-8 col-xl-9 my-0 py-1">
               {{ item.key }}
             </span>
+          </v-row>
+          <v-row class="my-3" v-if="event.protocol">
+            <span class="col-xs-12 col-md-6 col-lg-4 col-xl-3 my-0 py-1" style="font-weight: 300; font-size: 0.9rem;">
+              Protokollant:in
+            </span>
+
+            <div class="col-xs-12 col-md-6 col-lg-8 col-xl-9 my-0 py-1">
+              <user-chip :user="event.protocol"></user-chip>
+            </div>
           </v-row>
           <v-row class="my-3" v-if="event.wms_link">
             <span class="col-xs-12 col-md-6 col-lg-4 col-xl-3 my-0 py-1" style="font-weight: 300; font-size: 0.9rem;">
@@ -77,7 +91,7 @@
           </p>
         </v-col>
         <v-col cols="12" md="8">  
-          <file-manager v-model="this.event.files" :readonly="true">
+          <file-manager v-model="this.event.files" :folder="this.event.versioned_folder" :readonly="true">
           </file-manager>
         </v-col>
       </v-row>
@@ -286,9 +300,10 @@ import { IEvent, IEventApplication, IEventApplicationStatus } from '@/interfaces
 import FileManager from '@/components/file-manager/FileManager.vue';
 import { Route } from 'vue-router';
 import EventCodeDisplay from './EventCodeDisplay.vue';
+import UserChip from '@/components/user-chip/UserChip.vue';
 
 @Component({
-  components: { EmployeeProfilePicture, EmployeeCard, FileChip, EventApplicationCard, FileManager, EventCodeDisplay },
+  components: { EmployeeProfilePicture, EmployeeCard, FileChip, EventApplicationCard, FileManager, EventCodeDisplay, UserChip },
 })
 export default class TrainingDetail extends Vue {
   public today = new Date();
