@@ -240,6 +240,7 @@ export default {
 
   data: () => ({
     mode: 'stack',
+    weekday: [1, 2, 3, 4, 5, 6, 0],
     towerIndicatorIntervals:[0,15,30,45],
     towerIndicatorIntervalLength:1000*60*15, // 15 minutes
     events: [],
