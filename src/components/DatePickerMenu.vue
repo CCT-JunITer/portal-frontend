@@ -55,7 +55,7 @@ export default class DatePickerMenu extends Vue {
   }
 
   get date() {
-    if (this.value === null) {
+    if (!this.value) {
       return '';
     }
     return format(new Date(this.value), 'yyyy-MM-dd');
@@ -64,7 +64,7 @@ export default class DatePickerMenu extends Vue {
   toISO(value: string) {
     try {
       const date = parse(value, 'yyyy-MM-dd', new Date())
-      return formatISO(date);
+      return formatISO(date, { representation: 'date' });
     } catch(e) {
       return value;
     }
