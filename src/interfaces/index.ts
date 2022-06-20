@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/interface-name-prefix */
 export interface IUserProfile {
     email: string;
     private_email: string;

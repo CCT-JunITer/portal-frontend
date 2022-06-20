@@ -31,9 +31,9 @@ export const apiCallNotify = async <T>(context: ActionContext<unknown, State>, a
       commitAddNotification(context, { content: successText, color: 'success' });
     }
     return response;
-  } catch (e) {
+  } catch (e: any) {
     const error = e as AxiosError<{detail: any}>;
-    if (error.response?.data.detail.type == 'nextcloud authentication error') {
+    if (error.response?.data?.detail?.type == 'nextcloud authentication error') {
       await dispatchActionAuthenticateNextcloud(context)
       throw error;
     } else {
@@ -50,9 +50,9 @@ export const apiCall = async <T>(context: ActionContext<unknown, State>, apicall
   try {
     const response = await apicall(context.rootState.main.token);
     return response;
-  } catch (e) {
+  } catch (e: any) {
     const error = e as AxiosError<{detail: any}>;
-    if (error.response?.data.detail.type == 'nextcloud authentication error') {
+    if (error.response?.data?.detail?.type == 'nextcloud authentication error') {
       await dispatchActionAuthenticateNextcloud(context)
       throw error;
     } else {

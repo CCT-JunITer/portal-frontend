@@ -30,6 +30,7 @@
 <script lang="ts">
 import { Component, Vue, Prop, Emit, Watch } from 'vue-property-decorator';
 import { Cropper, CircleStencil } from 'vue-advanced-cropper';
+import 'vue-advanced-cropper/dist/style.css';
 import Compressor from 'compressorjs';
 import { commitAddNotification } from '@/store/main/mutations';
 

@@ -92,8 +92,8 @@ export default {
         return this.value.location
       },
       set(value) {
-        this.value.location = value
-        this.$emit('change', this.value)
+        const newValue = {...this.value, location: value};
+        this.$emit('change', newValue);
       }
     },
 
@@ -102,8 +102,8 @@ export default {
         return this.value.tower
       },
       set(value) {
-        this.value.tower = value
-        this.$emit('change', this.value)
+        const newValue = {...this.value, tower: value};
+        this.$emit('change', newValue);
       }
     }
   }

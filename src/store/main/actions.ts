@@ -187,21 +187,28 @@ export const actions = {
       headers,
       ...data.map(item => {
         const row = renderRow(item);
-        return row.map(value => value ? String(value) : '');
+        return row.map(value => {
+          const content = value ? String(value) : '';
+          if (content.indexOf('\n')){
+            return `"${content}"`;
+          }
+          return content
+        });
       })
     ];
 
     // create CSV
-    const csvContent = 'data:text/csv;charset=utf-8,'
-      + rows.map(e => e.join(',')).join('\n');
+    const csvContent = '\uFEFF' + rows.map(e => e.join(';')).join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
 
     // download file
-    const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
+    link.setAttribute('href', url);
     link.setAttribute('download', filename);
     document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
   },
   async removeNotification(context: MainContext, payload: { notification: AppNotification; timeout: number }) {
     return new Promise((resolve, reject) => {
@@ -248,7 +255,7 @@ export const actions = {
       } else {
         await dispatchLogOut(context);
       }
-    } catch (error) {
+    } catch (error: any) {
       commitRemoveNotification(context, loadingNotification);
       commitAddNotification(context, { content: `Error: ${error.response.data?.detail}`, color: 'error' });
     }

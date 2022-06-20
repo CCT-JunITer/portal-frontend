@@ -92,6 +92,11 @@ export default class AdminUsers extends Vue {
       value: 'entrydate',
     },
     {
+      text: 'Austrittsdatum',
+      sortable: true,
+      value: 'exitdate',
+    },
+    {
       text: 'Generation',
       sortable: true,
       value: 'generation',

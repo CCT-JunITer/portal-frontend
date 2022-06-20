@@ -83,7 +83,7 @@ export default class EventCodeDisplay extends Vue {
 
   public otp: string | null = null;
   public end_date: Date | null = null;
-  public timeout: NodeJS.Timeout | null = null;
+  public timeout: number | null = null;
   public openQr = false;
 
   get link() {
@@ -101,7 +101,7 @@ export default class EventCodeDisplay extends Vue {
 
   startTimer() {
     let running = this.isRunning();
-    const setTimer = () => setInterval(() => {
+    const setTimer = () => window.setInterval(() => {
       this.$forceUpdate();
       if(this.isRunning() !== running) {
         running = this.isRunning();
