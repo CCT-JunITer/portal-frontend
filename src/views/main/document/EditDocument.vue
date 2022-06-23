@@ -59,6 +59,21 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn @click="cancel" outlined color="cctOrange">Abbrechen</v-btn>
+          <consent-dialog @accept="deleteDocument" title="Dokument löschen" content="Wirklich löschen?" v-if="editDocument">
+            <template v-slot:activator="{ attrs, on }">
+              <v-btn 
+                v-bind="attrs" 
+                v-on="on" 
+                color="red" 
+                dark
+              >
+                <v-icon left>
+                  delete
+                </v-icon>
+                Löschen
+              </v-btn>
+            </template>
+          </consent-dialog>
           <v-btn
             @click="submit"
             color="cctGreen"
@@ -74,9 +89,8 @@
 
 <script lang="ts">
 import { IDocument, IDocumentCreate } from '@/interfaces';
-import { dispatchCreateDocument, dispatchGetOneDocument, dispatchUpdateDocument } from '@/store/document/actions';
+import { dispatchCreateDocument, dispatchGetOneDocument, dispatchUpdateDocument, dispatchDeleteDocument } from '@/store/document/actions';
 import { Vue, Component, Watch} from 'vue-property-decorator';
-import { format } from 'date-fns';
 import { readOneDocument, readRouteDocument } from '@/store/document/getters';
 import UploadButton from '@/components/UploadButton.vue';
 import VueTelInputVuetify from 'vue-tel-input-vuetify/lib/vue-tel-input-vuetify.vue';
@@ -84,9 +98,10 @@ import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture
 import FileManager from '@/components/file-manager/FileManager.vue';
 import DateTimePickerMenu from '@/components/DateTimePickerMenu.vue';
 import { Route } from 'vue-router';
+import ConsentDialog from '@/components/consent-dialog/ConsentDialog.vue';
 
 @Component({
-  components: {VueTelInputVuetify, UploadButton, DateTimePickerMenu, EmployeeProfilePicture, FileManager},
+  components: {VueTelInputVuetify, UploadButton, DateTimePickerMenu, EmployeeProfilePicture, FileManager, ConsentDialog },
 })
 export default class EditDocument extends Vue {
   public valid = false;
@@ -94,6 +109,12 @@ export default class EditDocument extends Vue {
 
   get documentInfo(): IDocument {
     return readRouteDocument(this.$store)(this.$route) as IDocument;
+  }
+
+  async deleteDocument() {
+    const oldDocument = this.documentInfo;
+    await dispatchDeleteDocument(this.$store, this.documentInfo.id);
+    this.$router.push(`/main/wms/documents/${oldDocument.type}`);
   }
 
   @Watch('$route', {immediate: true})

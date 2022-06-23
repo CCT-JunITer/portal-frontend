@@ -6,7 +6,6 @@
     ref="autocomplete"
     :items="items"
     @change="goToProfile"
-    @click="fetchResults"
     :no-filter="true"
     :loading="isLoading"
     :search-input.sync="searchText"
@@ -89,7 +88,7 @@ import { api } from '@/api';
 })
 export default class SearchBar extends Vue {
 
-  public results: any[] | null = null;
+  public results: { items: any[]; searchText: string } | null = null;
   public model = {};
   public searchText = '';
   public filter = '';
@@ -118,7 +117,7 @@ export default class SearchBar extends Vue {
   public async search(newVal?: string, oldVal?: string) {
     if (newVal === oldVal) {
       return;
-    } 
+    }
     this.isLoading = true;
     this.fetch();
   }
@@ -129,7 +128,9 @@ export default class SearchBar extends Vue {
     this.isLoading = true;
     const searchText = this.searchText || '';
     const response = await api.getSearchResults(this.$store.state.main.token, searchText)
-    this.results = response.data.results;
+    if (this.results?.searchText !== this.searchText) {
+      this.results = {items: response.data.results, searchText: searchText};
+    }
     this.isLoading = false;
   }
 
@@ -141,7 +142,7 @@ export default class SearchBar extends Vue {
     const sections = this.sections.filter(section => !this.filter || section.type === this.filter)
     for (let i = 0 ; i < sections.length; i++) {
       const section = sections[i];
-      const items = this.results[section.type].map((obj) => ({
+      const items = this.results.items[section.type].map((obj) => ({
         target: obj,
         searchType: section.type,
         searchId: `${section.type}-${obj.id}`,

@@ -359,7 +359,7 @@ export default class TrainingDetail extends Vue {
       },
       {
         name: 'Datum',
-        key: format(new Date(String(this.event?.date_from)), 'dd.MM.yyyy HH:mm') + ' - ' + format(new Date(String(this.event?.date_to)), 'dd.MM.yyy HH:mm'),
+        key: this.event?.timed ? this.$common.formatRange(this.event.date_from, this.event.date_to) : this.$common.format(new Date(this.event.date_from), 'dd.MM.yyyy')
       },
       this.event.type === 'training' && {
         name: 'Thema',

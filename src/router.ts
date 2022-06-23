@@ -460,7 +460,10 @@ export default new Router({
             },
             {
               path: 'calendar/:viewType/:viewDate',
-              component: () => import('./views/main/calendar/CalendarView.vue')
+              component: () => import('./views/main/calendar/CalendarMain.vue'),
+              meta: {
+                featureFlag: 'calendar'
+              }
             },
             {
               path: 'shop',

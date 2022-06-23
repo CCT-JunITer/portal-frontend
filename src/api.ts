@@ -142,7 +142,7 @@ export const api = {
     return axios.get<IEvent>(`${apiUrl}/api/v1/event/${eventId}`, { ...authHeaders(token) });
   },
   async deleteEvent(token: string, eventId: number,) {
-    return axios.delete(`${apiUrl}/api/v1/event/${eventId}`, { ...authHeaders(token)});
+    return axios.delete<IEvent>(`${apiUrl}/api/v1/event/${eventId}`, { ...authHeaders(token)});
   },
   async createUserOpen(token: string, data: IUserProfileCreate) {
     return axios.post(`${apiUrl}/api/v1/users/open`, data, {params: {token}});
@@ -249,6 +249,9 @@ export const api = {
   },
   async createDocument(token: string, data: IDocumentCreate) {
     return axios.post<IDocument>(`${apiUrl}/api/v1/document/`, data, authHeaders(token));
+  },
+  async deleteDocument(token: string, documentId: number) {
+    return axios.delete<IDocument>(`${apiUrl}/api/v1/document/${documentId}`, authHeaders(token));
   },
 
   async deleteCalendar(token: string, calendarId: string) {

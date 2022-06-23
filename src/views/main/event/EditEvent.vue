@@ -70,7 +70,8 @@
           <agenda-component v-model="event.agenda" class="input-lg">
           </agenda-component>
 
-          <date-time-picker-menu
+          <component
+            :is="!allday ? 'date-time-picker-menu' : 'date-picker-menu'"
             v-model ="event.date_from"
             defaultPicker="MONTH"
             :pickerProps="{
@@ -89,9 +90,10 @@
                 :rules="[$common.required]"
               ></v-text-field>
             </template>
-          </date-time-picker-menu>
+          </component>
           
-          <date-time-picker-menu
+          <component
+            :is="!allday ? 'date-time-picker-menu' : 'date-picker-menu'"
             v-model ="event.date_to"
             defaultPicker="MONTH"
             :pickerProps="{
@@ -110,7 +112,18 @@
                 :rules="[$common.required]"
               ></v-text-field>
             </template>
-          </date-time-picker-menu>
+          </component>
+
+          <v-checkbox
+            v-model="allday"
+            label="Ganztägig"
+            prepend-icon="mdi-clock"
+            class="input-lg"
+            persistent-hint
+            required
+          >
+          </v-checkbox>
+
 
           <v-text-field
             label="Externe Personen"
@@ -188,6 +201,22 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn @click="cancel" outlined color="cctOrange">Abbrechen</v-btn>
+
+          <consent-dialog @accept="deleteEvent" title="Dokument löschen" content="Wirklich löschen?" v-if="editEvent">
+            <template v-slot:activator="{ attrs, on }">
+              <v-btn 
+                v-bind="attrs" 
+                v-on="on" 
+                color="red" 
+                dark
+              >
+                <v-icon left>
+                  delete
+                </v-icon>
+                Event löschen
+              </v-btn>
+            </template>
+          </consent-dialog>
           <v-btn
             @click="submit"
             color="cctGreen"
@@ -210,15 +239,17 @@ import { IEvent, IEventCreate, IEventType } from '@/interfaces';
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 import UploadButton from '@/components/UploadButton.vue';
 import { readOneEvent } from '@/store/event/getters';
-import { dispatchCreateEvent, dispatchGetOneEvent, dispatchUpdateEvent } from '@/store/event/actions';
+import { dispatchCreateEvent, dispatchDeleteEvent, dispatchGetOneEvent, dispatchUpdateEvent } from '@/store/event/actions';
 import FileManager from '@/components/file-manager/FileManager.vue';
 import DateTimePickerMenu from '@/components/DateTimePickerMenu.vue';
 import { Route } from 'vue-router';
 import AgendaComponent from '@/components/agenda/AgendaComponent.vue';
 import UserSelect from '@/components/user-select/UserSelect.vue';
+import ConsentDialog from '@/components/consent-dialog/ConsentDialog.vue';
+import DatePickerMenu from '@/components/DatePickerMenu.vue';
 
 @Component({
-  components: {VueTelInputVuetify, UploadButton, DateTimePickerMenu, EmployeeProfilePicture, FileManager, AgendaComponent, UserSelect },
+  components: {VueTelInputVuetify, UploadButton, DatePickerMenu, DateTimePickerMenu, EmployeeProfilePicture, FileManager, AgendaComponent, UserSelect, ConsentDialog },
 })
 export default class AdminViewEvent extends Vue {
 
@@ -226,10 +257,23 @@ export default class AdminViewEvent extends Vue {
   public valid = false;
   public event: Partial<IEventCreate> = {}
   public trainingSubType: null | {type: string; topics: string[]} = null;
-
+  public allday = false;
 
   public get type() {
     return (this.$route.meta?.event_type || this.event?.type || 'training') as IEventType;
+  }
+
+  async deleteEvent() {
+    if (!this.editEvent) {
+      return;
+    }
+    const oldEvent = this.editEvent;
+    await dispatchDeleteEvent(this.$store, oldEvent.id);
+    if (oldEvent.type === 'training') {
+      this.$router.push('/main/trainings');
+    } else {
+      this.$router.push('/main/wms/meetings');
+    }
   }
 
   get fileLabels() {
@@ -283,6 +327,7 @@ export default class AdminViewEvent extends Vue {
     if ((this.$refs.form as HTMLFormElement).validate()) {
       const new_event = {
         ...this.event,
+        timed: !this.allday,
         type: this.type,
         subtype: this.trainingSubType && this.trainingSubType.type,
       } as IEventCreate;
@@ -304,10 +349,11 @@ export default class AdminViewEvent extends Vue {
   public reset() {
     if(this.editEvent) {
       this.event = {
-        ...this.editEvent, 
+        ...this.editEvent,
         participant_ids: this.editEvent.participants.map(u => u.id),
         leader_ids: this.editEvent.leaders.map(u => u.id),
       };
+      this.allday = !this.event.timed;
 
       if (this.event.subtype) {
         this.trainingSubType = this.$common.SCHULUNGSMAPPING.find(o => o.type === this.event?.subtype) || { type: this.event.subtype, topics: [] };

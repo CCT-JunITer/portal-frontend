@@ -26,6 +26,7 @@ import {
 import { AppNotification, MainState } from './state';
 import { apiCall, apiCallNotify } from '../utils';
 import { format } from 'date-fns';
+import { readIsFlagSet } from './getters';
 
 type MainContext = ActionContext<MainState, State>;
 
@@ -277,6 +278,19 @@ export const actions = {
     const response = await apiCall(context, api.requestAuthenticationURL);
     commitSetAuthenticationURL(context, response.data)
   },
+  async actionToggleFeatureFlag(context: MainContext, flag: string) {
+    const features = context.state.userProfile?.features || [];
+    let newFeatures: string[];
+    if (readIsFlagSet(context)(flag)) {
+      newFeatures = features.filter(feat => feat !== flag)
+    } else {
+      newFeatures = [...features, flag];
+    }
+    
+    await dispatchUpdateUserProfile(context, {
+      features: newFeatures
+    })
+  }
 };
 
 const { dispatch } = getStoreAccessors<MainState | any, State>('');
@@ -314,7 +328,4 @@ export const dispatchAddRequestMe = dispatch(actions.actionAddRequestMe);
 export const dispatchGetGroups = dispatch(actions.actionGetGroups); 
 export const dispatchSetPrimaryGroupMe = dispatch(actions.actionSetPrimaryGroupMe)
 export const dispatchActionAuthenticateNextcloud = dispatch(actions.actionAuthenticateNextcloud)
-
-
-
-
+export const dispatchToggleFeatureFlag = dispatch(actions.actionToggleFeatureFlag);

@@ -8,6 +8,9 @@
         <span class="text-overline text-center">
           {{ timeLeftFormatted() }}
         </span>
+        <span class="text-h5 leighter">
+          {{ otp }}
+        </span>
       </div>
     </template>
     <v-card>
@@ -20,9 +23,9 @@
           <span class="text-overline text-center">
             {{ timeLeftFormatted() }}
           </span>
-          <a :href="link" target="_blank" class="text-caption" style="text-decoration: none;">
+          <span class="text-h2">
             {{ otp }}
-          </a>
+          </span>
         </div>
       </v-card-text>
       <v-card-actions>
@@ -52,6 +55,30 @@
     <span class="text-overline text-center">
       Scanne jetzt den QR-Code ein
     </span>
+    <div class="ma-auto" style="max-width: 300px; position: relative;">
+
+      <v-otp-input
+        v-if="!inputOtpValid"
+        label="Code"
+        color="red"
+        v-model="inputOtp"
+        filled
+        @finish="doCheckin"
+      >
+      </v-otp-input>
+      <event-checkmark-animation v-if="inputOtpValid">
+      </event-checkmark-animation>
+      <v-alert v-else-if="inputOtpValid === false" color="red" text dense type="error">
+        Anmeldung nicht erfolgreich
+      </v-alert>
+      <v-overlay absolute :value="inputOtpLoading">
+        <v-progress-circular
+          indeterminate
+          color="primary"
+        ></v-progress-circular>
+      </v-overlay>
+    </div>
+
   </div>
 </template>
 
@@ -64,9 +91,11 @@ import { IEvent } from '@/interfaces';
 import { formatDistanceStrict } from 'date-fns';
 import { isBefore, isWithinInterval } from 'date-fns';
 import { readHasAnyPermission, readUserProfile } from '@/store/main/getters';
+import EventCheckmarkAnimation from './EventCheckmarkAnimation.vue';
+
 
 @Component({
-  components: {QrcodeVue}
+  components: {QrcodeVue, EventCheckmarkAnimation}
 })
 export default class EventCodeDisplay extends Vue {
 
@@ -82,9 +111,27 @@ export default class EventCodeDisplay extends Vue {
   }
 
   public otp: string | null = null;
+  public inputOtp: string | null = null;
+  public inputOtpValid: boolean | null = null;
+  public inputOtpLoading = false;
   public end_date: Date | null = null;
   public timeout: number | null = null;
   public openQr = false;
+
+  async doCheckin() {
+    if (!this.inputOtp) {
+      return;
+    }
+    try {
+      this.inputOtpLoading = true;
+      const response = await api.updateParticipants(this.$store.state.main.token, this.event.id, +this.inputOtp);
+      this.inputOtpValid = response.data;
+    } catch(e) {
+      this.inputOtpValid = false;
+    }
+    this.inputOtpLoading = false;
+    this.inputOtp = '';
+  }
 
   get link() {
     return `${window.location.origin}/main/events/check-in/${this.event.id}?otp=${this.otp}`

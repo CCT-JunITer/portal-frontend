@@ -37,6 +37,7 @@ export interface IUserProfile {
     bic: string;
     bank: string;
     contact: string[];
+    features: string[];
 
     admin_comment?: string;
 }
@@ -70,7 +71,7 @@ export interface IUserProfileUpdate {
     bic?: string;
     bank?: string;
     contact?: string[];
-
+    features?: string[];
 
     admin_comment?: string;
 }
@@ -118,6 +119,8 @@ export interface IEvent {
     agenda: string[];
     date_from: string;
     date_to: string;
+    timed: boolean;
+    approved: boolean;
     date_checkin_from: string;
     date_checkin_to: string;
     wms_link: string;
@@ -141,6 +144,8 @@ export interface IEventCreate {
     subtype: string;
     date_from: string;
     date_to: string;
+    timed: boolean;
+    approved: boolean;
     external: string;
     agenda: string[];
     is_membership_progression: boolean;

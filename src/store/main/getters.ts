@@ -15,6 +15,10 @@ export const getters = {
     }
     return state.users.find(user => user.id === numberId);
   },
+  isFlagSet: (state: MainState) => (flag: string) => {
+    const features = state.userProfile?.features || [];
+    return features.indexOf(flag) !== -1;
+  },
   toolbarColor: () => {
     //
   },
@@ -80,5 +84,5 @@ export const readRouteUser = read(getters.routeUser);
 export const readMyRequests = read(getters.myRequests);
 export const readGroups = read(getters.groups);
 export const readAuthenticationURL = read(getters.authenticationURL);
-
+export const readIsFlagSet = read(getters.isFlagSet);
 

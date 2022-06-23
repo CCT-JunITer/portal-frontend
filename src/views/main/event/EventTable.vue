@@ -14,6 +14,8 @@
       :loading="!items"
       :mobile-breakpoint="0"
       fixed-header
+      sort-by="date_from"
+      sort-desc
     >
       <template v-slot:top>
         <slot name="top"></slot>
@@ -48,12 +50,8 @@
         <a :href="item.wms_link"> {{ item.wms_link }}</a>
       </template>
       <template v-slot:item.date_from="{ item }">
-        {{ $common.format(new Date(item.date_from), 'dd.MM.yyyy HH:mm') }}
+        {{ item.timed ? $common.formatRange(item.date_from, item.date_to) : $common.format(new Date(item.date_from), 'dd.MM.yyyy')}}
       </template>
-      <template v-slot:item.date_to="{ item }">
-        {{ $common.format(new Date(item.date_to), 'dd.MM.yyyy HH:mm') }}
-      </template>
-
         
       <template v-slot:item.custom_show_participants="{ item }">
         <v-btn
@@ -149,7 +147,7 @@ export default class EventTable extends Vue {
 
   public get headers() {
     return [
-      {
+      this.type === 'training' && {
         text: 'Titel',
         sortable: true,
         value: 'title',
@@ -180,21 +178,19 @@ export default class EventTable extends Vue {
         align: 'left',
       },
       {
-        text: 'Datum von',
+        text: 'Datum',
         sortable: true,
         value: 'date_from',
         align: 'left',
+        sort: (a, b) => {
+          return new Date(a).getTime() - new Date(b).getTime();
+        }
       },
-      {
-        text: 'Datum bis',
-        sortable: true,
-        value: 'date_to',
-        align: 'left',
-      },
-      {
+      this.type === 'meeting' && {
         text: 'Agenda',
         value: 'custom_agenda',
         align: 'left',
+        sortable: false,
       },
       this.type === 'training' && {
         text: 'Ext. Trainer:innen',
@@ -221,10 +217,6 @@ export default class EventTable extends Vue {
         sortable: false,
       
       },
-      {
-        text: 'Dateien',
-        value: 'custom_files',
-      }
     ].filter(v => v);
   }
 

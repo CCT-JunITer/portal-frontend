@@ -38,6 +38,6 @@ export default class EventApplicationCard extends Vue {
 
 <style lang="scss">
 .pre-formatted {
-  white-space: pre;
+  white-space: pre-wrap;
 }
 </style>
