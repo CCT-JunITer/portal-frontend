@@ -9,7 +9,7 @@ stages:
   - deploy
 
 lint:
-  image: node:10.23-alpine
+  image: node:14.7-alpine
   stage: lint
   needs: []
   cache:
@@ -21,7 +21,7 @@ lint:
 
 
 test:
-  image: node:10.23-alpine
+  image: node:14.7-alpine
   stage: test
   needs: []
   cache:
@@ -32,7 +32,7 @@ test:
     - VUE_APP_ENV=dev npm run test:unit
 
 build staging:
-  image: node:10.23-alpine
+  image: node:14.7-alpine
   stage: build
   needs: []
   only:
@@ -50,7 +50,7 @@ build staging:
       - dist
 
 build production:
-  image: node:10.23-alpine
+  image: node:14.7-alpine
   stage: build
   needs: []
   only:
