@@ -223,16 +223,16 @@ export default class EmployeesView extends Vue {
 
 
   private categories = [{
-    value: 'all',
-    text: 'Alle'
-  }, {
-    value: 'members',
-    text: 'Mitglieder'
-  },
-  {
-    value: 'alumni',
-    text: 'Alumni'
-  }];
+                          value: 'all',
+                          text: 'Alle'
+                        }, {
+                          value: 'members',
+                          text: 'Mitglieder'
+                        },
+                        {
+                          value: 'alumni',
+                          text: 'Alumni'
+                        }];
   
   public get category() {
     const cat = (this.$route.query.category as string);

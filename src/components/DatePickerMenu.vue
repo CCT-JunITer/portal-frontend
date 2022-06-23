@@ -5,8 +5,9 @@
     :close-on-content-click="false"
     transition="scale-transition"
     offset-y
+    nudge-right="40"
     max-width="290px"
-    min-width="auto"
+    min-width="240px"
     v-bind="$attrs"
   >
     <template v-slot:activator="{ on, attrs }">
@@ -17,6 +18,7 @@
       </slot>
     </template>
     <v-date-picker
+      :active-picker="defaultPicker"
       color="cctBlue"
       ref="picker"
       v-model="date"
@@ -28,21 +30,13 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
-import { format, parse } from 'date-fns'
+import { Vue, Component, Prop } from 'vue-property-decorator'
+import { format, formatISO, parse } from 'date-fns'
 
 @Component({})
 export default class DatePickerMenu extends Vue {
 
   public menu = false;
-
-  @Watch('menu')
-  public onMenuOpen(menu: boolean) {
-    if (menu && this.defaultPicker) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      setTimeout(() => (this.$refs.picker as any).activePicker = this.defaultPicker);
-    }
-  }
 
   // https://github.com/vuetifyjs/vuetify/blob/master/packages/vuetify/src/components/VDatePicker/VDatePicker.ts#L407
   @Prop({ required: false })
@@ -57,11 +51,23 @@ export default class DatePickerMenu extends Vue {
 
 
   set date(value) {
-    this.$emit('input', value);
+    this.$emit('input', this.toISO(value));
   }
 
   get date() {
-    return this.value;
+    if (!this.value) {
+      return '';
+    }
+    return format(new Date(this.value), 'yyyy-MM-dd');
+  }
+
+  toISO(value: string) {
+    try {
+      const date = parse(value, 'yyyy-MM-dd', new Date())
+      return formatISO(date, { representation: 'date' });
+    } catch(e) {
+      return value;
+    }
   }
 
   onInputChange(value: string) {
@@ -69,7 +75,7 @@ export default class DatePickerMenu extends Vue {
       const date = parse(value, 'dd.MM.yyyy', new Date());
       this.date = format(date, 'yyyy-MM-dd');
     } catch(e) {
-      this.date = null;
+      this.date = '';
     }
   }
 

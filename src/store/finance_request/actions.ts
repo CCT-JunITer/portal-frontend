@@ -20,7 +20,7 @@ export const actions = {
       const response = await api.createFinanceRequest(context.rootState.main.token, payload);
       commitAddNotification(context, { content: 'Antrag wurde abgeschickt', color: 'success' });
       commitSetMyFinanceRequest(context, response.data)
-    } catch (error) {
+    } catch (error: any) {
       await dispatchCheckApiError(context, error);
     }
   },
@@ -31,7 +31,7 @@ export const actions = {
       if (response) {
         commitSetMyFinanceRequests(context, response.data);
       }
-    } catch (error) {
+    } catch (error: any) {
       await dispatchCheckApiError(context, error);
     }
   },
@@ -42,12 +42,12 @@ export const actions = {
       commitAddNotification(context, loadingNotification);
       const response = (await Promise.all([
         api.updateFinanceRequest(context.rootState.main.token, payload.id, payload.financeRequest),
-        await new Promise((resolve, reject) => setTimeout(() => resolve(), 500)),
+        await new Promise<void>((resolve, reject) => setTimeout(() => resolve(), 500)),
       ]))[0];
       commitSetMyFinanceRequest(context, response.data);
       commitRemoveNotification(context, loadingNotification);
       commitAddNotification(context, { content: 'Finance Request successfully updated', color: 'success' });
-    } catch (error) {
+    } catch (error: any) {
       await dispatchCheckApiError(context, error);
     }
   },
@@ -58,12 +58,12 @@ export const actions = {
       commitAddNotification(context, loadingNotification);
       const response = (await Promise.all([
         api.updateFinanceRequestState(context.rootState.main.token, payload.financeId, payload.updated_status, payload.updated_message_file, payload.updated_message_request),
-        await new Promise((resolve, reject) => setTimeout(() => resolve(), 500)),
+        await new Promise<void>((resolve, reject) => setTimeout(() => resolve(), 500)),
       ]))[0];
       //commitSetMyFinanceRequests(context, response.data);
       commitRemoveNotification(context, loadingNotification);
       commitAddNotification(context, { content: 'Finance Request successfully updated', color: 'success' });
-    } catch (error) {
+    } catch (error: any) {
       await dispatchCheckApiError(context, error);
     }
   },
@@ -73,12 +73,12 @@ export const actions = {
       commitAddNotification(context, loadingNotification);
       const response = (await Promise.all([
         api.updateFinanceRequestStateReceipt(context.rootState.main.token, payload.financeId, payload.updated_status, payload.updated_receipt),
-        await new Promise((resolve, reject) => setTimeout(() => resolve(), 500)),
+        await new Promise<void>((resolve, reject) => setTimeout(() => resolve(), 500)),
       ]))[0];
       //commitSetMyFinanceRequests(context, response.data);
       commitRemoveNotification(context, loadingNotification);
       commitAddNotification(context, { content: 'Finance Request successfully updated', color: 'success' });
-    } catch (error) {
+    } catch (error: any) {
       await dispatchCheckApiError(context, error);
     }
   },
@@ -88,12 +88,12 @@ export const actions = {
       commitAddNotification(context, loadingNotification);
       const response = (await Promise.all([
         api.updateFinanceRequestStateType(context.rootState.main.token, payload.financeId, payload.updated_status, payload.updated_association),
-        await new Promise((resolve, reject) => setTimeout(() => resolve(), 500)),
+        await new Promise<void>((resolve, reject) => setTimeout(() => resolve(), 500)),
       ]))[0];
       //commitSetMyFinanceRequests(context, response.data);
       commitRemoveNotification(context, loadingNotification);
       commitAddNotification(context, { content: 'Finance Request successfully updated', color: 'success' });
-    } catch (error) {
+    } catch (error: any) {
       await dispatchCheckApiError(context, error);
     }
   },
@@ -104,12 +104,12 @@ export const actions = {
       commitAddNotification(context, loadingNotification);
       const response = (await Promise.all([
         api.deleteFinanceRequest(context.rootState.main.token, payload),
-        await new Promise((resolve, reject) => setTimeout(() => resolve(), 500)),
+        await new Promise<void>((resolve, reject) => setTimeout(() => resolve(), 500)),
       ]))[0];
       commitRemoveNotification(context, loadingNotification);
       commitAddNotification(context, { content: 'Finanzantrag gelöscht', color: 'success' });
       commitDeleteMyFinanceRequest(context, response.data);
-    } catch (error) {
+    } catch (error: any) {
       await dispatchCheckApiError(context, error);
     }
   },

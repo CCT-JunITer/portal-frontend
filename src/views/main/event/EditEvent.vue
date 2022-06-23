@@ -24,18 +24,6 @@
             required
             :rules="[$common.required]"            
           ></v-text-field>
-          <!-- Woher kommt die Leertaste? -->
-
-          <v-select
-            label="Schulungsart"
-            v-if="type === 'training'"
-            v-model ="event.subtype"
-            class="input-lg"
-            required
-            prepend-icon="mdi-animation"
-            :items="$common.SCHULUNGSART"
-            :rules="[$common.required]"
-          ></v-select>
           <v-select
             label="Meetingart"
             v-if="type === 'meeting'"
@@ -46,16 +34,29 @@
             :items="$common.MEETINGART"
             :rules="[$common.required]"
           ></v-select>
+
           <v-select
-            label="Schulungsthema"
+            label="Schulungsart"
             v-if="type === 'training'"
-            v-model="event.topic"
-            :items="$common.SCHULUNGSTHEMA"
-            prepend-icon="mdi-collage"
+            v-model ="trainingSubType"
             class="input-lg"
             required
+            prepend-icon="mdi-animation"
+            return-object
+            item-text="type"
+            :items="$common.SCHULUNGSMAPPING"
             :rules="[$common.required]"
           ></v-select>
+          <div v-if="trainingSubType && trainingSubType.topics.length">
+            <v-select
+              label="Schulungsthema"
+              v-model ="event.topic"
+              class="input-lg"
+              prepend-icon="mdi-collage"
+              :items="trainingSubType.topics"
+              :rules="[$common.required]"
+            ></v-select>
+          </div>
           <v-textarea
             label="Beschreibung"
             v-model="event.description"
@@ -69,7 +70,8 @@
           <agenda-component v-model="event.agenda" class="input-lg">
           </agenda-component>
 
-          <date-time-picker-menu
+          <component
+            :is="!allday ? 'date-time-picker-menu' : 'date-picker-menu'"
             v-model ="event.date_from"
             defaultPicker="MONTH"
             :pickerProps="{
@@ -88,9 +90,10 @@
                 :rules="[$common.required]"
               ></v-text-field>
             </template>
-          </date-time-picker-menu>
+          </component>
           
-          <date-time-picker-menu
+          <component
+            :is="!allday ? 'date-time-picker-menu' : 'date-picker-menu'"
             v-model ="event.date_to"
             defaultPicker="MONTH"
             :pickerProps="{
@@ -109,7 +112,18 @@
                 :rules="[$common.required]"
               ></v-text-field>
             </template>
-          </date-time-picker-menu>
+          </component>
+
+          <v-checkbox
+            v-model="allday"
+            label="Ganztägig"
+            prepend-icon="mdi-clock"
+            class="input-lg"
+            persistent-hint
+            required
+          >
+          </v-checkbox>
+
 
           <v-text-field
             label="Externe Personen"
@@ -141,109 +155,74 @@
           >
           </v-checkbox>
 
-          <v-autocomplete
-            v-model="event.leader_ids"
-            :items="this.userProfiles"
+
+          <user-select
+            v-model="event.protocol_id"
+            class="input-lg"
+            prepend-icon="mdi-file"
             filled
-            chips
+            label="Protokollant:in"
+            :userChipProps="{
+              color: 'cctGreen',
+              dark: true,
+            }"
+          >
+          </user-select>
+          <user-select
+            v-model="event.leader_ids"
+            multiple
             class="input-lg"
             prepend-icon="mdi-school"
-            label="Sitzungsleiter:innen"
-            item-text="full_name"
-            item-value="id"
-            multiple
-          >
-            <template v-slot:selection="data">
-              <v-chip
-                color="cctGreen"
-                text-color="white"
-                v-bind="data.attrs"
-                :input-value="data.selected"
-                close
-                @click="data.select"
-                @click:close="removeTrainer(data.item)"
-              >
-                <v-avatar left>
-                  <employee-profile-picture
-                    :employee="data.item"
-                  ></employee-profile-picture>
-                </v-avatar>
-                {{ data.item.full_name }}
-              </v-chip>
-            </template>
-            <template v-slot:item="data">
-              <template>
-                <employee-profile-picture
-                  :employee="data.item"
-                  component="v-list-item-avatar"
-                  size="40"
-                ></employee-profile-picture>
-                <v-list-item-content>
-                  <v-list-item-title v-html="data.item.full_name"></v-list-item-title>
-                  <v-list-item-subtitle v-html="data.item.ressort"></v-list-item-subtitle>
-                </v-list-item-content>
-              </template>
-            </template>
-            
-          </v-autocomplete>
-
-
-          <v-autocomplete
-            v-model="event.participant_ids"
-            :items="this.userProfiles"
             filled
-            chips
-            class="input-lg"
-            label="Teilnehmer:innen"
-            item-text="full_name"
-            prepend-icon="mdi-account"
-            item-value="id"
-            multiple
+            label="Sitzungsleiter:innen"
+            :userChipProps="{
+              color: 'cctGreen',
+              dark: true,
+            }"
           >
-            <template v-slot:selection="data">
-              <v-chip
-                color="cctBlue"
-                text-color="white"
-                v-bind="data.attrs"
-                :input-value="data.selected"
-                close
-                @click="data.select"
-                @click:close="removeParticipant(data.item)"
-              >
-                <v-avatar left>
-                  <employee-profile-picture
-                    :employee="data.item"
-                  ></employee-profile-picture>
-                </v-avatar>
-                {{ data.item.full_name }}
-              </v-chip>
-            </template>
-            <template v-slot:item="data">
-              <template>
-                
-                <employee-profile-picture
-                  :employee="data.item"
-                  component="v-list-item-avatar"
-                  size="40"
-                ></employee-profile-picture>
-                <v-list-item-content>
-                  <v-list-item-title v-html="data.item.full_name"></v-list-item-title>
-                  <v-list-item-subtitle v-html="data.item.ressort"></v-list-item-subtitle>
-                </v-list-item-content>
-              </template>
-            </template>
-          </v-autocomplete>
-          <file-manager v-model="event.files" :multiple="true" :labels="fileLabels"></file-manager>
+          </user-select>
+
+          <user-select
+            v-model="event.participant_ids"
+            multiple
+            class="input-lg"
+            prepend-icon="mdi-account"
+            filled
+            label="Teilnehmer:innen"
+            :userChipProps="{
+              color: 'cctBlue',
+              dark: true,
+            }"
+          >
+          </user-select>
+          
+          <file-manager v-model="event.files" :folder="event.versioned_folder" :multiple="true" :labels="fileLabels"></file-manager>
         </v-form>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn @click="cancel" outlined color="cctOrange">Abbrechen</v-btn>
+
+          <consent-dialog @accept="deleteEvent" title="Dokument löschen" content="Wirklich löschen?" v-if="editEvent">
+            <template v-slot:activator="{ attrs, on }">
+              <v-btn 
+                v-bind="attrs" 
+                v-on="on" 
+                color="red" 
+                dark
+              >
+                <v-icon left>
+                  delete
+                </v-icon>
+                Event löschen
+              </v-btn>
+            </template>
+          </consent-dialog>
           <v-btn
             @click="submit"
             color="cctGreen"
             style="color: #ffffff"
           >
-            Schulung speichern
+            Event speichern
           </v-btn>
         </v-card-actions>
       </v-col>
@@ -260,32 +239,48 @@ import { IEvent, IEventCreate, IEventType } from '@/interfaces';
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 import UploadButton from '@/components/UploadButton.vue';
 import { readOneEvent } from '@/store/event/getters';
-import { dispatchCreateEvent, dispatchGetOneEvent, dispatchUpdateEvent } from '@/store/event/actions';
+import { dispatchCreateEvent, dispatchDeleteEvent, dispatchGetOneEvent, dispatchUpdateEvent } from '@/store/event/actions';
 import FileManager from '@/components/file-manager/FileManager.vue';
 import DateTimePickerMenu from '@/components/DateTimePickerMenu.vue';
 import { Route } from 'vue-router';
 import AgendaComponent from '@/components/agenda/AgendaComponent.vue';
+import UserSelect from '@/components/user-select/UserSelect.vue';
+import ConsentDialog from '@/components/consent-dialog/ConsentDialog.vue';
+import DatePickerMenu from '@/components/DatePickerMenu.vue';
 
 @Component({
-  components: {VueTelInputVuetify, UploadButton, DateTimePickerMenu, EmployeeProfilePicture, FileManager, AgendaComponent },
+  components: {VueTelInputVuetify, UploadButton, DatePickerMenu, DateTimePickerMenu, EmployeeProfilePicture, FileManager, AgendaComponent, UserSelect, ConsentDialog },
 })
 export default class AdminViewEvent extends Vue {
 
   public time_menu = false;
   public valid = false;
   public event: Partial<IEventCreate> = {}
-
-
+  public trainingSubType: null | {type: string; topics: string[]} = null;
+  public allday = false;
 
   public get type() {
     return (this.$route.meta?.event_type || this.event?.type || 'training') as IEventType;
   }
 
+  async deleteEvent() {
+    if (!this.editEvent) {
+      return;
+    }
+    const oldEvent = this.editEvent;
+    await dispatchDeleteEvent(this.$store, oldEvent.id);
+    if (oldEvent.type === 'training') {
+      this.$router.push('/main/trainings');
+    } else {
+      this.$router.push('/main/wms/meetings');
+    }
+  }
+
   get fileLabels() {
     if (this.type === 'training') {
-      return ['SEB-Auswertung', 'Präsentation', 'Teilnehmerliste', '']
+      return ['Evaluationsauswertung', 'Schulungsmaterial', 'Teilnahmeliste']
     } else if(this.type === 'meeting') {
-      return ['Präsentation', 'Anhang'];
+      return ['Präsentation', 'Protokoll'];
     }
   }
 
@@ -332,7 +327,9 @@ export default class AdminViewEvent extends Vue {
     if ((this.$refs.form as HTMLFormElement).validate()) {
       const new_event = {
         ...this.event,
+        timed: !this.allday,
         type: this.type,
+        subtype: this.trainingSubType && this.trainingSubType.type,
       } as IEventCreate;
 
       let event: IEvent | undefined;
@@ -352,27 +349,17 @@ export default class AdminViewEvent extends Vue {
   public reset() {
     if(this.editEvent) {
       this.event = {
-        ...this.editEvent, 
+        ...this.editEvent,
         participant_ids: this.editEvent.participants.map(u => u.id),
         leader_ids: this.editEvent.leaders.map(u => u.id),
       };
+      this.allday = !this.event.timed;
 
-      // const trainer_ids: number[] = this.editEvent.leaders.map(trainer => trainer.id);
-      // const participant_ids: number[] = this.editEvent.participants.map(participant => participant.id);
-      // const date_only = this.editEvent.date.split('T')[0];
-      // const time = this.editEvent.date.split('T')[1].substring(0,5);
-      
-      // this.event_titel = this.editEvent.title;
-      // this.event_type = this.editEvent.type;
-      // this.event_topic = this.editEvent.topic;
-      // this.event_description = this.editEvent.description;
-      // this.event_date = date_only
-      // this.event_time = time;      
-      // this.event_wms_link = this.editEvent.wms_link;
-      // this.event_external_trainers = this.editEvent.external_trainers;
-      // this.event_trainers = trainer_ids;
-      // this.event_participants = participant_ids;
-      // this.event_files = this.editEvent.files ? this.editEvent.files.split(',') : []
+      if (this.event.subtype) {
+        this.trainingSubType = this.$common.SCHULUNGSMAPPING.find(o => o.type === this.event?.subtype) || { type: this.event.subtype, topics: [] };
+        
+      }
+
     }
   }
 }

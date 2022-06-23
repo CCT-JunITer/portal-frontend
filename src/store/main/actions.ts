@@ -11,6 +11,7 @@ import { State } from '../state';
 import {
   commitAddNotification,
   commitRemoveNotification,
+  commitSetAuthenticationURL,
   commitSetGroups,
   commitSetLoggedIn,
   commitSetLogInError,
@@ -25,6 +26,7 @@ import {
 import { AppNotification, MainState } from './state';
 import { apiCall, apiCallNotify } from '../utils';
 import { format } from 'date-fns';
+import { readIsFlagSet } from './getters';
 
 type MainContext = ActionContext<MainState, State>;
 
@@ -150,7 +152,7 @@ export const actions = {
     }
   },
   async actionCheckApiError(context: MainContext, payload: AxiosError) {
-    if (payload.response!.status === 401) {
+    if (!payload.response || payload.response!.status === 401) {
       await dispatchLogOut(context);
     }
   },
@@ -186,21 +188,28 @@ export const actions = {
       headers,
       ...data.map(item => {
         const row = renderRow(item);
-        return row.map(value => value ? String(value) : '');
+        return row.map(value => {
+          const content = value ? String(value) : '';
+          if (content.indexOf('\n')){
+            return `"${content}"`;
+          }
+          return content
+        });
       })
     ];
 
     // create CSV
-    const csvContent = 'data:text/csv;charset=utf-8,'
-      + rows.map(e => e.join(',')).join('\n');
+    const csvContent = '\uFEFF' + rows.map(e => e.join(';')).join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
 
     // download file
-    const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
+    link.setAttribute('href', url);
     link.setAttribute('download', filename);
     document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
   },
   async removeNotification(context: MainContext, payload: { notification: AppNotification; timeout: number }) {
     return new Promise((resolve, reject) => {
@@ -247,7 +256,7 @@ export const actions = {
       } else {
         await dispatchLogOut(context);
       }
-    } catch (error) {
+    } catch (error: any) {
       commitRemoveNotification(context, loadingNotification);
       commitAddNotification(context, { content: `Error: ${error.response.data?.detail}`, color: 'error' });
     }
@@ -264,6 +273,24 @@ export const actions = {
     const response = await apiCall(context, api.getGroups);
     commitSetGroups(context, response.data);
   },
+
+  async actionAuthenticateNextcloud(context: MainContext) {
+    const response = await apiCall(context, api.requestAuthenticationURL);
+    commitSetAuthenticationURL(context, response.data)
+  },
+  async actionToggleFeatureFlag(context: MainContext, flag: string) {
+    const features = context.state.userProfile?.features || [];
+    let newFeatures: string[];
+    if (readIsFlagSet(context)(flag)) {
+      newFeatures = features.filter(feat => feat !== flag)
+    } else {
+      newFeatures = [...features, flag];
+    }
+    
+    await dispatchUpdateUserProfile(context, {
+      features: newFeatures
+    })
+  }
 };
 
 const { dispatch } = getStoreAccessors<MainState | any, State>('');
@@ -300,7 +327,5 @@ export const dispatchGetMyRequests = dispatch(actions.actionGetMyRequests);
 export const dispatchAddRequestMe = dispatch(actions.actionAddRequestMe); 
 export const dispatchGetGroups = dispatch(actions.actionGetGroups); 
 export const dispatchSetPrimaryGroupMe = dispatch(actions.actionSetPrimaryGroupMe)
-
-
-
-
+export const dispatchActionAuthenticateNextcloud = dispatch(actions.actionAuthenticateNextcloud)
+export const dispatchToggleFeatureFlag = dispatch(actions.actionToggleFeatureFlag);

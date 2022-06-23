@@ -12,9 +12,13 @@ export const mutations = {
   setDocument(state: DocumentState, payload: IDocument) {
     state.documents = replace(state.documents, payload);
   },
+  removeDocument(state: DocumentState, payload: IDocument) {
+    state.documents = state.documents.filter((doc) => doc.id !== payload.id);
+  }
 };
 
 const {commit} = getStoreAccessors<Document | any, State>('');
 
 export const commitSetDocuments = commit(mutations.setDocuments);
 export const commitSetDocument = commit(mutations.setDocument);
+export const commitRemoveDocument = commit(mutations.removeDocument);

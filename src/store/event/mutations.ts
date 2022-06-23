@@ -18,6 +18,9 @@ export const mutations = {
   setEvent(state: EventState, payload: IEvent) {
     state.events[payload.type] = replace(state.events[payload.type], payload);
   },
+  removeEvent(state: EventState, payload: IEvent) {
+    state.events[payload.type] = state.events[payload.type]?.filter(e => e.id !== payload.id) || [];
+  }
 };
 
 const {commit} = getStoreAccessors<EventState | any, State>('');
@@ -26,4 +29,4 @@ export const commitSetEventsFor = commit(mutations.setEventsFor);
 export const commitSetEvent = commit(mutations.setEvent);
 export const commitSetEvents = commit(mutations.setEvents);
 export const commitSetEventApplicationsFor = commit(mutations.setEventApplicationsFor);
-
+export const commitRemoveEvent = commit(mutations.removeEvent);

@@ -1,8 +1,9 @@
 import { AxiosError, AxiosResponse } from 'axios';
 import { ActionContext } from 'vuex';
-import { dispatchCheckApiError } from './main/actions';
-import { commitAddNotification, commitRemoveNotification } from './main/mutations';
-import { AppNotification } from './main/state';
+import { CalendarState } from './calendar/state';
+import { dispatchActionAuthenticateNextcloud, dispatchCheckApiError } from './main/actions';
+import { commitAddNotification, commitRemoveNotification, commitSetAuthenticationURL } from './main/mutations';
+import { AppNotification, MainState } from './main/state';
 import { State } from './state';
 
 export const replace = <T extends {id: number}>(array: T[] | null, payload: T): T[] => {
@@ -30,12 +31,17 @@ export const apiCallNotify = async <T>(context: ActionContext<unknown, State>, a
       commitAddNotification(context, { content: successText, color: 'success' });
     }
     return response;
-  } catch (e) {
-    const error = e as AxiosError<{detail: string}>;
-    loadingNotification && commitRemoveNotification(context, loadingNotification);
-    commitAddNotification(context, { content: `Fehler: ${error.response?.data.detail || error.message}`, color: 'error' });
-    await dispatchCheckApiError(context, error);
-    throw error;
+  } catch (e: any) {
+    const error = e as AxiosError<{detail: any}>;
+    if (error.response?.data?.detail?.type == 'nextcloud authentication error') {
+      await dispatchActionAuthenticateNextcloud(context)
+      throw error;
+    } else {
+      loadingNotification && commitRemoveNotification(context, loadingNotification);
+      commitAddNotification(context, { content: `Fehler: ${error.response?.data.detail || error.message}`, color: 'error' });
+      await dispatchCheckApiError(context, error);
+      throw error;
+    }
   }
 };
 
@@ -44,9 +50,14 @@ export const apiCall = async <T>(context: ActionContext<unknown, State>, apicall
   try {
     const response = await apicall(context.rootState.main.token);
     return response;
-  } catch (e) {
-    const error = e as AxiosError<{detail: string}>;
-    await dispatchCheckApiError(context, error);
-    throw error;
+  } catch (e: any) {
+    const error = e as AxiosError<{detail: any}>;
+    if (error.response?.data?.detail?.type == 'nextcloud authentication error') {
+      await dispatchActionAuthenticateNextcloud(context)
+      throw error;
+    } else {
+      await dispatchCheckApiError(context, error);
+      throw error;
+    }
   }
 };

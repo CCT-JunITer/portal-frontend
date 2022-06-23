@@ -58,7 +58,7 @@ export default class RequestCard extends Vue {
 
 <style>
 .pre-formatted {
-  white-space: pre;
+  white-space: pre-wrap;
 }
 
 </style>

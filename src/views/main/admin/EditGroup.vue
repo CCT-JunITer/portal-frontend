@@ -92,12 +92,24 @@
           <p class="text-body-2 text--secondary">Benutzer in der Gruppe</p>
         </v-col>
         <v-col cols="12" md="8">
+          <v-card-actions>
+            <user-group-add-dialog
+              :group="group"
+            ></user-group-add-dialog>
+          </v-card-actions>
           <v-list v-if="users">
             <user-list-item 
               v-for="user in users"
               :user="user"
               :key="user.id"
             >
+              <template v-slot:actions>
+                <v-btn icon color="red" @click="removeFromGroup(user)">
+                  <v-icon>
+                    mdi-delete
+                  </v-icon>
+                </v-btn>
+              </template>
             </user-list-item>
           </v-list>
         </v-col>
@@ -121,13 +133,14 @@
 <script lang="ts">
 import IconList from '@/components/icon-list/IconList.vue';
 import UserListItem from '@/components/user-list-item/UserListItem.vue';
-import { GroupCreate, GroupUpdate } from '@/interfaces';
-import { dispatchCreateGroup, dispatchGetAdminGroups, dispatchUpdateGroup } from '@/store/admin/actions';
+import { GroupCreate, GroupUpdate, IUserProfile } from '@/interfaces';
+import { dispatchCreateGroup, dispatchGetAdminGroups, dispatchRemoveUserFromGroup, dispatchUpdateGroup } from '@/store/admin/actions';
 import { readAdminOneGroup } from '@/store/admin/getters'
 import { Vue, Component, Prop } from 'vue-property-decorator'
+import UserGroupAddDialog from './UserGroupAddDialog.vue';
 
 @Component({
-  components: { UserListItem, IconList }
+  components: { UserListItem, IconList, UserGroupAddDialog }
 })
 export default class EditGroup extends Vue {
 
@@ -185,6 +198,10 @@ export default class EditGroup extends Vue {
 
   public get group() {
     return readAdminOneGroup(this.$store)(+this.$route.params.id);
+  }
+
+  async removeFromGroup(user: IUserProfile) {
+    await dispatchRemoveUserFromGroup(this.$store, { userId: user!.id, groupId: this.group!.id });
   }
 
 }

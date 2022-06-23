@@ -1,4 +1,4 @@
-import { getDayOfYear, parseISO } from 'date-fns';
+import { getDayOfYear, getTime, isDate, isEqual, isSameDay, parseISO, startOfDay } from 'date-fns';
 import { format, utcToZonedTime, formatInTimeZone } from 'date-fns-tz';
 import de from 'date-fns/locale/de';
 import { debounce } from './utils';
@@ -7,11 +7,11 @@ export { debounce }
 export { format, formatInTimeZone, parseISO, de, utcToZonedTime };
 
 export const RESSORTS = [
-  'Kein Ressort', 'Juniter','Public Affairs','Human Resources', 'Quality Management', 'International Networks','Board','Vorstand','Projektmanager'
+  'Kein Ressort', 'Juniter', 'Public Affairs', 'Human Resources', 'Quality Management', 'International Networks', 'Board', 'Vorstand', 'Projektmanager'
 ]
 
 export const FINANCE_REQUEST_STATUS = [
-  'created', 'request_rejected','request_accepted','file_uploaded', 'file_rejected', 'file_accepted'
+  'created', 'request_rejected', 'request_accepted', 'file_uploaded', 'file_rejected', 'file_accepted'
 ]
 
 export const STUDYLEVELS = [
@@ -23,7 +23,7 @@ export const MEMBERSTATUS = [
 ]
 
 export const BEZIRKE = [
-  'Charlottenburg','Wilmersdorf', 'Friedrichshain','Kreuzberg', 'Lichtenberg', 'Marzahn-Hellersdorf','Moabit', 'Mitte','Wedding', 'Neukölln', 'Pankow','Prenzlauer-Berg', 'Reinickendorf', 'Spandau', 'Steglitz-Zehlendorf','Tempelhof','Schöneberg', 'Treptow','Köpenick','Brandenburg','Potsdam','Sonstige'
+  'Charlottenburg', 'Wilmersdorf', 'Friedrichshain', 'Kreuzberg', 'Lichtenberg', 'Marzahn-Hellersdorf', 'Moabit', 'Mitte', 'Wedding', 'Neukölln', 'Pankow', 'Prenzlauer-Berg', 'Reinickendorf', 'Spandau', 'Steglitz-Zehlendorf', 'Tempelhof', 'Schöneberg', 'Treptow', 'Köpenick', 'Brandenburg', 'Potsdam', 'Sonstige'
 
 ]
 
@@ -31,9 +31,12 @@ export const UNIVERSITIES = [
   'Technische Universität Berlin', 'Freie Universität Berlin', 'Humboldt-Universität zu Berlin', 'Beuth Hochschule für Technik Berlin', 'Charité', 'Hochschule für Wirtschaft und Recht Berlin', 'Sonstiges'
 ];
 
-export const SCHULUNGSART = [
-  'Pflichtschulung', 'Zusatzschulung', 'Allgemeine Schulung'
+export const SCHULUNGSMAPPING = [
+  { type: 'Pflichtschulung', topics: ['BDSU-Schulung', 'Corporate Design', 'Finanzen & Recht', 'Internes Schulung', 'Präsentationstechniken', 'Projektschulung', 'Qualitätsmanagement'] },
+  { type: 'Zusatzschulung', topics: ['Human Resources', 'Information Technology', 'Marketing & Strategy', 'Quality & Operations', 'Softskills', 'EDV-Fertigkeiten', 'Diversity', 'Sustainability'] },
+  { type: 'Organisatorische Schulung', topics: ['MP-Schulungen', 'Sonstige', 'AC-Schulung'] },
 ];
+
 export const MEETINGART = [
   'Donnerstagssitzung', 'Mitgliederversammlung', 'Ressortsitzung', 'Workingsession'
 ];
@@ -52,9 +55,6 @@ export const KOSTENART = [
   { name: 'Andere', associations: [] },
 ];
 
-export const SCHULUNGSTHEMA = [
-  'Angebotsschulung', 'BDSU Schulung', 'Corporate Design', 'Externe Schulungs', 'Finanzen und Recht', 'Internes', 'Präsentationstechniken', 'Projektmanagement', 'Quilatitätsmanagement', 'MP-Projektcontroller','ZVG','Zusatzschulung','Sonstiges'   
-];
 export const GENDER = [
   'männlich', 'weiblich', 'nicht binär', 'keine Angabe'
 ]
@@ -107,16 +107,25 @@ export const isTodayBirthday = (date: Date | string) => {
   return getDayOfYear(date) === getDayOfYear(now);
 }
 
+export const formatRange = (date_from: string, date_to: string): string => {
+  const from = new Date(date_from);
+  const to = new Date(date_to);
+  if (isSameDay(from, to)) {
+    return format(from, 'dd.MM.yyyy HH:mm \'bis\' ') + format(to, 'HH:mm')
+  }
+  return format(from, 'dd.MM.yyyy HH:mm \'bis\' ') + format(to, 'dd.MM.yyyy HH:mm')
+}
+
 
 export const DOCUMENT_TYPES = [
   {
     name: 'Mitgliedswerdegang',
     value: 'member-progression',
-  }, 
+  },
   {
     name: 'Recruiting',
     value: 'recruiting',
-  }, 
+  },
   {
     name: 'Archiv',
     value: 'archive',

@@ -1,6 +1,5 @@
 <template>
   <v-chip
-    color="lightgrey"
     v-bind="$attrs"
     v-on="$listeners"
     v-if="user"
@@ -10,7 +9,7 @@
         :employee="user"
       ></employee-profile-picture>
     </v-avatar>
-    {{ user.full_name }}
+    {{ user.full_name || user.email }}
   </v-chip>
 </template>
 

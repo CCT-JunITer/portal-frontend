@@ -1,5 +1,5 @@
 <template>
-  <v-list-item :to="`/main/people/profile/view/${user.id}`" v-bind="$attrs" v-on="$listeners">
+  <v-list-item @click="goToProfile" v-bind="$attrs" v-on="$listeners">
     <employee-profile-picture
       :employee="user"
       component="v-list-item-avatar"
@@ -10,6 +10,9 @@
       <v-list-item-title v-text="user.full_name"></v-list-item-title>
       <v-list-item-subtitle v-text="user.ressort"></v-list-item-subtitle>
     </v-list-item-content>
+    <v-list-item-action>
+      <slot name="actions"></slot>
+    </v-list-item-action>
   </v-list-item>
 </template>
 
@@ -25,6 +28,10 @@ export default class UserListItem extends Vue {
 
   @Prop()
   public user!: IUserProfile;
+
+  public goToProfile() {
+    return this.$router.push({ path: '/main/people/profile/view/' + this.user.id })
+  }
 
 }
 </script>

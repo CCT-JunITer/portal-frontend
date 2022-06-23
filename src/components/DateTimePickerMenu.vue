@@ -2,54 +2,57 @@
   <v-menu
     ref="menu"
     v-model="menu"
+    :open-on-click="false"
     :close-on-content-click="false"
     transition="scale-transition"
-    offset-y
+    nudge-right="40"
     max-width="290px"
-    min-width="auto"
+    min-width="240px"
+    offset-y
     v-bind="$attrs"
   >
     <template v-slot:activator="{ on, attrs }">
       <slot 
         name="activator" 
-        v-bind:on="{...on, input: onInputChange, change: onInputChange}" 
-        v-bind:attrs="{...attrs, value: dateFormatted}">
+        v-bind:on="{...on, input: onInputChange, change: onInputChange, 'click:append': () => menu = true}" 
+        v-bind:attrs="{...attrs, value: dateFormatted, 'append-icon': 'mdi-calendar'}">
       </slot>
     </template>
-    <v-card>
-      <v-card-text class="px-0 py-0">
-        <v-tabs fixed-tabs v-model="activeTab" background-color="cctBlue" dark>
-          <v-tab key="calendar">
-            <slot name="dateIcon">
-              <v-icon>event</v-icon>
-            </slot>
-          </v-tab>
-          <v-tab key="timer">
-            <slot name="timeIcon">
-              <v-icon>access_time</v-icon>
-            </slot>
-          </v-tab>
-          <v-tab-item key="calendar">
-            <v-date-picker
-              color="cctBlue"
-              v-model="date" 
-              ref="picker"
-              v-bind="pickerProps" 
-              @input="activeTab = 1" 
-              full-width
-            >
-            </v-date-picker>
-          </v-tab-item>
-          <v-tab-item key="timer">
-            <v-time-picker
-              color="cctBlue"
-              ref="timer"
-              v-model="time"
-              format="24hr"
-            ></v-time-picker>
-          </v-tab-item>
-        </v-tabs>
-      </v-card-text>
+    <v-card tile>
+      <v-tabs fixed-tabs v-model="activeTab" background-color="cctBlue" dark>
+        <v-tab key="calendar">
+          <slot name="dateIcon">
+            <v-icon>event</v-icon>
+          </slot>
+        </v-tab>
+        <v-tab key="timer">
+          <slot name="timeIcon">
+            <v-icon>access_time</v-icon>
+          </slot>
+        </v-tab>
+      </v-tabs>
+      <v-tabs-items v-model="activeTab">
+        <v-tab-item key="calendar" eager>
+          <v-date-picker
+            :active-picker="defaultPicker"
+            color="cctBlue"
+            v-model="date" 
+            ref="picker"
+            v-bind="pickerProps" 
+            @input="activeTab = 1" 
+            full-width
+          >
+          </v-date-picker>
+        </v-tab-item>
+        <v-tab-item key="timer">
+          <v-time-picker
+            color="cctBlue"
+            ref="timer"
+            v-model="time"
+            format="24hr"
+          ></v-time-picker>
+        </v-tab-item>
+      </v-tabs-items>
       <v-card-actions>
         <v-spacer></v-spacer>
         <slot name="actions" :parent="this">
@@ -62,7 +65,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
+import { Vue, Component, Prop } from 'vue-property-decorator'
 import { format, formatISO, parse } from 'date-fns'
 
 @Component({})
@@ -70,15 +73,6 @@ export default class DateTimePickerMenu extends Vue {
 
   public menu = false;
   public activeTab = 0;
-
-  @Watch('menu')
-  public onMenuOpen(menu: boolean) {
-    if (menu && this.defaultPicker) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      setTimeout(() => (this.$refs.picker as any).activePicker = this.defaultPicker);
-    }
-  }
-
   // https://github.com/vuetifyjs/vuetify/blob/master/packages/vuetify/src/components/VDatePicker/VDatePicker.ts#L407
   @Prop({ required: false })
   public defaultPicker?: 'YEAR' | 'MONTH' | 'DATE';

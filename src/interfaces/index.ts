@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/interface-name-prefix */
 export interface IUserProfile {
     email: string;
     private_email: string;
@@ -38,6 +37,7 @@ export interface IUserProfile {
     bic: string;
     bank: string;
     contact: string[];
+    features: string[];
 
     admin_comment?: string;
 }
@@ -71,7 +71,7 @@ export interface IUserProfileUpdate {
     bic?: string;
     bank?: string;
     contact?: string[];
-
+    features?: string[];
 
     admin_comment?: string;
 }
@@ -119,16 +119,24 @@ export interface IEvent {
     agenda: string[];
     date_from: string;
     date_to: string;
+    timed: boolean;
+    approved: boolean;
     date_checkin_from: string;
     date_checkin_to: string;
     wms_link: string;
     external: string;
     id: number;
     files: string;
-    author: IUserProfile;
     leaders: IUserProfile[];
     participants: IUserProfile[];
     applications: IEventApplication[];
+    last_updated_id: number;
+    last_updated_by: IUserProfile;
+    date_last_updated: string;
+    author_id: number;
+    author: IUserProfile;
+    protocol_id: number;
+    protocol: IUserProfile;
 }
 export interface IEventCreate {
     title: string;
@@ -136,6 +144,8 @@ export interface IEventCreate {
     subtype: string;
     date_from: string;
     date_to: string;
+    timed: boolean;
+    approved: boolean;
     external: string;
     agenda: string[];
     is_membership_progression: boolean;
@@ -145,6 +155,9 @@ export interface IEventCreate {
     files: string;
     leader_ids: number[];
     participant_ids: number[];
+    last_updated_id: number;
+    author_id: number;
+    protocol_id: number;
 }
 
 export type UserType = 'alumni' | 'all' | 'members';
@@ -312,3 +325,51 @@ export interface IDocumentUpdate {
 }
 
 export type IDocumentType = 'member-progression' | 'recruiting' | 'archive' | 'public-affairs' | 'quality-management';
+
+export interface ICalendarNotification {
+    action: string;
+    trigger: Date; // time delta
+    repeat: number;
+}
+
+export interface ICalendarRRule {
+    freq: string;
+    endtype: string;
+    end: number|Date;
+    exdate: Date[];
+}
+
+export interface ICalendarAttendee {
+    cn: string;
+    mail: string;
+    cutype: string;
+    parstat: string;
+    rsvp: boolean;
+    role: string;
+}
+
+export interface ICalendarEvent {
+    name: string;
+    start: Date;
+    end: Date;
+    timed: boolean;
+    description: string;
+    location: string;
+    participants: ICalendarAttendee[];
+    notifications: ICalendarNotification[];
+    categories: string[];
+    color: string;
+    rrule: ICalendarRRule;
+    uid: string;
+    calendarId: string;
+    dates: [];
+}
+
+export interface ICalendar {
+    name: string;
+    events: ICalendarEvent[];
+    color?: string;
+    active?: boolean;
+    uid?: string;
+    rights: string; // this String can contain ['r', 'e', 'd', 'a'] (read, edit, delete, add)
+}

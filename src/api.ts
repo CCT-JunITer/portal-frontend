@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {apiUrl} from '@/env';
-import { IEvent, IEventCreate, IUserProfile, IUserProfileCreate, IUserProfileUpdate, UserType, RequestCreate, UserInvite, IEventApplicationCreate, IEventApplicationUpdate, IFinanceRequestCreate, IFinanceRequestUpdate, IFinanceRequest, Group, GroupUpdate, IUserSettings, IEventApplication, VersionedFolder, IDocumentCreate, IDocument, LabelledFile } from './interfaces';
+import { IEvent, IEventCreate, IUserProfile, IUserProfileCreate, IUserProfileUpdate, UserType, RequestCreate, UserInvite, IEventApplicationCreate, IEventApplicationUpdate, IFinanceRequestCreate, IFinanceRequestUpdate, IFinanceRequest, Group, GroupUpdate, IUserSettings, IEventApplication, VersionedFolder, IDocumentCreate, IDocument, LabelledFile, ICalendarEvent, ICalendar } from './interfaces';
 import {dataURItoBlob} from '@/utils';
 
 function authHeaders(token: string, headers = {}) {
@@ -142,7 +142,7 @@ export const api = {
     return axios.get<IEvent>(`${apiUrl}/api/v1/event/${eventId}`, { ...authHeaders(token) });
   },
   async deleteEvent(token: string, eventId: number,) {
-    return axios.delete(`${apiUrl}/api/v1/event/${eventId}`, { ...authHeaders(token)});
+    return axios.delete<IEvent>(`${apiUrl}/api/v1/event/${eventId}`, { ...authHeaders(token)});
   },
   async createUserOpen(token: string, data: IUserProfileCreate) {
     return axios.post(`${apiUrl}/api/v1/users/open`, data, {params: {token}});
@@ -249,6 +249,59 @@ export const api = {
   },
   async createDocument(token: string, data: IDocumentCreate) {
     return axios.post<IDocument>(`${apiUrl}/api/v1/document/`, data, authHeaders(token));
+  },
+  async deleteDocument(token: string, documentId: number) {
+    return axios.delete<IDocument>(`${apiUrl}/api/v1/document/${documentId}`, authHeaders(token));
+  },
+
+  async deleteCalendar(token: string, calendarId: string) {
+    return axios.delete<ICalendarEvent>(`${apiUrl}/api/v1/calendar?calendarId=${encodeURI(calendarId)}`, authHeaders(token));
+  },
+
+  async updateCalendar(token: string, calendar) {
+    const calendar_send = Object.assign({}, calendar);
+    delete calendar_send.events
+    return axios.put<ICalendarEvent>(`${apiUrl}/api/v1/calendar`, calendar_send, authHeaders(token));
+  },
+
+  async updateCalendarEvent(token: string, event) {
+    return axios.put<ICalendarEvent>(`${apiUrl}/api/v1/calendar/events`, event, authHeaders(token));
+  },
+
+  async deleteCalendarEvent(token: string, calendarId: string, eventId: string) {
+    return axios.delete(`${apiUrl}/api/v1/calendar/events?calendarId=${encodeURIComponent(calendarId)}&eventId=${encodeURIComponent(eventId)}`, authHeaders(token));
+  },
+
+  async getCalendar(token: string, start: Date|undefined = undefined, end: Date|undefined = undefined, calendars: string|undefined = undefined) {
+    let url = `${apiUrl}/api/v1/calendar/dateSearch`
+    let param_count = 0
+    if (start) {
+      if (param_count == 0) url += '?'
+      else url += '&'
+      url += 'start=' + start.toISOString()
+      param_count++;
+    }
+    if (end) {
+      if (param_count == 0) url += '?'
+      else url += '&'
+      url += 'end=' + end.toISOString()
+      param_count++;
+    }
+    if (calendars) {
+      if (param_count == 0) url += '?'
+      else url += '&'
+      url += 'valid_calendars=' + encodeURIComponent(calendars);
+      param_count++;
+    }
+    return axios.get(url, authHeaders(token));
+  },
+
+  async requestAuthenticationURL(token: string) {
+    return axios.get(`${apiUrl}/api/v1/calendar/requestAuthenticationURL`, authHeaders(token));
+  },
+  
+  async checkNextcloudAuthentication(token: string) {
+    return axios.get(`${apiUrl}/api/v1/calendar/checkAuthenticationStatus`, authHeaders(token));
   },
   // Search
   async getSearchResults(token: string, searchText: string) {

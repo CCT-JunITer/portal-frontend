@@ -83,14 +83,23 @@
             <v-list-item-title>Abmelden</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
+        <v-list-item @click="toggleFeature" v-if="$route.meta && $route.meta.featureFlag" color="cctOrange" :input-value="!isFlagSet()">
+          <v-list-item-icon>
+            <v-icon>{{ isFlagSet() ? 'mdi-flask-outline' : 'mdi-flask-empty-outline' }}</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>
+              <span>Beta für <b>{{ $route.meta.featureFlag }}</b> {{ isFlagSet() ? 'deaktivieren' : 'aktivieren' }}</span></v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
       </v-list>
     </v-card>
   </v-menu>
 </template>
 
 <script lang="ts">
-import { dispatchUserLogOut } from '@/store/main/actions';
-import { readUserProfile } from '@/store/main/getters';
+import { dispatchToggleFeatureFlag, dispatchUserLogOut } from '@/store/main/actions';
+import { readIsFlagSet, readUserProfile } from '@/store/main/getters';
 import { Vue, Component } from 'vue-property-decorator'
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 
@@ -105,6 +114,22 @@ export default class UserMenu extends Vue {
   
   public async logout() {
     await dispatchUserLogOut(this.$store);
+  }
+
+  public isFlagSet() {
+    const flag = this.$route.meta?.featureFlag;
+    if (!flag) {
+      return;
+    }
+    return readIsFlagSet(this.$store)(flag);
+  }
+
+  public async toggleFeature() {
+    const flag = this.$route.meta?.featureFlag;
+    if (!flag) {
+      return;
+    }
+    await dispatchToggleFeatureFlag(this.$store, flag);
   }
 
 }

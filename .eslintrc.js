@@ -19,6 +19,7 @@ module.exports = {
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'quotes': ['error', 'single'],
     'indent': ['error', 2],
+    'vue/no-v-text-v-html-on-component': 'warn',
     'vue/script-indent': ['error', 2, {'baseIndent': 0}],
     'vue/html-indent': ['error', 2, {'baseIndent': 1}],
     'vue/valid-v-slot': 'off',
@@ -30,7 +31,6 @@ module.exports = {
     'prefer-rest-params': 'warn',
     'getter-return': 'warn',
     '@typescript-eslint/no-use-before-define': 'warn',
-    '@typescript-eslint/interface-name-prefix': 'warn',
     'vuetify/no-deprecated-classes': 'error'
   },
   overrides: [
@@ -42,6 +42,12 @@ module.exports = {
       env: {
         jest: true
       }
-    }    
+    },
+    {
+      'files': ['*.vue'],
+      'rules': {
+        'indent': 'off'
+      }
+    }
   ]
 }

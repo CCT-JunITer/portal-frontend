@@ -140,7 +140,7 @@
         </v-list-item-content>
       </v-list-item>
 
-      <v-list-item to="/main/tower" color="cct-green">
+      <v-list-item to="/main/calendar/week/today?towernutzung=true" color="cct-green">
         <v-list-item-icon>
           <v-icon>mdi-chess-rook</v-icon>
         </v-list-item-icon>

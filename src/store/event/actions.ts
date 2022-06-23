@@ -7,6 +7,7 @@ import {
   commitSetEvents,
   commitSetEventApplicationsFor,
   commitSetEvent,
+  commitRemoveEvent,
 } from './mutations';
 import { EventState } from './state';
 import { IEventApplicationCreate, IEventApplicationUpdate, IEventCreate, IEventType } from '@/interfaces';
@@ -32,7 +33,8 @@ export const actions = {
     commitSetEventApplicationsFor(context, {eventId, payload: response.data});
   },
   async actionDeleteEvent(context: MainContext, payload: number) {
-    await apiCallNotify(context, token => api.deleteEvent(token, payload), { successText: 'Event erfolgreich gelöscht' });
+    const response = await apiCallNotify(context, token => api.deleteEvent(token, payload), { successText: 'Event erfolgreich gelöscht' });
+    commitRemoveEvent(context, response.data);
     // await dispatchGetEvents(context);
   },
   async actionUpdateEvent(context: MainContext, payload: { id: number; event: IEventCreate }) {

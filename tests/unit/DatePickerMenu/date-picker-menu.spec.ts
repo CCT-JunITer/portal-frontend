@@ -39,7 +39,7 @@ describe('DatePickerMenu.vue', () => {
     const datePicker = wrapper.findComponent(DatePickerMenu);
     (datePicker.vm as any).onInputChange('123asd');
 
-    expect(wrapper.vm.$data.date).toBe(null);
+    expect(wrapper.vm.$data.date).toBeFalsy();
   });
 
 
