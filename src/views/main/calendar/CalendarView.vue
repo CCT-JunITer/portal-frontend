@@ -278,6 +278,7 @@ export default {
       }
 
       const events = []
+      this.newEvent = undefined
       const towerIds = new Set()
 
       console.log([...this.calendars, this.towerCalendar])
