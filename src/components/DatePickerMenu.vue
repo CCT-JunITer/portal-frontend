@@ -14,7 +14,7 @@
       <slot 
         name="activator" 
         v-bind:on="{...on, change: onInputChange}" 
-        v-bind:attrs="{...attrs, value: dateFormatted}">
+        v-bind:attrs="{...attrs, value: dateFormatted, rules: [v => (!!v && isValid(v)) || 'Falsches Datumsformat']}">
       </slot>
     </template>
     <v-date-picker
@@ -31,7 +31,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
-import { format, formatISO, parse } from 'date-fns'
+import { format, formatISO, isValid, parse } from 'date-fns'
 
 @Component({})
 export default class DatePickerMenu extends Vue {
@@ -49,7 +49,6 @@ export default class DatePickerMenu extends Vue {
   @Prop()
   public pickerProps!: object;
 
-
   set date(value) {
     this.$emit('input', this.toISO(value));
   }
@@ -59,6 +58,20 @@ export default class DatePickerMenu extends Vue {
       return '';
     }
     return format(new Date(this.value), 'yyyy-MM-dd');
+  }
+
+  public isValid(value: string) {
+    const date = this.getDateFromInput(value);
+    return !!date && isValid(date);
+  }
+
+  getDateFromInput(value: string) {
+    const formatString = 'dd.MM.yyyy';
+    if (value.length !== formatString.length) {
+      return null;
+    }
+    const date = parse(value, formatString, new Date());
+    return date;
   }
 
   toISO(value: string) {
@@ -72,10 +85,14 @@ export default class DatePickerMenu extends Vue {
 
   onInputChange(value: string) {
     try {
-      const date = parse(value, 'dd.MM.yyyy', new Date());
-      this.date = format(date, 'yyyy-MM-dd');
+      const date = this.getDateFromInput(value);
+      if (date === null) {
+        this.$emit('input', null);
+        return;
+      }
+      this.$emit('input', this.toISO(format(date, 'yyyy-MM-dd')));
     } catch(e) {
-      this.date = '';
+      //
     }
   }
 
