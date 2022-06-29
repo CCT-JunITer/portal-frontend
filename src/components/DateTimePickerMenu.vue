@@ -15,7 +15,7 @@
       <slot 
         name="activator" 
         v-bind:on="{...on, input: onInputChange, change: onInputChange, 'click:append': () => menu = true}" 
-        v-bind:attrs="{...attrs, value: dateFormatted, 'append-icon': 'mdi-calendar'}">
+        v-bind:attrs="{...attrs, value: dateFormatted, 'append-icon': 'mdi-calendar', 'rules': [v => (!!v && isValid(v)) || 'Falsches Datumsformat']}">
       </slot>
     </template>
     <v-card tile>
@@ -65,8 +65,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator'
-import { format, formatISO, parse } from 'date-fns'
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
+import { format, formatISO, isValid, parse } from 'date-fns'
 
 @Component({})
 export default class DateTimePickerMenu extends Vue {
@@ -85,26 +85,30 @@ export default class DateTimePickerMenu extends Vue {
   public pickerProps!: object;
 
 
-  set date(value) {
-    this.$emit('input', this.toISO(value + ' ' + this.time));
-  }
+  public date: string | null = null;
+  public time: string | null = null;
 
-  get date() {
-    if (this.value === null) {
-      return '';
+  @Watch('value', {immediate: true})
+  public onValueChange(nextValue?: string) {
+    if (!nextValue || !isValid(new Date(nextValue))) {
+      return;
     }
-    return format(new Date(this.value), 'yyyy-MM-dd');
+    this.date = format(new Date(nextValue), 'yyyy-MM-dd');
+    this.time = format(new Date(nextValue), 'HH:mm');
   }
 
-  get time() {
-    if (this.value === null) {
-      return '';
+  public isValid(value: string) {
+    const date = this.getDateFromInput(value);
+    return !!date && isValid(date);
+  }
+
+  getDateFromInput(value: string) {
+    const formatString = 'dd.MM.yyyy HH:mm';
+    if (value.length !== formatString.length) {
+      return null;
     }
-    return format(new Date(this.value), 'HH:mm');
-  }
-
-  set time(value) {
-    this.$emit('input', this.toISO(this.date + ' ' + value));
+    const date = parse(value, formatString, new Date());
+    return date;
   }
 
   toISO(value: string) {
@@ -117,10 +121,12 @@ export default class DateTimePickerMenu extends Vue {
   }
 
   okHandler() {
+    this.$emit('input', this.toISO(this.date + ' ' + this.time))
     this.resetPicker()
   }
 
   clearHandler() {
+    this.$emit('input', null);
     this.resetPicker()
   }
 
@@ -133,10 +139,13 @@ export default class DateTimePickerMenu extends Vue {
 
   onInputChange(value: string) {
     try {
-      const date = parse(value, 'dd.MM.yyyy HH:mm', new Date());
+      const date = this.getDateFromInput(value);
+      if (date === null) {
+        return;
+      }
       this.$emit('input', this.toISO(format(date, 'yyyy-MM-dd HH:mm')));
     } catch(e) {
-      // this.$emit('input', null);
+      //
     }
   }
 
