@@ -87,7 +87,7 @@
                 v-on="on"
                 prepend-icon="mdi-calendar-range"
                 required
-                :rules="[$common.required]"
+                :rules="[$common.required, ...attrs.rules]"
               ></v-text-field>
             </template>
           </component>
@@ -101,7 +101,7 @@
               max: '2025-01-01'
             }"
           >
-            <template v-slot:activator="{ on, attrs, }">
+            <template v-slot:activator="{ on, attrs }">
               <v-text-field
                 label="Datum bis"
                 class="input-lg"
@@ -109,7 +109,7 @@
                 v-on="on"
                 prepend-icon="mdi-calendar-range"
                 required
-                :rules="[$common.required]"
+                :rules="[$common.required, ...attrs.rules]"
               ></v-text-field>
             </template>
           </component>

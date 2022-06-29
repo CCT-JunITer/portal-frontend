@@ -2,7 +2,7 @@
   <v-autocomplete
     :items="this.users"
     :item-value="this.returnValue"
-    :item-text="this.returnValue"
+    item-text="full_name"
     chips
     cache-items
     deletable-chips
