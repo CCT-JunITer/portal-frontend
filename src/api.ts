@@ -21,6 +21,9 @@ export const api = {
 
     return axios.post(`${apiUrl}/api/v1/login/access-token`, params);
   },
+  async impersonateUser(token: string, userId: number) {
+    return axios.get(`${apiUrl}/api/v1/users/admin/impersonate/${userId}`, authHeaders(token));
+  },
   async getMe(token: string) {
     return axios.get<IUserProfile>(`${apiUrl}/api/v1/users/me`, authHeaders(token));
   },

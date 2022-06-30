@@ -159,7 +159,6 @@ export default class EventMain extends Vue {
     return readEvents(this.$store)(this.type);
   }
   public async mounted() {
-    await dispatchGetUsers(this.$store);
     await dispatchGetEvents(this.$store, this.$route.meta?.event_type);
     await dispatchGetUserProfile(this.$store)
   }

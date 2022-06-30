@@ -13,6 +13,17 @@
         @close="inputAvatar = null"
       >
       </avatar-cropper-dialog>
+      <v-row>
+        <v-col cols="12" class="d-flex">
+          <v-spacer></v-spacer>
+          <v-btn @click="impersonate" outlined color="cctBlue">
+            <v-icon left>
+              account_box
+            </v-icon>
+            Imitieren
+          </v-btn>
+        </v-col>
+      </v-row>
 
       <v-row>
         <v-col cols="12" md="4" class="px-5">
@@ -408,7 +419,7 @@ import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture
 import UploadButton from '@/components/UploadButton.vue';
 import VueTelInputVuetify from 'vue-tel-input-vuetify/lib/vue-tel-input-vuetify.vue';
 import AvatarCropperDialog from '@/components/AvatarCropperDialog.vue';
-import { dispatchCreateUser, dispatchGetAdminUsers, dispatchGetOneAdminUser, dispatchRemoveUserFromGroup, dispatchSetPrimaryGroup, dispatchUpdateUser } from '@/store/admin/actions';
+import { dispatchCreateUser, dispatchImpersonateUser, dispatchGetOneAdminUser, dispatchRemoveUserFromGroup, dispatchSetPrimaryGroup, dispatchUpdateUser } from '@/store/admin/actions';
 import UserGroupCard from '@/components/user-group/UserGroupCard.vue';
 import GroupDialog from './GroupDialog.vue';
 import DeleteDialog from './DeleteDialog.vue';
@@ -581,6 +592,10 @@ export default class EditUser extends Vue {
 
   get userProfile() {
     return readAdminOneUser(this.$store)(+this.$router.currentRoute.params.id);
+  }
+
+  async impersonate() {
+    await dispatchImpersonateUser(this.$store, { userId: this.userProfile!.id});
   }
 
   async removeFromGroup(group: Group) {

@@ -59,7 +59,7 @@ export default class FinanceRequestCard extends Vue {
 
 <style lang="scss" scoped>
 .pre-formatted {
-  white-space: pre;
+  white-space: pre-wrap;
 }
 .archived {
   opacity: 0.75;

@@ -223,8 +223,8 @@ export default class FileManager extends Vue {
   public folder?: VersionedFolder;
 
   @Watch('folder', { immediate: true })
-  public onFolderChange(newFolder?: VersionedFolder, oldFolder?: VersionedFolder) {
-    if (newFolder?.id !== oldFolder?.id && newFolder) {
+  public onFolderChange(newFolder?: VersionedFolder) {
+    if (newFolder) {
       this.versionedFolder = newFolder;
     }
   }

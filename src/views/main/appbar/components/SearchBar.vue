@@ -9,6 +9,8 @@
     :no-filter="true"
     :loading="isLoading"
     :search-input.sync="searchText"
+    @click="results || fetch()"
+    @mouseover="results || fetch()"
     return-object
     clearable
     hide-details
@@ -90,7 +92,7 @@ export default class SearchBar extends Vue {
 
   public results: { items: any[]; searchText: string } | null = null;
   public model = {};
-  public searchText = '';
+  public searchText: string | null = null;
   public filter = '';
   public isLoading = false;
 

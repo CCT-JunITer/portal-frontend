@@ -79,7 +79,7 @@
             <v-list-item-title>Recruiting</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item to="/main/wms/documents/archive" class="ml-2" v-if="hasAnyPermission(['portal.documents.admin'])">
+        <v-list-item to="/main/wms/documents/archive" class="ml-2" v-if="hasAnyPermission(['portal.documents.archive.create'])">
           <v-list-item-icon>
             <v-icon>mdi-archive</v-icon>
           </v-list-item-icon>

@@ -4,9 +4,11 @@ import { IUserProfileCreate, IUserProfileUpdate, UserInvite, IFinanceRequestCrea
 import { State } from '../state';
 import { AdminState } from './state';
 import { getStoreAccessors } from 'typesafe-vuex';
-import { commitSetUser } from '../main/mutations';
+import { commitAddNotification, commitSetLoggedIn, commitSetLogInError, commitSetToken, commitSetUser, commitSetUserStatus } from '../main/mutations';
 import { commitSetAdminFinanceRequest, commitSetAdminFinanceRequests, commitSetAdminGroup, commitSetAdminGroups, commitSetAdminOneUser, commitSetAdminUsers, commitSetAlumniUsers, commitSetRequests } from './mutations';
 import { apiCall, apiCallNotify } from '../utils';
+import { saveLocalToken, saveLocalUserStatus } from '@/utils';
+import { dispatchGetUserProfile, dispatchRouteLoggedIn } from '../main/actions';
 
 type MainContext = ActionContext<AdminState, State>;
 
@@ -88,6 +90,22 @@ export const actions = {
     const response = await apiCallNotify(context, token => api.updateFinanceRequest(token, payload.id, payload.financeRequest));
     commitSetAdminFinanceRequest(context, response.data);
   },
+  async actionImpersonateUser(context: MainContext, payload: { userId: number }) {
+    const response = await apiCall(context, token => api.impersonateUser(token, payload.userId));
+    const token = response.data.access_token;
+    const user_status = response.data.user_status;
+    if (token) {
+      saveLocalToken(token);
+      commitSetToken(context, token);
+      saveLocalUserStatus(user_status);
+      commitSetUserStatus(context, user_status);
+      commitSetLoggedIn(context, true);
+      commitSetLogInError(context, false);
+      await dispatchGetUserProfile(context);
+      await dispatchRouteLoggedIn(context);
+      commitAddNotification(context, { content: 'Impersonating user', color: 'success' });
+    }
+  }
 };
 
 const { dispatch } = getStoreAccessors<AdminState, State>('');
@@ -109,4 +127,5 @@ export const dispatchEditUserGroup = dispatch(actions.actionEditUserGroup);
 export const dispatchRemoveUserFromGroup = dispatch(actions.actionRemoveUserFromGroup);
 export const dispatchSetPrimaryGroup = dispatch(actions.actionSetPrimaryGroup);
 export const dispatchAdminFinanceRequests = dispatch(actions.actionGetFinanceRequestsAdmin);
+export const dispatchImpersonateUser = dispatch(actions.actionImpersonateUser);
 
