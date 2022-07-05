@@ -15,7 +15,7 @@
     <div class="px-1">
       <v-data-table
         :headers="headers"
-        :items="documents"
+        :items="documents || []"
         :loading="documents === null"
         :items-per-page="5"
         class="elevation-1"
