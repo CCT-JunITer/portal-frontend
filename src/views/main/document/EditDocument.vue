@@ -2,7 +2,7 @@
   <v-container>
     <v-row>
       <v-col cols="12" md="4" class="px-5">
-        <h4 class="text-h4 text--primary mb-3">Neues Dokument hinzufügen</h4>
+        <h4 class="text-h4 text--primary mb-3">Dokument bearbeiten</h4>
         <!-- <p class="text-body-2 text--secondary">Hier kannst du ein neues Dokument hinzufügen</p> -->
       </v-col>
 
@@ -20,7 +20,7 @@
             required
             :rules="[$common.required]"            
           ></v-text-field>
-          <v-text-field
+          <v-textarea
             label="Beschreibung"
             v-model="document.description"
             class="input-lg"
@@ -28,7 +28,7 @@
             hint="Hier soll eine kurze Beschreibung zum Dokument eingegeben werden."
             required
             :rules="[$common.required]"
-          ></v-text-field>
+          ></v-textarea>
           <v-checkbox
             v-model="document.approved"
             label="Bestätigt"

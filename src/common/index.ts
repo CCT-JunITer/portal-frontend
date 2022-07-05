@@ -1,3 +1,4 @@
+import { IDocumentType } from '@/interfaces';
 import { getDayOfYear, getTime, isDate, isEqual, isSameDay, parseISO, startOfDay } from 'date-fns';
 import { format, utcToZonedTime, formatInTimeZone } from 'date-fns-tz';
 import de from 'date-fns/locale/de';
@@ -117,7 +118,7 @@ export const formatRange = (date_from: string, date_to: string): string => {
 }
 
 
-export const DOCUMENT_TYPES = [
+export const DOCUMENT_TYPES: { name: string; value: IDocumentType }[] = [
   {
     name: 'Mitgliedswerdegang',
     value: 'member-progression',
@@ -137,5 +138,9 @@ export const DOCUMENT_TYPES = [
   {
     name: 'Quality Management',
     value: 'quality-management',
+  },
+  {
+    name: 'Projektarbeit',
+    value: 'project-work',
   }
 ]

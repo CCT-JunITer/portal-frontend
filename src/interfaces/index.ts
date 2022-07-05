@@ -324,7 +324,7 @@ export interface IDocumentUpdate {
     approved: boolean;
 }
 
-export type IDocumentType = 'member-progression' | 'recruiting' | 'archive' | 'public-affairs' | 'quality-management';
+export type IDocumentType = 'member-progression' | 'recruiting' | 'archive' | 'public-affairs' | 'quality-management' | 'project-work';
 
 export interface ICalendarNotification {
     action: string;

@@ -87,6 +87,14 @@
             <v-list-item-title>Archiv</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
+        <v-list-item to="/main/wms/documents/project-work" class="ml-2">
+          <v-list-item-icon>
+            <v-icon>mdi-briefcase</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Projektarbeit</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
         <v-list-item to="/main/wms/documents/public-affairs" class="ml-2">
           <v-list-item-icon>
             <v-icon>mdi-earth</v-icon>

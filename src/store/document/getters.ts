@@ -6,10 +6,10 @@ import { IDocumentType } from '@/interfaces';
 
 export const getters = {
   documents: (state: DocumentState) => (documentType: IDocumentType) => {
-    return state.documents.filter((document) => document.type === documentType);
+    return state.documents[documentType];
   },
   oneDocument: (state: DocumentState) => (documentId: number) => {
-    const filteredDocuments = state.documents.filter((document) => document.id === documentId);
+    const filteredDocuments = Object.values(state.documents).flat().filter((document) => document?.id === documentId);
     if (filteredDocuments.length > 0) {
       return { ...filteredDocuments[0] };
     }
@@ -17,7 +17,7 @@ export const getters = {
   routeDocument: (state: DocumentState) => (route: Route) => {
     const id = route.params.id;
     const numberId = parseInt(id);
-    return state.documents.find(document => document.id === numberId);
+    return Object.values(state.documents).flat().find(document => document?.id === numberId);
   },
 };
 

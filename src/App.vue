@@ -43,6 +43,7 @@ import NotificationsManager from '@/components/NotificationsManager.vue';
 import { readIsLoggedIn } from '@/store/main/getters';
 import { dispatchCheckLoggedIn } from '@/store/main/actions';
 import NextcloudAuthenticationManager from '@/components/NextcloudAuthenticationManager.vue';
+import { api } from './api';
 
 @Component({
   components: {
@@ -69,6 +70,15 @@ export default class App extends Vue {
       });
     }
     await dispatchCheckLoggedIn(this.$store);
+  }
+
+  async errorCaptured(err, vm, info) {
+    await api.trackError(this.$store.state.main.token, {
+      error: err.message,
+      info: info,
+      state: this.$store.state,
+      route: this.$route.fullPath
+    });
   }
   
 }

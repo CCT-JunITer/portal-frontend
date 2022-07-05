@@ -12,10 +12,11 @@
         Neues Dokument
       </v-btn>
     </v-toolbar>
-    <v-container class="DocumentMain">
+    <div class="px-1">
       <v-data-table
         :headers="headers"
         :items="documents"
+        :loading="documents === null"
         :items-per-page="5"
         class="elevation-1"
       >
@@ -60,7 +61,7 @@
         </template>
       </v-data-table>
 
-    </v-container>
+    </div>
   </div>  
 </template>
 
@@ -78,7 +79,7 @@ export default class DocumentMain extends Vue {
 
   @Watch('$route', {immediate: true})
   public async onRouteChange(newRoute?: Route, oldRoute?: Route) {
-    if (newRoute?.meta?.document_type !== oldRoute?.meta?.document_type) {
+    if (newRoute?.params?.type !== oldRoute?.params?.type) {
       await dispatchGetDocuments(this.$store, this.type);
     }
   }
@@ -88,17 +89,11 @@ export default class DocumentMain extends Vue {
   }
 
   public get type() {
-    return this.$route.meta?.document_type as IDocumentType;
+    return this.$route.params.type as IDocumentType;
   }
 
   public get typeName() {
-    return {
-      'member-progression': 'Mitgliedswerdegang',
-      'recruiting': 'Recruiting',
-      'archive': 'Archiv',
-      'public-affairs': 'Öffentlichkeitsarbeit',
-      'quality-management': 'Quality Management'
-    }[this.type];
+    return this.$common.DOCUMENT_TYPES.find(dt => dt.value === this.type)?.name;
   }
 
 

@@ -1,5 +1,5 @@
-import { IDocument } from '@/interfaces';
+import { IDocument, IDocumentType } from '@/interfaces';
 
 export interface DocumentState {
-    documents: IDocument[];
+    documents: { [k in IDocumentType]: IDocument[] | null };
 }

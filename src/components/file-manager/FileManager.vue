@@ -185,7 +185,13 @@ export default class FileManager extends Vue {
   public showHistory = false;
 
   get effectiveFiles(): { [k: string]: LabelledFile[] } {
-    return this.versionedFolder?.effective_files.reduce((prev, curr) => {
+    if (!this.versionedFolder) {
+      return {};
+    }
+    if (!this.labels) {
+      return { '': this.versionedFolder.effective_files };
+    }
+    return this.versionedFolder.effective_files.reduce((prev, curr) => {
       if (this.labels && !this.labels.includes(curr.label || '')) {
         return prev;
       }

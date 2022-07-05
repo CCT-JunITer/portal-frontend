@@ -1,4 +1,4 @@
-import { IDocument } from '@/interfaces';
+import { IDocument, IDocumentType } from '@/interfaces';
 import { getStoreAccessors } from 'typesafe-vuex';
 import { State } from '../state';
 import { replace } from '../utils';
@@ -6,14 +6,14 @@ import { DocumentState } from './state';
 
 
 export const mutations = {
-  setDocuments(state: DocumentState, payload: IDocument[]) {
-    state.documents = payload;
+  setDocuments(state: DocumentState, payload: { documents: IDocument[]; type: IDocumentType}) {
+    state.documents[payload.type] = payload.documents;
   },
   setDocument(state: DocumentState, payload: IDocument) {
-    state.documents = replace(state.documents, payload);
+    state.documents[payload.type] = replace(state.documents[payload.type], payload);
   },
   removeDocument(state: DocumentState, payload: IDocument) {
-    state.documents = state.documents.filter((doc) => doc.id !== payload.id);
+    state.documents = state.documents[payload.type].filter((doc) => doc.id !== payload.id);
   }
 };
 

@@ -4,15 +4,15 @@ import { ActionContext } from 'vuex';
 import { State } from '../state';
 import { commitSetDocuments, commitSetDocument, commitRemoveDocument } from './mutations';
 import { DocumentState } from './state';
-import { IDocumentCreate } from '@/interfaces';
+import { IDocumentCreate, IDocumentType } from '@/interfaces';
 import { apiCall, apiCallNotify } from '../utils';
 
 type MainContext = ActionContext<DocumentState, State>;
 
 export const actions = {
-  async actionGetDocuments(context: MainContext, documentType: string) {
+  async actionGetDocuments(context: MainContext, documentType: IDocumentType) {
     const response = await apiCall(context, token => api.getDocuments(token, documentType));
-    commitSetDocuments(context, response.data);
+    commitSetDocuments(context, { documents: response.data, type: documentType });
   },
   async actionGetOneDocument(context: MainContext, documentId: number) {
     const response = await apiCall(context, (token) => api.getOneDocument(token, documentId));

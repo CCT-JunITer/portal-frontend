@@ -316,46 +316,11 @@ export default new Router({
                   children: [
                     {
                       path: '',
-                      redirect: { name: 'member-progression' }
+                      redirect: { path: 'member-progression' }
                     },
                     {
-                      path: 'member-progression',
-                      name: 'member-progression',
-                      meta: {
-                        document_type: 'member-progression',
-                      },
-                      component: () => import('./views/main/document/DocumentMain.vue')
-                    },
-                    {
-                      path: 'recruiting',
-                      name: 'recruiting',
-                      meta: {
-                        document_type: 'recruiting',
-                      },
-                      component: () => import('./views/main/document/DocumentMain.vue')
-                    },
-                    {
-                      path: 'archive',
-                      name: 'archive',
-                      meta: {
-                        document_type: 'archive',
-                      },
-                      component: () => import('./views/main/document/DocumentMain.vue')
-                    },
-                    {
-                      path: 'public-affairs',
-                      name: 'public-affairs',
-                      meta: {
-                        document_type: 'public-affairs',
-                      },
-                      component: () => import('./views/main/document/DocumentMain.vue')
-                    },
-                    {
-                      path: 'quality-management',
-                      name: 'quality-management',
-                      meta: {
-                        document_type: 'quality-management',
-                      },
+                      path: ':type',
+                      name: 'document',
                       component: () => import('./views/main/document/DocumentMain.vue')
                     },
                     {
