@@ -12,9 +12,9 @@
       >
       </v-date-picker>
       <v-btn
-        class=""
         block
         color="primary"
+        style="height:40px;flex-grow:0"
         @click="() => createNewEvent()"
       >
         Event erstellen
@@ -26,6 +26,7 @@
         flat
         tile
         ref="calendarSelector"
+        style="flex: 1 1 auto;"
       >
         <v-expansion-panel 
           ref="calendarSelectorPanel"
@@ -35,19 +36,21 @@
           </v-expansion-panel-header>
 
           <v-expansion-panel-content>
-            <v-list-item 
-              v-for="(calendar, i) in calendars"
-              :key="i"
-            >
-              <calendar-toolbar :calendarId="calendar.uid" @change="getEvents({start:undefined, end:undefined})">
-              </calendar-toolbar>
-            </v-list-item>
-            <v-list-item 
-              v-if="towernutzung&&towerCalendar"
-            >
-              <calendar-toolbar :calendarId="towerCalendar.uid" :tower="true" @change="getEvents({start:undefined, end:undefined})">
-              </calendar-toolbar>
-            </v-list-item>
+            <div style="position:absolute;overflow-y: scroll;">
+              <v-list-item 
+                v-for="(calendar, i) in calendars"
+                :key="i"
+              >
+                <calendar-toolbar :calendarId="calendar.uid" @change="getEvents({start:undefined, end:undefined})">
+                </calendar-toolbar>
+              </v-list-item>
+              <v-list-item 
+                v-if="towernutzung&&towerCalendar"
+              >
+                <calendar-toolbar :calendarId="towerCalendar.uid" :tower="true" @change="getEvents({start:undefined, end:undefined})">
+                </calendar-toolbar>
+              </v-list-item>
+            </div>
           </v-expansion-panel-content>
         </v-expansion-panel>
       </v-expansion-panels>
@@ -56,7 +59,7 @@
       <div style="height:100%;"></div>
 
       <v-btn
-        style="width=100%"
+        style="width=100%;align-self:flex-end"
         :href="`https://cloud.cct-ev.de/apps/calendar/${this.nextcloudViewTypes[this.type]}/${toUTCDateString(this.value)}`" 
         target="_blank"
       >
@@ -704,22 +707,22 @@ export default {
 
   .calendarContainer {
     display: flex;
-    position:fixed;
+    position:absolute;
     flex-direction: row;
-    height:calc(100% - 64px);
+    height:100%;
     width:100%;
+    overflow:hidden;
     background-color:#EEEEEE;
   }
 
 .calendarSidebar {
   background-color:#EEEEEE;
   color:#757575;
-  height:calc(100%);
-  width:300px;
+  height:100%;
   display:flex;
   align-items:flex-start;
   flex-direction: column;
-  flex-basis:auto;
+  flex-basis:300px;
 }
 
 .calendarMainView {

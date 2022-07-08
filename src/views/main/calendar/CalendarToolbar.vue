@@ -1,7 +1,7 @@
 <template>
   <div class="toolbarContainer">
     <v-checkbox 
-      style="display:block;width:100%"
+      style="display:block;width:100%;padding:0;margin:0;"
       class="text-truncate text-no-wrap"
       v-model="calendar.active"
       :color="calendar.color"
@@ -9,7 +9,7 @@
       ripple
     >
       <template v-slot:label>
-        <v-tooltip bottom>
+        <v-tooltip bottom style="padding:0;margin:0">
           <template v-slot:activator="{ on }">
             <div
               v-on="on"
@@ -23,8 +23,8 @@
     </v-checkbox>
 
     <div style="width:100%; flex-shrink:100"></div>
-    <div style="justify-self:flex-end;">
-      <v-menu offset-x >
+    <div >
+      <v-menu offset-x style="top:0;left:0">
         <template v-slot:activator="{attrs, on }">
           <v-btn 
             icon
