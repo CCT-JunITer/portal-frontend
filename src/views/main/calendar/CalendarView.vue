@@ -301,7 +301,7 @@ export default {
       }
 
       // adding tower events for towernutzung
-      if (towernutzung && this.towerCalendar) {
+      if (towernutzung && this.towerCalendar && this.towerCalendar.active) {
         this.towerCalendar.events.forEach(event => {
           if (!towerIds.has(event.uid)) {
             const uiEvents = constructUIEventsFromDates(event, this.towerCalendar);
