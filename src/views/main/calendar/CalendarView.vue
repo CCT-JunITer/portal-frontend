@@ -335,8 +335,8 @@ export default {
     showEvent ({ nativeEvent, event }) {
       const open = () => {
         const eventCopy = Object.assign({}, event.event)
-        eventCopy.start = new Date(event.start)
-        eventCopy.end = new Date(event.end)
+        eventCopy.viewStart = new Date(event.start)
+        eventCopy.viewEnd = new Date(event.end)
         console.log(eventCopy)
         commitSetSelectedEvent(this.$store, eventCopy)
         this.$refs.calendarEventPopup.setSelectedElement(nativeEvent.target)

@@ -57,7 +57,20 @@
               </v-list-item-icon>
               <v-list-item-title
               > 
-                Löschen 
+                Löschen
+              </v-list-item-title>
+            </v-list-item>
+
+            <v-list-item
+              link
+              @click="deleteExdate"
+            >
+              <v-list-item-icon>
+                <v-icon>mdi-delete</v-icon>
+              </v-list-item-icon>
+              <v-list-item-title
+              > 
+                Dieses vorkommen löschen
               </v-list-item-title>
             </v-list-item>
           </v-list>
@@ -169,7 +182,7 @@
         <v-btn
           :color="(selectedEventInternal.rrule) ? '' : 'success'"
           @click="save"
-          :loading="loading"
+          :loading="loading" 
         >
           {{(selectedEventInternal.rrule) ? 'Alle aktualisieren' : 'Speichern'}}
         </v-btn>
@@ -264,6 +277,7 @@ export default {
       // TODO: finish this function
       this.loadingExdate = true
       const event = this.selectedEvent
+      this.deleteExdate()
       // console.log(event)
       // if (!event) return;
       if (!event.rrule.exdate) event.rrule.exdate = []
@@ -277,9 +291,10 @@ export default {
       this.close()
     },
 
-    async save(mouseEvent=undefined, loading=true) {
+    async save(mouseEvent=undefined, loading=true, changes={}) {
       this.loading = loading;
       const savedEvent = Object.assign({},this.selectedEventInternal)
+      Object.assign(savedEvent, changes)
       if (this.calendar.uid != savedEvent.calendarId) {
         // TODO: disable notifications for remove event
         await dispatchRemoveEvent(this.$store, {uid:savedEvent.uid, calendarId:savedEvent.calendarId, notify:false})
@@ -314,6 +329,13 @@ export default {
       // commitUpdateSelectedEvent(this.$store, savedEvent)
       this.$emit('changed')
       this.close()
+    },
+
+    async deleteExdate() {
+      if (!this.selectedEventInternal.rrule.exdate) this.selectedEventInternal.rrule.exdate = []
+      this.selectedEventInternal.rrule.exdate.push(this.selectedEventInternal.viewStart)
+      console.log(this.selectedEventInternal)
+      this.save()
     },
 
     async deleteEvent() {
