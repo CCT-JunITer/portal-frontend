@@ -39,6 +39,7 @@ export class CalendarEvent {
   calendarId?: string;
   color?: string;
   eventColor?: string;
+  locationId = undefined;
   // uiEvents?: [] = [];
 
   // toICalendarEvent() {

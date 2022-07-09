@@ -41,6 +41,7 @@ export const actions = {
         timed: payload.event.timed,
         description: payload.event.description,
         location: payload.event.location,
+        locationId: payload.event.locationId,
         participants: payload.event.participants,
         notifications: payload.event.notifications,
         categories: payload.event.categories,
@@ -76,9 +77,9 @@ export const actions = {
     }
 
     if (payload.notify) {
-      response = await apiCallNotify(context, token => api.getCalendar(token, payload.start, payload.end, calendarIdsString), {successText: 'Kalender aktualisiert'})
+      response = await apiCallNotify(context, token => api.datesearch(token, payload.start, payload.end, calendarIdsString), {successText: 'Kalender aktualisiert'})
     } else {
-      response = await apiCall(context, token => api.getCalendar(token, payload.start, payload.end, calendarIdsString))
+      response = await apiCall(context, token => api.datesearch(token, payload.start, payload.end, calendarIdsString))
     }
 
     const calendars = response.data

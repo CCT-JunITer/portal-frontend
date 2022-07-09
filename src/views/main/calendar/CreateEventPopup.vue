@@ -63,6 +63,7 @@
 
             <v-list-item
               link
+              v-if="selectedEventInternal.rrule"
               @click="deleteExdate"
             >
               <v-list-item-icon>
@@ -308,7 +309,7 @@ export default {
         // savedEvent.end.setDate(savedEvent.end.getDate()+1)
       }
 
-      const wasTowerEvent = this.selectedEvent.tower
+      const wasTowerEvent = this.selectedEvent.locationId == 'tower'
 
       try {
         await dispatchUpdateCalendarEvent(this.$store, {event:savedEvent, notify:true})
@@ -321,7 +322,7 @@ export default {
         }
       }
 
-      if ((wasTowerEvent || savedEvent.tower) && this.towerCalendar.uid) { // update tower calendar if tower event was changed
+      if ((wasTowerEvent || savedEvent.locationId == 'tower') && this.towerCalendar.uid) { // update tower calendar if tower event was changed
         if (savedEvent.towerId) commitRemoveCalendarEvent(this.$store, {calendarId: this.towerCalendar.uid, uid:savedEvent.towerId})
         dispatchFetchCalendars(this.$store, {notify:false, start:savedEvent.start, end:savedEvent.end, calendarIds:[this.towerCalendar.uid]})
       }
@@ -334,7 +335,6 @@ export default {
     async deleteExdate() {
       if (!this.selectedEventInternal.rrule.exdate) this.selectedEventInternal.rrule.exdate = []
       this.selectedEventInternal.rrule.exdate.push(this.selectedEventInternal.viewStart)
-      console.log(this.selectedEventInternal)
       this.save()
     },
 
@@ -410,7 +410,6 @@ export default {
     uiCalendars() {
       const calendarNames = []
       if (this.calendars.forEach) {
-        console.log(this.calendars)
         this.calendars.forEach(element => {
           calendarNames.push({
             text:element.name,

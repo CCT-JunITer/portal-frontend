@@ -164,11 +164,11 @@
           </template>
           <template v-slot:event="{event, timed, timeSummary}">
             <div v-if="type=='month'" class="ml-1 disable-select">
-              <strong v-if="event.event.timed" v-html="timeSummary()"></strong> <v-icon v-if="event.event.tower&&!towernutzung">mdi-chess-rook</v-icon>{{event.name}}
+              <strong v-if="event.event.timed" v-html="timeSummary()"></strong> <v-icon v-if="event.event.locationId=='tower'&&!towernutzung">mdi-chess-rook</v-icon>{{event.name}}
             </div>
             <div v-else class="disable-select" :style="'padding-left:'+ 
               ((getIntervalTowerEvents({minute:event.start.getMinutes(), hour:event.start.getHours(), day:event.start.getDate(), month:event.start.getMonth(), year:event.start.getFullYear()}).length > 0 && !towernutzung) ? '25' : '5') +'px'">
-              <strong>{{event.name}} <v-icon v-if="event.event.tower&&!towernutzung">mdi-chess-rook</v-icon> </strong><div v-if="event.event.timed" ><div v-html="timeSummary()"></div></div>
+              <strong>{{event.name}} <v-icon v-if="event.event.locationId=='tower'&&!towernutzung">mdi-chess-rook</v-icon> </strong><div v-if="event.event.timed" ><div v-html="timeSummary()"></div></div>
             </div>
             <div
               v-if="timed"
@@ -291,7 +291,7 @@ export default {
           for (let j = 0; j < activeCalendar.events.length; j++) {
             const event = activeCalendar.events[j]
 
-            if (!towernutzung || event.tower) { // only tower events are displayed if towernutzung
+            if (!towernutzung || event.locationId == 'tower') { // only tower events are displayed if towernutzung
               const uiEvents = constructUIEventsFromDates(event, activeCalendar);
               events.push(...uiEvents)
               towerIds.add(event.towerId)
@@ -337,7 +337,6 @@ export default {
         const eventCopy = Object.assign({}, event.event)
         eventCopy.viewStart = new Date(event.start)
         eventCopy.viewEnd = new Date(event.end)
-        console.log(eventCopy)
         commitSetSelectedEvent(this.$store, eventCopy)
         this.$refs.calendarEventPopup.setSelectedElement(nativeEvent.target)
         requestAnimationFrame(() => requestAnimationFrame(() => this.$refs.calendarEventPopup.show()))
@@ -411,14 +410,12 @@ export default {
       }
       let event = undefined
       if (!this.newEvent || this.newEvent.event.uid) {
-        console.log('creating new Event')
-        console.log(this.newEvent)
         event = new CalendarEvent()
         event.name = 'Neues Event'
         event.start = start
         event.end = end
         event.calendarId = calendar.uid
-        if (this.towernutzung) event.tower = true
+        if (this.towernutzung) event.locationId = 'tower'
         event.dates = [[event.start, event.end]]
 
         const uiEvent = constructUIEventsFromDates(event, calendar);
@@ -432,7 +429,6 @@ export default {
         this.newEvent.start = start
         this.newEvent.end = end
       }
-      console.log(event)
 
       return this.newEvent
     },
@@ -562,6 +558,8 @@ export default {
 
         this.dragEvent.start = new Date(newStart)
         this.dragEvent.end = new Date(newEnd)
+        this.dragEvent.event.start = new Date(this.dragEvent.start)
+        this.dragEvent.event.end = new Date(this.dragEvent.end)
       } else if (this.createEvent && this.createStart !== null) {
         const mouseRounded = new Date(this.roundTime(mouse, false))
         const min = (mouseRounded < this.createStart) ? mouseRounded : this.createStart
@@ -569,6 +567,8 @@ export default {
 
         this.createEvent.start = min
         this.createEvent.end = max
+        this.createEvent.event.start = new Date(this.createEvent.start)
+        this.createEvent.event.end = new Date(this.createEvent.end)
       }
     },
     endDrag () {

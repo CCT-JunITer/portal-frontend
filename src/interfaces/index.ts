@@ -363,6 +363,7 @@ export interface ICalendarEvent {
     uid: string;
     calendarId: string;
     dates: [];
+    locationId: string;
 }
 
 export interface ICalendar {
