@@ -259,6 +259,7 @@ export default {
   methods: {
     async getEvents (payload, notify=true, fetch=false, calendarIds=undefined) {
       const {start, end} = this.getDateTimespan()
+      console.log(start + '\n' + end)
 
       if (start && end && !fetch) {
         if (this.viewStart > start || end > this.viewEnd) {
@@ -374,14 +375,17 @@ export default {
     getMonday(d) {
       d = new Date(d.toDateString());
       const day = d.getDay()
-      const diff = d.getDate() - (day == 0 ? -6:day-1); // adjust when day is sunday
+      const diff = d.getDate() - (day == 0 ? 6:day-1); // adjust when day is sunday
       return new Date(d.setDate(diff));
     },
 
     getSunday(d) {
       d = new Date(d.toDateString());
       const day = d.getDay()
-      const diff = d.getDate() + (7-day) + (day == 0 ? -7:0); // adjust when day is sunday
+      const diff = d.getDate() + (day == 0 ? 0:7-day); // adjust when day is sunday
+      // console.log(day)
+      // console.log(diff)
+      // console.log(d.getDate())
       return new Date(d.setDate(diff));
     },
 

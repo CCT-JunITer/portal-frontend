@@ -278,7 +278,6 @@ export const api = {
     if (start && start instanceof Date) {
       if (param_count == 0) url += '?'
       else url += '&'
-      console.log(start)
       url += 'start=' + start.toISOString()
       param_count++;
     }
