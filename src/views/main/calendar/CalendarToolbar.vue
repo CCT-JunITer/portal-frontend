@@ -1,120 +1,121 @@
 <template>
-  <div class="toolbarContainer">
-    <v-checkbox 
-      style="display:block;width:100%;padding:0;margin:0;"
-      class="text-truncate text-no-wrap"
-      v-model="calendar.active"
-      :color="calendar.color"
-      @change="clicked"
-      ripple
-    >
-      <template v-slot:label>
-        <v-tooltip bottom style="padding:0;margin:0">
-          <template v-slot:activator="{ on }">
-            <div
-              v-on="on"
-            >
-              {{calendar.name}}
-            </div>
-          </template>
-          {{calendar.name}}
-        </v-tooltip>
-      </template>
-    </v-checkbox>
+  <v-tooltip bottom style="padding:0;margin:0">
+    <template v-slot:activator="{ on, attrs}">
+      <v-btn 
+        class="toolbarContainer text-none"
+        elevation="0"
+        v-on="on"
+        v-bind="attrs"
+        style="background:transparent;padding:0"
+        @change="clicked"
+      >
+        <v-checkbox 
+          style="display:block;width:100%;"
+          class="text-truncate text-no-wrap"
+          v-model="calendar.active"
+          :color="calendar.color"
+          @change="clicked"
+          ripple
+          :label="calendar.name"
+        >
+        </v-checkbox>
 
-    <div style="width:100%; flex-shrink:100"></div>
-    <div >
-      <v-menu offset-x style="top:0;left:0">
-        <template v-slot:activator="{attrs, on }">
-          <v-btn 
-            icon
-            v-bind="attrs"
-            v-on="on"
-          >
-            <v-icon>mdi-dots-vertical</v-icon>
-          </v-btn>
-        </template>
+        <div style="width:100%; flex-shrink:100"></div>
+        <div >
+          <v-menu offset-x style="top:0;left:0">
+            <template v-slot:activator="{attrs, on }">
+              <v-btn 
+                icon
+                v-bind="attrs"
+                v-on="on"
+              >
+                <v-icon>mdi-dots-vertical</v-icon>
+              </v-btn>
+            </template>
 
-        <v-list>
-          <!-- <v-dialog
-            v-model="nameDialog"
-            persistent
-            max-width="600px"
-          >
-            <template v-slot:activator="{ on, attrs }">
+            <v-list>
+              <!-- <v-dialog
+                v-model="nameDialog"
+                persistent
+                max-width="600px"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-list-item
+                    link
+                    v-on="on"
+                    v-bind="attrs"
+                  >
+                    <v-list-item-icon>
+                      <v-icon>mdi-pencil</v-icon>
+                    </v-list-item-icon>
+                    <v-list-item-title>Name bearbeiten</v-list-item-title>
+
+
+                  </v-list-item>
+                </template>
+                <v-card>
+                  <v-card-title>
+                    <span class="text-h5">Kalender Name bearbeiten</span>
+                  </v-card-title>
+                  <v-card-text>
+                    <v-text-field
+                      label="Name"
+                      required
+                    ></v-text-field>
+                  </v-card-text>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                      color="blue darken-1"
+                      text
+                      @click="nameDialog = false"
+                    >
+                      Close
+                    </v-btn>
+                    <v-btn
+                      color="blue darken-1"
+                      text
+                      @click="nameDialog = false"
+                    >
+                      Save
+                    </v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
+
               <v-list-item
                 link
-                v-on="on"
-                v-bind="attrs"
+                @click="editColor"
               >
                 <v-list-item-icon>
                   <v-icon>mdi-pencil</v-icon>
                 </v-list-item-icon>
-                <v-list-item-title>Name bearbeiten</v-list-item-title>
+                <v-list-item-title>Farbe bearbeiten</v-list-item-title>
+              </v-list-item> -->
 
-
+              <v-list-item
+                link
+                @click="deleteCalendar"
+              >
+                <v-list-item-icon>
+                  <v-icon>mdi-delete</v-icon>
+                </v-list-item-icon>
+                <v-list-item-title>Löschen</v-list-item-title>
               </v-list-item>
-            </template>
-            <v-card>
-              <v-card-title>
-                <span class="text-h5">Kalender Name bearbeiten</span>
-              </v-card-title>
-              <v-card-text>
-                <v-text-field
-                  label="Name"
-                  required
-                ></v-text-field>
-              </v-card-text>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn
-                  color="blue darken-1"
-                  text
-                  @click="nameDialog = false"
-                >
-                  Close
-                </v-btn>
-                <v-btn
-                  color="blue darken-1"
-                  text
-                  @click="nameDialog = false"
-                >
-                  Save
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-
-          <v-list-item
-            link
-            @click="editColor"
-          >
-            <v-list-item-icon>
-              <v-icon>mdi-pencil</v-icon>
-            </v-list-item-icon>
-            <v-list-item-title>Farbe bearbeiten</v-list-item-title>
-          </v-list-item> -->
-
-          <v-list-item
-            link
-            @click="deleteCalendar"
-          >
-            <v-list-item-icon>
-              <v-icon>mdi-delete</v-icon>
-            </v-list-item-icon>
-            <v-list-item-title>Löschen</v-list-item-title>
-          </v-list-item>
-        </v-list>
-      </v-menu>
-    </div>
-    <!-- <v-overlay
-      :value="editable"
-      opacity="1"
-      color="white"
-      z-index=0
-    >
-    </v-overlay> -->
-  </div>
+            </v-list>
+          </v-menu>
+        </div>
+        <!-- <v-overlay
+          :value="editable"
+          opacity="1"
+          color="white"
+          z-index=0
+        >
+        </v-overlay> -->
+      </v-btn>
+    </template>
+    {{calendar.name}}
+  </v-tooltip>
 </template>
 
 <script>
@@ -194,6 +195,8 @@ export default {
 .toolbarContainer {
   width:100%;
   display:flex;
+  margin:0;
+  padding:0;
   justify-content: flex-start;
   align-items:center;
 }
