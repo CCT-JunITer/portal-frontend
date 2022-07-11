@@ -272,16 +272,16 @@ export const api = {
     return axios.delete(`${apiUrl}/api/v1/calendar/events?calendarId=${encodeURIComponent(calendarId)}&eventId=${encodeURIComponent(eventId)}`, authHeaders(token));
   },
 
-  async getCalendar(token: string, start: Date|undefined = undefined, end: Date|undefined = undefined, calendars: string|undefined = undefined) {
+  async datesearch(token: string, start: Date|undefined = undefined, end: Date|undefined = undefined, calendars: string|undefined = undefined) {
     let url = `${apiUrl}/api/v1/calendar/dateSearch`
     let param_count = 0
-    if (start) {
+    if (start && start instanceof Date) {
       if (param_count == 0) url += '?'
       else url += '&'
       url += 'start=' + start.toISOString()
       param_count++;
     }
-    if (end) {
+    if (end && end instanceof Date) {
       if (param_count == 0) url += '?'
       else url += '&'
       url += 'end=' + end.toISOString()
