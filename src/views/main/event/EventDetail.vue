@@ -91,7 +91,7 @@
           </p>
         </v-col>
         <v-col cols="12" md="8">  
-          <file-manager v-model="this.event.files" :folder="this.event.versioned_folder" :readonly="true">
+          <file-manager v-model="this.event.files" :folder="this.event.versioned_folder" :labels="fileLabels" :readonly="true">
           </file-manager>
         </v-col>
       </v-row>
@@ -349,6 +349,16 @@ export default class TrainingDetail extends Vue {
       await dispatchGetEventApplications(this.$store, +newRoute.params.id);
     }
   }
+
+  get fileLabels() {
+    if (this.event.type === 'training') {
+      return ['Evaluationsauswertung', 'Schulungsmaterial', 'Teilnahmeliste']
+    } else if(this.event.type === 'meeting') {
+      return ['Präsentation', 'Protokoll'];
+    }
+  }
+
+
 
 
   get eventDetails() {
