@@ -6,8 +6,8 @@
 
     <v-row>
       <v-col cols="12" md="4" class="px-5">
-        <h4 class="text-h4 text--primary mb-3">Neue {{ {'meeting': 'Meeting', 'training': 'Training'}[type] }} anlegen</h4>
-        <p class="text-body-2 text--secondary">Jede Schulung kann hier dokumentiert werden.</p>
+        <h4 class="text-h4 text--primary mb-3">Neues {{ {'meeting': 'Meeting', 'training': 'Training'}[type] }} anlegen</h4>
+        <p class="text-body-2 text--secondary">Jedes {{ {'meeting': 'Meeting', 'training': 'Training'}[type] }} kann hier dokumentiert werden.</p>
       </v-col>
 
       <v-col cols="12" md="8">
@@ -25,35 +25,23 @@
             :rules="[$common.required]"            
           ></v-text-field>
           <v-select
-            label="Meetingart"
-            v-if="type === 'meeting'"
-            v-model ="event.subtype"
-            class="input-lg"
-            required
-            prepend-icon="mdi-animation"
-            :items="$common.MEETINGART"
-            :rules="[$common.required]"
-          ></v-select>
-
-          <v-select
-            label="Schulungsart"
-            v-if="type === 'training'"
-            v-model ="trainingSubType"
+            :label="type === 'meeting' ? 'Meetingart': 'Schulungsart'"
+            v-model ="subtype"
             class="input-lg"
             required
             prepend-icon="mdi-animation"
             return-object
             item-text="type"
-            :items="$common.SCHULUNGSMAPPING"
+            :items="type === 'meeting' ? $common.MEETINGMAPPING : $common.SCHULUNGSMAPPING"
             :rules="[$common.required]"
           ></v-select>
-          <div v-if="trainingSubType && trainingSubType.topics.length">
+          <div v-if="subtype && subtype.topics && subtype.topics.length">
             <v-select
               label="Schulungsthema"
               v-model ="event.topic"
               class="input-lg"
               prepend-icon="mdi-collage"
-              :items="trainingSubType.topics"
+              :items="subtype.topics"
               :rules="[$common.required]"
             ></v-select>
           </div>
@@ -256,7 +244,7 @@ export default class AdminViewEvent extends Vue {
   public time_menu = false;
   public valid = false;
   public event: Partial<IEventCreate> = {}
-  public trainingSubType: null | {type: string; topics: string[]} = null;
+  public subtype: null | {type: string; topics?: string[]} = null;
   public allday = false;
 
   public get type() {
@@ -291,6 +279,8 @@ export default class AdminViewEvent extends Vue {
 
   @Watch('$route', {immediate: true})
   public async onRouteChange(newRoute?: Route, oldRoute?: Route) {
+    // reset sub-type
+    this.subtype = null;
     if (newRoute?.params.id !== oldRoute?.params.id) {
       await dispatchGetOneEvent(this.$store, +this.$route.params.id)
       this.reset();
@@ -329,7 +319,7 @@ export default class AdminViewEvent extends Vue {
         ...this.event,
         timed: !this.allday,
         type: this.type,
-        subtype: this.trainingSubType && this.trainingSubType.type,
+        subtype: this.subtype && this.subtype.type,
       } as IEventCreate;
 
       let event: IEvent | undefined;
@@ -356,7 +346,7 @@ export default class AdminViewEvent extends Vue {
       this.allday = !this.event.timed;
 
       if (this.event.subtype) {
-        this.trainingSubType = this.$common.SCHULUNGSMAPPING.find(o => o.type === this.event?.subtype) || { type: this.event.subtype, topics: [] };
+        this.subtype = (this.event.type === 'meeting' ? this.$common.MEETINGMAPPING : this.$common.SCHULUNGSMAPPING).find(o => o.type === this.event?.subtype) || { type: this.event.subtype, topics: [] };
         
       }
 

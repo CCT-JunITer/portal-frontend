@@ -38,8 +38,9 @@ export const SCHULUNGSMAPPING = [
   { type: 'Organisatorische Schulung', topics: ['MP-Schulungen', 'Sonstige', 'AC-Schulung'] },
 ];
 
-export const MEETINGART = [
-  'Donnerstagssitzung', 'Mitgliederversammlung', 'Ressortsitzung', 'Workingsession'
+export const MEETINGMAPPING = [
+  { type: 'Donnerstagssitzung' },
+  { type: 'Mitgliederversammlung'}
 ];
 
 export const KOSTENART = [
