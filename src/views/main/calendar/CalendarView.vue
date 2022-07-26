@@ -2,8 +2,8 @@
   <div class="calendarContainer">
     <v-navigation-drawer 
       class="calendarSidebar"
+      style="background-color:#EEEEEE"
       permanent
-      disable-resize-watcher
     >
       
       <v-date-picker 
@@ -741,12 +741,11 @@ export default {
 
 .calendarSidebar {
   background-color:#EEEEEE;
-  color:#757575;
   height:100%;
   display:flex;
   align-items:flex-start;
   flex-direction: column;
-  flex-basis:375px;
+  flex-basis:350px;
 }
 
 .calendarMainView {
