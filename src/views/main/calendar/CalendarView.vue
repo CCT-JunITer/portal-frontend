@@ -1,6 +1,10 @@
 <template>
   <div class="calendarContainer">
-    <div class="calendarSidebar">
+    <v-navigation-drawer 
+      class="calendarSidebar"
+      permanent
+      disable-resize-watcher
+    >
       
       <v-date-picker 
         v-model="picker"
@@ -9,14 +13,22 @@
         :type="pickerType"
         scrollable
         color="primary"
+        width="100%"
       >
       </v-date-picker>
       <v-btn
         block
         color="primary"
-        style="height:40px;flex-grow:0"
+        style="height:40px;width:100%"
         @click="() => createNewEvent()"
+        
       >
+        <v-icon
+          left
+          dark
+        >
+          mdi-calendar-plus
+        </v-icon>
         Event erstellen
       </v-btn>
 
@@ -26,17 +38,16 @@
         flat
         tile
         ref="calendarSelector"
-        style="flex: 1 1 auto;"
       >
-        <v-expansion-panel 
+        <v-expansion-panel
           ref="calendarSelectorPanel"
         >
           <v-expansion-panel-header>
-            <div style="color:#757575">Deine Kalender</div>
+            <div style="transparent">Deine Kalender</div>
           </v-expansion-panel-header>
 
           <v-expansion-panel-content>
-            <div style="position:absolute;overflow-y: scroll;">
+            <div style="">
               <v-list-item 
                 v-for="(calendar, i) in calendars"
                 :key="i"
@@ -55,18 +66,19 @@
         </v-expansion-panel>
       </v-expansion-panels>
       <!-- <v-divider class="my-2"></v-divider> -->
-
-      <div style="height:100%;"></div>
-
-      <v-btn
-        style="width=100%;align-self:flex-end"
-        :href="`https://cloud.cct-ev.de/apps/calendar/${this.nextcloudViewTypes[this.type]}/${toUTCDateString(this.value)}`" 
-        target="_blank"
-      >
-        <v-icon>mdi-open-in-new</v-icon> In der Nextcloud bearbeiten
-      </v-btn>
       
-    </div>
+      <!--<div style="height:100%;flex-shrink:100;"></div>-->
+      <template v-slot:append>
+        <v-btn
+          :href="nextcloudURL" 
+          target="_blank"
+          block
+        >
+          <v-icon>mdi-open-in-new</v-icon> In der Nextcloud bearbeiten
+        </v-btn>
+      </template>
+      
+    </v-navigation-drawer>
 
     <!-- <v-divider vertical> </v-divider> -->
 
@@ -602,10 +614,14 @@ export default {
       this.dragTime = null
       this.dragEvent = null
     },
-  // End: Drag and Drop methods
+    // End: Drag and Drop methods
   },
 
   computed: {
+    nextcloudURL: function () {
+      return 'https://cloud.cct-ev.de/apps/calendar/' + this.nextcloudViewTypes[this.type] + '/' + this.toUTCDateString(this.value)
+    },
+
     picker: {
       get: function() {
         const val = this.toUTCDateString(this.value)
@@ -616,6 +632,7 @@ export default {
         this.datePickerChanged(newDate)
       }
     },
+
     pickerType: function() {
       if (this.type == 'month') return 'month';
       else {
@@ -658,15 +675,18 @@ export default {
 
     towernutzung: {
       get() {
-        const tower = this.$route.query.towernutzung;
+        const tower = this.$route.meta?.towernutzung;
         if(tower === undefined){
           return false;
+        } else if (tower instanceof String) {
+          return tower.toLowerCase() == 'true' || tower.toLowerCase() == '1';
+        } else {
+          return tower;
         }
-        return tower.toLowerCase() == 'true' || tower.toLowerCase() == '1';
       },
 
       set(value) {
-        this.$router.replace({params:this.route.params, query: { ...this.$route.query, towernutzung: value }});
+        this.$router.replace({params:this.route.params, meta: { ...this.$route.meta, towernutzung: value }});
       }
     },
 
@@ -726,7 +746,7 @@ export default {
   display:flex;
   align-items:flex-start;
   flex-direction: column;
-  flex-basis:300px;
+  flex-basis:375px;
 }
 
 .calendarMainView {

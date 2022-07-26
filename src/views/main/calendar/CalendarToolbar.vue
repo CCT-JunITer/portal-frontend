@@ -10,7 +10,7 @@
         @change="clicked"
       >
         <v-checkbox 
-          style="display:block;width:100%;"
+          style="width:100%;"
           class="text-truncate text-no-wrap"
           v-model="calendar.active"
           :color="calendar.color"

@@ -466,6 +466,14 @@ export default new Router({
               }
             },
             {
+              path: 'towernutzung/:viewType/:viewDate',
+              component: () => import('./views/main/calendar/CalendarMain.vue'),
+              meta: {
+                featureFlag: 'calendar',
+                towernutzung: true,
+              }
+            },
+            {
               path: 'shop',
               component: () => import('./views/main/shop/Shop.vue')
             },
