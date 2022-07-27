@@ -267,7 +267,6 @@ export default {
       this.selectedOpen = true
       this.fullscreen = false;
       this.initSelectedEventInternal()
-      console.log(this.updatable)
     },
 
     close() {
@@ -306,7 +305,7 @@ export default {
         savedEvent.calendarId = this.calendar.uid
         delete savedEvent.uid
       }
-      console.log(savedEvent);
+      //console.log(savedEvent);
 
       // fullday events need an end date that is at least one day later than the start date
       if (!savedEvent.timed) {

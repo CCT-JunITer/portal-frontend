@@ -285,7 +285,6 @@ export default {
   methods: {
     async getEvents (payload, notify=true, fetch=false, calendarIds=undefined) {
       const {start, end} = this.getDateTimespan()
-      console.log(start + '\n' + end)
 
       if (start && end && !fetch) {
         if (this.viewStart > start || end > this.viewEnd) {
@@ -308,7 +307,7 @@ export default {
       this.newEvent = undefined
       const towerIds = new Set()
 
-      console.log([...this.calendars, this.towerCalendar])
+      //console.log([...this.calendars, this.towerCalendar])
       const towernutzung = this.towernutzung
       for (let i = 0; i < this.calendars.length; i++) {
         const activeCalendar = this.calendars[i];
