@@ -131,7 +131,7 @@
         </v-list-item-content>
       </v-list-item>
 
-      <v-list-item to="/main/calendar" color="purple">
+      <v-list-item :to="calendarURL" color="purple">
         <v-list-item-icon>
           <v-icon>mdi-calendar</v-icon>
         </v-list-item-icon>
@@ -140,7 +140,7 @@
         </v-list-item-content>
       </v-list-item>
 
-      <v-list-item to="/main/towernutzung/week/today" color="cct-green">
+      <v-list-item :to="towernutzungURL" color="cct-green">
         <v-list-item-icon>
           <v-icon>mdi-chess-rook</v-icon>
         </v-list-item-icon>
@@ -308,6 +308,28 @@ export default class NavigationDrawer extends Vue {
 
   set showDrawer(value) {
     commitSetDashboardShowDrawer(this.$store, value);
+  }
+
+  get calendarViewType() {
+    const param = this.$route.params['viewType']
+    if (!param) return 'week'
+    return param
+  }
+
+  get calendarViewDate() {
+    const param = this.$route.params['viewDate']
+    if (!param) return 'today'
+    return param
+  }
+
+  get towernutzungURL() {
+    const url = `/main/towernutzung/${this.calendarViewType}/${this.calendarViewDate}`
+    return url
+  }
+
+  get calendarURL() {
+    const url = `/main/calendar/${this.calendarViewType}/${this.calendarViewDate}`
+    return url
   }
 }
 </script>

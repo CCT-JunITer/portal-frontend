@@ -51,6 +51,7 @@
             <v-list-item
               link
               @click="deleteEvent"
+              v-if="deletable"
             >
               <v-list-item-icon>
                 <v-icon>mdi-delete</v-icon>
@@ -63,7 +64,7 @@
 
             <v-list-item
               link
-              v-if="selectedEventInternal.rrule"
+              v-if="selectedEventInternal.rrule && deletable"
               @click="deleteExdate"
             >
               <v-list-item-icon>
@@ -85,6 +86,7 @@
           item-value="uid"
           return-object
           label="Kalender"
+          :disabled="!updatable"
           outlined
         ></v-select>
 
@@ -184,6 +186,7 @@
           :color="(selectedEventInternal.rrule) ? '' : 'success'"
           @click="save"
           :loading="loading" 
+          v-if="updatable"
         >
           {{(selectedEventInternal.rrule) ? 'Alle aktualisieren' : 'Speichern'}}
         </v-btn>
@@ -264,6 +267,7 @@ export default {
       this.selectedOpen = true
       this.fullscreen = false;
       this.initSelectedEventInternal()
+      console.log(this.updatable)
     },
 
     close() {
@@ -398,12 +402,23 @@ export default {
       return readTowerCalendar(this.$store)
     },
 
+    updatable: function() {
+      if (!this.calendar) return false
+      return this.calendar.rights.includes('u');
+    },
+
+    deletable: function() {
+      if (!this.calendar) return false;
+      return this.calendar.rights.includes('d')
+    },
+
     calendars: function ()  {
-      const calendars = readCalendars(this.$store)
+      const calendars = [...readCalendars(this.$store)]
       
       calendars.forEach(e => {
         e.text = e.name
       })
+      if (this.towerCalendar && this.selectedEvent.calendarId == this.towerCalendar.uid) calendars.push(this.towerCalendar)
       return calendars
     },
 

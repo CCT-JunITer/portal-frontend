@@ -19,7 +19,7 @@
       <v-btn
         block
         color="primary"
-        style="height:40px;width:100%"
+        style="height:40px"
         @click="() => createNewEvent()"
         
       >
@@ -69,13 +69,15 @@
       
       <!--<div style="height:100%;flex-shrink:100;"></div>-->
       <template v-slot:append>
-        <v-btn
-          :href="nextcloudURL" 
-          target="_blank"
-          block
-        >
-          <v-icon>mdi-open-in-new</v-icon> In der Nextcloud bearbeiten
-        </v-btn>
+        <div class="pa-2" style="flex-grow: 2;width: 350px;">
+          <v-btn
+            block
+            :href="nextcloudURL" 
+            target="_blank"
+          >
+            <v-icon>mdi-open-in-new</v-icon> In der Nextcloud bearbeiten
+          </v-btn>
+        </div>
       </template>
       
     </v-navigation-drawer>
@@ -183,7 +185,16 @@
             </div>
             <div v-else class="disable-select" :style="'padding-left:'+ 
               ((getIntervalTowerEvents({minute:event.start.getMinutes(), hour:event.start.getHours(), day:event.start.getDate(), month:event.start.getMonth(), year:event.start.getFullYear()}).length > 0 && !towernutzung) ? '25' : '5') +'px'">
-              <strong>{{event.name}} <v-icon v-if="event.event.locationId=='tower'&&!towernutzung">mdi-chess-rook</v-icon> </strong><div v-if="event.event.timed" ><div v-html="timeSummary()"></div></div>
+              <strong>
+                {{event.name}} 
+                <v-icon v-if="event.event.locationId=='tower'&&!towernutzung">
+                  mdi-chess-rook
+                </v-icon>
+                <v-icon v-if="event.event.locationId=='cctelefon'">
+                  mdi-phone
+                </v-icon>
+              </strong>
+              <div v-if="event.event.timed" ><div v-html="timeSummary()"></div></div>
             </div>
             <div
               v-if="timed"
@@ -747,6 +758,12 @@ export default {
   flex-direction: column;
   flex-basis:350px;
   flex-shrink:0;
+}
+
+@media (max-width: 600px){
+.calendarSidebar {
+  flex-shrink:1;
+  }
 }
 
 .calendarMainView {
