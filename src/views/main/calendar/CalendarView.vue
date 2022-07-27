@@ -746,11 +746,13 @@ export default {
   align-items:flex-start;
   flex-direction: column;
   flex-basis:350px;
+  flex-shrink:0;
 }
 
 .calendarMainView {
   width:100%;
   height: 100%;
+  flex-shrink:1;
 }
 
 .VCalendarView {
