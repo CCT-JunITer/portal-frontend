@@ -80,6 +80,7 @@ export const mutations = {
         }
       }
     })
+    if (state.towerCalendar) state.towerCalendar.rights = 'r'
     // state.calendars = calendars
   },
 

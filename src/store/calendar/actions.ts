@@ -34,16 +34,28 @@ export const actions = {
 
   async actionUpdateCalendarEvent(context: MainContext, payload: {event: ICalendarEvent; notify?: boolean}) {
     if (payload.event) {
-      // const event_copied = Object.assign({}, event)
-      // delete event_copied.uiEvents
-      // const e = {name:event.name, uid:event.uid, calendarId:event.calendarId}
-      // console.log(e)
-      // console.log(event_copied)
+      const event_copied = {
+        name: payload.event.name,
+        start: payload.event.start,
+        end: payload.event.end,
+        timed: payload.event.timed,
+        description: payload.event.description,
+        location: payload.event.location,
+        locationId: payload.event.locationId,
+        participants: payload.event.participants,
+        notifications: payload.event.notifications,
+        categories: payload.event.categories,
+        color: payload.event.color,
+        rrule: payload.event.rrule,
+        uid: payload.event.uid,
+        calendarId: payload.event.calendarId,
+      }
+      console.log(event_copied)
       let response: any = undefined
       if (payload.notify) {
-        response = await apiCallNotify(context, token => api.updateCalendarEvent(token, payload.event), {successText: 'Event aktualisiert'})
+        response = await apiCallNotify(context, token => api.updateCalendarEvent(token, event_copied), {successText: 'Event aktualisiert'})
       } else {
-        response = await apiCall(context, token => api.updateCalendarEvent(token, payload.event))
+        response = await apiCall(context, token => api.updateCalendarEvent(token, event_copied))
       }
       commitUpdateEvent(context, response.data)
       return response.data
@@ -65,9 +77,9 @@ export const actions = {
     }
 
     if (payload.notify) {
-      response = await apiCallNotify(context, token => api.getCalendar(token, payload.start, payload.end, calendarIdsString), {successText: 'Kalender aktualisiert'})
+      response = await apiCallNotify(context, token => api.datesearch(token, payload.start, payload.end, calendarIdsString), {successText: 'Kalender aktualisiert'})
     } else {
-      response = await apiCall(context, token => api.getCalendar(token, payload.start, payload.end, calendarIdsString))
+      response = await apiCall(context, token => api.datesearch(token, payload.start, payload.end, calendarIdsString))
     }
 
     const calendars = response.data

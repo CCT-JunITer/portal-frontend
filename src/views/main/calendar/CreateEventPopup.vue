@@ -51,13 +51,28 @@
             <v-list-item
               link
               @click="deleteEvent"
+              v-if="deletable"
             >
               <v-list-item-icon>
                 <v-icon>mdi-delete</v-icon>
               </v-list-item-icon>
               <v-list-item-title
               > 
-                Löschen 
+                Löschen
+              </v-list-item-title>
+            </v-list-item>
+
+            <v-list-item
+              link
+              v-if="selectedEventInternal.rrule && deletable"
+              @click="deleteExdate"
+            >
+              <v-list-item-icon>
+                <v-icon>mdi-delete</v-icon>
+              </v-list-item-icon>
+              <v-list-item-title
+              > 
+                Dieses vorkommen löschen
               </v-list-item-title>
             </v-list-item>
           </v-list>
@@ -71,6 +86,7 @@
           item-value="uid"
           return-object
           label="Kalender"
+          :disabled="!updatable"
           outlined
         ></v-select>
 
@@ -169,7 +185,8 @@
         <v-btn
           :color="(selectedEventInternal.rrule) ? '' : 'success'"
           @click="save"
-          :loading="loading"
+          :loading="loading" 
+          v-if="updatable"
         >
           {{(selectedEventInternal.rrule) ? 'Alle aktualisieren' : 'Speichern'}}
         </v-btn>
@@ -264,6 +281,7 @@ export default {
       // TODO: finish this function
       this.loadingExdate = true
       const event = this.selectedEvent
+      this.deleteExdate()
       // console.log(event)
       // if (!event) return;
       if (!event.rrule.exdate) event.rrule.exdate = []
@@ -277,23 +295,24 @@ export default {
       this.close()
     },
 
-    async save(mouseEvent=undefined, loading=true) {
+    async save(mouseEvent=undefined, loading=true, changes={}) {
       this.loading = loading;
       const savedEvent = Object.assign({},this.selectedEventInternal)
+      Object.assign(savedEvent, changes)
       if (this.calendar.uid != savedEvent.calendarId) {
         // TODO: disable notifications for remove event
         await dispatchRemoveEvent(this.$store, {uid:savedEvent.uid, calendarId:savedEvent.calendarId, notify:false})
         savedEvent.calendarId = this.calendar.uid
         delete savedEvent.uid
       }
-      console.log(savedEvent);
+      //console.log(savedEvent);
 
       // fullday events need an end date that is at least one day later than the start date
       if (!savedEvent.timed) {
         // savedEvent.end.setDate(savedEvent.end.getDate()+1)
       }
 
-      const wasTowerEvent = this.selectedEvent.tower
+      const wasTowerEvent = this.selectedEvent.locationId == 'tower'
 
       try {
         await dispatchUpdateCalendarEvent(this.$store, {event:savedEvent, notify:true})
@@ -306,7 +325,7 @@ export default {
         }
       }
 
-      if ((wasTowerEvent || savedEvent.tower) && this.towerCalendar.uid) { // update tower calendar if tower event was changed
+      if ((wasTowerEvent || savedEvent.locationId == 'tower') && this.towerCalendar.uid) { // update tower calendar if tower event was changed
         if (savedEvent.towerId) commitRemoveCalendarEvent(this.$store, {calendarId: this.towerCalendar.uid, uid:savedEvent.towerId})
         dispatchFetchCalendars(this.$store, {notify:false, start:savedEvent.start, end:savedEvent.end, calendarIds:[this.towerCalendar.uid]})
       }
@@ -314,6 +333,12 @@ export default {
       // commitUpdateSelectedEvent(this.$store, savedEvent)
       this.$emit('changed')
       this.close()
+    },
+
+    async deleteExdate() {
+      if (!this.selectedEventInternal.rrule.exdate) this.selectedEventInternal.rrule.exdate = []
+      this.selectedEventInternal.rrule.exdate.push(this.selectedEventInternal.viewStart)
+      this.save()
     },
 
     async deleteEvent() {
@@ -376,19 +401,29 @@ export default {
       return readTowerCalendar(this.$store)
     },
 
+    updatable: function() {
+      if (!this.calendar) return false
+      return this.calendar.rights.includes('u');
+    },
+
+    deletable: function() {
+      if (!this.calendar) return false;
+      return this.calendar.rights.includes('d')
+    },
+
     calendars: function ()  {
-      const calendars = readCalendars(this.$store)
+      const calendars = [...readCalendars(this.$store)]
       
       calendars.forEach(e => {
         e.text = e.name
       })
+      if (this.towerCalendar && this.selectedEvent.calendarId == this.towerCalendar.uid) calendars.push(this.towerCalendar)
       return calendars
     },
 
     uiCalendars() {
       const calendarNames = []
       if (this.calendars.forEach) {
-        console.log(this.calendars)
         this.calendars.forEach(element => {
           calendarNames.push({
             text:element.name,

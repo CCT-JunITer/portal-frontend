@@ -363,6 +363,7 @@ export interface ICalendarEvent {
     uid: string;
     calendarId: string;
     dates: [];
+    locationId: string;
 }
 
 export interface ICalendar {
@@ -371,5 +372,5 @@ export interface ICalendar {
     color?: string;
     active?: boolean;
     uid?: string;
-    rights: string; // this String can contain ['r', 'e', 'd', 'a'] (read, edit, delete, add)
+    rights: string; // this String can contain ['c', 'r', 'u', 'd'] (create, read, update, delete)
 }

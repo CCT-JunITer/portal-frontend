@@ -1,6 +1,10 @@
 <template>
   <div class="calendarContainer">
-    <div class="calendarSidebar">
+    <v-navigation-drawer 
+      class="calendarSidebar"
+      style="background-color:#EEEEEE"
+      permanent
+    >
       
       <v-date-picker 
         v-model="picker"
@@ -9,14 +13,22 @@
         :type="pickerType"
         scrollable
         color="primary"
+        width="100%"
       >
       </v-date-picker>
       <v-btn
-        class=""
         block
         color="primary"
+        style="height:40px"
         @click="() => createNewEvent()"
+        
       >
+        <v-icon
+          left
+          dark
+        >
+          mdi-calendar-plus
+        </v-icon>
         Event erstellen
       </v-btn>
 
@@ -27,43 +39,48 @@
         tile
         ref="calendarSelector"
       >
-        <v-expansion-panel 
+        <v-expansion-panel
           ref="calendarSelectorPanel"
         >
           <v-expansion-panel-header>
-            <div style="color:#757575">Deine Kalender</div>
+            <div style="transparent">Deine Kalender</div>
           </v-expansion-panel-header>
 
           <v-expansion-panel-content>
-            <v-list-item 
-              v-for="(calendar, i) in calendars"
-              :key="i"
-            >
-              <calendar-toolbar :calendarId="calendar.uid" @change="getEvents({start:undefined, end:undefined})">
-              </calendar-toolbar>
-            </v-list-item>
-            <v-list-item 
-              v-if="towernutzung&&towerCalendar"
-            >
-              <calendar-toolbar :calendarId="towerCalendar.uid" :tower="true" @change="getEvents({start:undefined, end:undefined})">
-              </calendar-toolbar>
-            </v-list-item>
+            <div style="">
+              <v-list-item 
+                v-for="(calendar, i) in calendars"
+                :key="i"
+              >
+                <calendar-toolbar :calendarId="calendar.uid" @change="getEvents({start:undefined, end:undefined})">
+                </calendar-toolbar>
+              </v-list-item>
+              <v-list-item 
+                v-if="towernutzung&&towerCalendar"
+              >
+                <calendar-toolbar :calendarId="towerCalendar.uid" :tower="true" @change="getEvents({start:undefined, end:undefined})">
+                </calendar-toolbar>
+              </v-list-item>
+            </div>
           </v-expansion-panel-content>
         </v-expansion-panel>
       </v-expansion-panels>
       <!-- <v-divider class="my-2"></v-divider> -->
-
-      <div style="height:100%;"></div>
-
-      <v-btn
-        style="width=100%"
-        :href="`https://cloud.cct-ev.de/apps/calendar/${this.nextcloudViewTypes[this.type]}/${toUTCDateString(this.value)}`" 
-        target="_blank"
-      >
-        <v-icon>mdi-open-in-new</v-icon> In der Nextcloud bearbeiten
-      </v-btn>
       
-    </div>
+      <!--<div style="height:100%;flex-shrink:100;"></div>-->
+      <template v-slot:append>
+        <div class="pa-2" style="flex-grow: 2;width: 350px;">
+          <v-btn
+            block
+            :href="nextcloudURL" 
+            target="_blank"
+          >
+            <v-icon>mdi-open-in-new</v-icon> In der Nextcloud bearbeiten
+          </v-btn>
+        </div>
+      </template>
+      
+    </v-navigation-drawer>
 
     <!-- <v-divider vertical> </v-divider> -->
 
@@ -164,11 +181,20 @@
           </template>
           <template v-slot:event="{event, timed, timeSummary}">
             <div v-if="type=='month'" class="ml-1 disable-select">
-              <strong v-if="event.event.timed" v-html="timeSummary()"></strong> <v-icon v-if="event.event.tower&&!towernutzung">mdi-chess-rook</v-icon>{{event.name}}
+              <strong v-if="event.event.timed" v-html="timeSummary()"></strong> <v-icon v-if="event.event.locationId=='tower'&&!towernutzung">mdi-chess-rook</v-icon>{{event.name}}
             </div>
             <div v-else class="disable-select" :style="'padding-left:'+ 
               ((getIntervalTowerEvents({minute:event.start.getMinutes(), hour:event.start.getHours(), day:event.start.getDate(), month:event.start.getMonth(), year:event.start.getFullYear()}).length > 0 && !towernutzung) ? '25' : '5') +'px'">
-              <strong>{{event.name}} <v-icon v-if="event.event.tower&&!towernutzung">mdi-chess-rook</v-icon> </strong><div v-if="event.event.timed" ><div v-html="timeSummary()"></div></div>
+              <strong>
+                {{event.name}} 
+                <v-icon v-if="event.event.locationId=='tower'&&!towernutzung">
+                  mdi-chess-rook
+                </v-icon>
+                <v-icon v-if="event.event.locationId=='cctelefon'">
+                  mdi-phone
+                </v-icon>
+              </strong>
+              <div v-if="event.event.timed" ><div v-html="timeSummary()"></div></div>
             </div>
             <div
               v-if="timed"
@@ -281,7 +307,7 @@ export default {
       this.newEvent = undefined
       const towerIds = new Set()
 
-      console.log([...this.calendars, this.towerCalendar])
+      //console.log([...this.calendars, this.towerCalendar])
       const towernutzung = this.towernutzung
       for (let i = 0; i < this.calendars.length; i++) {
         const activeCalendar = this.calendars[i];
@@ -291,7 +317,7 @@ export default {
           for (let j = 0; j < activeCalendar.events.length; j++) {
             const event = activeCalendar.events[j]
 
-            if (!towernutzung || event.tower) { // only tower events are displayed if towernutzung
+            if (!towernutzung || event.locationId == 'tower') { // only tower events are displayed if towernutzung
               const uiEvents = constructUIEventsFromDates(event, activeCalendar);
               events.push(...uiEvents)
               towerIds.add(event.towerId)
@@ -301,7 +327,7 @@ export default {
       }
 
       // adding tower events for towernutzung
-      if (towernutzung && this.towerCalendar) {
+      if (towernutzung && this.towerCalendar && this.towerCalendar.active) {
         this.towerCalendar.events.forEach(event => {
           if (!towerIds.has(event.uid)) {
             const uiEvents = constructUIEventsFromDates(event, this.towerCalendar);
@@ -335,9 +361,8 @@ export default {
     showEvent ({ nativeEvent, event }) {
       const open = () => {
         const eventCopy = Object.assign({}, event.event)
-        eventCopy.start = new Date(event.start)
-        eventCopy.end = new Date(event.end)
-        console.log(eventCopy)
+        eventCopy.viewStart = new Date(event.start)
+        eventCopy.viewEnd = new Date(event.end)
         commitSetSelectedEvent(this.$store, eventCopy)
         this.$refs.calendarEventPopup.setSelectedElement(nativeEvent.target)
         requestAnimationFrame(() => requestAnimationFrame(() => this.$refs.calendarEventPopup.show()))
@@ -375,14 +400,17 @@ export default {
     getMonday(d) {
       d = new Date(d.toDateString());
       const day = d.getDay()
-      const diff = d.getDate() - (day == 0 ? -6:day-1); // adjust when day is sunday
+      const diff = d.getDate() - (day == 0 ? 6:day-1); // adjust when day is sunday
       return new Date(d.setDate(diff));
     },
 
     getSunday(d) {
       d = new Date(d.toDateString());
       const day = d.getDay()
-      const diff = d.getDate() + (7-day) + (day == 0 ? -7:0); // adjust when day is sunday
+      const diff = d.getDate() + (day == 0 ? 0:7-day); // adjust when day is sunday
+      // console.log(day)
+      // console.log(diff)
+      // console.log(d.getDate())
       return new Date(d.setDate(diff));
     },
 
@@ -411,14 +439,12 @@ export default {
       }
       let event = undefined
       if (!this.newEvent || this.newEvent.event.uid) {
-        console.log('creating new Event')
-        console.log(this.newEvent)
         event = new CalendarEvent()
         event.name = 'Neues Event'
         event.start = start
         event.end = end
         event.calendarId = calendar.uid
-        if (this.towernutzung) event.tower = true
+        if (this.towernutzung) event.locationId = 'tower'
         event.dates = [[event.start, event.end]]
 
         const uiEvent = constructUIEventsFromDates(event, calendar);
@@ -432,7 +458,6 @@ export default {
         this.newEvent.start = start
         this.newEvent.end = end
       }
-      console.log(event)
 
       return this.newEvent
     },
@@ -562,6 +587,8 @@ export default {
 
         this.dragEvent.start = new Date(newStart)
         this.dragEvent.end = new Date(newEnd)
+        this.dragEvent.event.start = new Date(this.dragEvent.start)
+        this.dragEvent.event.end = new Date(this.dragEvent.end)
       } else if (this.createEvent && this.createStart !== null) {
         const mouseRounded = new Date(this.roundTime(mouse, false))
         const min = (mouseRounded < this.createStart) ? mouseRounded : this.createStart
@@ -569,6 +596,8 @@ export default {
 
         this.createEvent.start = min
         this.createEvent.end = max
+        this.createEvent.event.start = new Date(this.createEvent.start)
+        this.createEvent.event.end = new Date(this.createEvent.end)
       }
     },
     endDrag () {
@@ -595,10 +624,14 @@ export default {
       this.dragTime = null
       this.dragEvent = null
     },
-  // End: Drag and Drop methods
+    // End: Drag and Drop methods
   },
 
   computed: {
+    nextcloudURL: function () {
+      return 'https://cloud.cct-ev.de/apps/calendar/' + this.nextcloudViewTypes[this.type] + '/' + this.toUTCDateString(this.value)
+    },
+
     picker: {
       get: function() {
         const val = this.toUTCDateString(this.value)
@@ -609,6 +642,7 @@ export default {
         this.datePickerChanged(newDate)
       }
     },
+
     pickerType: function() {
       if (this.type == 'month') return 'month';
       else {
@@ -651,15 +685,18 @@ export default {
 
     towernutzung: {
       get() {
-        const tower = this.$route.query.towernutzung;
+        const tower = this.$route.meta?.towernutzung;
         if(tower === undefined){
           return false;
+        } else if (tower instanceof String) {
+          return tower.toLowerCase() == 'true' || tower.toLowerCase() == '1';
+        } else {
+          return tower;
         }
-        return tower.toLowerCase() == 'true' || tower.toLowerCase() == '1';
       },
 
       set(value) {
-        this.$router.replace({params:this.route.params, query: { ...this.$route.query, towernutzung: value }});
+        this.$router.replace({params:this.route.params, meta: { ...this.$route.meta, towernutzung: value }});
       }
     },
 
@@ -704,27 +741,34 @@ export default {
 
   .calendarContainer {
     display: flex;
-    position:fixed;
+    position:absolute;
     flex-direction: row;
-    height:calc(100% - 64px);
+    height:100%;
     width:100%;
+    overflow:hidden;
     background-color:#EEEEEE;
   }
 
 .calendarSidebar {
   background-color:#EEEEEE;
-  color:#757575;
-  height:calc(100%);
-  width:300px;
+  height:100%;
   display:flex;
   align-items:flex-start;
   flex-direction: column;
-  flex-basis:auto;
+  flex-basis:350px;
+  flex-shrink:0;
+}
+
+@media (max-width: 600px){
+.calendarSidebar {
+  flex-shrink:1;
+  }
 }
 
 .calendarMainView {
   width:100%;
   height: 100%;
+  flex-shrink:1;
 }
 
 .VCalendarView {

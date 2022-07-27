@@ -33,7 +33,7 @@ export default class CalendarMain extends Vue {
   }
 
   public isTower() {
-    return this.$route.query.towernutzung;
+    return this.$route.meta?.towernutzung;
   }
 }
 </script>

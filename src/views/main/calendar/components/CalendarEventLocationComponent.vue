@@ -6,7 +6,6 @@
       v-model="location"
       label="Ort"
       full-width
-      :disabled="selectedItem.textfieldDisabled"
     >
     </v-text-field>
     <v-select
@@ -58,31 +57,36 @@ export default {
 
   data() {
     const cctLocations = [
-      {name: 'custom', location: '', tower:false, textfieldDisabled:false},
-      {name: 'Tower', location: 'Erweiterungsbau der TU Berlin, Str. des 17. Juni 145, 10623 Berlin, Raum 512', tower:true, textfieldDisabled:true},
-      {name: 'CCTelefon', location: 'https://zoom.us/j/2814954064?pwd=ME1GbWNjV3ptemVHL3Y3cGE2VWRHQT09', tower:false, textfieldDisabled:true}
+      {name: 'custom', location: '', locationId:undefined, textfieldDisabled:false},
+      {name: 'Tower', location: 'Erweiterungsbau der TU Berlin, Str. des 17. Juni 145, 10623 Berlin, Raum 512', locationId:'tower', textfieldDisabled:true},
+      {name: 'CCTelefon', location: 'https://zoom.us/j/2814954064?pwd=ME1GbWNjV3ptemVHL3Y3cGE2VWRHQT09', locationId:'cctelefon', textfieldDisabled:true}
     ]
+    const cctLocationsDict = {}
+    cctLocations.forEach(obj => {cctLocationsDict[obj.locationId] = obj})
+
     return {
       selectedItem: cctLocations[0],
       towerLocation: cctLocations[1],
-      cctLocations: cctLocations
+      cctLocations: cctLocations,
+      cctLocationsDict:cctLocationsDict
     }
   },
 
   created() {
-    if (this.tower) {
-      this.selectedItem = this.towerLocation
-    } else {
-      if (this.location == this.cctLocations[2].location) this.selectedItem = this.cctLocations[2]
-      else this.selectedItem = this.cctLocations[0]
-    }
+    // if (this.tower) {
+    //   this.selectedItem = this.towerLocation
+    // } else {
+    //   if (this.location == this.cctLocations[2].location) this.selectedItem = this.cctLocations[2]
+    //   else this.selectedItem = this.cctLocations[0]
+    // }
+    this.selectedItem = this.cctLocationsDict[this.locationId]
     this.changed()
   },
 
   methods: {
     changed() {
       this.location = this.selectedItem.location
-      this.tower = this.selectedItem.tower
+      this.locationId = this.selectedItem.locationId
     },
   },
 
@@ -92,17 +96,23 @@ export default {
         return this.value.location
       },
       set(value) {
-        const newValue = {...this.value, location: value};
+        const newValue = this.value;
+        // const newValue = {...this.value};
+        newValue.location = value
         this.$emit('change', newValue);
       }
     },
 
-    tower: {
+    tower() {return this.locationId == 'tower'},
+
+    locationId: {
       get() {
-        return this.value.tower
+        return (this.value.locationId) ? this.value.locationId : undefined
       },
       set(value) {
-        const newValue = {...this.value, tower: value};
+        const newValue = this.value;
+        // const newValue = {...this.value};
+        newValue.locationId = value
         this.$emit('change', newValue);
       }
     }
