@@ -173,7 +173,7 @@
               v-for="event in getIntervalTowerEvents({minute:0, hour:hour, day:day, month:month-1, year:year})"
             >
               <div 
-                :style="'margin-top:'+minutesToPixels(getIntervalEventStart(hour,day,month-1,year,event).getMinutes())+'px;height:'+minutesToPixels(getIntervalEventLength(hour,day,month-1,year,event))+'px;background-color:black;width:20px;z-index:30;position:absolute'"
+                :style="'margin-top:'+minutesToPixels(getIntervalEventStart(hour,day,month-1,year,event).getMinutes())+'px;height:'+minutesToPixels(getIntervalEventLength(hour,day,month-1,year,event))+'px;background-color:black;width:20px;z-index:1;position:absolute'"
                 :key="event.uid"
               >
               </div>
