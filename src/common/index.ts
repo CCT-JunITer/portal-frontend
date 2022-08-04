@@ -36,6 +36,7 @@ export const SCHULUNGSMAPPING = [
   { type: 'Pflichtschulung', topics: ['BDSU-Schulung', 'Corporate Design', 'Finanzen & Recht', 'Internes Schulung', 'Präsentationstechniken', 'Projektschulung', 'Qualitätsmanagement'] },
   { type: 'Zusatzschulung', topics: ['Human Resources', 'Information Technology', 'Marketing & Strategy', 'Quality & Operations', 'Softskills', 'EDV-Fertigkeiten', 'Diversity', 'Sustainability'] },
   { type: 'Organisatorische Schulung', topics: ['MP-Schulungen', 'Sonstige', 'AC-Schulung'] },
+  { type: 'Ressortskills', topics: ['EC', 'IT', 'QM', 'HR'] },
 ];
 
 export const MEETINGMAPPING = [
