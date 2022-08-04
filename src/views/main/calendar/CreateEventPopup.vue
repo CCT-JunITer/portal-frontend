@@ -267,6 +267,7 @@ export default {
       this.selectedOpen = true
       this.fullscreen = false;
       this.initSelectedEventInternal()
+      console.log(this.selectedEventInternal)
     },
 
     close() {

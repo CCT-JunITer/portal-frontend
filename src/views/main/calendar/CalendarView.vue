@@ -232,7 +232,7 @@ import { readAuthenticationURL } from '@/store/main/getters';
 /*
   this function generates all ui events from a given event. There can be more ui events due to recurring events. The backend generates the date intervals for this according to the standard
 */
-function constructUIEventsFromDates(event, calendar) { 
+function constructUIEventsFromDates(event, calendar, viewStart, viewEnd) { 
   const events = []
   let event_color = (calendar.color) ? calendar.color : 'blue';
   if (event.eventColor) {
@@ -252,6 +252,75 @@ function constructUIEventsFromDates(event, calendar) {
     })
   })
   return events
+}
+
+const FREQUENCIES = {'SECONDLY':1000, 'MINUTELY':60000, 'HOURLY':3600000, 'DAILY':86400000, 'WEEKLY':604800000}
+function constructUIEvents(event, calendar, viewStart, viewEnd) {
+  
+  const events = []
+  let event_color = (calendar.color) ? calendar.color : 'blue';
+  if (event.eventColor) {
+    const rgb = keyword.rgb(event.eventColor)
+    event_color = 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')'
+  }
+
+  const rrule = event.rrule
+  let condition = (i, date) => {return i < 1};
+  if (rrule) {
+    if (rrule.endtype == 'COUNT') {
+      rrule.end = parseInt(rrule.end)
+      condition = (i, date) => {return i < rrule.end};
+    } else if (rrule.endtype == 'UNTIL') {
+      const end = new Date(rrule.end)
+      condition = (i, date) => {return date < end};
+    } else if (!rrule.endtype) {
+      condition = (i, date) => {return date < viewEnd}
+    } else {
+      console.error('The type ' + rrule.endtype + ' is not known!')
+    }
+  }
+  let event_start = event.start;
+  let event_end = event.end;
+  for (let i = 0; condition(i, event_start); i++) {
+    event_start = new Date(event.start)
+    event_end = new Date(event.end)
+
+    if (rrule) {
+      if (rrule.freq == 'MONTHLY') {
+        event_start.setMonth(event_start.getMonth()+i)
+        event_end.setMonth(event_end.getMonth()+i)
+      } else if (rrule.freq == 'YEARLY') {
+        event_start.setFullYear(event_start.getFullYear()+i)
+        event_end.setFullYear(event_end.getFullYear()+i)
+      } else {
+        if (rrule.freq in FREQUENCIES) {
+          event_start = new Date(event_start - (FREQUENCIES[rrule.freq]*-i))
+          event_end = new Date(event_end - (FREQUENCIES[rrule.freq]*-i))
+        }
+      }
+
+      
+
+      if (rrule.exdate.find(element => new Date(element).toISOString() == event_start.toISOString())) {
+        continue;
+      }
+    }
+
+    if (!event.timed) {
+      event_end.setDate(event_end.getDate()-1)
+    }
+    events.push({
+      name:event.name,
+      start:event_start,
+      end:event_end,
+      color:event_color,
+      timed:event.timed,
+      event:event,
+      iteration:i
+    })
+  }
+
+  return events;
 }
 
 export default {
@@ -306,7 +375,7 @@ export default {
       const events = []
       this.newEvent = undefined
       const towerIds = new Set()
-
+      console.log(this.calendars)
       //console.log([...this.calendars, this.towerCalendar])
       const towernutzung = this.towernutzung
       for (let i = 0; i < this.calendars.length; i++) {
@@ -318,7 +387,7 @@ export default {
             const event = activeCalendar.events[j]
 
             if (!towernutzung || event.locationId == 'tower') { // only tower events are displayed if towernutzung
-              const uiEvents = constructUIEventsFromDates(event, activeCalendar);
+              const uiEvents = constructUIEvents(event, activeCalendar, this.viewStart, this.viewEnd);
               events.push(...uiEvents)
               towerIds.add(event.towerId)
             }
@@ -330,7 +399,7 @@ export default {
       if (towernutzung && this.towerCalendar && this.towerCalendar.active) {
         this.towerCalendar.events.forEach(event => {
           if (!towerIds.has(event.uid)) {
-            const uiEvents = constructUIEventsFromDates(event, this.towerCalendar);
+            const uiEvents = constructUIEvents(event, this.towerCalendar, this.viewStart, this.viewEnd);
             events.push(...uiEvents)
           }
         })
@@ -447,7 +516,7 @@ export default {
         if (this.towernutzung) event.locationId = 'tower'
         event.dates = [[event.start, event.end]]
 
-        const uiEvent = constructUIEventsFromDates(event, calendar);
+        const uiEvent = constructUIEvents(event, calendar, this.viewStart, this.viewEnd);
         this.events.push(...uiEvent);
         commitSetSelectedEvent(this.$store, event)
         this.newEvent = uiEvent[0]

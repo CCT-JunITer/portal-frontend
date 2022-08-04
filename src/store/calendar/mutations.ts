@@ -44,6 +44,8 @@ export const mutations = {
 
   updateEvent(state: CalendarState, event: ICalendarEvent) {
     const calendarEvent: ICalendarEvent|undefined = getters.getEventByUID(state, event.uid)
+    event.start = new Date(event.start)
+    event.end = new Date(event.end)
     if (calendarEvent) {
       Object.assign(calendarEvent, event)
     } else { // if event does not exist
@@ -66,9 +68,15 @@ export const mutations = {
       // console.log(payload.calendars)
       const calendarObject: ICalendar|undefined = (c.uid) ? getters.getCalendarByUID(state, c.uid) : undefined
       if (calendarObject) {
+        // generate dict of uids
+        const uids = new Set()
+        c.events.forEach(event => {uids.add(event.uid)})
+
         calendarObject.events.forEach(event => {
           if (payload.start && payload.end && (event.end <= payload.start || event.start >= payload.end)) {
-            c?.events.push(event)
+            if (!uids.has(event.uid)) {
+              c?.events.push(event)
+            }
           }
         })
         Object.assign(calendarObject, c)
