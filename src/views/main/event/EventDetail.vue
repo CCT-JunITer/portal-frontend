@@ -255,6 +255,12 @@
           <p class="text-body-2 text--secondary">
             Teilnehmer:innen
           </p>
+          <v-btn color="cctBlue" @click="exportParticipants" dark outlined small>
+            <v-icon left>
+              mdi-clipboard-text
+            </v-icon>
+            Exportieren
+          </v-btn>
         </v-col>
 
         <v-col cols="12" md="8">  
@@ -296,11 +302,12 @@ import { readEventsApplicationsFor, readRouteEvent } from '@/store/event/getters
 import { dispatchGetEventApplications, dispatchGetOneEvent, dispatchUpdateEventApplication } from '@/store/event/actions';
 import FileChip from '@/components/file-chip/FileChip.vue';
 import EventApplicationCard from '@/components/event-application/EventApplicationCard.vue';
-import { IEvent, IEventApplication, IEventApplicationStatus } from '@/interfaces';
+import { IEvent, IEventApplication, IEventApplicationStatus, IUserProfile } from '@/interfaces';
 import FileManager from '@/components/file-manager/FileManager.vue';
 import { Route } from 'vue-router';
 import EventCodeDisplay from './EventCodeDisplay.vue';
 import UserChip from '@/components/user-chip/UserChip.vue';
+import { dispatchSaveAsCsv } from '@/store/main/actions';
 
 @Component({
   components: { EmployeeProfilePicture, EmployeeCard, FileChip, EventApplicationCard, FileManager, EventCodeDisplay, UserChip },
@@ -358,6 +365,16 @@ export default class TrainingDetail extends Vue {
     }
   }
 
+
+  public async exportParticipants() {
+
+    await dispatchSaveAsCsv(this.$store, {
+      data: this.event.participants,
+      fileName: 'Teilnehmendenliste_' + this.event.title.replace(' ', '_'),
+      headers: ['firstname', 'lastname', 'email'],
+      renderRow: (item: IUserProfile) => [item.first_name, item.last_name, item.email]
+    })
+  }
 
 
 
