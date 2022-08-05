@@ -254,6 +254,7 @@ function constructUIEventsFromDates(event, calendar, viewStart, viewEnd) {
   return events
 }
 
+
 const FREQUENCIES = {'SECONDLY':1000, 'MINUTELY':60000, 'HOURLY':3600000, 'DAILY':86400000, 'WEEKLY':604800000}
 function constructUIEvents(event, calendar, viewStart, viewEnd) {
   
@@ -266,7 +267,22 @@ function constructUIEvents(event, calendar, viewStart, viewEnd) {
 
   const rrule = event.rrule
   let condition = (i, date) => {return i < 1};
+  let i_offset = 0;
   if (rrule) {
+    // calculate i_offset, such that only recurring events are generated in the viewStart and viewEnd interval for performance reasons
+    if (rrule.freq == 'MONTHLY') {
+      i_offset = (viewStart.getFullYear() - event.end.getFullYear()) + (viewStart.getMonth() - event.end.getMonth())
+    } else if (rrule.freq == 'YEARLY') {
+      i_offset = viewStart.getFullYear() - event.end.getFullYear()
+    } else {
+      if (rrule.freq in FREQUENCIES) {
+        const freq = FREQUENCIES[rrule.freq]
+        i_offset = Math.floor((viewStart.valueOf()/freq) - (event.end.valueOf()/freq))
+      }
+    }
+    i_offset = Math.max(i_offset, 0)
+    console.log(i_offset)
+
     if (rrule.endtype == 'COUNT') {
       rrule.end = parseInt(rrule.end)
       condition = (i, date) => {return i < rrule.end};
@@ -279,9 +295,10 @@ function constructUIEvents(event, calendar, viewStart, viewEnd) {
       console.error('The type ' + rrule.endtype + ' is not known!')
     }
   }
+
   let event_start = event.start;
   let event_end = event.end;
-  for (let i = 0; condition(i, event_start); i++) {
+  for (let i = i_offset; condition(i, event_start); i++) {
     event_start = new Date(event.start)
     event_end = new Date(event.end)
 
