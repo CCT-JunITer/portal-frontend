@@ -186,13 +186,13 @@
             <div v-else class="disable-select" :style="'padding-left:'+ 
               ((getIntervalTowerEvents({minute:event.start.getMinutes(), hour:event.start.getHours(), day:event.start.getDate(), month:event.start.getMonth(), year:event.start.getFullYear()}).length > 0 && !towernutzung) ? '25' : '5') +'px'">
               <strong>
-                {{event.name}} 
                 <v-icon v-if="event.event.locationId=='tower'&&!towernutzung">
                   mdi-chess-rook
                 </v-icon>
                 <v-icon v-if="event.event.locationId=='cctelefon'">
                   mdi-phone
                 </v-icon>
+                {{event.name}} 
               </strong>
               <div v-if="event.event.timed" ><div v-html="timeSummary()"></div></div>
             </div>

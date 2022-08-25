@@ -69,16 +69,18 @@ export const mutations = {
       const calendarObject: ICalendar|undefined = (c.uid) ? getters.getCalendarByUID(state, c.uid) : undefined
       if (calendarObject) {
         // generate dict of uids
-        const uids = new Set()
-        c.events.forEach(event => {uids.add(event.uid)})
-
-        calendarObject.events.forEach(event => {
-          if (payload.start && payload.end && (event.end <= payload.start || event.start >= payload.end)) {
-            if (!uids.has(event.uid)) {
-              c?.events.push(event)
+        if (c.events) {
+          const uids = new Set()
+          c.events.forEach(event => {uids.add(event.uid)})
+  
+          calendarObject.events.forEach(event => {
+            if (payload.start && payload.end && (event.end <= payload.start || event.start >= payload.end)) {
+              if (!uids.has(event.uid)) {
+                c?.events.push(event)
+              }
             }
-          }
-        })
+          })
+        }
         Object.assign(calendarObject, c)
       } else {
         if (c.uid && TowerCalendarIDs.has(c.uid)) {

@@ -50,7 +50,11 @@ export const actions = {
         uid: payload.event.uid,
         calendarId: payload.event.calendarId,
       }
-      console.log(event_copied)
+
+      // const calendar = getters.getCalendarByUID(context.state, payload.event.calendarId)
+      // if (calendar) {
+      //   dispatch((state, payload) => payload.calendar.loading = payload.loading)(context, {calendar:calendar, loading:true})
+      // }
       let response: any = undefined
       if (payload.notify) {
         response = await apiCallNotify(context, token => api.updateCalendarEvent(token, event_copied), {successText: 'Event aktualisiert'})
@@ -58,13 +62,21 @@ export const actions = {
         response = await apiCall(context, token => api.updateCalendarEvent(token, event_copied))
       }
       commitUpdateEvent(context, response.data)
+
+      // if (calendar) calendar.loading = false;
       return response.data
     }
   },
 
   async actionUpdateCalendar(context: MainContext, calendar) {
-    const calendarCopy = Object.assign({}, calendar);
-    delete calendarCopy.text
+    const calendarCopy = {
+      name: calendar.name,
+      uid: calendar.name,
+      events: calendar.events,
+      color: calendar.color,
+      active: calendar.active,
+      rights: calendar.rights
+    }
     const response = await apiCall(context, token => api.updateCalendar(token, calendarCopy))
     return response.data
   },
