@@ -7,7 +7,7 @@ import { ActionContext } from 'vuex';
 import { State } from '../state';
 import { apiCall, apiCallNotify } from '../utils';
 import { readCalendars } from './getters';
-import { commitDeleteCalendar, commitRemoveCalendarEvent, commitUpdateCalendars, commitUpdateEvent } from './mutations';
+import { commitDeleteCalendar, commitRemoveCalendarEvent, commitUpdateCalendarRights, commitUpdateCalendars, commitUpdateEvent } from './mutations';
 import { CalendarState } from './state';
 
 type MainContext = ActionContext<CalendarState, State>;
@@ -68,6 +68,11 @@ export const actions = {
     }
   },
 
+  async actionFetchCalendarRights(context: MainContext, payload:any) {
+    const response = await apiCall(context, token => api.updateCalendarRights(token))
+    commitUpdateCalendarRights(context, {calendars:response.data})
+  },
+
   async actionUpdateCalendar(context: MainContext, calendar) {
     const calendarCopy = {
       name: calendar.name,
@@ -120,3 +125,4 @@ export const dispatchFetchCalendars = dispatch(actions.actionFetchCalendars);
 export const dispatchUpdateCalendarEvent = dispatch(actions.actionUpdateCalendarEvent);
 export const dispatchDeleteCalendar = dispatch(actions.actionDeleteCalendar);
 export const dispatchUpdateCalendar = dispatch(actions.actionUpdateCalendar);
+export const dispatchFetchCalendarRights = dispatch(actions.actionFetchCalendarRights);

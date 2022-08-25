@@ -224,8 +224,8 @@ import { keyword } from 'color-convert';
 import CalendarEventPopup from './CreateEventPopup.vue'
 import CalendarToolbar from './CalendarToolbar.vue';
 import { commitSetSelectedEvent } from '@/store/calendar/mutations';
-import { dispatchFetchCalendars } from '@/store/calendar/actions';
-import { readCalendars, readSelectedEvent, readTowerCalendar } from '@/store/calendar/getters';
+import { dispatchFetchCalendars, dispatchFetchCalendarRights} from '@/store/calendar/actions';
+import { readCalendars, readCalendarsWithoutTower, readSelectedEvent, readTowerCalendar, getters} from '@/store/calendar/getters';
 import { CalendarEvent } from './CalendarEvent';
 import { readAuthenticationURL } from '@/store/main/getters';
 
@@ -387,6 +387,7 @@ export default {
         }
         
         await dispatchFetchCalendars(this.$store, {notify:notify, start:start, end:end, calendarIds:calendarIds})
+        dispatchFetchCalendarRights(this.$store, {})
       }
 
       const events = []
@@ -620,7 +621,9 @@ export default {
     // Start: Drag and drop methods
 
     startDrag ({ event, timed }) {
-      if (event && timed) {
+      // check rights
+      const event_calendar = this.allCalendars.find(x => {return x.uid && x.uid == event.event.calendarId})
+      if (event && timed && (event_calendar || event_calendar.rights.includes('u'))) {
         this.dragEvent = event
         this.dragTime = null
         this.extendOriginal = null
@@ -787,8 +790,12 @@ export default {
     },
 
     calendars: function ()  {
-      const calendars = readCalendars(this.$store)
+      const calendars = readCalendarsWithoutTower(this.$store)
       return calendars
+    },
+
+    allCalendars: function() {
+      return readCalendars(this.$store)
     },
 
     authenticationURL: function() {

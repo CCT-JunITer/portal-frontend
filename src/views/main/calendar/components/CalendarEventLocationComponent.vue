@@ -6,6 +6,7 @@
       v-model="location"
       label="Ort"
       full-width
+      :disabled="disabled"
     >
     </v-text-field>
     <v-select
@@ -16,6 +17,7 @@
       return-object
       class="ml-3"
       label="Typ"
+      :disabled="disabled"
       style="width:60px;align-self:flex-end"
     >
     </v-select>
@@ -48,7 +50,7 @@
 
 <script>
 export default {
-  props: ['value'],
+  props: ['value', 'disabled'],
   
   model: {
     prop:'value',

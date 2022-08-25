@@ -47,13 +47,20 @@
           </v-menu>
         </div>
       </v-btn>
+      <v-progress-linear
+        v-if="calendar.loading"
+        indeterminate
+        absolute
+        bottom
+        color="primary"
+      ></v-progress-linear>
     </template>
     {{calendar.name}}
   </v-tooltip>
 </template>
 
 <script>
-import { readCalendars, readTowerCalendar } from '@/store/calendar/getters'
+import { readCalendars, readCalendarsWithoutTower, readTowerCalendar } from '@/store/calendar/getters'
 import { dispatchDeleteCalendar, dispatchFetchCalendars, dispatchUpdateCalendar } from '@/store/calendar/actions'
 import { commitUpdateCalendars } from '@/store/calendar/mutations'
 
@@ -78,7 +85,7 @@ export default {
 
   computed: {
     calendars: function ()  {
-      return readCalendars(this.$store)
+      return readCalendarsWithoutTower(this.$store)
     },
 
     towerCalendar: function() {

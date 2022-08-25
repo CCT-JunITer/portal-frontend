@@ -9,6 +9,7 @@
     max-width="290px"
     min-width="240px"
     v-bind="$attrs"
+    :disabled="disabled"
   >
     <template v-slot:activator="{ on, attrs }">
       <slot 
@@ -48,6 +49,9 @@ export default class DatePickerMenu extends Vue {
 
   @Prop()
   public pickerProps!: object;
+
+  @Prop({required: false, default: false})
+  public disabled?: boolean;
 
   set date(value) {
     this.$emit('input', this.toISO(value));

@@ -33,6 +33,7 @@
             v-model="selectedEventInternal.name"
             flat
             full-width
+            :disabled="!updatable"
           ></v-text-field>
         </v-toolbar-title>
         <v-spacer></v-spacer>
@@ -95,6 +96,7 @@
             :is="selectedEventInternal.timed ? 'date-time-picker-menu' : 'date-picker-menu'"
             v-model ="startDate"
             defaultPicker="DATE"
+            :disabled="!updatable"
             :pickerProps="{}"
           >
             <template v-slot:activator="{ on, attrs, }">
@@ -106,6 +108,7 @@
                 prepend-icon="mdi-calendar-range"
                 required
                 :rules="[$common.required]"
+                :disabled="!updatable"
               ></v-text-field>
             </template>
           </component>
@@ -128,6 +131,7 @@
                 prepend-icon="mdi-calendar-range"
                 required
                 :rules="[$common.required]"
+                :disabled="!updatable"
               ></v-text-field>
             </template>
           </component>
@@ -137,6 +141,7 @@
           style="padding:0;margin:0"
           :value="!selectedEventInternal.timed"
           :input-value="!selectedEventInternal.timed"
+          :disabled="!updatable"
           @change="timedChanged"
           label="ganztägig"
         ></v-checkbox>
@@ -144,6 +149,7 @@
         <calendar-event-location-component
           v-if="selectedOpen"
           v-model="selectedEventInternal"
+          :disabled="!updatable"
         > 
         </calendar-event-location-component>
 
@@ -159,6 +165,7 @@
           v-model="selectedEventInternal.description"
           filled
           label="Beschreibung"
+          :disabled="!updatable"
         ></v-textarea>
 
       </v-card-text>
@@ -199,7 +206,7 @@
 
 import { dispatchFetchCalendars, dispatchRemoveEvent, dispatchUpdateCalendarEvent } from '@/store/calendar/actions'
 import { commitAddEventToCalendar, commitSetSelectedEvent, commitRemoveCalendarEvent, commitUpdateSelectedEvent, commitUpdateEvent } from '@/store/calendar/mutations'
-import { readCalendarById, readCalendars, readSelectedEvent, readEventByUID, readCalendarByUID, readTowerCalendar} from '@/store/calendar/getters'
+import { readCalendarById, readCalendars, readCalendarsWithoutTower, readSelectedEvent, readEventByUID, readCalendarByUID, readTowerCalendar} from '@/store/calendar/getters'
 import { getCalendarById } from '@/store/utils'
 import CalendarEventLocationComponent from './components/CalendarEventLocationComponent.vue'
 import DateTimePickerMenu from '@/components/DateTimePickerMenu.vue'
@@ -413,12 +420,12 @@ export default {
     },
 
     calendars: function ()  {
-      const calendars = [...readCalendars(this.$store)]
+      const calendars = [...readCalendarsWithoutTower(this.$store)]
+      if (this.towerCalendar && this.selectedEvent.calendarId == this.towerCalendar.uid) calendars.push(this.towerCalendar)
       
       calendars.forEach(e => {
         e.text = e.name
       })
-      if (this.towerCalendar && this.selectedEvent.calendarId == this.towerCalendar.uid) calendars.push(this.towerCalendar)
       return calendars
     },
 

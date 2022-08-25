@@ -10,6 +10,7 @@
     min-width="240px"
     offset-y
     v-bind="$attrs"
+    :disabled="disabled"
   >
     <template v-slot:activator="{ on, attrs }">
       <slot 
@@ -84,6 +85,8 @@ export default class DateTimePickerMenu extends Vue {
   @Prop()
   public pickerProps!: object;
 
+  @Prop({ required: false, default: false })
+  public disabled?: boolean;
 
   public date: string | null = null;
   public time: string | null = null;

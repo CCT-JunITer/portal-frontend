@@ -3,10 +3,17 @@ import { getStoreAccessors } from 'typesafe-vuex';
 import { State } from '../state';
 import { CalendarState } from './state';
 
+const TowerCalendarIDs = new Set(['tower_shared_by_CalendarBot']);
 export const getters = {
 
   getCalendars(state: CalendarState) {
     return state.calendars
+  },
+
+  getCalendarsWithoutTower(state: CalendarState) {
+    const calendars = [...state.calendars]
+    calendars.filter(x => {return x.uid && !TowerCalendarIDs.has(x.uid)})
+    return calendars
   },
 
   getSelectedEvent(state: CalendarState) {
@@ -14,7 +21,7 @@ export const getters = {
   },
 
   getTowerCalendar(state: CalendarState) {
-    return state.towerCalendar;
+    return state.calendars.find(x => {return x.uid && TowerCalendarIDs.has(x.uid)});
   },
 
   getEventByUID(state: CalendarState, uid: string) {
@@ -31,8 +38,6 @@ export const getters = {
 
 
   getCalendarByUID(state: CalendarState, uid: string) {
-    if (state.towerCalendar && state.towerCalendar.uid == uid) return state.towerCalendar
-    
     const calendar = state.calendars.find(x => x.uid == uid)
     return calendar
   }
@@ -42,6 +47,7 @@ export const getters = {
 const {read} = getStoreAccessors<CalendarState, State>('');
 
 export const readCalendars = read(getters.getCalendars);
+export const readCalendarsWithoutTower = read(getters.getCalendarsWithoutTower);
 export const readSelectedEvent = read(getters.getSelectedEvent);
 export const readTowerCalendar = read(getters.getTowerCalendar);
 export const readEventByUID = read(getters.getEventByUID);

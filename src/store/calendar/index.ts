@@ -14,7 +14,6 @@ const defaultState: CalendarState = {
   // }
   ],
   selectedEvent: undefined,
-  towerCalendar: undefined
 };
   
 export const calendarModule = {

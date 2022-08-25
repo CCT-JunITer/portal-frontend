@@ -4,7 +4,6 @@ import {getters} from './getters';
 import { getStoreAccessors } from 'typesafe-vuex';
 import { State } from '../state';
 
-const TowerCalendarIDs = new Set(['tower_shared_by_CalendarBot']);
 const Replacements = [' (Calendar Bot)', ' (calendarbot)']
 
 export const mutations = {
@@ -83,15 +82,22 @@ export const mutations = {
         }
         Object.assign(calendarObject, c)
       } else {
-        if (c.uid && TowerCalendarIDs.has(c.uid)) {
-          state.towerCalendar = c;
-        } else {
-          state.calendars.push(c)
-        }
+        state.calendars.push(c)
       }
     })
-    if (state.towerCalendar) state.towerCalendar.rights = 'r'
     // state.calendars = calendars
+  },
+
+  updateCalendarRights(state: CalendarState, payload: {calendars: ICalendar[]}) {
+    console.log(payload.calendars)
+    if (payload.calendars) {
+      payload.calendars.forEach(c => {
+        const calendar_object = state.calendars.find(x => {return x.uid && x.uid == c.uid})
+        if (calendar_object) {
+          calendar_object.rights = c.rights
+        }
+      })
+    }
   },
 
   deleteCalendar(state: CalendarState, calendarId: string) {
@@ -109,3 +115,4 @@ export const commitUpdateSelectedEvent = commit(mutations.updateSelectedEvent)
 export const commitUpdateEvent = commit(mutations.updateEvent)
 export const commitDeleteCalendar = commit(mutations.deleteCalendar)
 export const commitAddEventToCalendar = commit(mutations.addEventToCalendar)
+export const commitUpdateCalendarRights = commit(mutations.updateCalendarRights)

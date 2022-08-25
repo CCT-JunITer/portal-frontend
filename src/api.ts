@@ -302,6 +302,10 @@ export const api = {
     return axios.get(url, authHeaders(token));
   },
 
+  async updateCalendarRights(token: string) {
+    return axios.get(`${apiUrl}/api/v1/calendar/updateRights`, authHeaders(token));
+  },    
+
   async requestAuthenticationURL(token: string) {
     return axios.get(`${apiUrl}/api/v1/calendar/requestAuthenticationURL`, authHeaders(token));
   },
