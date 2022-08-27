@@ -172,11 +172,17 @@
             <template
               v-for="event in getIntervalTowerEvents({minute:0, hour:hour, day:day, month:month-1, year:year})"
             >
-              <div 
-                :style="'margin-top:'+minutesToPixels(getIntervalEventStart(hour,day,month-1,year,event).getMinutes())+'px;height:'+minutesToPixels(getIntervalEventLength(hour,day,month-1,year,event))+'px;background-color:black;width:20px;z-index:1;position:absolute'"
-                :key="event.uid"
-              >
-              </div>
+              <template>
+                <v-sheet
+                  title=""
+                  color="black"
+                  width="20px"
+                  :height="minutesToPixels(getIntervalEventLength(hour,day,month-1,year,event))"
+                  tile
+                  :key="event.uid"
+                  style="z-index:1;position:absolute"
+                ></v-sheet>
+              </template>
             </template>
           </template>
           <template v-slot:event="{event, timed, timeSummary}">
@@ -281,7 +287,6 @@ function constructUIEvents(event, calendar, viewStart, viewEnd) {
       }
     }
     i_offset = Math.max(i_offset, 0)
-    console.log(i_offset)
 
     if (rrule.endtype == 'COUNT') {
       rrule.end = parseInt(rrule.end)
@@ -412,7 +417,6 @@ export default {
           }
         }
       }
-
       // adding tower events for towernutzung
       if (towernutzung && this.towerCalendar && this.towerCalendar.active) {
         this.towerCalendar.events.forEach(event => {

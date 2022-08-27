@@ -85,7 +85,7 @@ export default {
 
   computed: {
     calendars: function ()  {
-      return readCalendarsWithoutTower(this.$store)
+      return readCalendars(this.$store)
     },
 
     towerCalendar: function() {
@@ -94,7 +94,6 @@ export default {
     
     calendar: {
       get() {
-        if (this.tower) return this.towerCalendar
         return this.calendars.find(x => x.uid == this.calendarId)
       },
       set(object) {
@@ -124,7 +123,7 @@ export default {
     },
     clicked() {
       dispatchUpdateCalendar(this.$store, this.calendar);
-      this.$emit('change');
+      this.$emit('change', this.calendar);
     }
   }
   

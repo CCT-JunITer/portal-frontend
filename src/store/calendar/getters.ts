@@ -11,9 +11,7 @@ export const getters = {
   },
 
   getCalendarsWithoutTower(state: CalendarState) {
-    const calendars = [...state.calendars]
-    calendars.filter(x => {return x.uid && !TowerCalendarIDs.has(x.uid)})
-    return calendars
+    return state.calendars.filter(x => x.uid && !TowerCalendarIDs.has(x.uid))
   },
 
   getSelectedEvent(state: CalendarState) {

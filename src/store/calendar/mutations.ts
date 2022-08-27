@@ -59,9 +59,11 @@ export const mutations = {
 
   updateCalendars(state: CalendarState, payload: {calendars: ICalendar[]; start?: Date; end?: Date}) {
     payload.calendars.forEach((c) => {
-      Replacements.forEach((ss) => {
-        c.name = c.name.replace(ss, '')
-      })
+      if (c.name) {
+        Replacements.forEach((ss) => {
+          c.name = c.name.replace(ss, '')
+        })
+      }
       
       // console.log('updating from ' + payload.start?.toISOString() + ' to ' + payload.end?.toISOString() + ' at calendar "' + c.uid + '"')
       // console.log(payload.calendars)
@@ -89,7 +91,6 @@ export const mutations = {
   },
 
   updateCalendarRights(state: CalendarState, payload: {calendars: ICalendar[]}) {
-    console.log(payload.calendars)
     if (payload.calendars) {
       payload.calendars.forEach(c => {
         const calendar_object = state.calendars.find(x => {return x.uid && x.uid == c.uid})

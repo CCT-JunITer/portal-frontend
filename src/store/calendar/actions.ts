@@ -76,11 +76,10 @@ export const actions = {
   async actionUpdateCalendar(context: MainContext, calendar) {
     const calendarCopy = {
       name: calendar.name,
-      uid: calendar.name,
+      uid: calendar.uid,
       events: calendar.events,
       color: calendar.color,
-      active: calendar.active,
-      rights: calendar.rights
+      active: calendar.active
     }
     const response = await apiCall(context, token => api.updateCalendar(token, calendarCopy))
     return response.data
