@@ -28,7 +28,7 @@
             mdi-fullscreen-exit
           </v-icon>
         </v-btn>
-        <v-toolbar-title>
+        <v-toolbar-title style="width:100%">
           <v-text-field
             v-model="selectedEventInternal.name"
             flat
@@ -88,6 +88,7 @@
           return-object
           label="Kalender"
           :disabled="!updatable"
+          :class="(fullscreen) ? 'mt-5' : ''" 
           outlined
         ></v-select>
 
