@@ -7,6 +7,7 @@
       label="Ort"
       full-width
       :disabled="disabled"
+      :readonly="readonly"
     >
     </v-text-field>
     <v-select
@@ -18,6 +19,7 @@
       class="ml-3"
       label="Typ"
       :disabled="disabled"
+      :readonly="readonly"
       style="width:60px;align-self:flex-end"
     >
     </v-select>
@@ -50,7 +52,7 @@
 
 <script>
 export default {
-  props: ['value', 'disabled'],
+  props: ['value', 'disabled', 'readonly'],
   
   model: {
     prop:'value',

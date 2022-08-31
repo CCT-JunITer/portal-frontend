@@ -30,11 +30,14 @@
         </v-btn>
         <v-toolbar-title style="width:100%">
           <v-text-field
+            class="mt-3"
             v-model="selectedEventInternal.name"
             flat
             full-width
-            :disabled="!updatable"
-          ></v-text-field>
+            :solo="!updatable"
+            :readonly="!updatable"
+          >
+          </v-text-field>
         </v-toolbar-title>
         <v-spacer></v-spacer>
         <v-menu offset-y>
@@ -80,17 +83,26 @@
         </v-menu>
       </v-toolbar>
       <v-card-text>
+        <div v-if="fullscreen" class="mt-5"></div>
         <v-select
+          v-if="updatable"
           :items="calendars"
           v-model="calendar"
           item-text="name"
           item-value="uid"
           return-object
           label="Kalender"
-          :disabled="!updatable"
-          :class="(fullscreen) ? 'mt-5' : ''" 
           outlined
         ></v-select>
+        <v-text-field
+          v-else
+          :value="(calendar) ? calendar.name : ''"
+          outlined
+          label="Kalender"
+          readonly
+        >
+
+        </v-text-field>
 
         <div style="display:flex">
           <component
@@ -109,7 +121,7 @@
                 prepend-icon="mdi-calendar-range"
                 required
                 :rules="[$common.required]"
-                :disabled="!updatable"
+                :readonly="!updatable"
               ></v-text-field>
             </template>
           </component>
@@ -121,6 +133,7 @@
             :is="selectedEventInternal.timed ? 'date-time-picker-menu' : 'date-picker-menu'"
             v-model ="endDate"
             defaultPicker="DATE"
+            :disabled="!updatable"
             :pickerProps="{}"
           >
             <template v-slot:activator="{ on, attrs, }">
@@ -132,7 +145,7 @@
                 prepend-icon="mdi-calendar-range"
                 required
                 :rules="[$common.required]"
-                :disabled="!updatable"
+                :readonly="!updatable"
               ></v-text-field>
             </template>
           </component>
@@ -142,7 +155,7 @@
           style="padding:0;margin:0"
           :value="!selectedEventInternal.timed"
           :input-value="!selectedEventInternal.timed"
-          :disabled="!updatable"
+          :readonly="!updatable"
           @change="timedChanged"
           label="ganztägig"
         ></v-checkbox>
@@ -150,7 +163,7 @@
         <calendar-event-location-component
           v-if="selectedOpen"
           v-model="selectedEventInternal"
-          :disabled="!updatable"
+          :readonly="!updatable"
         > 
         </calendar-event-location-component>
 
@@ -166,7 +179,7 @@
           v-model="selectedEventInternal.description"
           filled
           label="Beschreibung"
-          :disabled="!updatable"
+          :readonly="!updatable"
         ></v-textarea>
 
       </v-card-text>
@@ -428,19 +441,6 @@ export default {
         e.text = e.name
       })
       return calendars
-    },
-
-    uiCalendars() {
-      const calendarNames = []
-      if (this.calendars.forEach) {
-        this.calendars.forEach(element => {
-          calendarNames.push({
-            text:element.name,
-            element:element
-          })
-        });
-      }
-      return calendarNames
     },
 
     selectedEvent: function () {
