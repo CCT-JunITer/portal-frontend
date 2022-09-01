@@ -7,18 +7,27 @@
         v-on="on"
         v-bind="attrs"
         style="background:transparent;padding:0"
-        @change="clicked"
+        @click="clicked"
       >
         <v-checkbox 
-          style="width:100%;"
-          class="text-truncate text-no-wrap"
+          v-if="calendar.loading == 0"
+          class="text-truncate text-no-wrap mr-1"
           v-model="calendar.active"
           :color="calendar.color"
-          @change="clicked"
+          @click="clicked"
           ripple
-          :label="calendar.name"
         >
         </v-checkbox>
+        <v-progress-circular
+          v-else
+          class="mr-2 text-center"
+          indeterminate
+          size="30"
+          :color="calendar.color"
+        >
+          {{calendar.loading}}
+        </v-progress-circular>
+        <v-label><div style="letter-spacing:normal">{{calendar.name}}</div></v-label>
 
         <div style="width:100%; flex-shrink:100"></div>
         <div >
@@ -47,13 +56,15 @@
           </v-menu>
         </div>
       </v-btn>
-      <v-progress-linear
-        v-if="calendar.loading"
+      <!-- <v-progress-linear
+        :active="loading > 0"
         indeterminate
         absolute
         bottom
-        color="primary"
-      ></v-progress-linear>
+        :color="(calendar.color) ? calendar.color : 'primary'"
+      >
+      </v-progress-linear> -->
+
     </template>
     {{calendar.name}}
   </v-tooltip>
@@ -78,7 +89,6 @@ export default {
 
   data() {
     return {
-      editable:false,
       nameDialog: false,
     }
   },
@@ -99,6 +109,10 @@ export default {
       set(object) {
         commitUpdateCalendars(this.$store, [object])
       }
+    },
+
+    loading: function(){
+      return (this.calendar.loading) ? this.calendar.loading : 0
     }
   },
   methods: {
@@ -121,10 +135,21 @@ export default {
     editColor() {
       this.editName()
     },
+
     clicked() {
+      this.calendar.active = !this.calendar.active
+      console.log(this.calendar.active)
+      this.updateCalendar()
+    },
+
+    updateCalendar() {
       dispatchUpdateCalendar(this.$store, this.calendar);
       this.$emit('change', this.calendar);
-    }
+    },
+    editable() {
+      if (!this.calendar) return false
+      return this.calendar.rights.includes('u')
+    },
   }
   
 }

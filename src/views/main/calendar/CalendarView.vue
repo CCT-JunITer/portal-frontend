@@ -353,6 +353,7 @@ export default {
 
   async created() {
     this.update(true);
+    dispatchFetchCalendarRights(this.$store, {})
   },
 
   data: () => ({
@@ -374,7 +375,7 @@ export default {
     dragDiv: null,
   }),
   methods: {
-    async getEvents (payload, notify=true, fetch=false, calendarIds=undefined) {
+    async getEvents (payload, notify=false, fetch=false, calendarIds=undefined) {
       const {start, end} = this.getDateTimespan()
 
       if (start && end && !fetch) {
@@ -392,7 +393,6 @@ export default {
         }
         
         await dispatchFetchCalendars(this.$store, {notify:notify, start:start, end:end, calendarIds:calendarIds})
-        dispatchFetchCalendarRights(this.$store, {})
       }
 
       const events = []

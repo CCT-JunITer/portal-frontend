@@ -86,6 +86,14 @@ export const actions = {
   },
 
   async actionFetchCalendars(context: MainContext, payload: {notify: boolean; start?: Date; end?: Date; calendarIds?: string[]}) {
+    let calendars = readCalendars(context);
+    if (payload.calendarIds) {
+      calendars.filter(x => x.uid && payload.calendarIds?.includes(x.uid))
+    }
+    const changes: any = []
+    calendars.forEach(x => {changes.push({uid:x.uid, loading:x.loading})})
+    commitUpdateCalendars(context, {calendars:changes, loadingOffset:1})
+    
     let response;
     let calendarIdsString: undefined|string = undefined
     if (payload.calendarIds) {
@@ -98,7 +106,7 @@ export const actions = {
       response = await apiCall(context, token => api.datesearch(token, payload.start, payload.end, calendarIdsString))
     }
 
-    const calendars = response.data
+    calendars = response.data
     // initing the events correctly. Dates are not parsed
     calendars.forEach(calendar => {
       calendar.events.forEach(event => {
@@ -106,7 +114,7 @@ export const actions = {
         event.end = new Date(event.end)
       });
     });
-    commitUpdateCalendars(context, {calendars:calendars, start:payload.start, end:payload.end})
+    commitUpdateCalendars(context, {calendars:calendars, start:payload.start, end:payload.end, loadingOffset:-1})
   },
 
   async actionDeleteCalendar(context: MainContext, calendarId: string) {

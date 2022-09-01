@@ -373,5 +373,5 @@ export interface ICalendar {
     active?: boolean;
     uid?: string;
     rights: string; // this String can contain ['c', 'r', 'u', 'd'] (create, read, update, delete)
-    loading?: boolean;
+    loading?: number;
 }

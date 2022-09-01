@@ -57,7 +57,8 @@ export const mutations = {
     }
   },
 
-  updateCalendars(state: CalendarState, payload: {calendars: ICalendar[]; start?: Date; end?: Date}) {
+  updateCalendars(state: CalendarState, payload: {calendars: ICalendar[]; start?: Date; end?: Date, loadingOffset?: number}) {
+    const loadingOffset = (payload.loadingOffset) ? payload.loadingOffset : 0;
     payload.calendars.forEach((c) => {
       if (c.name) {
         Replacements.forEach((ss) => {
@@ -82,8 +83,14 @@ export const mutations = {
             }
           })
         }
+        if (calendarObject.loading) c.loading = calendarObject.loading+loadingOffset
+        else c.loading = loadingOffset
+        c.loading = Math.max(c.loading, 0)
+
         Object.assign(calendarObject, c)
+        console.log(calendarObject.loading)
       } else {
+        c.loading = 0;
         state.calendars.push(c)
       }
     })
