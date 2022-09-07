@@ -125,22 +125,29 @@
 
           <v-spacer></v-spacer>
           <v-btn-toggle
+            v-if="windowWidth > 900"
             v-model="type"
             group
             mandatory
           >
-            <v-btn value="day">
-              Tag
-            </v-btn>
-
-            <v-btn value="week">
-              Woche
-            </v-btn>
-
-            <v-btn value="month">
-              Monat
+            <v-btn 
+              v-for="item in types"
+              :value="item.value"
+              :key="item.value"
+            >
+              {{item.name}}
             </v-btn>
           </v-btn-toggle>
+          <v-select
+            v-else
+            style="top:20px;width:25px"
+            v-model="type"
+            :items="types"
+            item-text="name"
+            item-value="value"
+            label="Ansicht"
+          >
+          </v-select>
         </v-toolbar>
       </v-sheet>
       <div class ="VCalendarView">
@@ -354,6 +361,11 @@ export default {
   async created() {
     this.update(true);
     dispatchFetchCalendarRights(this.$store, {})
+    window.addEventListener('resize', this.windowResized);
+  },
+
+  destroyed() {
+    window.removeEventListener('resize', this.windowResized);
   },
 
   data: () => ({
@@ -362,7 +374,15 @@ export default {
     towerIndicatorIntervals:[0,15,30,45],
     towerIndicatorIntervalLength:1000*60*15, // 15 minutes
     events: [],
+    types: [
+      {name:'Tag', value:'day'},
+      {name:'Woche', value:'week'},
+      {name:'Monat', value:'month'}
+    ],
     nextcloudViewTypes: {'day':'timeGridDay', 'week':'timeGridWeek', 'month':'dayGridMonth'},
+
+    windowWidth: window.innerWidth,
+    windowHeight: window.innerHeight,
 
     newEvent: undefined,
 
@@ -428,6 +448,11 @@ export default {
       }
 
       this.events = events
+    },
+
+    windowResized() {
+      this.windowWidth = window.innerWidth
+      this.windowHeight = window.innerHeight
     },
 
     async update(notify, fetch=true, calendarIds=undefined) {
