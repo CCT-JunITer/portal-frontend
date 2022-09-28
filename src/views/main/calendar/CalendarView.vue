@@ -182,12 +182,14 @@
               <template>
                 <v-sheet
                   title=""
+                  class="clickable"
                   color="black"
                   width="20px"
                   :height="minutesToPixels(getIntervalEventLength(hour,day,month-1,year,event))"
                   tile
                   :key="event.uid"
                   style="z-index:1;position:absolute"
+                  @click="(clickEvent) => {showEvent({nativeEvent:clickEvent, event:event})}"
                 ></v-sheet>
               </template>
             </template>
@@ -418,8 +420,8 @@ export default {
       const events = []
       this.newEvent = undefined
       const towerIds = new Set()
-      console.log(this.calendars)
-      //console.log([...this.calendars, this.towerCalendar])
+      console.log(this.allCalendars)
+
       const towernutzung = this.towernutzung
       for (let i = 0; i < this.calendars.length; i++) {
         const activeCalendar = this.calendars[i];
@@ -841,6 +843,11 @@ export default {
 
   },
 
+  mounted() {
+    // this ensures that the calendar scrolls initially to the bottom of the page
+    this.$refs.calendar.$children[0].scrollToTime(1000*60*60*24)
+  },
+
 
   watch: {
     towernutzung(val) {
@@ -879,6 +886,10 @@ export default {
   flex-direction: column;
   flex-basis:350px;
   flex-shrink:0;
+}
+
+.clickable:hover {
+  cursor:pointer
 }
 
 @media (max-width: 600px){
