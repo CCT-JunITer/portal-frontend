@@ -152,15 +152,27 @@
             </template>
           </component>
         </div>
+        
+        <div style="margin-left:25px; margin-top: 10px;display:flex;justify-content: flex-start; align-items:center;">
+          <v-checkbox 
+            style="padding:0;margin:0"
+            :value="!selectedEventInternal.timed"
+            :input-value="!selectedEventInternal.timed"
+            :readonly="!updatable"
+            hide-details
+            @change="timedChanged"
+            label="ganztägig"
+          ></v-checkbox>
 
-        <v-checkbox 
-          style="padding:0;margin:0"
-          :value="!selectedEventInternal.timed"
-          :input-value="!selectedEventInternal.timed"
-          :readonly="!updatable"
-          @change="timedChanged"
-          label="ganztägig"
-        ></v-checkbox>
+          <calendar-r-rule-editor-component
+            style="margin-left:10px;flex-grow: 1;"
+            v-model="selectedEventInternal.rrule"
+            :readonly="!updatable"
+          >
+          </calendar-r-rule-editor-component>
+
+          <!-- <div style="width:100%;flex-shrink: 1;"></div> -->
+        </div>
 
         <calendar-event-location-component
           v-if="selectedOpen"
@@ -232,6 +244,7 @@ import intervalToDuration from 'date-fns/intervalToDuration'
 import add from 'date-fns/add'
 import sub from 'date-fns/sub'
 import { dispatchUpdateEvent } from '@/store/event/actions'
+import CalendarRRuleEditorComponent from './components/CalendarRRuleEditorComponent.vue'
 
 export default {
   props: {
@@ -242,6 +255,7 @@ export default {
     CalendarEventLocationComponent,
     DateTimePickerMenu,
     DatePickerMenu,
+    CalendarRRuleEditorComponent,
   },
 
   emits: ['clickEditEvent', 'close', 'changed'],
@@ -255,7 +269,7 @@ export default {
       calendar: undefined,
 
       cctLocations: ['Tower', 'CCTelefon'],
-      selectedEventInternal:{calendar:{name:''}, start:new Date(), end:new Date(), timed:true},
+      selectedEventInternal:{calendar:{name:''}, start:new Date(), end:new Date(), timed:true, rrule:undefined},
       loading:false,
       loadingExdate:false,
     }
