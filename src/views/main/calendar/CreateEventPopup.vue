@@ -88,6 +88,7 @@
           v-if="updatable"
           :items="calendars"
           v-model="calendar"
+          prepend-icon="mdi-calendar"
           item-text="name"
           item-value="uid"
           return-object
@@ -98,6 +99,7 @@
           v-else
           :value="(calendar) ? calendar.name : ''"
           outlined
+          prepend-icon="mdi-calendar"
           label="Kalender"
           readonly
         >
