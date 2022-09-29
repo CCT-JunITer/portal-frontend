@@ -358,7 +358,7 @@ export interface ICalendarEvent {
     participants: ICalendarAttendee[];
     notifications: ICalendarNotification[];
     categories: string[];
-    color: string;
+    eventColor: string;
     rrule: ICalendarRRule;
     uid: string;
     calendarId: string;

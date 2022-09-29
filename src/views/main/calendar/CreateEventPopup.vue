@@ -9,13 +9,11 @@
     fullscreen
   >
     <v-card
-      color="grey lighten-4"
       min-width="400px"
       flat
     >
       <v-toolbar
-        :color="selectedEvent.color"
-        dark
+        :color="eventColor"
       >
         <v-btn 
           icon
@@ -84,29 +82,41 @@
       </v-toolbar>
       <v-card-text>
         <div v-if="fullscreen" class="mt-5"></div>
-        <v-select
-          v-if="updatable"
-          :items="calendars"
-          v-model="calendar"
-          prepend-icon="mdi-calendar"
-          item-text="name"
-          item-value="uid"
-          return-object
-          label="Kalender"
-          outlined
-        ></v-select>
-        <v-text-field
-          v-else
-          :value="(calendar) ? calendar.name : ''"
-          outlined
-          prepend-icon="mdi-calendar"
-          label="Kalender"
-          readonly
-        >
 
-        </v-text-field>
+        <div style="display:flex; align-items:center;">
+          <v-icon class="mr-1">mdi-calendar</v-icon>
+          
+          <v-select
+            v-if="updatable"
+            :items="calendars"
+            item-color="color"
+            v-model="calendar"
+            item-text="name"
+            item-value="uid"
+            return-object
+            label="Kalender"
+            outlined
+            hide-details
+          >
+            <template v-slot:item="{item}">
+              <div>{{item.name}}</div> <v-spacer></v-spacer> <v-icon :color="item.color">mdi-circle</v-icon>
+            </template>
 
-        <div style="display:flex">
+          </v-select>
+          <v-text-field
+            v-else
+            :value="(calendar) ? calendar.name : ''"
+            outlined
+            label="Kalender"
+            readonly
+            hide-details
+          ></v-text-field>
+          <calendar-color-picker-component
+            v-model="eventColor"
+          ></calendar-color-picker-component>
+        </div>
+
+        <div style="display:flex;">
           <component
             :is="selectedEventInternal.timed ? 'date-time-picker-menu' : 'date-picker-menu'"
             v-model ="startDate"
@@ -153,26 +163,32 @@
           </component>
         </div>
         
-        <div style="margin-left:25px; margin-top: 10px;display:flex;justify-content: flex-start; align-items:center;">
-          <v-checkbox 
-            style="padding:0;margin:0"
-            :value="!selectedEventInternal.timed"
-            :input-value="!selectedEventInternal.timed"
-            :readonly="!updatable"
-            hide-details
-            @change="timedChanged"
-            label="ganztägig"
-          ></v-checkbox>
-
-          <calendar-r-rule-editor-component
-            style="margin-left:10px;flex-grow: 1;"
-            v-model="selectedEventInternal.rrule"
-            :readonly="!updatable"
-          >
-          </calendar-r-rule-editor-component>
-
-          <!-- <div style="width:100%;flex-shrink: 1;"></div> -->
-        </div>
+        <!-- <div style="margin-left:25px; margin-top: 10px;display:flex;justify-content: flex-start; align-items:center;"> -->
+        <v-container style="margin-left:20px;margin-top:0">
+          <v-row align-content="center">
+            <v-col cols="auto" align-self="center">
+              <v-checkbox 
+                style="padding:0;margin:0"
+                :value="!selectedEventInternal.timed"
+                :input-value="!selectedEventInternal.timed"
+                :readonly="!updatable"
+                hide-details
+                @change="timedChanged"
+                label="ganztägig"
+              ></v-checkbox>
+            </v-col>
+  
+            <v-col>
+              <calendar-r-rule-editor-component
+                v-model="selectedEventInternal.rrule"
+                :readonly="!updatable"
+              >
+              </calendar-r-rule-editor-component>
+            </v-col>
+            <v-spacer></v-spacer>
+          </v-row>
+        </v-container>
+        <!-- </div> -->
 
         <calendar-event-location-component
           v-if="selectedOpen"
@@ -204,7 +220,7 @@
           color="secondary"
           @click="close"
         >
-          Cancel
+          Abbrechen
         </v-btn>
 
         <v-spacer></v-spacer>
@@ -245,6 +261,7 @@ import add from 'date-fns/add'
 import sub from 'date-fns/sub'
 import { dispatchUpdateEvent } from '@/store/event/actions'
 import CalendarRRuleEditorComponent from './components/CalendarRRuleEditorComponent.vue'
+import CalendarColorPickerComponent from './components/CalendarColorPickerComponent.vue'
 
 export default {
   props: {
@@ -256,6 +273,7 @@ export default {
     DateTimePickerMenu,
     DatePickerMenu,
     CalendarRRuleEditorComponent,
+    CalendarColorPickerComponent
   },
 
   emits: ['clickEditEvent', 'close', 'changed'],
@@ -266,7 +284,7 @@ export default {
       selectedOpen: false,
       fullscreen: false,
 
-      calendar: undefined,
+      calendar: {colo:'white', rights:'r'},
 
       cctLocations: ['Tower', 'CCTelefon'],
       selectedEventInternal:{calendar:{name:''}, start:new Date(), end:new Date(), timed:true, rrule:undefined},
@@ -337,6 +355,7 @@ export default {
       this.loading = loading;
       const savedEvent = Object.assign({},this.selectedEventInternal)
       Object.assign(savedEvent, changes)
+      console.log(savedEvent)
       if (this.calendar.uid != savedEvent.calendarId) {
         // TODO: disable notifications for remove event
         await dispatchRemoveEvent(this.$store, {uid:savedEvent.uid, calendarId:savedEvent.calendarId, notify:false})
@@ -396,6 +415,18 @@ export default {
   },
 
   computed: {
+    eventColor: {
+      get() {
+        let color = this.selectedEventInternal.eventColor
+        if (!color || color == '') color = this.calendar.color
+        return color
+      },
+
+      set(val) {
+        this.selectedEventInternal.eventColor = val
+      }
+    },
+
     startDate: {
       get() {
         return this.selectedEventInternal.start;
@@ -450,6 +481,7 @@ export default {
     },
 
     calendars: function ()  {
+      // TODO: filter out calendars that does not have create right
       const calendars = [...readCalendarsWithoutTower(this.$store)]
       if (this.towerCalendar && this.selectedEvent.calendarId == this.towerCalendar.uid) calendars.push(this.towerCalendar)
       

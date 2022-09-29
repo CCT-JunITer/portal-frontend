@@ -61,7 +61,7 @@ export default {
 
   data() {
     const cctLocations = [
-      {name: 'custom', location: '', locationId:undefined, textfieldDisabled:false},
+      {name: 'Benutzerdefiniert', location: '', locationId:undefined, textfieldDisabled:false},
       {name: 'Tower', location: 'Erweiterungsbau der TU Berlin, Str. des 17. Juni 145, 10623 Berlin, Raum 512', locationId:'tower', textfieldDisabled:true},
       {name: 'CCTelefon', location: 'https://zoom.us/j/2814954064?pwd=ME1GbWNjV3ptemVHL3Y3cGE2VWRHQT09', locationId:'cctelefon', textfieldDisabled:true}
     ]

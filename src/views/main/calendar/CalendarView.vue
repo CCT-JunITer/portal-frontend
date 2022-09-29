@@ -244,41 +244,12 @@ import { readCalendars, readCalendarsWithoutTower, readSelectedEvent, readTowerC
 import { CalendarEvent } from './CalendarEvent';
 import { readAuthenticationURL } from '@/store/main/getters';
 
-/*
-  this function generates all ui events from a given event. There can be more ui events due to recurring events. The backend generates the date intervals for this according to the standard
-*/
-function constructUIEventsFromDates(event, calendar, viewStart, viewEnd) { 
-  const events = []
-  let event_color = (calendar.color) ? calendar.color : 'blue';
-  if (event.eventColor) {
-    const rgb = keyword.rgb(event.eventColor)
-    event_color = 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')'
-  }
-
-  event.dates.forEach((d, i, array) => {
-    events.push({
-      name:event.name,
-      start:new Date(d[0]),
-      end:new Date(d[1]),
-      color:event_color,
-      timed:event.timed,
-      event:event,
-      iteration:i
-    })
-  })
-  return events
-}
 
 
 const FREQUENCIES = {'SECONDLY':1000, 'MINUTELY':60000, 'HOURLY':3600000, 'DAILY':86400000, 'WEEKLY':604800000}
 function constructUIEvents(event, calendar, viewStart, viewEnd) {
   
   const events = []
-  let event_color = (calendar.color) ? calendar.color : 'blue';
-  if (event.eventColor) {
-    const rgb = keyword.rgb(event.eventColor)
-    event_color = 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')'
-  }
 
   const rrule = event.rrule
   let condition = (i, date) => {return i < 1};
@@ -344,7 +315,7 @@ function constructUIEvents(event, calendar, viewStart, viewEnd) {
       name:event.name,
       start:event_start,
       end:event_end,
-      color:event_color,
+      color:event.eventColor,
       timed:event.timed,
       event:event,
       iteration:i
@@ -564,6 +535,7 @@ export default {
         event.calendarId = calendar.uid
         if (this.towernutzung) event.locationId = 'tower'
         event.dates = [[event.start, event.end]]
+        event.eventColor = calendar.color
 
         const uiEvent = constructUIEvents(event, calendar, this.viewStart, this.viewEnd);
         this.events.push(...uiEvent);
