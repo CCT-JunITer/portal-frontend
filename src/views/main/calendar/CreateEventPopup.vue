@@ -14,6 +14,7 @@
     >
       <v-toolbar
         :color="eventColor"
+        :dark="darkmode"
       >
         <v-btn 
           icon
@@ -264,6 +265,17 @@ import { dispatchUpdateEvent } from '@/store/event/actions'
 import CalendarRRuleEditorComponent from './components/CalendarRRuleEditorComponent.vue'
 import CalendarColorPickerComponent from './components/CalendarColorPickerComponent.vue'
 
+function hexToRgb(c){
+  if(/^#([a-f0-9]{3}){1,2}$/.test(c)){
+    if(c.length== 4){
+      c= '#'+[c[1], c[1], c[2], c[2], c[3], c[3]].join('');
+    }
+    c= '0x'+c.substring(1);
+    return [(c>>16)&255, (c>>8)&255, c&255]
+  }
+  return undefined;
+}
+
 export default {
   props: {
 
@@ -408,7 +420,7 @@ export default {
       this.loading = true
       commitRemoveCalendarEvent(this.$store, this.selectedEventInternal);
       const response = await dispatchRemoveEvent(this.$store, this.selectedEventInternal, false)
-      this.$emit('changed')
+      this.$emit('changed') 
       this.close()
     },
 
@@ -421,6 +433,14 @@ export default {
   },
 
   computed: {
+    darkmode() { // this function is only used to determine if the toolbar should be in darkmode. This ensures, that the title has enough contrast to its background to read it properly
+      const rgb = hexToRgb(this.eventColor)
+      if (!rgb) return false
+      const brightness = rgb[0] + rgb[1] + rgb[2]
+      const darkness = 255*3 - brightness
+      return darkness >= brightness
+    },
+
     eventColor: {
       get() {
         let color = this.selectedEventInternal.eventColor
