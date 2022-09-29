@@ -3,8 +3,13 @@ import { CalendarState } from './state';
 import {getters} from './getters';
 import { getStoreAccessors } from 'typesafe-vuex';
 import { State } from '../state';
+import { keyword } from 'color-convert';
 
 const Replacements = [' (Calendar Bot)', ' (calendarbot)']
+
+function rgbToHex(r, g, b) {
+  return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+}
 
 export const mutations = {
 
@@ -88,12 +93,35 @@ export const mutations = {
         c.loading = Math.max(c.loading, 0)
 
         Object.assign(calendarObject, c)
-        console.log(calendarObject.loading)
       } else {
         c.loading = 0;
         state.calendars.push(c)
       }
+
+      // normalise the calendars and events such that all data has the same format
+      if (!c.color) c.color = '#0082C9' // this color is the default color of the nextcloud calendar that is displayed if no color is specified in the calendar data
+      
+      if (c.events) {
+        c.events.forEach(event => {
+          // correctly initialize the fetched objects
+          event.start = new Date(event.start)
+          event.end = new Date(event.end)
+          
+          // all colors should be hexvalues
+          let event_color = (c.color) ? c.color : 'blue';
+          if (event.eventColor) {
+            event_color = event.eventColor
+            const hexPattern = /[0-9A-Fa-f]{6}/g
+            if (!event_color.match(hexPattern)) { // TODO: colors in rgb format (rgb(x,y,z)) are not converted. Do that
+              const rgb = keyword.rgb(event.eventColor)
+              event_color = rgbToHex(rgb[0], rgb[1], rgb[2])
+            }
+          }
+          event.eventColor = event_color
+        })
+      }
     })
+
     // state.calendars = calendars
   },
 

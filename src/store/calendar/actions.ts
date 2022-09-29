@@ -45,7 +45,7 @@ export const actions = {
         participants: payload.event.participants,
         notifications: payload.event.notifications,
         categories: payload.event.categories,
-        color: payload.event.color,
+        eventColor: payload.event.eventColor,
         rrule: payload.event.rrule,
         uid: payload.event.uid,
         calendarId: payload.event.calendarId,
@@ -108,12 +108,12 @@ export const actions = {
 
     calendars = response.data
     // initing the events correctly. Dates are not parsed
-    calendars.forEach(calendar => {
-      calendar.events.forEach(event => {
-        event.start = new Date(event.start)
-        event.end = new Date(event.end)
-      });
-    });
+    // calendars.forEach(calendar => {
+    //   calendar.events.forEach(event => {
+    //     event.start = new Date(event.start)
+    //     event.end = new Date(event.end)
+    //   });
+    // });
     commitUpdateCalendars(context, {calendars:calendars, start:payload.start, end:payload.end, loadingOffset:-1})
   },
 
