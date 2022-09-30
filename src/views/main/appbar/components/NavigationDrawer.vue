@@ -1,10 +1,6 @@
 <template>
-  <v-navigation-drawer temporary v-model="showDrawer" fixed width="300px">
+  <v-navigation-drawer v-model="showDrawer" clipped app fixed width="300px" :style="`padding-top: ${$vuetify.application.top}px; z-index: 4; top: 0; max-height: unset;`">
     <template v-slot:prepend>
-      <v-app-bar dark :color="env === 'production' ? 'cctBlue' : 'cctOrange darken-3'" class="flex-grow-0">
-        <v-app-bar-nav-icon default @click.stop="switchShowDrawer"></v-app-bar-nav-icon>
-        <portal-button></portal-button>
-      </v-app-bar>
       <v-list dense nav>
         <v-list-item two-line v-if="userProfile">
           <v-list-item-avatar>
@@ -266,7 +262,6 @@
 
 <script lang="ts">
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
-import { env } from '@/env';
 import {
   readDashboardShowDrawer,
   readHasAdminAccess,
@@ -280,19 +275,18 @@ import {
   Vue,
   Component
 } from 'vue-property-decorator'
+import CustomAppBar from './CustomAppBar.vue';
 import PortalButton from './PortalButton.vue';
-
-
 
 @Component({
   components: {
     EmployeeProfilePicture,
-    PortalButton
+    PortalButton,
+    CustomAppBar
   }
 })
 export default class NavigationDrawer extends Vue {
 
-  public env = env;
   public hasAnyPermission = readHasAnyPermission(this.$store);
 
   public get hasAdminAccess() {

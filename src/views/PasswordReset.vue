@@ -10,10 +10,10 @@
               lazy-validation
               @submit.prevent="submit"
             >
-              <v-toolbar dark :color="env === 'production' ? 'cctBlue' : 'cctOrange darken-3'">
+              <custom-app-bar dark>
                 <portal-button></portal-button>
                 <v-spacer></v-spacer>
-              </v-toolbar>
+              </custom-app-bar>
               <v-card-text>
                 <v-alert
                   color="cctOrange"
@@ -60,20 +60,19 @@
 </template>
 
 <script lang="ts">
-import { env } from '@/env';
 import { dispatchResetPassword } from '@/store/main/actions';
 import { Vue, Component } from 'vue-property-decorator'
+import CustomAppBar from './main/appbar/components/CustomAppBar.vue';
 import PortalButton from './main/appbar/components/PortalButton.vue';
 
 @Component({
-  components: { PortalButton }
+  components: { PortalButton, CustomAppBar }
 })
 export default class UserProfileEditPassword extends Vue {
   public valid = false;
   public password1 = '';
   public password2 = '';
   public token = '';
-  public env = env;
 
   public async submit() {
     if ((this.$refs.form as HTMLFormElement).validate()) {
