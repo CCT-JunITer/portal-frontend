@@ -4,6 +4,7 @@
     offset-y
     mode="hexa"
     :close-on-content-click="false"
+    :disabled="disabled"
   >
     <template v-slot:activator="{ on, attrs }">
       <v-btn

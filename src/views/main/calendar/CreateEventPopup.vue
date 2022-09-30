@@ -115,6 +115,7 @@
           ></v-text-field>
           <calendar-color-picker-component
             v-model="eventColor"
+            :disabled="!updatable"
           ></calendar-color-picker-component>
         </div>
 
