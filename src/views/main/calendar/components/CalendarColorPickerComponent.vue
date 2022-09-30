@@ -17,7 +17,8 @@
         <v-icon>mdi-circle</v-icon>
       </v-btn>
     </template>
-    <v-card>
+    <v-card
+    >
       <v-card-text>
         <v-color-picker
           v-model="colorInternal"
@@ -51,11 +52,11 @@ export default {
       colorInternal: '',
       show:false,
       swatches: [
-        ['#FF0000', '#AA0000', '#550000'],
-        ['#FFFF00', '#AAAA00', '#555500'],
-        ['#00FF00', '#00AA00', '#005500'],
-        ['#00FFFF', '#00AAAA', '#005555'],
-        ['#0000FF', '#0000AA', '#000055'],
+        // those colors are from the google calendar
+        ['#d50000', '#e67c73', '#f4511e'],
+        ['#f6bf26', '#33b679', '#0b8043'],
+        ['#039be5', '#3f51b5', '#7986cb'],
+        ['#8e24aa', '#616161', '#795548'],
       ],
     }
   },
