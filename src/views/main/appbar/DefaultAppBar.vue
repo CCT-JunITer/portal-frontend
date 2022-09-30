@@ -1,5 +1,10 @@
 <template>
-  <v-app-bar dark :color="env === 'production' ? 'cctBlue' : 'cctOrange darken-3'" class="flex-grow-0" app ref="toolbar" v-mutate="onMutate">
+  <custom-app-bar
+    dark 
+    app
+    clipped-left
+    fixed
+  >
     <v-app-bar-nav-icon default @click.stop="switchShowDrawer"></v-app-bar-nav-icon>
     <portal-button></portal-button>
     <v-container class="pa-0">
@@ -7,7 +12,7 @@
     </v-container>
     
     <user-menu></user-menu>
-  </v-app-bar>
+  </custom-app-bar>
 </template>
 
 <script lang="ts">
@@ -19,14 +24,13 @@ import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture
 import SearchBar from './components/SearchBar.vue';
 import UserMenu from './components/UserMenu.vue';
 import PortalButton from './components/PortalButton.vue';
-import { env } from '@/env';
+import CustomAppBar from './components/CustomAppBar.vue';
 
 @Component({
-  components: { EmployeeProfilePicture, UserMenu, SearchBar, PortalButton },
+  components: { EmployeeProfilePicture, UserMenu, SearchBar, PortalButton, CustomAppBar },
 })
 export default class DefaultAppBar extends Vue {
 
-  public env = env;
 
   public get userProfile() {
     return readUserProfile(this.$store);
@@ -37,15 +41,6 @@ export default class DefaultAppBar extends Vue {
       this.$store,
       !readDashboardShowDrawer(this.$store),
     );
-  }
-
-  onMutate() {
-    let height = '0'
-    const toolbar = this.$refs.toolbar
-    if (toolbar) {
-      height = `${(toolbar as any).$el.offsetHeight}px`
-    }
-    document.documentElement.style.setProperty('--toolbarHeight', height)
   }
 }
 </script>

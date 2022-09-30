@@ -1,8 +1,8 @@
 <template>
   <div>
-    <v-app-bar dark color="cctBlue" class="flex-grow-0" app>
+    <custom-app-bar dark color="cctBlue" class="flex-grow-0" app>
       <portal-button :to="null"></portal-button>
-    </v-app-bar>
+    </custom-app-bar>
 
 
     <v-main>
@@ -368,6 +368,8 @@ import AvatarCropperDialog from '@/components/AvatarCropperDialog.vue';
 import DatePickerMenu from '@/components/DatePickerMenu.vue';
 import jwt_decode from 'jwt-decode';
 import PortalButton from './appbar/components/PortalButton.vue';
+import CustomAppBar from './appbar/components/CustomAppBar.vue';
+
 
 @Component({
   components: {
@@ -377,6 +379,7 @@ import PortalButton from './appbar/components/PortalButton.vue';
     VueTelInputVuetify,
     DatePickerMenu,
     PortalButton,
+    CustomAppBar
   },
 })
 export default class AccountCreate extends Vue {

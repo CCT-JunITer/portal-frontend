@@ -5,10 +5,10 @@
         <v-flex xs12 sm8 md4>
           <v-card elevation="10">
             <v-form @submit.prevent="submit">
-              <v-toolbar dark :color="env === 'production' ? 'cctBlue' : 'cctOrange darken-3'">
+              <custom-app-bar dark>
                 <portal-button></portal-button>
                 <v-spacer></v-spacer>
-              </v-toolbar>
+              </custom-app-bar>
               <v-card-text>
                 <v-text-field
                   prepend-icon="person" 
@@ -48,15 +48,14 @@ import { Component, Vue } from 'vue-property-decorator';
 import { readLoginError } from '@/store/main/getters';
 import { dispatchLogIn } from '@/store/main/actions';
 import PortalButton from './main/appbar/components/PortalButton.vue';
-import { env } from '@/env';
+import CustomAppBar from './main/appbar/components/CustomAppBar.vue';
 
 @Component({
-  components: { PortalButton }
+  components: { PortalButton, CustomAppBar }
 })
 export default class Login extends Vue {
   public email = '';
   public password = '';
-  public env = env;
 
   public get loginError() {
     return readLoginError(this.$store);

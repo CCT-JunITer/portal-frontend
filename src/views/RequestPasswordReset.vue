@@ -10,7 +10,7 @@
             @submit.prevent="submit"
           >
             <v-card elevation="10">
-              <v-toolbar dark :color="env === 'production' ? 'cctBlue' : 'cctOrange darken-3'">
+              <custom-app-bar dark>
                 <v-btn icon to="/login">
                   <v-icon>
                     mdi-arrow-left
@@ -18,7 +18,7 @@
                 </v-btn>
                 <portal-button></portal-button>
                 <v-spacer></v-spacer>
-              </v-toolbar>
+              </custom-app-bar>
               <v-card-text>
                 <v-text-field
                   v-model="email"
@@ -54,14 +54,13 @@ import { Component, Vue } from 'vue-property-decorator';
 import { readLoginError } from '@/store/main/getters';
 import { dispatchPasswordRecovery } from '@/store/main/actions';
 import PortalButton from './main/appbar/components/PortalButton.vue';
-import { env } from '@/env';
+import CustomAppBar from './main/appbar/components/CustomAppBar.vue';
 
 @Component({
-  components: { PortalButton }
+  components: { PortalButton, CustomAppBar }
 })
 export default class RequestPasswordReset extends Vue {
   public email = '';
-  public env = env;
   public valid = false;
 
   public get loginError() {
