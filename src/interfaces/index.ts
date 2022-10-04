@@ -334,6 +334,7 @@ export interface ICalendarNotification {
 
 export interface ICalendarRRule {
     freq: string;
+    interval:number;
     endtype: string;
     end: number|Date;
     exdate: Date[];

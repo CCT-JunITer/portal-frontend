@@ -283,21 +283,23 @@ function constructUIEvents(event, calendar, viewStart, viewEnd) {
 
   let event_start = event.start;
   let event_end = event.end;
+  let interval = 1
+  if (rrule && rrule.interval) interval = rrule.interval
   for (let i = i_offset; condition(i, event_start); i++) {
     event_start = new Date(event.start)
     event_end = new Date(event.end)
 
     if (rrule) {
       if (rrule.freq == 'MONTHLY') {
-        event_start.setMonth(event_start.getMonth()+i)
-        event_end.setMonth(event_end.getMonth()+i)
+        event_start.setMonth(event_start.getMonth()+(i*interval))
+        event_end.setMonth(event_end.getMonth()+(i*interval))
       } else if (rrule.freq == 'YEARLY') {
-        event_start.setFullYear(event_start.getFullYear()+i)
-        event_end.setFullYear(event_end.getFullYear()+i)
+        event_start.setFullYear(event_start.getFullYear()+(i*interval))
+        event_end.setFullYear(event_end.getFullYear()+(i*interval))
       } else {
         if (rrule.freq in FREQUENCIES) {
-          event_start = new Date(event_start - (FREQUENCIES[rrule.freq]*-i))
-          event_end = new Date(event_end - (FREQUENCIES[rrule.freq]*-i))
+          event_start = new Date(event_start - (FREQUENCIES[rrule.freq]*-(i*interval)))
+          event_end = new Date(event_end - (FREQUENCIES[rrule.freq]*-(i*interval)))
         }
       }
 
