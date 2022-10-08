@@ -5,6 +5,7 @@ import Router, { Route } from 'vue-router';
 import RouterComponent from './components/RouterComponent.vue';
 import { State } from './store/state';
 import { Store } from 'vuex';
+import { moduleRoutes } from './modules';
 
 Vue.use(Router);
 
@@ -41,6 +42,7 @@ export default new Router({
         },
         {
           path: 'main',
+          name: 'main',
           component: () => import(/* webpackChunkName: "main" */ './views/main/Main.vue'),
           redirect: 'main/people',
           meta: {
@@ -445,7 +447,10 @@ export default new Router({
             {
               path: 'hochladen',
               component: () => import('./views/main/hochladen/Hochladen.vue')
-            }
+            },
+
+            // add module routes to main children
+            ...moduleRoutes
           ],
         },
       ],

@@ -1,4 +1,4 @@
-import { bootstrap, getTestUser} from './../utils';
+import { bootstrap, getTestUser} from '@tests/utils';
 import EmployeeCard from '@/components/employee/EmployeeCard.vue'
 
 describe('EmployeeCard.vue', () => {

@@ -3,7 +3,7 @@ import {apiUrl} from '@/env';
 import { IEvent, IEventCreate, IUserProfile, IUserProfileCreate, IUserProfileUpdate, UserType, RequestCreate, UserInvite, IEventApplicationCreate, IEventApplicationUpdate, IFinanceRequestCreate, IFinanceRequestUpdate, IFinanceRequest, Group, GroupUpdate, IUserSettings, IEventApplication, VersionedFolder, IDocumentCreate, IDocument, LabelledFile, ICalendarEvent, ICalendar } from './interfaces';
 import {dataURItoBlob} from '@/utils';
 
-function authHeaders(token: string, headers = {}) {
+export function authHeaders(token: string, headers = {}) {
   return {
     headers: {
       Authorization: `Bearer ${token}`,

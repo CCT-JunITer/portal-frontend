@@ -7,7 +7,7 @@ exports[`DatePickerMenu.vue should match snapshot 1`] = `
       <div class="v-input input-lg v-input--is-label-active v-input--is-dirty theme--light v-text-field">
         <div class="v-input__control">
           <div class="v-input__slot">
-            <div class="v-text-field__slot"><label for="input-5" class="v-label v-label--active theme--light" style="left: 0px; position: absolute;">Geburtstag</label><input required="required" role="button" aria-haspopup="true" aria-expanded="false" id="input-5" type="text"></div>
+            <div class="v-text-field__slot"><label for="input-7" class="v-label v-label--active theme--light" style="left: 0px; position: absolute;">Geburtstag</label><input required="required" role="button" aria-haspopup="true" aria-expanded="false" id="input-7" type="text"></div>
           </div>
           <div class="v-text-field__details">
             <div class="v-messages theme--light">
