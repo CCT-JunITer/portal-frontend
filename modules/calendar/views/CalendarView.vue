@@ -177,7 +177,7 @@
             v-slot:interval="{minutesToPixels, hour, day, month, year}"
           >
             <template
-              v-for="event in getIntervalTowerEvents({minute:0, hour:hour, day:day, month:month-1, year:year})"
+              v-for="event in getIntervalTowerEvents({minutes:0, hour:hour, day:day, month:month-1, year:year})"
             >
               <template>
                 <v-sheet
@@ -199,7 +199,7 @@
               <strong v-if="event.event.timed" v-html="timeSummary()"></strong> <v-icon v-if="event.event.locationId=='tower'&&!towernutzung">mdi-chess-rook</v-icon>{{event.name}}
             </div>
             <div v-else class="disable-select" :style="'padding-left:'+ 
-              ((getIntervalTowerEvents({minute:event.start.getMinutes(), hour:event.start.getHours(), day:event.start.getDate(), month:event.start.getMonth(), year:event.start.getFullYear()}).length > 0 && !towernutzung) ? '25' : '5') +'px'">
+              ((getIntervalTowerEvents({minutes:event.start.getMinutes(), hour:event.start.getHours(), day:event.start.getDate(), month:event.start.getMonth(), year:event.start.getFullYear()}).length > 0 && !towernutzung) ? '25' : '5') +'px'">
               <strong>
                 <v-icon v-if="event.event.locationId=='tower'&&!towernutzung">
                   mdi-chess-rook
@@ -233,15 +233,12 @@
 
 <script>
 
-import {api} from '@/api';
-import { parseJSON } from 'date-fns';
-import { keyword } from 'color-convert';
 import CalendarEventPopup from './CreateEventPopup.vue'
 import CalendarToolbar from './CalendarToolbar.vue';
-import { commitSetSelectedEvent } from '@/store/calendar/mutations';
-import { dispatchFetchCalendars, dispatchFetchCalendarRights} from '@/store/calendar/actions';
-import { readCalendars, readCalendarsWithoutTower, readSelectedEvent, readTowerCalendar, getters} from '@/store/calendar/getters';
-import { CalendarEvent } from './CalendarEvent';
+import { commitSetSelectedEvent } from '../store/mutations';
+import { dispatchFetchCalendars, dispatchFetchCalendarRights} from '../store/actions';
+import { readCalendars, readCalendarsWithoutTower, readSelectedEvent, readTowerCalendar, getters} from '../store/getters';
+import { CalendarEvent } from '../types/CalendarEvent';
 import { readAuthenticationURL } from '@/store/main/getters';
 
 

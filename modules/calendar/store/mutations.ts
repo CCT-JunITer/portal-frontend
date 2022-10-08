@@ -1,8 +1,8 @@
-import { ICalendar, ICalendarEvent } from '@/interfaces';
+import { ICalendar, ICalendarEvent } from '../types';
 import { CalendarState } from './state';
 import {getters} from './getters';
 import { getStoreAccessors } from 'typesafe-vuex';
-import { State } from '../state';
+import { State } from '@/store/state';
 import { keyword } from 'color-convert';
 
 const Replacements = [' (Calendar Bot)', ' (calendarbot)']

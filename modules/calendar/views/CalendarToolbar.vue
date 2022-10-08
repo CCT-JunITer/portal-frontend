@@ -71,9 +71,9 @@
 </template>
 
 <script>
-import { readCalendars, readCalendarsWithoutTower, readTowerCalendar } from '@/store/calendar/getters'
-import { dispatchDeleteCalendar, dispatchFetchCalendars, dispatchUpdateCalendar } from '@/store/calendar/actions'
-import { commitUpdateCalendars } from '@/store/calendar/mutations'
+import { readCalendars, readCalendarsWithoutTower, readTowerCalendar } from '../store/getters'
+import { dispatchDeleteCalendar, dispatchFetchCalendars, dispatchUpdateCalendar } from '../store/actions'
+import { commitUpdateCalendars } from '../store/mutations'
 
 export default {
 

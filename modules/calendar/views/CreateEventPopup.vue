@@ -251,20 +251,18 @@
 
 <script>
 
-import { dispatchFetchCalendars, dispatchRemoveEvent, dispatchUpdateCalendarEvent } from '@/store/calendar/actions'
-import { commitAddEventToCalendar, commitSetSelectedEvent, commitRemoveCalendarEvent, commitUpdateSelectedEvent, commitUpdateEvent } from '@/store/calendar/mutations'
-import { readCalendarById, readCalendars, readCalendarsWithoutTower, readSelectedEvent, readEventByUID, readTowerCalendar, getters} from '@/store/calendar/getters'
-import { getCalendarById } from '@/store/utils'
-import CalendarEventLocationComponent from './components/CalendarEventLocationComponent.vue'
+import { dispatchFetchCalendars, dispatchRemoveEvent, dispatchUpdateCalendarEvent } from '../store/actions'
+import { commitAddEventToCalendar, commitSetSelectedEvent, commitRemoveCalendarEvent, commitUpdateSelectedEvent, commitUpdateEvent } from '../store/mutations'
+import { readCalendarById, readCalendars, readCalendarsWithoutTower, readSelectedEvent, readEventByUID, readTowerCalendar, getters} from '../store/getters'
 import DateTimePickerMenu from '@/components/DateTimePickerMenu.vue'
 import DatePickerMenu from '@/components/DatePickerMenu.vue'
 import isAfter from 'date-fns/isAfter'
 import intervalToDuration from 'date-fns/intervalToDuration'
 import add from 'date-fns/add'
 import sub from 'date-fns/sub'
-import { dispatchUpdateEvent } from '@/store/event/actions'
-import CalendarRRuleEditorComponent from './components/CalendarRRuleEditorComponent.vue'
-import CalendarColorPickerComponent from './components/CalendarColorPickerComponent.vue'
+import CalendarEventLocationComponent from '../components/CalendarEventLocationComponent.vue'
+import CalendarRRuleEditorComponent from '../components/CalendarRRuleEditorComponent.vue'
+import CalendarColorPickerComponent from '../components/CalendarColorPickerComponent.vue'
 
 function hexToRgb(c){
   if(/^#([a-f0-9]{3}){1,2}$/.test(c)){

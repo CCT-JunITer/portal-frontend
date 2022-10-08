@@ -1,11 +1,9 @@
-import { api } from '@/api';
-import { ICalendarEvent } from '@/interfaces';
-import { CalendarEvent } from '@/views/main/calendar/CalendarEvent';
-import { endOfDay, startOfDay } from 'date-fns';
+import { api } from '../api';
+import { ICalendarEvent } from '../types';
 import { getStoreAccessors } from 'typesafe-vuex';
 import { ActionContext } from 'vuex';
-import { State } from '../state';
-import { apiCall, apiCallNotify } from '../utils';
+import { State } from '@/store/state';
+import { apiCall, apiCallNotify } from '@/store/utils';
 import { readCalendars } from './getters';
 import { commitDeleteCalendar, commitRemoveCalendarEvent, commitUpdateCalendarRights, commitUpdateCalendars, commitUpdateEvent } from './mutations';
 import { CalendarState } from './state';
