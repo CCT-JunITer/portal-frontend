@@ -30,18 +30,6 @@
         <v-alert border="left" type="info" dense text>
           <a target="_blank" href="https://wiki.cct-ev.de/index.php/Signatur_erstellen">Hier</a> findest du den Wiki-Eintrag zur Einrichtung der Signatur im Email Programm.
         </v-alert>
-        <v-btn class="ma-2" color="cctOrange" dark @click="codeSignatureOpen = !codeSignatureOpen" outlined small>
-          <v-icon left>
-            mdi-filter-variant
-          </v-icon>
-          Code anzeigen
-        </v-btn>
-        <v-btn class="ma-2" color="cctBlue" dark @click="copySignatureToClipboard" outlined small>
-          <v-icon left small>
-            mdi-content-copy
-          </v-icon>
-          In Zwischenablage kopieren
-        </v-btn>
         <v-btn class="ma-2" color="cctGreen" dark @click="resetFields" outlined small>
           <v-icon left small>
             mdi-account
@@ -86,6 +74,18 @@
           >
           </v-text-field>
         </v-form>
+        <v-btn class="ma-2" color="cctOrange" dark @click="codeSignatureOpen = !codeSignatureOpen" outlined small>
+          <v-icon left>
+            mdi-filter-variant
+          </v-icon>
+          Code anzeigen
+        </v-btn>
+        <v-btn class="ma-2" color="cctBlue" dark @click="copySignatureToClipboard" outlined small>
+          <v-icon left small>
+            mdi-content-copy
+          </v-icon>
+          In Zwischenablage kopieren
+        </v-btn>
         <v-expand-transition>
           <div v-show="codeSignatureOpen">
             <p style="background-color: #F5F5F5; padding: 10px; border-radius: 5px; font-style: italic;" id="code-to-copy">
