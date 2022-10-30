@@ -1,6 +1,5 @@
 import { AxiosError, AxiosResponse } from 'axios';
 import { ActionContext } from 'vuex';
-import { CalendarState } from './calendar/state';
 import { dispatchActionAuthenticateNextcloud, dispatchCheckApiError } from './main/actions';
 import { commitAddNotification, commitRemoveNotification, commitSetAuthenticationURL } from './main/mutations';
 import { AppNotification, MainState } from './main/state';

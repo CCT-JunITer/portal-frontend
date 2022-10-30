@@ -3,6 +3,7 @@ import VueRouter from 'vue-router';
 import { createLocalVue, mount, ThisTypedMountOptions } from '@vue/test-utils'
 import { VueClass } from 'vue-class-component/lib/declarations'
 import Vuetify from 'vuetify'
+import store from '@/store';
 
 export const getTestUser = <T extends Partial<IUserProfile>>(options?: T): Partial<IUserProfile> & T => ({
   birthdate: '01-01-1999',
@@ -38,6 +39,7 @@ export const bootstrap = () => {
     return mount(component, {
       localVue,
       vuetify,
+      store,
       router,
       ...options,
     })

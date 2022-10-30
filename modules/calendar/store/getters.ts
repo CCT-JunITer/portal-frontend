@@ -1,6 +1,6 @@
-import { ICalendarEvent } from '@/interfaces';
+import { ICalendarEvent } from '../types';
 import { getStoreAccessors } from 'typesafe-vuex';
-import { State } from '../state';
+import { State } from '@/store/state';
 import { CalendarState } from './state';
 
 const TowerCalendarIDs = new Set(['tower_shared_by_CalendarBot']);

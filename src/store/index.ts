@@ -7,7 +7,7 @@ import { adminModule } from './admin';
 import { eventModule } from './event';
 import { financeRequestModule } from './finance_request';
 import { documentModule } from './document';
-import { calendarModule } from './calendar';
+import { moduleStores } from '@/modules';
 
 Vue.use(Vuex);
 
@@ -18,7 +18,7 @@ const storeOptions: StoreOptions<State> = {
     event: eventModule,
     finance_request: financeRequestModule,
     document: documentModule,
-    calendars: calendarModule
+    ...moduleStores
   },
 };
 
