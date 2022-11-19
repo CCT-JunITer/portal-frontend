@@ -14,6 +14,10 @@ export const getters = {
     return state.calendars.filter(x => x.uid && !TowerCalendarIDs.has(x.uid))
   },
 
+  getUpdatableCalendars(state: CalendarState) {
+    return state.calendars.filter(x =>  x.rights.includes('u'))
+  },
+
   getSelectedEvent(state: CalendarState) {
     return state.selectedEvent
   },
@@ -50,3 +54,4 @@ export const readSelectedEvent = read(getters.getSelectedEvent);
 export const readTowerCalendar = read(getters.getTowerCalendar);
 export const readEventByUID = read(getters.getEventByUID);
 export const readCalendarByUID = read(getters.getCalendarByUID);
+export const readUpdatableCalendars = read(getters.getUpdatableCalendars);
