@@ -32,10 +32,25 @@
         </v-icon>
         Event erstellen
       </v-btn>
-
-      <v-expansion-panels 
+      
+      <calendar-list-component
+        ref="updatableCalendarList"
+        v-model="updatableCalendars"
+        label="Kalender mit Editierrechte"
+        icon="mdi-calendar-edit"
+        @change="getEvents({start:undefined, end:undefined})"
+      ></calendar-list-component>
+      <v-divider></v-divider>
+      <calendar-list-component
+        ref="readonlyCalendarList"
+        v-model="readonlyCalendars"
+        label="Kalender ohne Editierrechte"
+        icon="mdi-calendar-blank"
+        @change="getEvents({start:undefined, end:undefined})"
+      ></calendar-list-component>
+      <!-- <v-expansion-panels 
         :value="1"
-        class="mt-2" 
+        class="mt-2"
         flat
         tile
         ref="calendarSelector"
@@ -65,7 +80,7 @@
             </div>
           </v-expansion-panel-content>
         </v-expansion-panel>
-      </v-expansion-panels>
+      </v-expansion-panels> -->
       <!-- <v-divider class="my-2"></v-divider> -->
       
       <!--<div style="height:100%;flex-shrink:100;"></div>-->
@@ -235,10 +250,10 @@
 <script>
 
 import CalendarEventPopup from './CreateEventPopup.vue'
-import CalendarToolbar from './CalendarToolbar.vue';
+import CalendarListComponent from '../components/CalendarListComponent.vue';
 import { commitSetSelectedEvent } from '../store/mutations';
 import { dispatchFetchCalendars, dispatchFetchCalendarRights} from '../store/actions';
-import { readCalendars, readCalendarsWithoutTower, readSelectedEvent, readTowerCalendar, getters, readUpdatableCalendars} from '../store/getters';
+import { readCalendars, readCalendarsWithoutTower, readSelectedEvent, readTowerCalendar, readUpdatableCalendars, readReadonlyCalendars} from '../store/getters';
 import { CalendarEvent } from '../types/CalendarEvent';
 import { readAuthenticationURL } from '@/store/main/getters';
 
@@ -327,8 +342,9 @@ function constructUIEvents(event, calendar, viewStart, viewEnd) {
 
 export default {
   components: {
-    CalendarToolbar,
-    CalendarEventPopup
+    // CalendarToolbar,
+    CalendarEventPopup,
+    CalendarListComponent
   },
 
   async created() {
@@ -430,7 +446,8 @@ export default {
 
     async update(notify, fetch=true, calendarIds=undefined) {
       await this.getEvents({}, notify, fetch, calendarIds)
-      if (this.$refs.calendarSelectorPanel) this.$refs.calendarSelectorPanel.isActive = true;
+      if (this.$refs.updatableCalendarList) this.$refs.updatableCalendarList.setUnfolded(true);
+      if (this.$refs.readonlyCalendarList) this.$refs.readonlyCalendarList.setUnfolded(true);
     },
 
     showEventEditor(selectedEvent) {
@@ -810,6 +827,12 @@ export default {
 
     updatableCalendars: function() {
       const calendars = readUpdatableCalendars(this.$store)
+      if (!calendars) return []
+      return calendars;
+    },
+
+    readonlyCalendars: function() {
+      const calendars = readReadonlyCalendars(this.$store)
       if (!calendars) return []
       return calendars;
     },

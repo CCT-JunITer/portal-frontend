@@ -18,6 +18,10 @@ export const getters = {
     return state.calendars.filter(x =>  x.rights.includes('u'))
   },
 
+  getReadonlyCalendars(state: CalendarState) {
+    return state.calendars.filter(x => !x.rights.includes('u'))
+  },
+
   getSelectedEvent(state: CalendarState) {
     return state.selectedEvent
   },
@@ -55,3 +59,4 @@ export const readTowerCalendar = read(getters.getTowerCalendar);
 export const readEventByUID = read(getters.getEventByUID);
 export const readCalendarByUID = read(getters.getCalendarByUID);
 export const readUpdatableCalendars = read(getters.getUpdatableCalendars);
+export const readReadonlyCalendars = read(getters.getReadonlyCalendars);
