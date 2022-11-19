@@ -43,44 +43,11 @@
       <v-divider></v-divider>
       <calendar-list-component
         ref="readonlyCalendarList"
-        v-model="readonlyCalendars"
+        v-model="readonlyCalendarsWithoutTower"
         label="Kalender ohne Editierrechte"
         icon="mdi-calendar-blank"
         @change="getEvents({start:undefined, end:undefined})"
       ></calendar-list-component>
-      <!-- <v-expansion-panels 
-        :value="1"
-        class="mt-2"
-        flat
-        tile
-        ref="calendarSelector"
-      >
-        <v-expansion-panel
-          ref="calendarSelectorPanel"
-        >
-          <v-expansion-panel-header>
-            <div style="transparent">Deine Kalender</div>
-          </v-expansion-panel-header>
-
-          <v-expansion-panel-content>
-            <div style="">
-              <v-list-item 
-                v-for="(calendar, i) in calendars"
-                :key="i"
-              >
-                <calendar-toolbar :calendarId="calendar.uid" @change="getEvents({start:undefined, end:undefined})">
-                </calendar-toolbar>
-              </v-list-item>
-              <v-list-item 
-                v-if="towernutzung&&towerCalendar"
-              >
-                <calendar-toolbar :calendarId="towerCalendar.uid" :tower="true" @change="getEvents({start:undefined, end:undefined})">
-                </calendar-toolbar>
-              </v-list-item>
-            </div>
-          </v-expansion-panel-content>
-        </v-expansion-panel>
-      </v-expansion-panels> -->
       <!-- <v-divider class="my-2"></v-divider> -->
       
       <!--<div style="height:100%;flex-shrink:100;"></div>-->
@@ -253,7 +220,7 @@ import CalendarEventPopup from './CreateEventPopup.vue'
 import CalendarListComponent from '../components/CalendarListComponent.vue';
 import { commitSetSelectedEvent } from '../store/mutations';
 import { dispatchFetchCalendars, dispatchFetchCalendarRights} from '../store/actions';
-import { readCalendars, readCalendarsWithoutTower, readSelectedEvent, readTowerCalendar, readUpdatableCalendars, readReadonlyCalendars} from '../store/getters';
+import { readCalendars, readCalendarsWithoutTower, readSelectedEvent, readTowerCalendar, readUpdatableCalendarsWithoutTower, readReadonlyCalendarsWithoutTower} from '../store/getters';
 import { CalendarEvent } from '../types/CalendarEvent';
 import { readAuthenticationURL } from '@/store/main/getters';
 
@@ -826,13 +793,13 @@ export default {
     },
 
     updatableCalendars: function() {
-      const calendars = readUpdatableCalendars(this.$store)
+      const calendars = readUpdatableCalendarsWithoutTower(this.$store)
       if (!calendars) return []
       return calendars;
     },
 
-    readonlyCalendars: function() {
-      const calendars = readReadonlyCalendars(this.$store)
+    readonlyCalendarsWithoutTower: function() {
+      const calendars = readReadonlyCalendarsWithoutTower(this.$store)
       if (!calendars) return []
       return calendars;
     },

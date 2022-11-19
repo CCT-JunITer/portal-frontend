@@ -14,12 +14,12 @@ export const getters = {
     return state.calendars.filter(x => x.uid && !TowerCalendarIDs.has(x.uid))
   },
 
-  getUpdatableCalendars(state: CalendarState) {
-    return state.calendars.filter(x =>  x.rights.includes('u'))
+  getUpdatableCalendarsWithoutTower(state: CalendarState) {
+    return getters.getCalendarsWithoutTower(state).filter(x =>  x.rights.includes('u'))
   },
 
-  getReadonlyCalendars(state: CalendarState) {
-    return state.calendars.filter(x => !x.rights.includes('u'))
+  getReadonlyCalendarsWithoutTower(state: CalendarState) {
+    return getters.getCalendarsWithoutTower(state).filter(x => !x.rights.includes('u'))
   },
 
   getSelectedEvent(state: CalendarState) {
@@ -58,5 +58,5 @@ export const readSelectedEvent = read(getters.getSelectedEvent);
 export const readTowerCalendar = read(getters.getTowerCalendar);
 export const readEventByUID = read(getters.getEventByUID);
 export const readCalendarByUID = read(getters.getCalendarByUID);
-export const readUpdatableCalendars = read(getters.getUpdatableCalendars);
-export const readReadonlyCalendars = read(getters.getReadonlyCalendars);
+export const readUpdatableCalendarsWithoutTower = read(getters.getUpdatableCalendarsWithoutTower);
+export const readReadonlyCalendarsWithoutTower = read(getters.getReadonlyCalendarsWithoutTower);
