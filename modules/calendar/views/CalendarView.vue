@@ -237,7 +237,7 @@ import CalendarEventPopup from './CreateEventPopup.vue'
 import CalendarToolbar from './CalendarToolbar.vue';
 import { commitSetSelectedEvent } from '../store/mutations';
 import { dispatchFetchCalendars, dispatchFetchCalendarRights} from '../store/actions';
-import { readCalendars, readCalendarsWithoutTower, readSelectedEvent, readTowerCalendar, getters} from '../store/getters';
+import { readCalendars, readCalendarsWithoutTower, readSelectedEvent, readTowerCalendar, getters, readUpdatableCalendars} from '../store/getters';
 import { CalendarEvent } from '../types/CalendarEvent';
 import { readAuthenticationURL } from '@/store/main/getters';
 
@@ -514,11 +514,11 @@ export default {
     // },
 
     createNewEvent(start=undefined, end=undefined) {
-      if (!this.calendars || this.calendars.length < 1) {
+      if (!this.updatableCalendars || this.updatableCalendars.length < 1) {
         alert('Du brauchst einen Kalender, damit du Events erstellen kannst.')
         return undefined
       }
-      const calendar = this.calendars[0]
+      const calendar = this.updatableCalendars[0]
       if (!start) {
         start = new Date(this.value)
         start.setHours(new Date().getHours())
@@ -805,6 +805,10 @@ export default {
 
     allCalendars: function() {
       return readCalendars(this.$store)
+    },
+
+    updatableCalendars: function() {
+      return readUpdatableCalendars(this.$store);
     },
 
     authenticationURL: function() {
