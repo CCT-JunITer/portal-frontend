@@ -36,7 +36,7 @@
       <calendar-list-component
         ref="updatableCalendarList"
         v-model="updatableCalendars"
-        label="Kalender mit Editierrechte"
+        label="Kalender mit Editierrechten"
         icon="mdi-calendar-edit"
         @change="getEvents({start:undefined, end:undefined})"
       ></calendar-list-component>
