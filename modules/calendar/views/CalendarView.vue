@@ -2,7 +2,6 @@
   <div class="calendarContainer">
     <v-navigation-drawer 
       class="calendarSidebar"
-      style="background-color:#EEEEEE"
       permanent
     >
       
@@ -839,10 +838,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-  :root {
-    --calendarSidebar: #A2A2A1FF;
-  }
-
   .calendarContainer {
     display: flex;
     position:absolute;
@@ -850,10 +845,9 @@ export default {
     height:100%;
     width:100%;
     overflow:hidden;
-    background-color:#EEEEEE;
   }
-
-.calendarSidebar {
+  
+  .calendarSidebar {
   background-color:#EEEEEE;
   height:100%;
   display:flex;
@@ -919,18 +913,19 @@ export default {
 
 <style>
 .v-date-picker-table {
-  background: #EEEEEE;
+  background: transparent;
 }
 
 .v-date-picker-header {
-  background-color: #EEEEEE;
+  background-color: transparent ;
 }
 
-.v-expansion-panel-content__wrap {
-  background-color: #EEEEEE;
+.theme--light.v-card {
+  background-color: transparent;
 }
 
-.v-expansion-panel-header {
-  background-color: #EEEEEE;
+.theme--light.v-picker__body {
+  background-color: transparent;
 }
+
 </style>
