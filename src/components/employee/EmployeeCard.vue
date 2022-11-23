@@ -31,9 +31,10 @@
           </div>
           <div v-else>
             <div class="text-body-2 mb-2">
-              Alumni seit <b>{{ exitFormatted }}</b>
+              Alumni <span v-if="isDataComplete">seit <b>{{ exitFormatted }}</b></span>
             </div>
-            <v-chip small color="cctOrange" outlined dark label>{{ yearsIn }} im Verein</v-chip>
+            <v-chip v-if="isDataComplete" small color="cctOrange" outlined dark label>{{ yearsIn }} im Verein</v-chip>
+            <v-chip v-else small color="red" outlined dark label>Daten unvollständig</v-chip>
           </div>
         </div>
       </div>
@@ -43,6 +44,7 @@
       <v-btn
         text
         small
+        :disabled="!employee.email"
         :href="`mailto:${employee.email}`"
         color="grey"
         class="center-employee-text">
@@ -52,6 +54,7 @@
       <v-btn
         text
         small
+        :disabled="!employee.phonenumber"
         :href="`tel:${employee.phonenumber}`"
         color="grey"
         class="center-employee-text">
@@ -90,12 +93,16 @@ export default class EmployeeCard extends Vue {
     return this.employee.is_alumni;
   }
 
+  get isDataComplete(){
+    return this.employee.exitdate && this.employee.entrydate
+  }
+
   get exitFormatted() {
     return format(new Date(this.employee.exitdate), 'MMMM yyyy', { locale: de });
   }
 
   get yearsIn() {
-    return formatDistance(new Date(this.employee.exitdate), new Date(this.employee.entrydate), { locale: de })
+    return formatDistance(new Date(this.employee.exitdate), new Date(this.employee.entrydate), { locale: de });
   }
 
 
