@@ -9,7 +9,7 @@ stages:
   - deploy
 
 lint:
-  image: node:14.7-alpine
+  image: node:lts
   stage: lint
   needs: []
   cache:
@@ -21,7 +21,7 @@ lint:
 
 
 test:
-  image: node:14.7-alpine
+  image: node:lts
   stage: test
   needs: []
   cache:
@@ -31,60 +31,38 @@ test:
     - npm install --progress=false
     - VUE_APP_ENV=dev npm run test:unit
 
-build staging:
-  image: node:14.7-alpine
+build:
+  image: node:lts
   stage: build
   needs: []
-  only:
-    refs:
-      - master
   cache:
     paths:
       - node_modules
   script:
     - npm install --progress=false
-    - VUE_APP_DOMAIN_STAG="stag.api.cct-ev.de" VUE_APP_ENV=staging npm run build
+    - npm run build
   artifacts:
     expire_in: 1 week
     paths:
       - dist
 
-build production:
-  image: node:14.7-alpine
-  stage: build
-  needs: []
-  only:
-    refs:
-      - production
-  cache:
-    paths:
-      - node_modules
-  script:
-    - npm install --progress=false
-    - VUE_APP_DOMAIN_PROD="api.cct-ev.de" VUE_APP_ENV=production npm run build
-  artifacts:
-    expire_in: 1 week
-    paths:
-      - dist
 
 build image:
   stage: build image
-  image: docker:19.03.8
-  only:
-    refs:
-      - production
-      - master
+  image: docker:latest
   services:
-    - docker:19.03.8-dind
+    - docker:dind
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  environment:
+    IMAGE: "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG" 
   script:
-    - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG || true
-    - docker build --cache-from $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG -t $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG .
-    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+    - docker pull $IMAGE || true
+    - docker build --cache-from $IMAGE -t $IMAGE .
+    - docker push $IMAGE
 
 deploy staging:
-  image: docker/compose:alpine-1.27.4
+  image: docker:latest
   stage: deploy
   needs:
     - job: build image
@@ -98,6 +76,7 @@ deploy staging:
   variables:
     DOCKER_HOST: 'ssh://gitlab-ci@stag.api.cct-ev.de'
     DOMAIN: stag.portal.cct-ev.de
+    IMAGE: "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG" 
   before_script:
     - "which ssh-agent || ( apk update && apk add openssh-client )"
     - eval $(ssh-agent -s)
@@ -112,20 +91,20 @@ deploy staging:
 
 
 deploy production:
-  image: docker/compose:alpine-1.27.4
+  image: docker:latest
   stage: deploy
   needs:
     - job: build image
       artifacts: false
   only:
-    refs:
-      - production
+    - tags
   environment:
     name: prod
     url: https://portal.cct-ev.de
   variables:
     DOCKER_HOST: 'ssh://gitlab-ci@portal.cct-ev.de'
     DOMAIN: portal.cct-ev.de
+    IMAGE: "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG" 
   before_script:
     - "which ssh-agent || ( apk update && apk add openssh-client )"
     - eval $(ssh-agent -s)

@@ -1,7 +1,7 @@
 version: "3.3"
 services:
   frontend:
-    image: registry.gitlab.cct-ev.de/juniter/pv-tool3/frontend:$CI_COMMIT_REF_NAME
+    image: $IMAGE
     restart: unless-stopped
     networks: 
       - traefik

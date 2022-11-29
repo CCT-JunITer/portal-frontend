@@ -22,10 +22,19 @@ npm install
 ```
 npm run serve
 ```
+or add backend-URL:
+```
+VUE_APP_BACKEND_URL=http://localhost:8000 npm run serve
+```
+
 
 ### Compiles and minifies for production
 ```
 npm run build
+```
+or add backend-URL:
+```
+VUE_APP_BACKEND_URL=http://localhost:8000 npm run serve
 ```
 
 ### Run your tests
