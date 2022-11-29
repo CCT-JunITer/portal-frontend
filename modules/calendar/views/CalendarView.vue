@@ -2,7 +2,6 @@
   <div class="calendarContainer">
     <v-navigation-drawer 
       class="calendarSidebar"
-      style="background-color:#EEEEEE"
       permanent
     >
       
@@ -19,6 +18,7 @@
       <v-btn
         block
         color="primary"
+        :disabled="updatableCalendars.length == 0"
         style="height:40px"
         @click="() => createNewEvent()"
         
@@ -31,40 +31,22 @@
         </v-icon>
         Event erstellen
       </v-btn>
-
-      <v-expansion-panels 
-        :value="1"
-        class="mt-2" 
-        flat
-        tile
-        ref="calendarSelector"
-      >
-        <v-expansion-panel
-          ref="calendarSelectorPanel"
-        >
-          <v-expansion-panel-header>
-            <div style="transparent">Deine Kalender</div>
-          </v-expansion-panel-header>
-
-          <v-expansion-panel-content>
-            <div style="">
-              <v-list-item 
-                v-for="(calendar, i) in calendars"
-                :key="i"
-              >
-                <calendar-toolbar :calendarId="calendar.uid" @change="getEvents({start:undefined, end:undefined})">
-                </calendar-toolbar>
-              </v-list-item>
-              <v-list-item 
-                v-if="towernutzung&&towerCalendar"
-              >
-                <calendar-toolbar :calendarId="towerCalendar.uid" :tower="true" @change="getEvents({start:undefined, end:undefined})">
-                </calendar-toolbar>
-              </v-list-item>
-            </div>
-          </v-expansion-panel-content>
-        </v-expansion-panel>
-      </v-expansion-panels>
+      
+      <calendar-list-component
+        ref="updatableCalendarList"
+        v-model="updatableCalendars"
+        label="Kalender mit Editierrechten"
+        icon="mdi-calendar-edit"
+        @change="getEvents({start:undefined, end:undefined})"
+      ></calendar-list-component>
+      <v-divider></v-divider>
+      <calendar-list-component
+        ref="readonlyCalendarList"
+        v-model="readonlyCalendarsWithoutTower"
+        label="Kalender ohne Editierrechte"
+        icon="mdi-calendar-blank"
+        @change="getEvents({start:undefined, end:undefined})"
+      ></calendar-list-component>
       <!-- <v-divider class="my-2"></v-divider> -->
       
       <!--<div style="height:100%;flex-shrink:100;"></div>-->
@@ -234,10 +216,10 @@
 <script>
 
 import CalendarEventPopup from './CreateEventPopup.vue'
-import CalendarToolbar from './CalendarToolbar.vue';
+import CalendarListComponent from '../components/CalendarListComponent.vue';
 import { commitSetSelectedEvent } from '../store/mutations';
 import { dispatchFetchCalendars, dispatchFetchCalendarRights} from '../store/actions';
-import { readCalendars, readCalendarsWithoutTower, readSelectedEvent, readTowerCalendar, getters, readUpdatableCalendars} from '../store/getters';
+import { readCalendars, readCalendarsWithoutTower, readSelectedEvent, readTowerCalendar, readUpdatableCalendarsWithoutTower, readReadonlyCalendarsWithoutTower} from '../store/getters';
 import { CalendarEvent } from '../types/CalendarEvent';
 import { readAuthenticationURL } from '@/store/main/getters';
 
@@ -326,8 +308,9 @@ function constructUIEvents(event, calendar, viewStart, viewEnd) {
 
 export default {
   components: {
-    CalendarToolbar,
-    CalendarEventPopup
+    // CalendarToolbar,
+    CalendarEventPopup,
+    CalendarListComponent
   },
 
   async created() {
@@ -429,7 +412,8 @@ export default {
 
     async update(notify, fetch=true, calendarIds=undefined) {
       await this.getEvents({}, notify, fetch, calendarIds)
-      if (this.$refs.calendarSelectorPanel) this.$refs.calendarSelectorPanel.isActive = true;
+      if (this.$refs.updatableCalendarList) this.$refs.updatableCalendarList.setUnfolded(true);
+      if (this.$refs.readonlyCalendarList) this.$refs.readonlyCalendarList.setUnfolded(true);
     },
 
     showEventEditor(selectedEvent) {
@@ -808,7 +792,15 @@ export default {
     },
 
     updatableCalendars: function() {
-      return readUpdatableCalendars(this.$store);
+      const calendars = readUpdatableCalendarsWithoutTower(this.$store)
+      if (!calendars) return []
+      return calendars;
+    },
+
+    readonlyCalendarsWithoutTower: function() {
+      const calendars = readReadonlyCalendarsWithoutTower(this.$store)
+      if (!calendars) return []
+      return calendars;
     },
 
     authenticationURL: function() {
@@ -846,10 +838,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-  :root {
-    --calendarSidebar: #A2A2A1FF;
-  }
-
   .calendarContainer {
     display: flex;
     position:absolute;
@@ -857,10 +845,9 @@ export default {
     height:100%;
     width:100%;
     overflow:hidden;
-    background-color:#EEEEEE;
   }
-
-.calendarSidebar {
+  
+  .calendarSidebar {
   background-color:#EEEEEE;
   height:100%;
   display:flex;
@@ -926,18 +913,19 @@ export default {
 
 <style>
 .v-date-picker-table {
-  background: #EEEEEE;
+  background: transparent;
 }
 
 .v-date-picker-header {
-  background-color: #EEEEEE;
+  background-color: transparent ;
 }
 
-.v-expansion-panel-content__wrap {
-  background-color: #EEEEEE;
+.theme--light.v-card {
+  background-color: transparent;
 }
 
-.v-expansion-panel-header {
-  background-color: #EEEEEE;
+.theme--light.v-picker__body {
+  background-color: transparent;
 }
+
 </style>
