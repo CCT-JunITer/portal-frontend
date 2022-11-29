@@ -59,7 +59,7 @@
               type="info"
               class="input-lg"
             >
-              Ressortsbudgets werden nicht vom Finanzvorstand geprüft und müssen vorher unbedingt mit dem Ressortleiter abgesprochen werden.
+              Ressortsbudgets werden nicht vom Finanzvorstand geprüft und müssen vorher unbedingt mit der Ressortleitung abgesprochen werden.
             </v-alert>
           </div>  
 

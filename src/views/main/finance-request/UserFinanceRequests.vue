@@ -5,7 +5,7 @@
       flat
       color="#eee"
     >
-      <v-toolbar-title class="text-h4">Finanzanträge (Beta)</v-toolbar-title>
+      <v-toolbar-title class="text-h4">Finanzanträge</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn x-large icon color="cctOrange" :to="{ name: 'finance-request-create' }">
         <v-icon> mdi-plus-circle</v-icon>
