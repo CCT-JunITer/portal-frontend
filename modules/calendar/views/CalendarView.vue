@@ -920,7 +920,7 @@ export default {
   background-color: transparent ;
 }
 
-.theme--light.v-card {
+.v-picker.v-card.v-picker--date.theme--light {
   background-color: transparent;
 }
 
