@@ -251,7 +251,7 @@
 
 <script>
 
-import { dispatchFetchCalendars, dispatchRemoveEvent, dispatchUpdateCalendarEvent } from '../store/actions'
+import { dispatchFetchCalendars, dispatchRemoveEvent, dispatchUpdateCalendar, dispatchUpdateCalendarEvent } from '../store/actions'
 import { commitAddEventToCalendar, commitSetSelectedEvent, commitRemoveCalendarEvent, commitUpdateSelectedEvent, commitUpdateEvent } from '../store/mutations'
 import { readCalendarById, readCalendars, readCalendarsWithoutTower, readSelectedEvent, readEventByUID, readTowerCalendar, getters} from '../store/getters'
 import DateTimePickerMenu from '@/components/DateTimePickerMenu.vue'
@@ -403,6 +403,10 @@ export default {
         if (savedEvent.towerId) commitRemoveCalendarEvent(this.$store, {calendarId: this.towerCalendar.uid, uid:savedEvent.towerId})
         dispatchFetchCalendars(this.$store, {notify:false, start:savedEvent.start, end:savedEvent.end, calendarIds:[this.towerCalendar.uid]})
       }
+
+      // set calendar to active when it is updated, so that the event is displayed after saving
+      this.calendar.active = true;
+      dispatchUpdateCalendar(this.$store, this.calendar);
 
       // commitUpdateSelectedEvent(this.$store, savedEvent)
       this.$emit('changed')

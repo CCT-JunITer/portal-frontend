@@ -480,9 +480,6 @@ export default {
       d = new Date(d.toDateString());
       const day = d.getDay()
       const diff = d.getDate() + (day == 0 ? 0:7-day); // adjust when day is sunday
-      // console.log(day)
-      // console.log(diff)
-      // console.log(d.getDate())
       return new Date(d.setDate(diff));
     },
 
@@ -502,7 +499,9 @@ export default {
         alert('Du brauchst einen Kalender, damit du Events erstellen kannst.')
         return undefined
       }
-      const calendar = this.updatableCalendars[0]
+      let calendar = this.updatableCalendars.find((x) => x.active) // allways take initially the first active calendar in the updatable list 
+      if (!calendar) calendar = this.updatableCalendars[0]
+
       if (!start) {
         start = new Date(this.value)
         start.setHours(new Date().getHours())
@@ -554,35 +553,12 @@ export default {
       return `${date.getFullYear().toString().padStart(4,'0')}-${(date.getMonth()+1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')}`
     },
 
-    isTowerInterval(hour, day, month, year) {
-      const intervalStart = this.createDate(hour, day, month, year)
-      const intervalEnd = this.createDate(hour+1, day, month, year)
-    },
-
-    isInInterval(hour, day, month, year, event) {
-      const intervalStart = this.createDate(hour, day, month, year)
-      const intervalEnd = this.createDate(hour+1, day, month, year)
-      return (event.start < intervalEnd && event.end > intervalStart)
-    },
-
-    getIntervalEventStart(hour, day, month, year, event) {
-      const intervalStart = this.createDate(0, hour, day, month, year)
-      const start = (event.start < intervalStart) ? intervalStart : event.start
-      return start
-    },
-
     getIntervalEventLength(hour, day, month, year, event) {
       const intervalStart = this.createDate(0, hour, day, month, year)
       const intervalEnd = this.createDate(0, hour+1, day, month, year)
       const start = (event.start < intervalStart) ? intervalStart : event.start
       const end = (event.end > intervalEnd) ? intervalEnd : event.end
       return (event.end-event.start)/1000/60
-    },
-
-    getIntervalEventEnd(hour, day, month, year, event) {
-      const intervalEnd = this.createDate(0, hour+1, day, month, year)
-      const end = (event.end > intervalEnd) ? intervalEnd : event.end
-      return end
     },
 
     getIntervalTowerEvents({minutes, hour, day, month, year}, length=1000*60*60) {
