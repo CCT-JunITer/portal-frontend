@@ -343,11 +343,13 @@ export default {
     },
 
     close() {
-      this.loading = false;
-      this.loadingExdate = false
-      this.selectedOpen = false
-      this.initSelectedEventInternal()
-      this.$emit('close')
+      if (this.selectedOpen == true) {
+        this.loading = false;
+        this.loadingExdate = false
+        this.selectedOpen = false
+        this.initSelectedEventInternal()
+        this.$emit('close')
+      }
     },
 
     async saveExdate() {

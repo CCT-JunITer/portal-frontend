@@ -182,7 +182,8 @@
             </div>
             <div v-else class="disable-select" :style="'padding-left:'+ 
               ((getIntervalTowerEvents({minutes:event.start.getMinutes(), hour:event.start.getHours(), day:event.start.getDate(), month:event.start.getMonth(), year:event.start.getFullYear()}).length > 0 && !towernutzung) ? '25' : '5') +'px'">
-              <strong>
+              <strong :id="'e' + convert_uid_to_id(event.event.uid)">
+                <v-icon v-if="!event.event.uid">mdi-new-box</v-icon>
                 <v-icon v-if="event.event.locationId=='tower'&&!towernutzung">
                   mdi-chess-rook
                 </v-icon>
@@ -205,6 +206,7 @@
           ref="calendarEventPopup" 
           @clickEditEvent="showEventEditor"
           @changed="update(false, false)"
+          @close="eventPopupClosed"
         >
         </calendar-event-popup>
       </div>
@@ -593,8 +595,10 @@ export default {
         this.dragTime = null
         this.extendOriginal = null
       }
+      this.$refs.calendarEventPopup.close()
     },
     startTime (tms) {
+      this.$refs.calendarEventPopup.close()
       const mouse = this.toTime(tms)
 
       // this prevents dragging new events if the black box referring to a tower event is clicked
@@ -661,6 +665,17 @@ export default {
       }
     },
     endDrag () {
+      // the following lines of code search for the new created div in the calendar and call the showEvent function with it
+      // the div is found by its id. The id of the div is the uid of the event converted by the convertuid_to_id function, so that it matches the id pattern
+      const event = (this.createEvent) ? this.createEvent : this.dragEvent
+      if (this.$refs.calendar && event) { 
+        const div = this.$refs.calendar.$el.querySelector('#e' + this.convert_uid_to_id(event.event.uid))
+        if (div) {
+          const nativeEvent = {target:div.parentNode.parentNode, stopPropagation:()=>{return 0}}
+          this.showEvent({nativeEvent:nativeEvent, event:event})
+        }
+      }
+
       this.dragTime = null
       this.dragEvent = null
       this.createEvent = null
@@ -684,7 +699,16 @@ export default {
       this.dragTime = null
       this.dragEvent = null
     },
+
+    convert_uid_to_id(uid) {
+      if (!uid) return 'undefined'
+      return uid.replace(/[^A-Za-z0-9_-]/g, '')
+    },
     // End: Drag and Drop methods
+
+    eventPopupClosed() {
+      if (!this.dragEvent || this.dragEvent.event.uid != this.newEvent.event.uid) this.getEvents({start:undefined, end:undefined})
+    },
   },
 
   computed: {
