@@ -16,7 +16,7 @@ export const mutations = {
   removeCalendarEvent(state: CalendarState, event: {calendarId: string; uid: string}) {
     if (!event) return;
 
-    const calendar = getters.getCalendarByUID(state, event.calendarId)
+    const calendar = getters.getCalendarByUID(state)(event.calendarId)
     if (calendar) {
       calendar.events = calendar.events.filter(x => x.uid != event.uid)
     }
@@ -53,7 +53,7 @@ export const mutations = {
     if (calendarEvent) {
       Object.assign(calendarEvent, event)
     } else { // if event does not exist
-      const calendar: ICalendar|undefined = getters.getCalendarByUID(state, event.calendarId)
+      const calendar: ICalendar|undefined = getters.getCalendarByUID(state)(event.calendarId)
       if (calendar) {
         calendar.events.push(event)
       } else {
@@ -73,7 +73,7 @@ export const mutations = {
       
       // console.log('updating from ' + payload.start?.toISOString() + ' to ' + payload.end?.toISOString() + ' at calendar "' + c.uid + '"')
       // console.log(payload.calendars)
-      const calendarObject: ICalendar|undefined = (c.uid) ? getters.getCalendarByUID(state, c.uid) : undefined
+      const calendarObject: ICalendar|undefined = (c.uid) ? getters.getCalendarByUID(state)(c.uid) : undefined
       if (calendarObject) {
         // generate dict of uids
         if (c.events) {

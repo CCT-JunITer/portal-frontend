@@ -251,9 +251,9 @@
 
 <script>
 
-import { dispatchFetchCalendars, dispatchRemoveEvent, dispatchUpdateCalendarEvent } from '../store/actions'
+import { dispatchFetchCalendars, dispatchRemoveEvent, dispatchUpdateCalendar, dispatchUpdateCalendarEvent } from '../store/actions'
 import { commitAddEventToCalendar, commitSetSelectedEvent, commitRemoveCalendarEvent, commitUpdateSelectedEvent, commitUpdateEvent } from '../store/mutations'
-import { readCalendarById, readCalendars, readCalendarsWithoutTower, readSelectedEvent, readEventByUID, readTowerCalendar, getters} from '../store/getters'
+import { readCalendarByUID, readCalendars, readCalendarsWithoutTower, readSelectedEvent, readEventByUID, readTowerCalendar, getters} from '../store/getters'
 import DateTimePickerMenu from '@/components/DateTimePickerMenu.vue'
 import DatePickerMenu from '@/components/DatePickerMenu.vue'
 import isAfter from 'date-fns/isAfter'
@@ -329,7 +329,7 @@ export default {
 
     initSelectedEventInternal() {
       this.selectedEventInternal = Object.assign({}, this.selectedEvent)
-      this.calendar = this.getCalendarByUID(this.selectedEventInternal.calendarId)
+      this.calendar = readCalendarByUID(this.$store)(this.selectedEventInternal.calendarId)
     },
 
     show(selectedEvent=undefined) {
@@ -404,6 +404,10 @@ export default {
         dispatchFetchCalendars(this.$store, {notify:false, start:savedEvent.start, end:savedEvent.end, calendarIds:[this.towerCalendar.uid]})
       }
 
+      // set calendar to active when it is updated, so that the event is displayed after saving
+      this.calendar.active = true;
+      dispatchUpdateCalendar(this.$store, this.calendar);
+
       // commitUpdateSelectedEvent(this.$store, savedEvent)
       this.$emit('changed')
       this.close()
@@ -423,12 +427,6 @@ export default {
       this.close()
     },
 
-    getCalendarByUID(uid) {
-      if (this.towerCalendar && this.towerCalendar.uid == uid) return this.towerCalendar
-      
-      const calendar = this.calendars.find(x => x.uid == uid)
-      return calendar
-    }
   },
 
   computed: {

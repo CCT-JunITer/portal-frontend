@@ -43,10 +43,12 @@ export const getters = {
   },
 
 
-  getCalendarByUID(state: CalendarState, uid: string) {
-    const calendar = state.calendars.find(x => x.uid == uid)
-    return calendar
-  }
+  getCalendarByUID(state: CalendarState) {
+    return function (uid:string) {
+      const calendar = state.calendars.find(x => x.uid == uid)
+      return calendar
+    }
+  },
   
 }
 
