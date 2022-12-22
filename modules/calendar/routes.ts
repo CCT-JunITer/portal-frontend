@@ -9,15 +9,11 @@ export const routes: RouteConfig[] = [
   {
     path: 'calendar/:viewType/:viewDate',
     component: () => import('./views/CalendarMain.vue'),
-    meta: {
-      featureFlag: 'calendar'
-    }
   },
   {
     path: 'towernutzung/:viewType/:viewDate',
     component: () => import('./views/CalendarMain.vue'),
     meta: {
-      featureFlag: 'calendar',
       towernutzung: true,
     }
   },

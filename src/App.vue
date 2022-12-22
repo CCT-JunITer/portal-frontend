@@ -3,36 +3,28 @@
     <v-app>
       <router-view v-if="loggedIn !== null" />
       <NotificationsManager></NotificationsManager>
-      <nextcloud-authentication-manager> </nextcloud-authentication-manager>
+      <nextcloud-authentication-manager></nextcloud-authentication-manager>
       <v-snackbar
         v-model="hasUpdate"
-        color="cctBlue"
+        color="cctPurple"
         shaped
         right
         bottom
         timeout="-1"
       >
-        Update verfügbar
+        App wird <strong>automatisch</strong> aktualisiert
         <template v-slot:action="{ attrs }">
           <v-btn
-            color="green"
+            color="cctOrange"
+            small
             text
             v-bind="attrs"
             @click="skipWaiting"
           >
-            Aktualisieren
-          </v-btn>
-          <v-btn
-            color="pink"
-            text
-            v-bind="attrs"
-            @click="hasUpdate = false"
-          >
-            Ignorieren
+            neu laden
           </v-btn>
         </template>
       </v-snackbar>
-
     </v-app>
   </div>
 </template>
@@ -59,8 +51,9 @@ export default class App extends Vue {
   }
 
   public async skipWaiting() {
+    (this as any).$workbox.messageSkipWaiting();
     this.hasUpdate = false;
-    await (this as any).$workbox.messageSW({ type: 'SKIP_WAITING' });
+    window.location.reload();
   }
 
   public async created() {
