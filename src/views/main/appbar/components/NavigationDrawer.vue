@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer v-model="showDrawer" clipped app fixed width="300px" :style="`padding-top: ${$vuetify.application.top}px; z-index: 4; top: 0; max-height: unset;`">
+  <v-navigation-drawer v-model="showDrawer" clipped app fixed temporary width="300px" :style="`padding-top: ${$vuetify.application.top}px; z-index: 4; top: 0; max-height: unset;`">
     <template v-slot:prepend>
       <v-list dense nav>
         <v-list-item two-line v-if="userProfile">
