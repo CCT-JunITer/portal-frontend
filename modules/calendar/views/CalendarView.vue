@@ -159,7 +159,7 @@
             v-slot:interval="{minutesToPixels, hour, day, month, year}"
           >
             <template
-              v-for="event in getIntervalTowerEvents({minutes:0, hour:hour, day:day, month:month-1, year:year})"
+              v-for="event in towerEventInInterval[[year, month-1, day, hour]]"
             >
               <template>
                 <v-sheet
@@ -167,10 +167,10 @@
                   class="clickable"
                   color="black"
                   width="20px"
-                  :height="minutesToPixels(getIntervalEventLength(hour,day,month-1,year,event))"
+                  :height="minutesToPixels(event.length)"
                   tile
                   :key="event.uid"
-                  style="z-index:1;position:absolute"
+                  :style="'z-index:1;position:absolute;margin-top:' + (event.padding)  + 'px;'"
                   @click="(clickEvent) => {showEvent({nativeEvent:clickEvent, event:event})}"
                 ></v-sheet>
               </template>
@@ -181,7 +181,7 @@
               <strong v-if="event.event.timed" v-html="timeSummary()"></strong> <v-icon v-if="event.event.locationId=='tower'&&!towernutzung">mdi-chess-rook</v-icon>{{event.name}}
             </div>
             <div v-else class="disable-select" :style="'padding-left:'+ 
-              ((getIntervalTowerEvents({minutes:event.start.getMinutes(), hour:event.start.getHours(), day:event.start.getDate(), month:event.start.getMonth(), year:event.start.getFullYear()}).length > 0 && !towernutzung) ? '25' : '5') +'px'">
+              ((towerEventInInterval[[event.start.getFullYear(), event.start.getMonth(), event.start.getDate(), event.start.getHours()]] && !towernutzung) ? '25' : '5') +'px'">
               <strong :id="'e' + convert_uid_to_id(event.event.uid)">
                 <v-icon v-if="!event.event.uid">mdi-new-box</v-icon>
                 <v-icon v-if="event.event.locationId=='tower'&&!towernutzung">
@@ -551,39 +551,12 @@ export default {
       return d
     },
 
+    toUTCDateTimeString(date) {
+      return `${date.getFullYear().toString().padStart(4,'0')}-${(date.getMonth()+1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')}T${(date.getHours()).toString().padStart(2,'0')}:${(date.getMinutes()).toString().padStart(2,'0')}`
+    },
+
     toUTCDateString(date) {
       return `${date.getFullYear().toString().padStart(4,'0')}-${(date.getMonth()+1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')}`
-    },
-
-    getIntervalEventLength(hour, day, month, year, event) {
-      const intervalStart = this.createDate(0, hour, day, month, year)
-      const intervalEnd = this.createDate(0, hour+1, day, month, year)
-      const start = (event.start < intervalStart) ? intervalStart : event.start
-      const end = (event.end > intervalEnd) ? intervalEnd : event.end
-      return (event.end-event.start)/1000/60
-    },
-
-    getIntervalTowerEvents({minutes, hour, day, month, year}, length=1000*60*60) {
-      const intervalStart = this.createDate(minutes, hour, day, month, year)
-      const intervalEnd = this.createDate(minutes, hour, day, month, year)
-      intervalEnd.setTime(intervalEnd.getTime()+length)
-
-      const intervals = []
-      if (this.towerCalendar) {
-        this.towerCalendar.events.forEach((event) => {
-          if (event.start < intervalEnd && event.end > intervalStart) {
-            const start = (event.start < intervalStart) ? intervalStart : event.start
-            const end = (event.end > intervalEnd) ? intervalEnd : event.end
-            intervals.push({
-              event:event,
-              start:start,
-              end:end,
-              length:(event.end-event.start)/1000/60
-            });
-          }
-        })
-      }
-      return intervals;
     },
 
     // Start: Drag and drop methods
@@ -811,6 +784,50 @@ export default {
 
     towerCalendar: function() {
       return readTowerCalendar(this.$store);
+    },
+
+    /**
+     * This function generates a dict for each hourly interval in week view, where it saves all tower events in a list that are scheduled in that interval and calculates the length and y position of the black box
+     * This has to be recalculated each time the value or type is changed 
+     */
+    towerEventInInterval: function() {
+      const dict = {}
+      const monday = this.getMonday(this.value)
+      
+      if (this.towerCalendar && this.towerCalendar.events) {
+        const towerevents = []
+        this.towerCalendar.events.forEach(event => {
+          const uiEvents = constructUIEvents(event, this.towerCalendar, this.viewStart, this.viewEnd)
+          towerevents.push(...uiEvents)
+        })
+        towerevents.sort((a,b) => {return a.start-b.start})
+        for (let h = 0; h < (24*7)+1; h++) {
+          const intervalStart = new Date(monday - h*1000*60*60*-1)
+          const intervalEnd = new Date(monday - (h+1)*1000*60*60*-1 - 1)
+          while (towerevents.length > 0 && (towerevents[0].end < intervalStart)) towerevents.shift();
+          
+          const key = [intervalStart.getFullYear(), intervalStart.getMonth(), intervalStart.getDate(), intervalStart.getHours()]
+          const eventsInInterval = []
+          while (towerevents.length > 0 && 
+            (towerevents[0].start <= intervalEnd && intervalStart <= towerevents[0].end)) {
+            const start = (towerevents[0].start < intervalStart) ? intervalStart : towerevents[0].start
+            const end = (towerevents[0].end > intervalEnd) ? intervalEnd : towerevents[0].end
+            eventsInInterval.push({...towerevents[0],
+                                   // convert to minutes
+                                   length:(end-start)/1000/60, 
+                                   padding:Math.max(0, (towerevents[0].start - intervalStart) / 1000/60)
+            })
+            if (towerevents[0].end <= intervalEnd) {
+              towerevents.shift()
+            } else {
+              break
+            }
+          }
+          
+          dict[key] = eventsInInterval
+        }
+      }
+      return dict
     },
 
     selectedEvent: function() {
