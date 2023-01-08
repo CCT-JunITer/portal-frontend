@@ -5,13 +5,13 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { store } from '@/store';
-import { dispatchCheckLoggedIn } from '@/store/main/actions';
 import { readIsLoggedIn } from '@/store/main/getters';
+import { dispatchCheckLoggedIn } from '@/store/main/actions';
 
 const startRouteGuard = async (to, from, next) => {
   await dispatchCheckLoggedIn(store);
   if (readIsLoggedIn(store)) {
-    if (!(to.path as string).startsWith('/main') || to.path === '/') {
+    if (!(to.path as string).startsWith('/main')) {
       next('/main');
     } else {
       next();
@@ -36,14 +36,12 @@ export default class Start extends Vue {
   }
 
   mounted() {
-    setTimeout(() => {
-      const splash = document.getElementById('splash-screen');
-      if (!splash) {
-        return;
-      }
-      splash.classList.add('ended');
-      setTimeout(() => splash.remove(), 1000);
-    }, 1000);
+    const splash = document.getElementById('splash-screen');
+    if (!splash) {
+      return;
+    }
+    splash.classList.add('ended');
+    setTimeout(() => splash.remove(), 1000);
   }
 }
 </script>

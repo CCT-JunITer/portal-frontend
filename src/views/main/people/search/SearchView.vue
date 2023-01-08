@@ -164,7 +164,7 @@ import Backdrop from '@/components/Backdrop.vue';
 import { IUserProfile, UserType } from '@/interfaces';
 import EmployeeCard from '@/components/employee/EmployeeCard.vue';
 import { readGroups, readUsers } from '@/store/main/getters';
-import { dispatchGetGroups, dispatchGetUsers } from '@/store/main/actions';
+import { dispatchGetUsers } from '@/store/main/actions';
 import { MEMBERSTATUS, UNIVERSITIES } from '@/common';
 
 @Component({
@@ -310,7 +310,6 @@ export default class EmployeesView extends Vue {
 
   public async mounted() {
     await dispatchGetUsers(this.$store);
-    await dispatchGetGroups(this.$store);
   }
 
   public async onCategoryChange() {

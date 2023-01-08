@@ -1,7 +1,7 @@
 import { RouteConfig } from 'vue-router';
 import { Module } from 'vuex';
 
-import * as modules from '../modules';
+import * as modules from '@modules/index';
 import { State } from './store/state';
 
 export interface PortalModule {

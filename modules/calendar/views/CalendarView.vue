@@ -221,9 +221,8 @@ import CalendarEventPopup from './CreateEventPopup.vue'
 import CalendarListComponent from '../components/CalendarListComponent.vue';
 import { commitSetSelectedEvent } from '../store/mutations';
 import { dispatchFetchCalendars, dispatchFetchCalendarRights} from '../store/actions';
-import { readCalendars, readCalendarsWithoutTower, readSelectedEvent, readTowerCalendar, readUpdatableCalendarsWithoutTower, readReadonlyCalendarsWithoutTower} from '../store/getters';
+import { readCalendars, readCalendarsWithoutTower, readSelectedEvent, readTowerCalendar, readUpdatableCalendarsWithoutTower, readReadonlyCalendarsWithoutTower, readAuthenticationURL} from '../store/getters';
 import { CalendarEvent } from '../types/CalendarEvent';
-import { readAuthenticationURL } from '@/store/main/getters';
 
 
 

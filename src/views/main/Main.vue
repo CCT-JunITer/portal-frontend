@@ -16,7 +16,6 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { readUserProfile } from '@/store/main/getters';
 import NavigationDrawer from './appbar/components/NavigationDrawer.vue';
-import { dispatchUserLogOut } from '@/store/main/actions';
 import DefaultAppBar from '@/views/main/appbar/DefaultAppBar.vue';
 import RouteTitle from '@/views/main/RouteTitle.vue';
 import { store } from '@/store';
@@ -49,11 +48,6 @@ export default class Main extends Vue {
     const fromDepth = from.path.split('/').length
     this.transitionDirection = toDepth < fromDepth ? 'v-slide-x-transition' : 'v-slide-x-reverse-transition'
     routeGuardMain(to, from, next);
-  }
-
-
-  public async logout() {
-    await dispatchUserLogOut(this.$store);
   }
 }
 </script>

@@ -11,7 +11,7 @@
   >
     <template v-slot:selection="{ attrs, on, item, selected, parent }">
       <user-chip
-        v-bind="{...attrs, ...$props.userChipProps}"
+        v-bind="{...attrs, ...userChipProps}"
         v-on="on"
         :input-value="selected"
         :user="item"
@@ -36,7 +36,6 @@
 </template>
 
 <script lang="ts">
-import { IUserProfile } from '@/interfaces';
 import { dispatchGetUsers } from '@/store/main/actions'
 import { readUsers } from '@/store/main/getters';
 import { Vue, Component, Prop } from 'vue-property-decorator'
@@ -56,11 +55,13 @@ export default class UserSelect extends Vue {
   @Prop({ default: 'id' })
   public returnValue!: string;
 
-  @Prop()
-  public userChipProps!: typeof VChip;
+  @Prop({ default: () => ({}), required: false })
+  public userChipProps?: typeof VChip;
 
   async mounted() {
-    await dispatchGetUsers(this.$store);
+    if (!this.users || !this.users.length) {
+      await dispatchGetUsers(this.$store);
+    }
   }
 
   get users() {

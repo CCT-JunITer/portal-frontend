@@ -1,4 +1,4 @@
-import { Group, IUserProfile, Request, IEvent, IEventApplication, IFinanceRequest, IUserSettings } from '@/interfaces';
+import { Group, IUserProfile, Request, IUserSettings, DocEnum } from '@/interfaces';
 
 export interface AppNotification {
     content: string;
@@ -19,5 +19,5 @@ export interface MainState {
     users: IUserProfile[];
     myRequests: Request[];
     groups: Group[];
-    authenticationURL: string|undefined;
+    docEnums: { [k: string]: DocEnum[] };
 }

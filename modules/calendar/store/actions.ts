@@ -3,15 +3,18 @@ import { ICalendarEvent } from '../types';
 import { getStoreAccessors } from 'typesafe-vuex';
 import { ActionContext } from 'vuex';
 import { State } from '@/store/state';
-import { apiCall, apiCallNotify } from '@/store/utils';
+import { apiCall, apiCallNotify } from '../utils';
 import { readCalendars } from './getters';
-import { commitDeleteCalendar, commitRemoveCalendarEvent, commitUpdateCalendarRights, commitUpdateCalendars, commitUpdateEvent } from './mutations';
+import { commitDeleteCalendar, commitRemoveCalendarEvent, commitSetAuthenticationURL, commitUpdateCalendarRights, commitUpdateCalendars, commitUpdateEvent } from './mutations';
 import { CalendarState } from './state';
 
 type MainContext = ActionContext<CalendarState, State>;
 
 export const actions = {
-
+  async actionAuthenticateNextcloud(context: MainContext) {
+    const response = await apiCall(context, api.requestAuthenticationURL);
+    commitSetAuthenticationURL(context, response.data)
+  },
   async actionRemoveEvent(context: MainContext, event: {calendarId: string; uid: string; notify: boolean}) {
     const selected = context.state.selectedEvent
     event.notify = !event.notify
@@ -131,3 +134,5 @@ export const dispatchUpdateCalendarEvent = dispatch(actions.actionUpdateCalendar
 export const dispatchDeleteCalendar = dispatch(actions.actionDeleteCalendar);
 export const dispatchUpdateCalendar = dispatch(actions.actionUpdateCalendar);
 export const dispatchFetchCalendarRights = dispatch(actions.actionFetchCalendarRights);
+
+export const dispatchActionAuthenticateNextcloud = dispatch(actions.actionAuthenticateNextcloud)

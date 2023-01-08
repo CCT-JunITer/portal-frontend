@@ -3,7 +3,7 @@
     <employee-profile-picture
       :employee="user"
       component="v-list-item-avatar"
-      size="40"
+      size="24"
     ></employee-profile-picture>
 
     <v-list-item-content>

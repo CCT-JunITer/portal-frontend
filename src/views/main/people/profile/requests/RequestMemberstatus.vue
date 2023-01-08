@@ -56,7 +56,7 @@
 <script lang="ts">
 import UserGroupCard from '@/components/user-group/UserGroupCard.vue';
 import { Group, RequestCreate, RequestGroup } from '@/interfaces';
-import { dispatchAddRequestMe, dispatchGetGroups } from '@/store/main/actions';
+import { dispatchAddRequestMe } from '@/store/main/actions';
 import { readGroups, readUserProfile } from '@/store/main/getters';
 import { Vue, Component, Prop } from 'vue-property-decorator'
 
@@ -112,10 +112,6 @@ export default class UserProfileRessortChange extends Vue {
 
   get userProfile() {
     return readUserProfile(this.$store);
-  }
-
-  async mounted() {
-    await dispatchGetGroups(this.$store);
   }
 
   get memberstatuses() {

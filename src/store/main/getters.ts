@@ -60,7 +60,7 @@ export const getters = {
   firstNotification: (state: MainState) => state.notifications.length > 0 && state.notifications[0],
   myRequests: (state: MainState) => state.myRequests,
   groups: (state: MainState) => state.groups,
-  authenticationURL: (state: MainState) => state.authenticationURL,
+  oneDocEnum: (state: MainState) => (name: string) => state.docEnums[name],
 };
 
 const {read} = getStoreAccessors<MainState, State>('');
@@ -83,6 +83,5 @@ export const readIsMe = read(getters.isMe);
 export const readRouteUser = read(getters.routeUser);
 export const readMyRequests = read(getters.myRequests);
 export const readGroups = read(getters.groups);
-export const readAuthenticationURL = read(getters.authenticationURL);
 export const readIsFlagSet = read(getters.isFlagSet);
-
+export const readOneDocEnum = read(getters.oneDocEnum);

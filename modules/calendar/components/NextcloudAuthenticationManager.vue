@@ -1,16 +1,8 @@
 <template>
-  <div class="text-center">
-    <!-- <v-btn
-      :disabled="dialog"
-      :loading="dialog"
-      class="white--text"
-      color="purple darken-2"
-      @click="dialog = true"
-    >
-      Start loading
-    </v-btn> -->
-    <v-dialog :value="dialog" persistent width="500">
-      <v-card>
+  <div class="d-flex justify-center align-center fill-height">
+    <slot name="default" v-if="!dialog"></slot>
+    <div :value="dialog" v-else>
+      <v-card max-width="500">
         <v-toolbar
           color="primary"
           dark
@@ -52,14 +44,15 @@
         </v-card-actions>
         
       </v-card>
-    </v-dialog>
+    </div>
   </div>
 </template>
 
 <script>
-import { readAuthenticationURL } from '@/store/main/getters';
-import { commitSetAuthenticationURL } from '@/store/main/mutations';
-import { api } from '@/api';
+import { readAuthenticationURL } from '../store/getters';
+import { commitSetAuthenticationURL } from '../store/mutations';
+import { api } from '../api'
+
 export default {
   data() {
     return {
@@ -70,6 +63,7 @@ export default {
 
   watch: {
     authenticationURL(val) {
+      if (this.timer) clearInterval(this.timer);
       if (this.dialog) this.show()
       else this.close()
     }
@@ -94,6 +88,9 @@ export default {
         this.close();
       }
     },
+  },
+  destroyed() {
+    this.close();
   },
 
   computed: {

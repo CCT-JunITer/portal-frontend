@@ -30,6 +30,9 @@ export const api = {
   async getMe(token: string) {
     return axios.get<IUserProfile>(`${apiUrl}/api/v1/users/me`, authHeaders(token));
   },
+  async getDocEnums(token: string) {
+    return axios.get(`${apiUrl}/api/v1/utils/doc-enums`, authHeaders(token));
+  },
   async getUserSettingsMe(token: string) {
     return axios.get<IUserSettings>(`${apiUrl}/api/v1/users/email-settings/me`, authHeaders(token));
   },
@@ -261,13 +264,6 @@ export const api = {
   },
 
 
-  async requestAuthenticationURL(token: string) {
-    return axios.get(`${apiUrl}/api/v1/calendar/requestAuthenticationURL`, authHeaders(token));
-  },
-  
-  async checkNextcloudAuthentication(token: string) {
-    return axios.get(`${apiUrl}/api/v1/calendar/checkAuthenticationStatus`, authHeaders(token));
-  },
   // Search
   async getSearchResults(token: string, searchText: string) {
     return axios.get(`${apiUrl}/api/v1/search/`, { ...authHeaders(token), params: { text: searchText } });

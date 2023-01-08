@@ -3,6 +3,7 @@
     v-bind="$attrs"
     v-on="$listeners"
     v-if="user"
+    @click="goToProfile"
   >
     <v-avatar left>
       <employee-profile-picture
@@ -27,6 +28,12 @@ export default class UserChip extends Vue {
 
   @Prop()
   public user!: IUserProfile;
+
+  public goToProfile() {
+    return this.$router.push({ path: '/main/people/profile/view/' + this.user.id })
+  }
+
+
 
 }
 </script>

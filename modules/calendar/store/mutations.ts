@@ -12,7 +12,9 @@ function rgbToHex(r, g, b) {
 }
 
 export const mutations = {
-
+  setAuthenticationURL(state: CalendarState, url: string) {
+    state.authenticationURL = url;
+  },
   removeCalendarEvent(state: CalendarState, event: {calendarId: string; uid: string}) {
     if (!event) return;
 
@@ -144,6 +146,7 @@ export const mutations = {
 
 const {commit} = getStoreAccessors<CalendarState | any, State>('');
 
+export const commitSetAuthenticationURL = commit(mutations.setAuthenticationURL);
 export const commitSetSelectedEvent = commit(mutations.setSelectedEvent)
 export const commitRemoveCalendarEvent = commit(mutations.removeCalendarEvent)
 export const commitUpdateCalendars = commit(mutations.updateCalendars)

@@ -1,9 +1,8 @@
 <template>
   <div id="app">
     <v-app>
-      <router-view v-if="loggedIn !== null" />
+      <router-view />
       <NotificationsManager></NotificationsManager>
-      <nextcloud-authentication-manager></nextcloud-authentication-manager>
       <v-snackbar
         v-model="hasUpdate"
         color="cctPurple"
@@ -32,23 +31,15 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import NotificationsManager from '@/components/NotificationsManager.vue';
-import { readIsLoggedIn } from '@/store/main/getters';
-import { dispatchCheckLoggedIn } from '@/store/main/actions';
-import NextcloudAuthenticationManager from '@/components/NextcloudAuthenticationManager.vue';
 import { api } from './api';
 
 @Component({
   components: {
     NotificationsManager,
-    NextcloudAuthenticationManager
   },
 })
 export default class App extends Vue {
   public hasUpdate = false;
-
-  get loggedIn() {
-    return readIsLoggedIn(this.$store);
-  }
 
   public async skipWaiting() {
     (this as any).$workbox.messageSkipWaiting();
@@ -62,7 +53,6 @@ export default class App extends Vue {
         this.hasUpdate = true;
       });
     }
-    await dispatchCheckLoggedIn(this.$store);
   }
 
   async errorCaptured(err, vm, info) {

@@ -43,7 +43,7 @@
             <v-list-item-title>Wissensmanagement</v-list-item-title>
           </v-list-item-content>
         </template>
-        <v-list-item to="/main/wms/projects" disabled class="ml-2">
+        <v-list-item to="/main/wms/projects" color="cctPurple" class="ml-2">
           <v-list-item-icon>
             <v-icon>mdi-account-tie</v-icon>
           </v-list-item-icon>

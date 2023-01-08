@@ -53,6 +53,10 @@
             <v-icon left>mdi-folder</v-icon>
             Dokumente
           </v-btn>
+          <v-btn value="project">
+            <v-icon left>mdi-account</v-icon>
+            Projekte
+          </v-btn>
         </v-btn-toggle>
       </v-list-item>
     </template>
@@ -72,6 +76,12 @@
         </v-list-item-content>
       </template>
       <template v-if="item.searchType === 'document'">
+        <v-list-item-content>
+          <v-list-item-title v-text="item.target.title"></v-list-item-title>
+          <v-list-item-subtitle v-text="item.target.description"></v-list-item-subtitle>
+        </v-list-item-content>
+      </template>
+      <template v-if="item.searchType === 'project'">
         <v-list-item-content>
           <v-list-item-title v-text="item.target.title"></v-list-item-title>
           <v-list-item-subtitle v-text="item.target.description"></v-list-item-subtitle>
@@ -112,6 +122,10 @@ export default class SearchBar extends Vue {
     {
       type: 'document',
       name: 'Dokumente',
+    },
+    {
+      type: 'project',
+      name: 'Projekte',
     }
   ]
   
@@ -140,6 +154,7 @@ export default class SearchBar extends Vue {
     if (!this.results) {
       return [];
     }
+    // TODO: types can be hard
     const arr: any[] = [];
     const sections = this.sections.filter(section => !this.filter || section.type === this.filter)
     for (let i = 0 ; i < sections.length; i++) {
@@ -181,6 +196,9 @@ export default class SearchBar extends Vue {
     }
     if (e?.searchType === 'document') {
       return this.$router.push({ path: '/main/wms/documents/edit/' + e.id })
+    }
+    if (e?.searchType === 'project') {
+      return this.$router.push({ path: '/main/wms/projects/' + e.id })
     }
     console.error(`unhandled searchtype '${e.searchType}'`);
   }

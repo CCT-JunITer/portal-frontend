@@ -213,7 +213,7 @@ export default class CreateFinanceRequest extends Vue {
 
     if ((this.$refs.form as HTMLFormElement).validate()) {
       const newFinanceRequest: IFinanceRequestCreate = {
-        amount: +this.amount.replace(',', '.'),
+        amount: this.$common.text2Decimal(this.amount),
         type: this.type?.name || 'unknown',
         purpose: this.purpose,
         files: this.files,
@@ -222,7 +222,7 @@ export default class CreateFinanceRequest extends Vue {
         iban: this.iban,
       };
       const updatedFinanceRequest: IFinanceRequestUpdate = {
-        amount: +this.amount.replace(',', '.'),
+        amount: this.$common.text2Decimal(this.amount),
         type: this.type?.name || 'unknown',
         purpose: this.purpose,
         files: this.files,
@@ -265,7 +265,7 @@ export default class CreateFinanceRequest extends Vue {
         this.isRessortBudget = true;
         this.association = this.editFinanceRequest.association;
       }
-      this.amount = this.editFinanceRequest.amount.toFixed(2).replace('.', ',');
+      this.amount = this.$common.decimal2Text(this.editFinanceRequest.amount, 2);
       this.type = this.$common.KOSTENART.find(o => o.name === this.editFinanceRequest?.type) || { name: this.editFinanceRequest.type, associations: [] };
       this.purpose = this.editFinanceRequest.purpose;
       this.files = this.editFinanceRequest.files;

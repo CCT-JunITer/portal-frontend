@@ -357,6 +357,7 @@
 
     </div>
   </v-container>
+  <loading-page v-else></loading-page>
 </template>
 
 <script lang="ts">

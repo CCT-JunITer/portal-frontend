@@ -1,11 +1,11 @@
 import { IDocumentType } from '@/interfaces';
-import { getDayOfYear, getTime, isDate, isEqual, isSameDay, parseISO, startOfDay } from 'date-fns';
-import { format, utcToZonedTime, formatInTimeZone } from 'date-fns-tz';
+import { getDayOfYear, isSameDay, parseISO } from 'date-fns';
+import { format as formatFns, utcToZonedTime, formatInTimeZone } from 'date-fns-tz';
 import de from 'date-fns/locale/de';
 import { debounce } from './utils';
 
 export { debounce }
-export { format, formatInTimeZone, parseISO, de, utcToZonedTime };
+export { formatInTimeZone, parseISO, de, utcToZonedTime };
 
 export const RESSORTS = [
   'Kein Ressort', 'Juniter', 'Public Affairs', 'Human Resources', 'Quality Management', 'International Networks', 'Board', 'Vorstand', 'Projektmanager'
@@ -94,11 +94,15 @@ export const isLinkedIn = (url: string) => {
 
 export const required = (v: string) => !!v || 'Dieses Feld wird benötigt.';
 
-export const isNumber = (v: string) => (v && !!v.match(/^[0-9]+$/)) || 'Dies ist keine Zahl.';
+export const isEmpty = (v: string) => !v || 'Dieses Feld muss leer sein.';
+
+export const isNumber = (v: string) => (!v || !!v.match(/^[0-9]+$/)) || 'Dies ist keine Zahl.';
+
+export const isDecimal = (v: string) => (!v || !!v.match(/^\d+(,\d+)?$/)) || 'Dies ist keine Zahl.';
 
 export const isEmail = (v: string) => (v && !!v.match(/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/)) || 'Dies ist keine E-Mail.';
 
-export const isCurrency = (v: string) => (v && !!v.match(/^\d+$|^\d+,\d{2}$/) || 'Dies ist kein gültiger Geldbetrag.')
+export const isCurrency = (v: string) => (!v || !!v.match(/^\d+$|^\d+,\d{2}$/) || 'Dies ist kein gültiger Geldbetrag.')
 
 export const isIBAN = (v: string) => (!v || !!v.match(/[A-Z]{2}[0-9]{2}(?:[ ]?[0-9]{4}){4}(?!(?:[ ]?[0-9]){3})(?:[ ]?[0-9]{1,2})?/)) || 'Dies ist keine IBAN.';
 
@@ -110,6 +114,19 @@ export const isTodayBirthday = (date: Date | string) => {
   return getDayOfYear(date) === getDayOfYear(now);
 }
 
+export const format = (date?: string | number | Date, format?: string) => {
+  if (!date) {
+    return '';
+  }
+  if (typeof date === 'string') {
+    date = new Date(date);
+  }
+  if (!format) {
+    format = 'dd.MM.yyyy';
+  }
+  return formatFns(date, format);
+}
+
 export const formatRange = (date_from: string, date_to: string): string => {
   const from = new Date(date_from);
   const to = new Date(date_to);
@@ -117,6 +134,33 @@ export const formatRange = (date_from: string, date_to: string): string => {
     return format(from, 'dd.MM.yyyy HH:mm \'bis\' ') + format(to, 'HH:mm')
   }
   return format(from, 'dd.MM.yyyy HH:mm \'bis\' ') + format(to, 'dd.MM.yyyy HH:mm')
+}
+
+
+export const formatDateRange = (date_from: string, date_to: string): string => {
+  const from = new Date(date_from);
+  const to = new Date(date_to);
+  if (isSameDay(from, to)) {
+    return format(from, 'dd.MM.yyyy \'bis\' ')
+  }
+  return format(from, 'dd.MM.yyyy \'bis\' ') + format(to, 'dd.MM.yyyy')
+}
+
+export const decimal2Text = (decimal?: number, fixed?: number): string => {
+  if (!decimal) {
+    return '';
+  }
+  if (fixed) {
+    return decimal.toFixed(fixed).replace('.', ',');
+  }
+  return decimal.toString().replace('.', ',');
+}
+
+export const text2Decimal = (text?: string) => {
+  if (!text) {
+    return NaN;
+  }
+  return +text.replace(',', '.');
 }
 
 

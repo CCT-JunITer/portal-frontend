@@ -5,7 +5,7 @@ import { CalendarState } from './state';
 
 const TowerCalendarIDs = new Set(['tower_shared_by_CalendarBot']);
 export const getters = {
-
+  authenticationURL: (state: CalendarState) => state.authenticationURL,
   getCalendars(state: CalendarState) {
     return state.calendars
   },
@@ -54,6 +54,7 @@ export const getters = {
 
 const {read} = getStoreAccessors<CalendarState, State>('');
 
+export const readAuthenticationURL = read(getters.authenticationURL);
 export const readCalendars = read(getters.getCalendars);
 export const readCalendarsWithoutTower = read(getters.getCalendarsWithoutTower);
 export const readSelectedEvent = read(getters.getSelectedEvent);

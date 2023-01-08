@@ -35,15 +35,14 @@
       >
         <v-card v-if="this.files">
           <v-card-title>
-            <span class="text-h5">Datei umbenennen</span>
+            <span class="text-h5">Dateien umbenennen</span>
           </v-card-title>
           <v-card-text>
+            <v-alert type="info" text dense v-if="labels">
+              Du kannst den Dateien <code>labels</code> zuordnen, indem du auf die Dateivorschau klickst.
+            </v-alert>
             <file-chip-group>
-
-              <div
-                v-for="file in this.files"
-                :key="file.key"
-              >
+              <v-form v-model="file.formValid" ref="forms" v-for="file in this.files" :key="file.key">
                 <v-menu
                   :close-on-content-click="false"
                   v-model="file.menu"
@@ -51,12 +50,13 @@
                   right
                   transition="scale-transition"
                   offset-y
+                  eager
                 >
                   <template v-slot:activator="{ on, attrs}">
                     <v-chip 
                       v-bind="attrs"
                       v-on="on"
-                      color="cctBlue"
+                      :color="file.formValid ? 'cctBlue' : 'error'"
                       outlined
                     >
                       <v-icon left size="20">
@@ -66,7 +66,7 @@
                         {{ file.label + '/'}}
                       </span>
                       <span class="text-truncate file-chip__displayname">
-                        {{ file.fileName }}
+                        {{ file.fileName }}.{{ file.fileExtention }}
                       </span>
                     </v-chip>
                   </template>
@@ -74,15 +74,22 @@
                     <v-card-text>
                       <v-select
                         label="Label"
+                        filled
                         v-model="file.label"
                         :items="labels"
                         v-if="labels && labels.length"
+                        :rules="[$common.required]"
                       >
                       </v-select>
                       <v-text-field
-                        label="Name"
+                        label="Dateiname"
+                        filled
                         v-model="file.fileName"
+                        :rules="[$common.required]"
                       >
+                        <template #append>
+                          <span class="text-button">.{{file.fileExtention}}</span>
+                        </template>
                       </v-text-field>
                     </v-card-text>
                     <v-card-actions>
@@ -93,6 +100,7 @@
                       <v-btn
                         color="primary"
                         text
+                        :disabled="!file.formValid"
                         @click="file.menu = false"
                       >
                         Speichern
@@ -100,7 +108,7 @@
                     </v-card-actions>
                   </v-card>
                 </v-menu>
-              </div>
+              </v-form>
             </file-chip-group>
           </v-card-text>
           <v-card-actions>
@@ -179,7 +187,7 @@ export default class FileManager extends Vue {
 
   public isUploading = false;
   public dialog = false;
-  public files: { file: File; fileName: string; key: number; label?: string }[] | null = null;
+  public files: { file: File; fileName: string; fileExtention: string; key: number; label?: string; formValid: boolean }[] | null = null;
 
   public versionedFolder: VersionedFolder | null = null;
   public showHistory = false;
@@ -278,11 +286,20 @@ export default class FileManager extends Vue {
   }
 
   public onFileChanged(files: File[]) {
-    this.files = files.map((file, i) => ({ file, fileName: file.name, key: i, label: this.labels ? this.labels[0] : '' }));
+    this.files = files.map((file, i) => {
+      const fileExtentionIndex = file.name.lastIndexOf('.');
+      const fileName = file.name.substring(0, fileExtentionIndex);
+      const fileExtention = file.name.substring(fileExtentionIndex + 1);
+      return { file, fileName, fileExtention, key: i, label: '', formValid: false }
+    });
     this.dialog = true;
   }
 
   public async uploadFiles() {
+    const valid = (this.$refs as any).forms.every(form => form.validate())
+    if (!valid) {
+      return;
+    }
     if (!this.files) {
       return;
     }
@@ -290,11 +307,12 @@ export default class FileManager extends Vue {
     this.dialog = false;
     const files: LabelledFile[] = [];
 
-    for(const { file, fileName, label } of this.files) {
+    for(const { file, fileName, fileExtention, label } of this.files) {
+      const fullFileName = fileName + '.' + fileExtention;
       try {
         const response = await dispatchUploadFile(this.$store, {
           file,
-          fileName
+          fileName: fullFileName
         });
         if (response) {
           files.push({ file_id: response.filename, label: label })

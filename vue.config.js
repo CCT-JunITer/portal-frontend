@@ -1,5 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { GenerateSW } = require('workbox-webpack-plugin');
+const { TsconfigPathsPlugin } = require('tsconfig-paths-webpack-plugin');
 
 module.exports = {
   'transpileDependencies': true,
@@ -36,5 +37,8 @@ module.exports = {
           'v-responsive': 'src',
         }
       }));
+    config.resolve
+      .plugin('tsconfig-paths')
+      .use(TsconfigPathsPlugin);
   },
 }

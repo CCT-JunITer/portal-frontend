@@ -6,6 +6,13 @@ import { ICalendarEvent } from './types';
 
 
 export const api = {
+  async requestAuthenticationURL(token: string) {
+    return axios.get(`${apiUrl}/api/v1/calendar/requestAuthenticationURL`, authHeaders(token));
+  },
+  
+  async checkNextcloudAuthentication(token: string) {
+    return axios.get(`${apiUrl}/api/v1/calendar/checkAuthenticationStatus`, authHeaders(token));
+  },
   async deleteCalendar(token: string, calendarId: string) {
     return axios.delete<ICalendarEvent>(`${apiUrl}/api/v1/calendar?calendarId=${encodeURI(calendarId)}`, authHeaders(token));
   },

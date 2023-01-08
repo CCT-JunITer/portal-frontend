@@ -11,7 +11,7 @@ import { State } from '../state';
 import {
   commitAddNotification,
   commitRemoveNotification,
-  commitSetAuthenticationURL,
+  commitSetDocEnums,
   commitSetGroups,
   commitSetLoggedIn,
   commitSetLogInError,
@@ -31,6 +31,14 @@ import { readIsFlagSet } from './getters';
 type MainContext = ActionContext<MainState, State>;
 
 export const actions = {
+  async actionGetMasterdata(context: MainContext) {
+    // Always load this
+    return Promise.all([
+      dispatchGetUserProfile(context),
+      dispatchGetGroups(context),
+      dispatchGetDocEnums(context),
+    ])
+  },
   async actionLogIn(context: MainContext, payload: { username: string; password: string }) {
     try {
       const response = await api.logInGetToken(payload.username, payload.password);
@@ -41,10 +49,10 @@ export const actions = {
         commitSetToken(context, token);
         saveLocalUserStatus(user_status);
         commitSetUserStatus(context, user_status);
+        await dispatchGetMasterdata(context);
+        await dispatchRouteLoggedIn(context);
         commitSetLoggedIn(context, true);
         commitSetLogInError(context, false);
-        await dispatchGetUserProfile(context);
-        await dispatchRouteLoggedIn(context);
         commitAddNotification(context, { content: 'Logged in', color: 'success' });
       } else {
         await dispatchLogOut(context);
@@ -53,6 +61,10 @@ export const actions = {
       commitSetLogInError(context, true);
       await dispatchLogOut(context);
     }
+  },
+  async actionGetDocEnums(context) {
+    const response = await apiCall(context, api.getDocEnums);
+    commitSetDocEnums(context, response.data);
   },
   async actionGetUserProfile(context: MainContext) {
     const response = await apiCall(context, api.getMe);
@@ -121,9 +133,9 @@ export const actions = {
       }
       if (token) {
         try {
-          const response = await api.getMe(token);
+          await dispatchGetMasterdata(context);
           commitSetLoggedIn(context, true);
-          commitSetUserProfile(context, response.data);
+          console.log('Logged in')
         } catch (error) {
           await dispatchRemoveLogIn(context);
         }
@@ -247,10 +259,10 @@ export const actions = {
         commitSetToken(context, token);
         saveLocalUserStatus(user_status);
         commitSetUserStatus(context, user_status);
+        await dispatchGetMasterdata(context);
+        await dispatchRouteLoggedIn(context);
         commitSetLoggedIn(context, true);
         commitSetLogInError(context, false);
-        await dispatchGetUserProfile(context);
-        await dispatchRouteLoggedIn(context);
         commitRemoveNotification(context, loadingNotification);
         commitAddNotification(context, { content: 'Account erstellt', color: 'success' });
       } else {
@@ -274,10 +286,6 @@ export const actions = {
     commitSetGroups(context, response.data);
   },
 
-  async actionAuthenticateNextcloud(context: MainContext) {
-    const response = await apiCall(context, api.requestAuthenticationURL);
-    commitSetAuthenticationURL(context, response.data)
-  },
   async actionToggleFeatureFlag(context: MainContext, flag: string) {
     const features = context.state.userProfile?.features || [];
     let newFeatures: string[];
@@ -297,6 +305,8 @@ const { dispatch } = getStoreAccessors<MainState | any, State>('');
 
 export const dispatchCheckApiError = dispatch(actions.actionCheckApiError);
 export const dispatchCheckLoggedIn = dispatch(actions.actionCheckLoggedIn);
+export const dispatchGetMasterdata = dispatch(actions.actionGetMasterdata);
+export const dispatchGetDocEnums = dispatch(actions.actionGetDocEnums);
 
 export const dispatchGetUserProfile = dispatch(actions.actionGetUserProfile);
 export const dispatchGetUserSettingsMe = dispatch(actions.actionGetUserSettings);
@@ -327,5 +337,4 @@ export const dispatchGetMyRequests = dispatch(actions.actionGetMyRequests);
 export const dispatchAddRequestMe = dispatch(actions.actionAddRequestMe); 
 export const dispatchGetGroups = dispatch(actions.actionGetGroups); 
 export const dispatchSetPrimaryGroupMe = dispatch(actions.actionSetPrimaryGroupMe)
-export const dispatchActionAuthenticateNextcloud = dispatch(actions.actionAuthenticateNextcloud)
 export const dispatchToggleFeatureFlag = dispatch(actions.actionToggleFeatureFlag);

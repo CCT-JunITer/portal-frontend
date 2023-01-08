@@ -83,13 +83,13 @@
             <v-list-item-title>Abmelden</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item @click="toggleFeature" v-if="$route.meta && $route.meta.featureFlag" color="cctOrange" :input-value="!isFlagSet()">
+        <v-list-item @click="toggleFeature" v-if="flag" color="cctOrange" :input-value="!isFlagSet()">
           <v-list-item-icon>
             <v-icon>{{ isFlagSet() ? 'mdi-flask-outline' : 'mdi-flask-empty-outline' }}</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title>
-              <span>Beta für <b>{{ $route.meta.featureFlag }}</b> {{ isFlagSet() ? 'deaktivieren' : 'aktivieren' }}</span></v-list-item-title>
+              <span>Beta für <b>{{ flag }}</b> {{ isFlagSet() ? 'deaktivieren' : 'aktivieren' }}</span></v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -116,20 +116,27 @@ export default class UserMenu extends Vue {
     await dispatchUserLogOut(this.$store);
   }
 
+  get flag() {
+    for (const record of [...this.$route.matched].reverse()) {
+      if (record.meta.featureFlag) {
+        return record.meta.featureFlag;
+      }
+    }
+    return null;
+  }
+
   public isFlagSet() {
-    const flag = this.$route.meta?.featureFlag;
-    if (!flag) {
+    if (!this.flag) {
       return;
     }
-    return readIsFlagSet(this.$store)(flag);
+    return readIsFlagSet(this.$store)(this.flag)
   }
 
   public async toggleFeature() {
-    const flag = this.$route.meta?.featureFlag;
-    if (!flag) {
+    if (!this.flag) {
       return;
     }
-    await dispatchToggleFeatureFlag(this.$store, flag);
+    await dispatchToggleFeatureFlag(this.$store, this.flag);
   }
 
 }

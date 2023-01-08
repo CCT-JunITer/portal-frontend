@@ -160,7 +160,7 @@ export default new Router({
                           path: 'projects',
                           name: 'profile-projects',
                           component: () => import(
-                          /* webpackChunkName: "main-profile-projects" */  './views/main/people/profile/UserProfileProjects.vue'),
+                          /* webpackChunkName: "main-profile-projects" */  '@modules/projects/views/profile/UserProfileProjects.vue'),
                         },
                         {
                           path: 'about',

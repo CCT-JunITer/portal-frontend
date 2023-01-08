@@ -1,4 +1,4 @@
-import { Group, IUserProfile, Request, IEvent, IEventApplication, IUserSettings } from '@/interfaces';
+import { Group, IUserProfile, Request, IEvent, IEventApplication, IUserSettings, DocEnum } from '@/interfaces';
 import { MainState, AppNotification } from './state';
 import { getStoreAccessors } from 'typesafe-vuex';
 import { State } from '../state';
@@ -48,8 +48,8 @@ export const mutations = {
   setGroups(state: MainState, payload: Group[]) {
     state.groups = payload;
   },
-  setAuthenticationURL(state: MainState, url: string) {
-    state.authenticationURL = url;
+  setDocEnums(state: MainState, enums: {[k: string]: DocEnum[]}) {
+    state.docEnums = enums;
   }
 };
 
@@ -69,5 +69,4 @@ export const commitSetUser = commit(mutations.setUser);
 export const commitSetUsers = commit(mutations.setUsers);
 export const commitSetMyRequests = commit(mutations.setMyRequests);
 export const commitSetGroups = commit(mutations.setGroups);
-export const commitSetAuthenticationURL = commit(mutations.setAuthenticationURL);
-
+export const commitSetDocEnums = commit(mutations.setDocEnums);

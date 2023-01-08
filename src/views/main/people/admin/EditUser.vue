@@ -414,7 +414,7 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import { Group, IUserProfileCreate } from '@/interfaces';
-import { dispatchGetGroups, dispatchUploadFile } from '@/store/main/actions';
+import { dispatchUploadFile } from '@/store/main/actions';
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 import UploadButton from '@/components/UploadButton.vue';
 import VueTelInputVuetify from 'vue-tel-input-vuetify/lib/vue-tel-input-vuetify.vue';
@@ -501,10 +501,6 @@ export default class EditUser extends Vue {
       }
       this.reset();
     }
-  }
-
-  public async mounted() {
-    await dispatchGetGroups(this.$store);
   }
 
   public reset() {

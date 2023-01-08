@@ -56,7 +56,7 @@
           </v-icon>
           Profil bearbeiten
         </v-btn>
-        <v-btn :to="`/main/people/admin/users/edit/${userProfile.id}`" color="red" small outlined v-if="isSuperuser" class="ma-2 flex-grow-1">
+        <v-btn :to="`/main/people/admin/users/edit/${userProfile.id}`" color="red" small outlined v-if="canEditPeople" class="ma-2 flex-grow-1">
           <v-icon left small>
             mdi-wrench
           </v-icon>
@@ -84,6 +84,12 @@
           </v-icon>
           Meetings
         </v-tab>
+        <v-tab :ripple="false" :to="{name: 'profile-projects' }">
+          <v-icon left>
+            mdi-account-tie
+          </v-icon>
+          Projekte
+        </v-tab>
       </v-tabs>
       <v-divider></v-divider>
     </div>
@@ -92,11 +98,12 @@
       <router-view></router-view>
     </div>
   </v-container>
+  <loading-page v-else></loading-page>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
-import { readIsMe, readRouteUser, readUserProfile } from '@/store/main/getters';
+import { readHasAnyPermission, readIsMe, readRouteUser, readUserProfile } from '@/store/main/getters';
 import { dispatchGetOneUser } from '@/store/main/actions';
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 import EmployeeCard from '@/components/employee/EmployeeCard.vue';
@@ -138,8 +145,8 @@ export default class UserProfile extends Vue {
     return readRouteUser(this.$store)(this.$route);
   }
 
-  get isSuperuser() {
-    return readUserProfile(this.$store)?.is_superuser;
+  get canEditPeople() {
+    return readHasAnyPermission(this.$store)(['portal.users.admin.users']);
   }
 
   get exitFormatted() {

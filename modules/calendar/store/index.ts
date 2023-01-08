@@ -13,6 +13,7 @@ const defaultState: CalendarState = {
   // }
   ],
   selectedEvent: undefined,
+  authenticationURL: undefined,
 };
   
 export const calendarStore = {
