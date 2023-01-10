@@ -5,22 +5,28 @@
       permanent
       touchless
       :mini-variant.sync="mini"
-      width="350"
+      :width="expandedNavbarWidth"
     >
       <template v-slot:prepend>
-        <v-list-item 
-          link
-          @click="mini = !mini"
+        <v-list
           dense
+          :width="expandedNavbarWidth"
+          style="padding:0"
         >
-          <v-list-item-icon>
-            <v-icon v-if="mini">mdi-chevron-right</v-icon>
-            <v-icon v-else>mdi-chevron-left</v-icon>
-          </v-list-item-icon>
-          <v-list-item-subtitle>
-            Seitenleiste ausblenden
-          </v-list-item-subtitle>
-        </v-list-item>
+          <v-list-item 
+            link
+            @click="mini = !mini"
+            dense
+          >
+            <v-list-item-icon>
+              <v-icon v-if="mini">mdi-chevron-right</v-icon>
+              <v-icon v-else>mdi-chevron-left</v-icon>
+            </v-list-item-icon>
+            <v-list-item-subtitle>
+              Seitenleiste ausblenden
+            </v-list-item-subtitle>
+          </v-list-item>
+        </v-list>
         <v-divider></v-divider>
       </template>
       
@@ -351,7 +357,6 @@ export default {
 
   data: () => ({
     mode: 'stack',
-    mini:false,
     weekday: [1, 2, 3, 4, 5, 6, 0],
     towerIndicatorIntervals:[0,15,30,45],
     towerIndicatorIntervalLength:1000*60*15, // 15 minutes
@@ -362,6 +367,9 @@ export default {
       {name:'Monat', value:'month'}
     ],
     nextcloudViewTypes: {'day':'timeGridDay', 'week':'timeGridWeek', 'month':'dayGridMonth'},
+    
+    mini:false,
+    expandedNavbarWidth:350,
 
     windowWidth: -1,
     windowHeight: -1,
@@ -899,7 +907,6 @@ export default {
   
   .transparentComponent {
     opacity:0.85;
-
   }
 
   .calendarSidebar {
