@@ -3,6 +3,7 @@
     <v-navigation-drawer 
       class="calendarSidebar transparentComponent"
       permanent
+      touchless
       :mini-variant.sync="mini"
       width="350"
     >
