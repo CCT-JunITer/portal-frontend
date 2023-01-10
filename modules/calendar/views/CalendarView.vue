@@ -1,42 +1,34 @@
 <template>
   <div class="calendarContainer">
     <v-navigation-drawer 
-      class="calendarSidebar"
+      class="calendarSidebar transparentComponent"
       permanent
+      :mini-variant.sync="mini"
+      width="350"
     >
-      
-      <v-date-picker 
-        v-model="picker"
-        first-day-of-week="1"
-        no-title
-        :type="pickerType"
-        scrollable
-        color="primary"
-        width="100%"
-      >
-      </v-date-picker>
-      <v-btn
-        block
-        color="primary"
-        :disabled="updatableCalendars.length == 0"
-        style="height:40px"
-        @click="() => createNewEvent()"
-        
-      >
-        <v-icon
-          left
-          dark
+      <template v-slot:prepend>
+        <v-list-item 
+          link
+          @click="mini = !mini"
+          dense
         >
-          mdi-calendar-plus
-        </v-icon>
-        Event erstellen
-      </v-btn>
+          <v-list-item-icon>
+            <v-icon v-if="mini">mdi-chevron-right</v-icon>
+            <v-icon v-else>mdi-chevron-left</v-icon>
+          </v-list-item-icon>
+          <v-list-item-subtitle>
+            Seitenleiste ausblenden
+          </v-list-item-subtitle>
+        </v-list-item>
+        <v-divider></v-divider>
+      </template>
       
       <calendar-list-component
         ref="updatableCalendarList"
         v-model="updatableCalendars"
         label="Kalender mit Editierrechten"
         icon="mdi-calendar-edit"
+        :tooltipDisabled="!mini"
         @change="getEvents({start:undefined, end:undefined})"
       ></calendar-list-component>
       <v-divider></v-divider>
@@ -45,21 +37,50 @@
         v-model="readonlyCalendarsWithoutTower"
         label="Kalender ohne Editierrechte"
         icon="mdi-calendar-blank"
+        :tooltipDisabled="!mini"
         @change="getEvents({start:undefined, end:undefined})"
       ></calendar-list-component>
       <!-- <v-divider class="my-2"></v-divider> -->
       
       <!--<div style="height:100%;flex-shrink:100;"></div>-->
+
       <template v-slot:append>
-        <div class="pa-2" style="flex-grow: 2;width: 350px;">
-          <v-btn
-            block
-            :href="nextcloudURL" 
-            target="_blank"
-          >
-            <v-icon>mdi-open-in-new</v-icon> In der Nextcloud bearbeiten
-          </v-btn>
-        </div>
+        <v-divider></v-divider>
+
+        <v-date-picker
+          v-if="!mini && windowHeight > 800"
+          v-model="picker"
+          first-day-of-week="1"
+          no-title
+          :type="pickerType"
+          scrollable
+          color="primary"
+          width="100%"
+        >
+        </v-date-picker>
+        
+        <v-list-item 
+          :class="(updatableCalendars.length == 0) ? 'grey' : 'primary'"
+          :disabled="updatableCalendars.length == 0"
+          @click="() => createNewEvent()"
+          link
+        >
+          <v-list-item-icon><v-icon color="white">mdi-calendar-plus</v-icon></v-list-item-icon>
+          <v-list-item-title style="color:white">
+            EVENT ERSTELLEN
+          </v-list-item-title>
+        </v-list-item>
+
+        <v-list-item 
+          :href="nextcloudURL" 
+          target="_blank"
+          link
+        >
+          <v-list-item-icon><v-icon>mdi-open-in-new</v-icon></v-list-item-icon>
+          <v-list-item-title>
+            IN DER NEXTCLOUD BEARBEITEN
+          </v-list-item-title>
+        </v-list-item>
       </template>
       
     </v-navigation-drawer>
@@ -70,8 +91,10 @@
       <v-sheet height="64">
         <v-toolbar
           flat
+          style="background-color:transparent;line-break: auto;"
         >
           <v-btn
+            v-if="windowWidth > 550"
             outlined
             class="mr-4"
             color="grey darken-2"
@@ -101,7 +124,7 @@
               mdi-chevron-right
             </v-icon>
           </v-btn>
-          <v-toolbar-title v-if="$refs.calendar">
+          <v-toolbar-title v-if="$refs.calendar && windowWidth > 550">
             {{ $refs.calendar.title }}
           </v-toolbar-title>
 
@@ -311,13 +334,14 @@ export default {
   components: {
     // CalendarToolbar,
     CalendarEventPopup,
-    CalendarListComponent
+    CalendarListComponent,
   },
 
   async created() {
     this.update(true);
     dispatchFetchCalendarRights(this.$store, {})
     window.addEventListener('resize', this.windowResized);
+    this.windowResized()
   },
 
   destroyed() {
@@ -326,6 +350,7 @@ export default {
 
   data: () => ({
     mode: 'stack',
+    mini:false,
     weekday: [1, 2, 3, 4, 5, 6, 0],
     towerIndicatorIntervals:[0,15,30,45],
     towerIndicatorIntervalLength:1000*60*15, // 15 minutes
@@ -337,8 +362,8 @@ export default {
     ],
     nextcloudViewTypes: {'day':'timeGridDay', 'week':'timeGridWeek', 'month':'dayGridMonth'},
 
-    windowWidth: window.innerWidth,
-    windowHeight: window.innerHeight,
+    windowWidth: -1,
+    windowHeight: -1,
 
     newEvent: undefined,
 
@@ -407,8 +432,13 @@ export default {
     },
 
     windowResized() {
-      this.windowWidth = window.innerWidth
-      this.windowHeight = window.innerHeight
+      if (this.windowWidth != window.innerWidth || this.windowHeight != window.innerHeight) {
+        this.windowWidth = window.innerWidth
+        this.windowHeight = window.innerHeight
+  
+        if (this.windowWidth < 900) this.mini = true
+        else this.mini = false
+      }
     },
 
     async update(notify, fetch=true, calendarIds=undefined) {
@@ -857,6 +887,7 @@ export default {
 
 <style scoped lang="scss">
   .calendarContainer {
+    background-image: linear-gradient(210deg, var(--v-cctBlue-base) 0%, var(--v-cctBlue-base) 30%, var(--v-cctPurple-base) 100%);
     display: flex;
     position:absolute;
     flex-direction: row;
@@ -865,27 +896,28 @@ export default {
     overflow:hidden;
   }
   
+  .transparentComponent {
+    opacity:0.85;
+
+  }
+
   .calendarSidebar {
-  background-color:#EEEEEE;
   height:100%;
   display:flex;
   align-items:flex-start;
   flex-direction: column;
-  flex-basis:350px;
   flex-shrink:0;
+  margin-left:10px;
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
 }
 
 .clickable:hover {
   cursor:pointer
 }
 
-@media (max-width: 600px){
-.calendarSidebar {
-  flex-shrink:1;
-  }
-}
-
 .calendarMainView {
+  background-color:transparent;
   width:100%;
   height: 100%;
   flex-shrink:1;
