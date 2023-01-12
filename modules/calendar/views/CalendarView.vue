@@ -263,6 +263,8 @@ function constructUIEvents(event, calendar, viewStart, viewEnd) {
 
   const rrule = event.rrule
   let condition = (i, date) => {return i < 1};
+  let interval = 1
+  if (rrule && rrule.interval) interval = rrule.interval
   let i_offset = 0;
   if (rrule) {
     // calculate i_offset, such that only recurring events are generated in the viewStart and viewEnd interval for performance reasons
@@ -276,7 +278,7 @@ function constructUIEvents(event, calendar, viewStart, viewEnd) {
         i_offset = Math.floor((viewStart.valueOf()/freq) - (event.end.valueOf()/freq))
       }
     }
-    i_offset = Math.max(i_offset, 0)
+    i_offset = Math.max(i_offset, 0) / interval
 
     if (rrule.endtype == 'COUNT') {
       rrule.end = parseInt(rrule.end)
@@ -293,8 +295,6 @@ function constructUIEvents(event, calendar, viewStart, viewEnd) {
 
   let event_start = event.start;
   let event_end = event.end;
-  let interval = 1
-  if (rrule && rrule.interval) interval = rrule.interval
   for (let i = i_offset; condition(i, event_start); i++) {
     event_start = new Date(event.start)
     event_end = new Date(event.end)
