@@ -862,7 +862,7 @@ export default {
             }
           }
           
-          dict[key] = eventsInInterval
+          dict[key] = (eventsInInterval.length > 0) ? eventsInInterval : undefined
         }
       }
       return dict
