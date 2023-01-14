@@ -88,8 +88,24 @@
             IN DER NEXTCLOUD BEARBEITEN
           </v-list-item-title>
         </v-list-item>
+        <v-divider></v-divider>
+        <v-list dense style="padding:0;margin:0">
+          <v-list-group prepend-icon="mdi-cog-outline" append-icon="">
+            <template v-slot:activator>
+              <v-list-item-subtitle>Einstellungen</v-list-item-subtitle>
+            </template>
+            <v-list-item-group
+              :value="(towerCalendar && towerCalendar.active) ? 0 : undefined"
+              color="primary"
+            >
+              <v-list-item @click="() => towerCalendar && setTowerCalendarActive(!towerCalendar.active)">
+                <v-list-item-icon class="test-center"><v-icon v-if="towerCalendar && towerCalendar.active">mdi-checkbox-marked</v-icon><v-icon v-else>mdi-checkbox-blank-outline</v-icon></v-list-item-icon>
+                <v-list-item-title>Toweranzeige anschalten</v-list-item-title>
+              </v-list-item>
+            </v-list-item-group>
+          </v-list-group>
+        </v-list>
       </template>
-      
     </v-navigation-drawer>
 
     <!-- <v-divider vertical> </v-divider> -->
@@ -101,7 +117,7 @@
           style="background-color:transparent;line-break: auto;"
         >
           <v-btn
-            v-if="windowWidth > 550"
+            v-if="windowWidth > smallWidth"
             outlined
             class="mr-4"
             color="grey darken-2"
@@ -131,13 +147,13 @@
               mdi-chevron-right
             </v-icon>
           </v-btn>
-          <v-toolbar-title v-if="$refs.calendar && windowWidth > 550">
+          <v-toolbar-title v-if="$refs.calendar && windowWidth > smallWidth">
             {{ $refs.calendar.title }}
           </v-toolbar-title>
 
           <v-spacer></v-spacer>
           <v-btn-toggle
-            v-if="windowWidth > 900"
+            v-if="windowWidth > mediumWidth"
             v-model="type"
             group
             mandatory
@@ -185,7 +201,7 @@
             <v-icon v-if="!towernutzung">mdi-chess-rook</v-icon>
           </template>
           <template 
-            v-if="!towernutzung"
+            v-if="!towernutzung && towerCalendar && towerCalendar.active"
             v-slot:interval="{minutesToPixels, hour, day, month, year}"
           >
             <template
@@ -211,7 +227,7 @@
               <strong v-if="event.event.timed" v-html="timeSummary()"></strong> <v-icon v-if="event.event.locationId=='tower'&&!towernutzung">mdi-chess-rook</v-icon>{{event.name}}
             </div>
             <div v-else class="disable-select" :style="'overflow-x:hidden;padding-left:'+ 
-              ((towerEventInInterval[[event.start.getFullYear(), event.start.getMonth(), event.start.getDate(), event.start.getHours()]] && !towernutzung) ? '25' : '5') +'px'">
+              ((towerEventInInterval[[event.start.getFullYear(), event.start.getMonth(), event.start.getDate(), event.start.getHours()]] && towerCalendar.active && !towernutzung) ? '25' : '5') +'px'">
               <strong :id="'e' + convert_uid_to_id(event.event.uid)">
                 <v-icon v-if="!event.event.uid">mdi-new-box</v-icon>
                 <v-icon v-if="event.event.locationId=='tower'&&!towernutzung">
@@ -250,7 +266,7 @@
 import CalendarEventPopup from './CreateEventPopup.vue'
 import CalendarListComponent from '../components/CalendarListComponent.vue';
 import { commitSetSelectedEvent } from '../store/mutations';
-import { dispatchFetchCalendars, dispatchFetchCalendarRights} from '../store/actions';
+import { dispatchFetchCalendars, dispatchFetchCalendarRights, dispatchUpdateCalendar} from '../store/actions';
 import { readCalendars, readCalendarsWithoutTower, readSelectedEvent, readTowerCalendar, readUpdatableCalendarsWithoutTower, readReadonlyCalendarsWithoutTower, readAuthenticationURL} from '../store/getters';
 import { CalendarEvent } from '../types/CalendarEvent';
 
@@ -363,16 +379,20 @@ export default {
     events: [],
     types: [
       {name:'Tag', value:'day'},
+      {name:'4 Tage', value:'4day'},
       {name:'Woche', value:'week'},
-      {name:'Monat', value:'month'}
+      {name:'Monat', value:'month'},
     ],
-    nextcloudViewTypes: {'day':'timeGridDay', 'week':'timeGridWeek', 'month':'dayGridMonth'},
+    nextcloudViewTypes: {'day':'timeGridDay', '4day': 'timeGridWeek', 'week':'timeGridWeek', 'month':'dayGridMonth'},
     
     mini:false,
     expandedNavbarWidth:350,
 
     windowWidth: -1,
     windowHeight: -1,
+
+    mediumWidth: 1000,
+    smallWidth: 550,
 
     newEvent: undefined,
 
@@ -445,8 +465,14 @@ export default {
         this.windowWidth = window.innerWidth
         this.windowHeight = window.innerHeight
   
-        if (this.windowWidth < 900) this.mini = true
-        else this.mini = false
+        if (this.windowWidth < this.mediumWidth) {
+          this.mini = true
+          if (this.type == 'week') this.type = '4day'
+        }
+        else {
+          if (this.type == '4day') this.type = 'week'
+          this.mini = false
+        }
       }
     },
 
@@ -477,6 +503,7 @@ export default {
         eventCopy.viewEnd = new Date(event.end)
         commitSetSelectedEvent(this.$store, eventCopy)
         this.$refs.calendarEventPopup.setSelectedElement(nativeEvent.target)
+        this.$refs.calendarEventPopup.setFullscreen(this.windowWidth < this.mediumWidth)
         requestAnimationFrame(() => requestAnimationFrame(() => this.$refs.calendarEventPopup.show()))
       }
 
@@ -497,7 +524,7 @@ export default {
         const end = this.getSunday(end_of_month)
         end.setDate(end.getDate()+1)
         return {start: this.getMonday(start_of_month), end: end}
-      } else if (this.type == 'week') {
+      } else if (this.type == 'week' || this.type == '4day') {
         const monday = this.getMonday(this.value);
         const sunday = this.getSunday(this.value);
         sunday.setDate(sunday.getDate()+1)
@@ -719,6 +746,12 @@ export default {
 
     eventPopupClosed() {
       if (!this.dragEvent || this.dragEvent.event.uid != this.newEvent.event.uid) this.getEvents({start:undefined, end:undefined})
+    },
+
+    setTowerCalendarActive(active) {
+      this.towerCalendar.active = active
+      dispatchUpdateCalendar(this.$store, this.towerCalendar)
+      this.getEvents({start:undefined, end:undefined}, false, false, undefined)
     },
   },
 

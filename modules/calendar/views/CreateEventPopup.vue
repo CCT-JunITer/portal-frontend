@@ -337,7 +337,6 @@ export default {
       this.loadingExdate = false
       this.loading = false;
       this.selectedOpen = true
-      this.fullscreen = false;
       this.initSelectedEventInternal()
       console.log(this.selectedEventInternal)
     },
@@ -429,6 +428,10 @@ export default {
       this.close()
     },
 
+    setFullscreen(value) {
+      this.fullscreen = value
+      console.log('fullscreen ' + this.fullscreen)
+    },
   },
 
   computed: {
