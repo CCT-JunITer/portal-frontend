@@ -4,7 +4,7 @@
       class="calendarSidebar transparentComponent"
       permanent
       touchless
-      :mini-variant.sync="mini"
+      :mini-variant="mini"
       :width="expandedNavbarWidth"
     >
       <template v-slot:prepend>
@@ -66,31 +66,55 @@
         >
         </v-date-picker>
         
-        <v-list-item 
-          :class="(updatableCalendars.length == 0) ? 'grey' : 'primary'"
-          :disabled="updatableCalendars.length == 0"
-          @click="() => createNewEvent()"
-          link
-        >
-          <v-list-item-icon><v-icon color="white">mdi-calendar-plus</v-icon></v-list-item-icon>
-          <v-list-item-title style="color:white">
-            EVENT ERSTELLEN
-          </v-list-item-title>
-        </v-list-item>
-
-        <v-list-item 
-          :href="nextcloudURL" 
-          target="_blank"
-          link
-        >
-          <v-list-item-icon><v-icon>mdi-open-in-new</v-icon></v-list-item-icon>
-          <v-list-item-title>
-            IN DER NEXTCLOUD BEARBEITEN
-          </v-list-item-title>
-        </v-list-item>
+        <v-tooltip right :disabled="!mini">
+          <template v-slot:activator="{ on, attrs}">
+            <v-list-item 
+              :class="(updatableCalendars.length == 0) ? 'grey' : 'primary'"
+              :disabled="updatableCalendars.length == 0"
+              @click="() => createNewEvent()"
+              link
+              v-on="on"
+              v-bind="attrs"
+            >
+              <v-list-item-icon><v-icon color="white">mdi-calendar-plus</v-icon></v-list-item-icon>
+              <v-list-item-title style="color:white">
+                NEUES EVENT ERSTELLEN
+              </v-list-item-title>
+            </v-list-item>
+          </template>
+          Neues Event erstellen
+        </v-tooltip>
+        
+        <v-tooltip right :disabled="!mini">
+          <template v-slot:activator="{ on, attrs}">
+            <v-list-item 
+              :href="nextcloudURL" 
+              target="_blank"
+              link
+              v-on="on"
+              v-bind="attrs"
+            >
+              <v-list-item-icon><v-icon>mdi-open-in-new</v-icon></v-list-item-icon>
+              <v-list-item-title>
+                IN DER NEXTCLOUD BEARBEITEN
+              </v-list-item-title>
+            </v-list-item>
+          </template>
+          In der Nextcloud bearbeiten
+        </v-tooltip>
         <v-divider></v-divider>
         <v-list dense style="padding:0;margin:0">
-          <v-list-group prepend-icon="mdi-cog-outline" append-icon="">
+          <v-list-group v-model="settingsUnfolded" append-icon="" @click="mini = false">
+            <template v-slot:prependIcon>
+              <v-tooltip right :disabled="!mini">
+                <template v-slot:activator="{ on, attrs}">
+                  <div v-on="on" v-bind="attrs">
+                    <v-icon >mdi-cog-outline</v-icon>
+                  </div>
+                </template>
+                Einstellungen
+              </v-tooltip>
+            </template>
             <template v-slot:activator>
               <v-list-item-subtitle>Einstellungen</v-list-item-subtitle>
             </template>
@@ -386,6 +410,7 @@ export default {
     nextcloudViewTypes: {'day':'timeGridDay', '4day': 'timeGridWeek', 'week':'timeGridWeek', 'month':'dayGridMonth'},
     
     mini:false,
+    settingsUnfolded:false,
     expandedNavbarWidth:350,
 
     windowWidth: -1,
@@ -914,6 +939,9 @@ export default {
 
 
   watch: {
+    mini(val) {
+      if (val) this.settingsUnfolded = false
+    },
     towernutzung(val) {
       this.update(false)
     },
