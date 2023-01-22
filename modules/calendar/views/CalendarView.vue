@@ -55,7 +55,7 @@
         <v-divider></v-divider>
 
         <v-date-picker
-          v-if="!mini && windowHeight > 800"
+          v-if="!mini && windowHeight > 800 && datePickerEnabled"
           v-model="picker"
           first-day-of-week="1"
           no-title
@@ -119,12 +119,17 @@
               <v-list-item-subtitle>Einstellungen</v-list-item-subtitle>
             </template>
             <v-list-item-group
-              :value="(towerCalendar && towerCalendar.active) ? 0 : undefined"
+              :value="highlightedSettings"
               color="primary"
+              multiple
             >
               <v-list-item @click="() => towerCalendar && setTowerCalendarActive(!towerCalendar.active)">
                 <v-list-item-icon class="test-center"><v-icon v-if="towerCalendar && towerCalendar.active">mdi-checkbox-marked</v-icon><v-icon v-else>mdi-checkbox-blank-outline</v-icon></v-list-item-icon>
                 <v-list-item-title>Toweranzeige anschalten</v-list-item-title>
+              </v-list-item>
+              <v-list-item @click="() => datePickerEnabled = !datePickerEnabled">
+                <v-list-item-icon class="test-center"><v-icon v-if="datePickerEnabled">mdi-checkbox-marked</v-icon><v-icon v-else>mdi-checkbox-blank-outline</v-icon></v-list-item-icon>
+                <v-list-item-title>Datumsanzeige anschalten</v-list-item-title>
               </v-list-item>
             </v-list-item-group>
           </v-list-group>
@@ -410,6 +415,7 @@ export default {
     nextcloudViewTypes: {'day':'timeGridDay', '4day': 'timeGridWeek', 'week':'timeGridWeek', 'month':'dayGridMonth'},
     
     mini:false,
+    datePickerEnabled: true,
     settingsUnfolded:false,
     expandedNavbarWidth:350,
 
@@ -430,6 +436,8 @@ export default {
     dragDiv: null,
   }),
   methods: {
+
+
     async getEvents (payload, notify=false, fetch=false, calendarIds=undefined) {
       const {start, end} = this.getDateTimespan()
 
@@ -781,6 +789,15 @@ export default {
   },
 
   computed: {
+    highlightedSettings: function() {
+      const highlighted = []
+
+      if (this.datePickerEnabled) highlighted.push(1)
+      if (this.towerCalendar && this.towerCalendar.active) highlighted.push(0)
+      
+      return highlighted
+    },
+
     nextcloudURL: function () {
       return 'https://cloud.cct-ev.de/apps/calendar/' + this.nextcloudViewTypes[this.type] + '/' + this.toUTCDateString(this.value)
     },
