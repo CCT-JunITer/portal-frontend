@@ -905,7 +905,8 @@ export default {
      */
     towerEventInInterval: function() {
       const dict = {}
-      const monday = this.getMonday(this.value)
+      let startDay = this.getMonday(this.value)
+      if (this.type == '4day') startDay = new Date(this.value.toDateString())
       
       if (this.towerCalendar && this.towerCalendar.events) {
         const towerevents = []
@@ -915,8 +916,8 @@ export default {
         })
         towerevents.sort((a,b) => {return a.start-b.start})
         for (let h = 0; h < (24*7)+1; h++) {
-          const intervalStart = new Date(monday - h*1000*60*60*-1)
-          const intervalEnd = new Date(monday - (h+1)*1000*60*60*-1 - 1)
+          const intervalStart = new Date(startDay - h*1000*60*60*-1)
+          const intervalEnd = new Date(startDay - (h+1)*1000*60*60*-1)
           while (towerevents.length > 0 && (towerevents[0].end < intervalStart)) towerevents.shift();
           
           const key = [intervalStart.getFullYear(), intervalStart.getMonth(), intervalStart.getDate(), intervalStart.getHours()]
@@ -924,7 +925,7 @@ export default {
           while (towerevents.length > 0 && 
             (towerevents[0].start <= intervalEnd && intervalStart <= towerevents[0].end)) {
             const start = (towerevents[0].start < intervalStart) ? intervalStart : towerevents[0].start
-            const end = (towerevents[0].end > intervalEnd) ? intervalEnd : towerevents[0].end
+            const end = (towerevents[0].end > intervalEnd) ? intervalEnd : towerevents[0].end - (1000*60) // to have a pixel space between each tower interval
             eventsInInterval.push({...towerevents[0],
                                    // convert to minutes
                                    length:(end-start)/1000/60, 
