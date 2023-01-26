@@ -89,7 +89,7 @@ export const actions = {
   async actionFetchCalendars(context: MainContext, payload: {notify: boolean; start?: Date; end?: Date; calendarIds?: string[]}) {
     let calendars = readCalendars(context);
     if (payload.calendarIds) {
-      calendars.filter(x => x.uid && payload.calendarIds?.includes(x.uid))
+      calendars = calendars.filter(x => x.uid && payload.calendarIds?.includes(x.uid))
     }
     const changes: any = []
     calendars.forEach(x => {changes.push({uid:x.uid, loading:x.loading})})

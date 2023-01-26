@@ -305,6 +305,19 @@ export default {
     }
   },
 
+  watch: {
+    selectedOpen: {
+      handler(newValue, oldValue) {
+        if (!newValue && oldValue) { // if the popup is closing
+          this.loading = false;
+          this.loadingExdate = false
+          this.initSelectedEventInternal()
+          this.$emit('close')
+        }
+      }
+    }
+  },
+
   methods: {
     calendarChanged(newCalendar) {
       this.calendar = newCalendar
@@ -329,6 +342,8 @@ export default {
 
     initSelectedEventInternal() {
       this.selectedEventInternal = Object.assign({}, this.selectedEvent)
+      this.selectedEventInternal.start = this.selectedEvent.viewStart
+      this.selectedEventInternal.end = this.selectedEvent.viewEnd
       this.calendar = readCalendarByUID(this.$store)(this.selectedEventInternal.calendarId)
     },
 
@@ -342,13 +357,8 @@ export default {
     },
 
     close() {
-      if (this.selectedOpen == true) {
-        this.loading = false;
-        this.loadingExdate = false
-        this.selectedOpen = false
-        this.initSelectedEventInternal()
-        this.$emit('close')
-      }
+      // the rest of this function will be applied in the watcher
+      this.selectedOpen = false
     },
 
     async saveExdate() {
@@ -422,15 +432,17 @@ export default {
 
     async deleteEvent() {
       this.loading = true
+      await dispatchRemoveEvent(this.$store, this.selectedEventInternal, false)
+      if (this.selectedEvent.locationId == 'tower') {
+        commitRemoveCalendarEvent(this.$store, {calendarId:this.towerCalendar.uid, uid:this.selectedEvent.towerId});
+      }
       commitRemoveCalendarEvent(this.$store, this.selectedEventInternal);
-      const response = await dispatchRemoveEvent(this.$store, this.selectedEventInternal, false)
       this.$emit('changed') 
       this.close()
     },
 
     setFullscreen(value) {
       this.fullscreen = value
-      console.log('fullscreen ' + this.fullscreen)
     },
   },
 

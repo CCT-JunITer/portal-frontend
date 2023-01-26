@@ -438,7 +438,7 @@ export default {
   methods: {
 
 
-    async getEvents (payload, notify=false, fetch=false, calendarIds=undefined) {
+    async getEvents (payload={}, notify=false, fetch=false, calendarIds=undefined) {
       const {start, end} = this.getDateTimespan()
 
       if (start && end && !fetch) {
@@ -721,8 +721,6 @@ export default {
   
           this.dragEvent.start = new Date(newStart)
           this.dragEvent.end = new Date(newEnd)
-          this.dragEvent.event.start = new Date(this.dragEvent.start)
-          this.dragEvent.event.end = new Date(this.dragEvent.end)
         }
       } else if (this.createEvent && this.createStart !== null) {
         const mouseRounded = new Date(this.roundTime(mouse, false))
@@ -731,8 +729,6 @@ export default {
 
         this.createEvent.start = min
         this.createEvent.end = max
-        this.createEvent.event.start = new Date(this.createEvent.start)
-        this.createEvent.event.end = new Date(this.createEvent.end)
       }
     },
     endDrag () {
@@ -778,7 +774,9 @@ export default {
     // End: Drag and Drop methods
 
     eventPopupClosed() {
-      if (!this.dragEvent || this.dragEvent.event.uid != this.newEvent.event.uid) this.getEvents({start:undefined, end:undefined})
+      if (!this.dragEvent || (this.dragEvent && this.dragEvent == this.selectedEvent)) {
+        this.getEvents()
+      }
     },
 
     setTowerCalendarActive(active) {
