@@ -226,9 +226,6 @@
           @mouseup:time="endDrag"
           @mouseleave.native="cancelDrag"
         >
-          <template v-slot:day-header="{}">
-            <v-icon v-if="!towernutzung">mdi-chess-rook</v-icon>
-          </template>
           <template 
             v-if="!towernutzung && towerCalendar && towerCalendar.active"
             v-slot:interval="{minutesToPixels, hour, day, month, year}"
@@ -237,17 +234,24 @@
               v-for="event in towerEventInInterval[[year, month-1, day, hour]]"
             >
               <template>
-                <v-sheet
-                  title=""
-                  class="clickable"
-                  color="black"
-                  width="20px"
-                  :height="minutesToPixels(event.length)"
-                  tile
-                  :key="event.uid"
-                  :style="'z-index:1;position:absolute;margin-top:' + (event.padding)  + 'px;'"
-                  @click="(clickEvent) => {showEvent({nativeEvent:clickEvent, event:event})}"
-                ></v-sheet>
+                <v-tooltip v-bind:key="event.uid" bottom>
+                  <template v-slot:activator="{ on, attrs}">
+                    <v-sheet
+                      title=""
+                      class="clickable"
+                      color="black"
+                      width="10px"
+                      :height="minutesToPixels(event.length)"
+                      tile
+                      :key="event.uid"
+                      :style="'z-index:1;position:absolute;margin-top:' + (event.padding)  + 'px;'"
+                      @click="(clickEvent) => {showEvent({nativeEvent:clickEvent, event:event})}"
+                      v-on="on"
+                      v-bind="attrs"
+                    ></v-sheet>
+                  </template>
+                  Der Tower ist für '{{ event.name }}' reserviert.
+                </v-tooltip>
               </template>
             </template>
           </template>
@@ -256,7 +260,7 @@
               <strong v-if="event.event.timed" v-html="timeSummary()"></strong> <v-icon v-if="event.event.locationId=='tower'&&!towernutzung">mdi-chess-rook</v-icon>{{event.name}}
             </div>
             <div v-else class="disable-select" :style="'overflow-x:hidden;padding-left:'+ 
-              ((towerEventInInterval[[event.start.getFullYear(), event.start.getMonth(), event.start.getDate(), event.start.getHours()]] && towerCalendar.active && !towernutzung) ? '25' : '5') +'px'">
+              ((towerEventInInterval[[event.start.getFullYear(), event.start.getMonth(), event.start.getDate(), event.start.getHours()]] && towerCalendar.active && !towernutzung) ? '12' : '5') +'px'">
               <strong :id="'e' + convert_uid_to_id(event.event.uid)">
                 <v-icon v-if="!event.event.uid">mdi-new-box</v-icon>
                 <v-icon v-if="event.event.locationId=='tower'&&!towernutzung">
