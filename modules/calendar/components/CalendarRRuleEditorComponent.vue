@@ -34,6 +34,9 @@ export default {
         'YEARLY': 'Jährlich',
         'custom': 'Benutzerdefiniert'
       },
+      freqToNamePlural: {
+        'DAILY':'Tägig',
+      },
       types: [
         {freq:undefined},
         {freq:'DAILY'},
@@ -50,6 +53,9 @@ export default {
       const freq = (obj) ? obj.freq : undefined
 
       let text = this.freqToName[freq]
+      if (freq && obj.interval && obj.interval > 1) {
+        text = obj.interval + ' ' + ((freq in this.freqToNamePlural) ? this.freqToNamePlural[freq] : this.freqToName[freq])
+      }
       
       // console.log(typeName + '  ' + ((obj) ? obj.freq : 'object undefined'))
       if (obj.end && obj.endtype) {
