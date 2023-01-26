@@ -71,7 +71,7 @@
             <v-list-item 
               :class="(updatableCalendars.length == 0) ? 'grey' : 'primary'"
               :disabled="updatableCalendars.length == 0"
-              @click="() => createNewEvent(undefined, undefined, true)"
+              @click="() => createNewEvent()"
               link
               v-on="on"
               v-bind="attrs"
@@ -533,15 +533,14 @@ export default {
       this.$router.replace({params: {...this.$route.params, viewType:'day', viewDate:this.toUTCDateString(new Date(date))}, query:this.$route.query}).catch((err)=>err)
     },
 
-    showEvent ({ nativeEvent, event}, fullscreen=undefined) {
+    showEvent ({ nativeEvent, event }) {
       const open = () => {
         const eventCopy = Object.assign({}, event.event)
         eventCopy.viewStart = new Date(event.start)
         eventCopy.viewEnd = new Date(event.end)
         commitSetSelectedEvent(this.$store, eventCopy)
-        this.$refs.calendarEventPopup.setSelectedElement((nativeEvent) ? nativeEvent.target : undefined)
-        if (fullscreen === undefined) this.$refs.calendarEventPopup.setFullscreen(this.windowWidth < this.mediumWidth)
-        else this.$refs.calendarEventPopup.setFullscreen(fullscreen)
+        this.$refs.calendarEventPopup.setSelectedElement(nativeEvent.target)
+        this.$refs.calendarEventPopup.setFullscreen(this.windowWidth < this.mediumWidth)
         requestAnimationFrame(() => requestAnimationFrame(() => this.$refs.calendarEventPopup.show()))
       }
 
@@ -552,7 +551,7 @@ export default {
         open()
       }
 
-      if (nativeEvent.stopPropagation) nativeEvent.stopPropagation()
+      nativeEvent.stopPropagation()
     },
 
     getDateTimespan() {
@@ -599,7 +598,7 @@ export default {
     //   return null
     // },
 
-    createNewEvent(start=undefined, end=undefined, showPopup=false) {
+    createNewEvent(start=undefined, end=undefined) {
       if (!this.updatableCalendars || this.updatableCalendars.length < 1) {
         alert('Du brauchst einen Kalender, damit du Events erstellen kannst.')
         return undefined
@@ -638,10 +637,6 @@ export default {
         event.end = end
         this.newEvent.start = start
         this.newEvent.end = end
-      }
-
-      if (showPopup) {
-        this.showEvent({nativeEvent:{target:undefined}, event:this.newEvent}, true)
       }
 
       return this.newEvent
@@ -747,7 +742,7 @@ export default {
       if (this.$refs.calendar && event) { 
         const div = this.$refs.calendar.$el.querySelector('#e' + this.convert_uid_to_id(event.event.uid))
         if (div) {
-          const nativeEvent = {target:div.parentNode.parentNode}
+          const nativeEvent = {target:div.parentNode.parentNode, stopPropagation:()=>{return 0}}
           this.showEvent({nativeEvent:nativeEvent, event:event})
         }
       }
