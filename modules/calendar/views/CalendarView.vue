@@ -1049,22 +1049,3 @@ export default {
   }
 }
 </style>
-
-<style>
-.v-date-picker-table {
-  background: transparent;
-}
-
-.v-date-picker-header {
-  background-color: transparent ;
-}
-
-.v-picker.v-card.v-picker--date.theme--light {
-  background-color: transparent;
-}
-
-.theme--light.v-picker__body {
-  background-color: transparent;
-}
-
-</style>

@@ -169,7 +169,7 @@
         <!-- <div style="margin-left:25px; margin-top: 10px;display:flex;justify-content: flex-start; align-items:center;"> -->
         <v-container style="margin-left:20px;margin-top:0">
           <v-row align-content="center">
-            <v-col cols="auto" align-self="center">
+            <v-col cols="3" align-self="center">
               <v-checkbox 
                 style="padding:0;margin:0"
                 :value="!selectedEventInternal.timed"
@@ -181,7 +181,7 @@
               ></v-checkbox>
             </v-col>
   
-            <v-col>
+            <v-col cols="9">
               <calendar-r-rule-editor-component
                 v-model="selectedEventInternal.rrule"
                 :readonly="!updatable"
