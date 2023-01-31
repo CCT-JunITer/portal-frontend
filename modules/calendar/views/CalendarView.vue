@@ -327,7 +327,7 @@ function constructUIEvents(event, calendar, viewStart, viewEnd) {
         i_offset = Math.floor((viewStart.valueOf()/freq) - (event.end.valueOf()/freq))
       }
     }
-    i_offset = Math.max(i_offset, 0) / interval
+    i_offset = Math.floor(Math.max(i_offset, 0) / interval)
 
     if (rrule.endtype == 'COUNT') {
       rrule.end = parseInt(rrule.end)

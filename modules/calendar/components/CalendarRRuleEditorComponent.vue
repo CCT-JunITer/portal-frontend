@@ -200,6 +200,10 @@ export default {
 
 
   methods: {
+    toGermanDateString(date) {
+      return `${date.getDate().toString().padStart(2,'0')}.${(date.getMonth()+1).toString().padStart(2,'0')}.${date.getFullYear().toString().padStart(4,'0')}`
+    },
+
     objectToText(obj) {
       const freq = (obj) ? obj.freq : undefined
       if (freq == 'custom') return 'Benutzerdefiniert...'
@@ -215,7 +219,7 @@ export default {
           text += ', ' + obj.end + ' Mal'
         } else if (obj.endtype == 'UNTIL') {
           const end = new Date(obj.end)
-          text += ' bis zum ' + end.getDate() + '.' + end.getMonth() + '.' + end.getFullYear()
+          text += ' bis zum ' + this.toGermanDateString(end)
         }
       }
 
