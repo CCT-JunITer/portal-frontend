@@ -313,19 +313,19 @@ function constructUIEvents(event, calendar, viewStart, viewEnd) {
   const rrule = event.rrule
   let condition = (i, date) => {return i < 1};
   let interval = 1
-  if (rrule && rrule.interval) interval = rrule.interval
+  if (rrule && rrule.freq && rrule.interval) interval = rrule.interval
   let i_offset = 0;
-  if (rrule) {
+  if (rrule && rrule.freq) {
     // calculate i_offset, such that only recurring events are generated in the viewStart and viewEnd interval for performance reasons
     if (rrule.freq == 'MONTHLY') {
       i_offset = (viewStart.getFullYear() - event.end.getFullYear()) + (viewStart.getMonth() - event.end.getMonth())
     } else if (rrule.freq == 'YEARLY') {
       i_offset = viewStart.getFullYear() - event.end.getFullYear()
+    } else if (rrule.freq in FREQUENCIES) {
+      const freq = FREQUENCIES[rrule.freq]
+      i_offset = Math.floor((viewStart.valueOf()/freq) - (event.end.valueOf()/freq))
     } else {
-      if (rrule.freq in FREQUENCIES) {
-        const freq = FREQUENCIES[rrule.freq]
-        i_offset = Math.floor((viewStart.valueOf()/freq) - (event.end.valueOf()/freq))
-      }
+      console.error('The frequency ' + rrule.freq + ' is not known!')
     }
     i_offset = Math.floor(Math.max(i_offset, 0) / interval)
 
@@ -348,7 +348,7 @@ function constructUIEvents(event, calendar, viewStart, viewEnd) {
     event_start = new Date(event.start)
     event_end = new Date(event.end)
 
-    if (rrule) {
+    if (rrule && rrule.freq) {
       if (rrule.freq == 'MONTHLY') {
         event_start.setMonth(event_start.getMonth()+(i*interval))
         event_end.setMonth(event_end.getMonth()+(i*interval))

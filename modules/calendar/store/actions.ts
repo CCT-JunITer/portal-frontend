@@ -52,10 +52,11 @@ export const actions = {
         calendarId: payload.event.calendarId,
       }
 
-      // const calendar = getters.getCalendarByUID(context.state, payload.event.calendarId)
-      // if (calendar) {
-      //   dispatch((state, payload) => payload.calendar.loading = payload.loading)(context, {calendar:calendar, loading:true})
-      // }
+      if (event_copied.locationId == 'tower' && (event_copied.rrule && event_copied.rrule.freq) && event_copied.calendarId != 'meeting_shared_by_CalendarBot') {
+        alert('Wiederkehrende Tower events sind derzeit nur Termine im Sitzungkalender erlaubt!')
+        return payload.event
+      }
+
       let response: any = undefined
       if (payload.notify) {
         response = await apiCallNotify(context, token => api.updateCalendarEvent(token, event_copied), {successText: 'Event aktualisiert'})
@@ -64,7 +65,6 @@ export const actions = {
       }
       commitUpdateEvent(context, response.data)
 
-      // if (calendar) calendar.loading = false;
       return response.data
     }
   },

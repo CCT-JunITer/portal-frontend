@@ -315,8 +315,8 @@ export default {
       },
 
       set: function(val) {
-        if (val.freq === undefined) val = undefined
-        this.$emit('change', {...val});
+        if (val.freq === undefined) this.$emit('change', undefined)
+        else this.$emit('change', {...val});
       }
     },
 
