@@ -1,5 +1,6 @@
 <template>
   <component
+    v-if="selectedOpen"
     :is="fullscreen ? 'v-dialog' : 'v-menu'"
     v-model="selectedOpen"
     :close-on-content-click="false"
@@ -252,7 +253,7 @@
 <script>
 
 import { dispatchFetchCalendars, dispatchRemoveEvent, dispatchUpdateCalendar, dispatchUpdateCalendarEvent } from '../store/actions'
-import { commitAddEventToCalendar, commitSetSelectedEvent, commitRemoveCalendarEvent, commitUpdateSelectedEvent, commitUpdateEvent } from '../store/mutations'
+import { commitSetSelectedEvent, commitRemoveCalendarEvent } from '../store/mutations'
 import { readCalendarByUID, readCalendars, readCalendarsWithoutTower, readSelectedEvent, readEventByUID, readTowerCalendar, getters} from '../store/getters'
 import DateTimePickerMenu from '@/components/DateTimePickerMenu.vue'
 import DatePickerMenu from '@/components/DatePickerMenu.vue'
@@ -315,6 +316,13 @@ export default {
           this.$emit('close')
         }
       }
+    },
+    selectedEvent: {
+      handler(newValue, oldValue) {
+        if (newValue != oldValue) {
+          this.initSelectedEventInternal()
+        }
+      }
     }
   },
 
@@ -342,8 +350,8 @@ export default {
 
     initSelectedEventInternal() {
       this.selectedEventInternal = Object.assign({}, this.selectedEvent)
-      this.selectedEventInternal.start = this.selectedEvent.viewStart
-      this.selectedEventInternal.end = this.selectedEvent.viewEnd
+      if (this.selectedEvent.viewStart) this.selectedEventInternal.start = this.selectedEvent.viewStart
+      if (this.selectedEvent.viewEnd) this.selectedEventInternal.end = this.selectedEvent.viewEnd
       this.calendar = readCalendarByUID(this.$store)(this.selectedEventInternal.calendarId)
     },
 
@@ -383,26 +391,26 @@ export default {
       this.loading = loading;
       const savedEvent = Object.assign({},this.selectedEventInternal)
       Object.assign(savedEvent, changes)
-      console.log(savedEvent)
       if (this.calendar.uid != savedEvent.calendarId) {
-        // TODO: disable notifications for remove event
         await dispatchRemoveEvent(this.$store, {uid:savedEvent.uid, calendarId:savedEvent.calendarId, notify:false})
         savedEvent.calendarId = this.calendar.uid
         delete savedEvent.uid
       }
-      //console.log(savedEvent);
 
       // fullday events need an end date that is at least one day later than the start date
       if (!savedEvent.timed) {
-        // savedEvent.end.setDate(savedEvent.end.getDate()+1)
+        savedEvent.end = new Date(savedEvent.end)
+        savedEvent.end.setDate(savedEvent.end.getDate()+1)
       }
-
+      
+      console.log(savedEvent)
       const wasTowerEvent = this.selectedEvent.locationId == 'tower'
 
       try {
-        await dispatchUpdateCalendarEvent(this.$store, {event:savedEvent, notify:true})
+        const response = await dispatchUpdateCalendarEvent(this.$store, {event:savedEvent, notify:true})
+        this.selectedEvent = response
       } catch(e) {
-        if (e.response.status != 403) {
+        if (!e.response || e.response.status != 403) {
           throw e
         } else {
           this.loading = false;
@@ -419,7 +427,6 @@ export default {
       this.calendar.active = true;
       dispatchUpdateCalendar(this.$store, this.calendar);
 
-      // commitUpdateSelectedEvent(this.$store, savedEvent)
       this.$emit('changed')
       this.close()
     },
@@ -531,10 +538,15 @@ export default {
       return calendars
     },
 
-    selectedEvent: function () {
-      const selected = readSelectedEvent(this.$store)
-      if (selected) return selected
-      return {}
+    selectedEvent: {
+      get: function () {
+        const selected = readSelectedEvent(this.$store)
+        if (selected) return selected
+        return {}
+      },
+      set: function(newValue) {
+        commitSetSelectedEvent(this.$store, newValue)
+      }
     },
 
     // calendar: function () {

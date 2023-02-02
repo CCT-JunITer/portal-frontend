@@ -35,6 +35,7 @@ export interface ICalendarEvent {
     eventColor: string;
     rrule: ICalendarRRule;
     uid: string;
+    towerId:string;
     calendarId: string;
     dates: [];
     locationId: string;
