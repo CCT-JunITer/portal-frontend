@@ -50,6 +50,7 @@ export const actions = {
         rrule: payload.event.rrule,
         uid: payload.event.uid,
         calendarId: payload.event.calendarId,
+        towerId:payload.event.towerId
       }
 
       if (event_copied.locationId == 'tower' && (event_copied.rrule && event_copied.rrule.freq) && event_copied.calendarId != 'meeting_shared_by_CalendarBot') {
@@ -62,6 +63,10 @@ export const actions = {
         response = await apiCallNotify(context, token => api.updateCalendarEvent(token, event_copied), {successText: 'Event aktualisiert'})
       } else {
         response = await apiCall(context, token => api.updateCalendarEvent(token, event_copied))
+      }
+      // only one event is changed by the api. Sometimes a new event is created and the old deleted. Therefore in such a case the event should be deleted.
+      if (event_copied.uid && (event_copied.uid != response.data.uid)) {
+        commitRemoveCalendarEvent(context, event_copied)
       }
       commitUpdateEvent(context, response.data)
 
