@@ -347,7 +347,7 @@ function constructUIEvents(event, calendar, viewStart, viewEnd) {
   for (let i = i_offset; condition(i, event_start); i++) {
     event_start = new Date(event.start)
     event_end = new Date(event.end)
-    
+
     if (rrule && rrule.freq) {
       if (rrule.freq == 'MONTHLY') {
         event_start.setMonth(event_start.getMonth()+(i*interval))
@@ -361,10 +361,7 @@ function constructUIEvents(event, calendar, viewStart, viewEnd) {
           event_end = new Date(event_end - (FREQUENCIES[rrule.freq]*-(i*interval)))
         }
       }
-      
-      if (event.name == 'Juniter Ressortsitzung') {
-        console.log(event_start)
-      }
+
       
 
       if (rrule.exdate.find(element => new Date(element).toISOString() == event_start.toISOString())) {

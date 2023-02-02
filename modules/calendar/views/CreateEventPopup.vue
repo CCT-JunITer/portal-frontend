@@ -397,7 +397,6 @@ export default {
         delete savedEvent.uid
       }
 
-      // fullday events need an end date that is at least one day later than the start date
       if (!savedEvent.timed) {
         savedEvent.end = new Date(savedEvent.end)
         savedEvent.end.setDate(savedEvent.end.getDate()+1)
