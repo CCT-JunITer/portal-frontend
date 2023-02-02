@@ -347,7 +347,7 @@ function constructUIEvents(event, calendar, viewStart, viewEnd) {
   for (let i = i_offset; condition(i, event_start); i++) {
     event_start = new Date(event.start)
     event_end = new Date(event.end)
-
+    
     if (rrule && rrule.freq) {
       if (rrule.freq == 'MONTHLY') {
         event_start.setMonth(event_start.getMonth()+(i*interval))
@@ -361,13 +361,19 @@ function constructUIEvents(event, calendar, viewStart, viewEnd) {
           event_end = new Date(event_end - (FREQUENCIES[rrule.freq]*-(i*interval)))
         }
       }
-
+      
+      if (event.name == 'Juniter Ressortsitzung') {
+        console.log(event_start)
+      }
       
 
       if (rrule.exdate.find(element => new Date(element).toISOString() == event_start.toISOString())) {
         continue;
       }
     }
+
+    // check condition again for recurring events
+    if (!condition(i, event_start)) break;
 
     if (!event.timed) {
       event_end.setDate(event_end.getDate()-1)
@@ -954,7 +960,7 @@ export default {
 
   mounted() {
     // this ensures that the calendar scrolls initially to the bottom of the page
-    this.$refs.calendar.$children[0].scrollToTime(1000*60*60*24)
+    if (this.$refs.calendar.$children[0].scrollToTime) this.$refs.calendar.$children[0].scrollToTime(1000*60*60*24)
   },
 
 
