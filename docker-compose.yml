@@ -3,5 +3,14 @@ services:
   frontend:
     image: $IMAGE
     restart: unless-stopped
-    ports:
-      - "8080:80"
+    networks: 
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-frontend.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-frontend.entrypoints=websecure"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-frontend.tls.certresolver=letsencrypt"
+
+networks: 
+  traefik:
+    external: true

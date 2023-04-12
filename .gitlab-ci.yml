@@ -1,11 +1,27 @@
 variables:
   DOCKER_TLS_CERTDIR: "/certs"
+  BASE_DOMAIN: cct-ev.de
+
+
+.install-ssh: &install-ssh
+  - "which ssh-agent || ( apk update && apk add openssh-client )"
+  - eval $(ssh-agent -s)
+  - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+
+.docker-compose-run: &docker-compose-run
+  - COMPOSE_PROJECT_NAME=portal-$CI_ENVIRONMENT_SLUG docker-compose -f docker-compose.yml pull
+  - COMPOSE_PROJECT_NAME=portal-$CI_ENVIRONMENT_SLUG docker-compose -f docker-compose.yml up -d
+
+
+
 
 stages:
   - lint
   - test
   - build
-  - build image
   - deploy
 
 lint:
@@ -31,24 +47,9 @@ test:
     - npm install --progress=false
     - VUE_APP_ENV=dev npm run test:unit
 
+
 build:
-  image: node:lts
   stage: build
-  needs: []
-  cache:
-    paths:
-      - node_modules
-  script:
-    - npm install --progress=false
-    - npm run build
-  artifacts:
-    expire_in: 1 week
-    paths:
-      - dist
-
-
-build image:
-  stage: build image
   image: docker:latest
   services:
     - docker:dind
@@ -61,59 +62,132 @@ build image:
     - docker build --cache-from $IMAGE -t $IMAGE .
     - docker push $IMAGE
 
-deploy staging:
-  image: docker:latest
-  stage: deploy
-  needs:
-    - job: build image
-      artifacts: false
-  only:
-    refs:
-      - master
+
+
+deploy stag: 
+  extends: 
+    - .deploy base
   environment:
     name: stag
-    url: https://stag.portal.cct-ev.de
+    url: https://portal.stag.$BASE_DOMAIN
+    on_stop: stop stag
   variables:
-    DOCKER_HOST: 'ssh://gitlab-ci@stag.api.cct-ev.de'
-    DOMAIN: stag.portal.cct-ev.de
-    IMAGE: "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG" 
-  before_script:
-    - "which ssh-agent || ( apk update && apk add openssh-client )"
-    - eval $(ssh-agent -s)
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-    - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  script:
-    - COMPOSE_PROJECT_NAME=portal-$CI_ENVIRONMENT_SLUG docker-compose -f docker-compose.stag.yml pull
-    - COMPOSE_PROJECT_NAME=portal-$CI_ENVIRONMENT_SLUG docker-compose -f docker-compose.stag.yml up -d
+    DOCKER_HOST: 'ssh://gitlab-ci@portal.stag.${BASE_DOMAIN}'
+    DOMAIN: "portal.stag.${BASE_DOMAIN}"
+  only: 
+    - master
 
+stop stag:
+  only:
+    - master
+  extends: 
+    - .stop base
+  environment:
+    name: stag
+  variables:
+    DOCKER_HOST: 'ssh://gitlab-ci@portal.stag.${BASE_DOMAIN}'
+    DOMAIN: "portal.stag.${BASE_DOMAIN}"
+
+deploy review: 
+  extends: 
+    - .deploy base
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+    url: https://$CI_ENVIRONMENT_SLUG.portal.stag.$BASE_DOMAIN
+    on_stop: stop review
+  variables:
+    DOCKER_HOST: 'ssh://gitlab-ci@portal.stag.${BASE_DOMAIN}'
+    DOMAIN: "$CI_ENVIRONMENT_SLUG.portal.stag.${BASE_DOMAIN}"
+  only: 
+    - branches
+  except:
+    - production
+    - master
+    - tags
+
+
+stop review:
+  only:
+    - branches
+  except:
+    - production
+    - master
+    - tags
+  extends: 
+    - .stop base
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+  variables:
+    DOCKER_HOST: 'ssh://gitlab-ci@portal.stag.${BASE_DOMAIN}'
+    DOMAIN: "$CI_ENVIRONMENT_SLUG.portal.stag.${BASE_DOMAIN}"
 
 deploy production:
   image: docker:latest
   stage: deploy
-  needs:
-    - job: build image
+  needs: 
+    - job: build
       artifacts: false
-  only:
+  only: 
     - tags
   environment:
     name: prod
-    url: https://portal.cct-ev.de
+    url: https://portal.$BASE_DOMAIN
+    on_stop: stop production
+  extends: 
+    - .deploy base
   variables:
-    DOCKER_HOST: 'ssh://gitlab-ci@portal.cct-ev.de'
-    DOMAIN: portal.cct-ev.de
-    IMAGE: "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG" 
+    DOCKER_HOST: 'ssh://gitlab-ci@portal.${BASE_DOMAIN}'
+    DOMAIN: "portal.${BASE_DOMAIN}"
+    IMAGE: "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
+
+
+stop production:
+  only:
+    - tags
+  extends: 
+    - .stop base
+  environment:
+    name: prod
+  variables:
+    DOCKER_HOST: 'ssh://gitlab-ci@portal.${BASE_DOMAIN}'
+    DOMAIN: "portal.${BASE_DOMAIN}"
+
+
+
+# templates
+
+.deploy base:
+  image: docker:latest
+  stage: deploy
+  needs: 
+    - job: build
+      artifacts: false
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+    url: https://$CI_ENVIRONMENT_SLUG.$BASE_DOMAIN
+    on_stop: stop review
+  variables:
+    IMAGE: "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
   before_script:
-    - "which ssh-agent || ( apk update && apk add openssh-client )"
-    - eval $(ssh-agent -s)
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-    - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+    - *install-ssh
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - COMPOSE_PROJECT_NAME=portal-$CI_ENVIRONMENT_SLUG docker-compose pull
-    - COMPOSE_PROJECT_NAME=portal-$CI_ENVIRONMENT_SLUG docker-compose up -d
+    - *docker-compose-run
+
+.stop base:
+  image: docker:latest
+  stage: deploy
+  needs: 
+    - job: build
+      artifacts: false
+  environment:
+    action: stop
+  when: manual
+  variables:
+    IMAGE: "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
+  before_script:
+    - *install-ssh
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - COMPOSE_PROJECT_NAME=portal-$CI_ENVIRONMENT_SLUG docker-compose -f docker-compose.yml down -v
 
