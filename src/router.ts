@@ -428,6 +428,10 @@ export default new Router({
               path: 'hochladen',
               component: () => import('./views/main/hochladen/Hochladen.vue')
             },
+            {
+              path: 'tower-anwesenheit',
+              component: () => import('./views/main/toweranwesenheit/TowerAnwesenheit.vue')
+            },
 
             // add module routes to main children
             ...moduleRoutes

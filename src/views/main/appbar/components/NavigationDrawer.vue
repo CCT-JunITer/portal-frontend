@@ -144,12 +144,21 @@
         </v-list-item-content>
       </v-list-item>
 
-      <v-list-item :to="towernutzungURL" color="cct-green">
+      <v-list-item :to="towernutzungURL" color="purple">
         <v-list-item-icon>
           <v-icon>mdi-chess-rook</v-icon>
         </v-list-item-icon>
         <v-list-item-content>
           <v-list-item-title>Towernutzung</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+
+      <v-list-item to="/main/tower-anwesenheit" color="cctOrange">
+        <v-list-item-icon>
+          <v-icon>mdi-key</v-icon>
+        </v-list-item-icon>
+        <v-list-item-content>
+          <v-list-item-title>Tower-Anwesenheit</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
 
