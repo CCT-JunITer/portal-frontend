@@ -6,7 +6,7 @@
         Projekte
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn color="cctGreen" style="color: white" :to="{name: 'project-create'}">
+      <v-btn disabled color="cctGreen" style="color: white" :to="{name: 'project-create'}">
         <v-icon left>
           mdi-account-tie
         </v-icon>
