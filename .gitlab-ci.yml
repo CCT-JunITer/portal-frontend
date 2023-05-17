@@ -1,6 +1,8 @@
 variables:
   DOCKER_TLS_CERTDIR: "/certs"
   BASE_DOMAIN: cct-ev.de
+  STACK_NAME: portal-frontend-$CI_ENVIRONMENT_SLUG
+ 
 
 
 .install-ssh: &install-ssh
@@ -11,11 +13,10 @@ variables:
   - chmod 700 ~/.ssh
   - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
 
-.docker-compose-run: &docker-compose-run
-  - COMPOSE_PROJECT_NAME=portal-$CI_ENVIRONMENT_SLUG docker-compose -f docker-compose.yml pull
-  - COMPOSE_PROJECT_NAME=portal-$CI_ENVIRONMENT_SLUG docker-compose -f docker-compose.yml up -d
-
-
+.docker-stack-run: &docker-stack-run
+  - docker stack deploy -c docker-compose.yml --prune --resolve-image always --with-registry-auth $STACK_NAME
+.docker-stack-stop: &docker-stack-stop
+  - docker stack rm $STACK_NAME
 
 
 stages:
@@ -34,6 +35,10 @@ lint:
   script:
     - npm install --progress=false
     - VUE_APP_ENV=dev npm run lint
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_REF_PROTECTED == "true"
+
 
 
 test:
@@ -46,6 +51,9 @@ test:
   script:
     - npm install --progress=false
     - VUE_APP_ENV=dev npm run test:unit
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_REF_PROTECTED == "true"
 
 
 build:
@@ -61,6 +69,9 @@ build:
     - docker pull $IMAGE || true
     - docker build --cache-from $IMAGE -t $IMAGE .
     - docker push $IMAGE
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_REF_PROTECTED == "true"
 
 
 
@@ -98,21 +109,13 @@ deploy review:
   variables:
     DOCKER_HOST: 'ssh://gitlab-ci@portal.stag.${BASE_DOMAIN}'
     DOMAIN: "$CI_ENVIRONMENT_SLUG.portal.stag.${BASE_DOMAIN}"
-  only: 
-    - branches
-  except:
-    - production
-    - master
-    - tags
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
 
 
 stop review:
-  only:
-    - branches
-  except:
-    - production
-    - master
-    - tags
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
   extends: 
     - .stop base
   environment:
@@ -172,7 +175,7 @@ stop production:
     - *install-ssh
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - *docker-compose-run
+    - *docker-stack-run
 
 .stop base:
   image: docker:latest
@@ -189,5 +192,5 @@ stop production:
     - *install-ssh
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - COMPOSE_PROJECT_NAME=portal-$CI_ENVIRONMENT_SLUG docker-compose -f docker-compose.yml down -v
+    - *docker-stack-stop
 
