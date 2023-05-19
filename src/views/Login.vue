@@ -26,6 +26,23 @@
                   id="password" 
                   type="password">
                 </v-text-field>
+                <div v-if="env !== 'production'">
+                  <v-combobox
+                    v-model="apiUrl"
+                    label="Backend URL"
+                    prepend-icon="mdi-earth"
+                    :items="environments"
+                    item-text="name"
+                    item-value="external_url"
+                    :return-object="false"
+                  >
+                    <template v-slot:append-outer>
+                      <v-btn small @click="loadUrls" color="cctGreen" dark>
+                        Load URLs
+                      </v-btn>
+                    </template>
+                  </v-combobox>
+                </div>
                 <v-alert :value="loginError" transition="fade-transition" type="error">
                   Incorrect email or password
                 </v-alert>
@@ -49,6 +66,8 @@ import { readLoginError } from '@/store/main/getters';
 import { dispatchLogIn } from '@/store/main/actions';
 import PortalButton from './main/appbar/components/PortalButton.vue';
 import CustomAppBar from './main/appbar/components/CustomAppBar.vue';
+import { apiUrl, changeApi, env } from '@/env';
+import axios from 'axios';
 
 @Component({
   components: { PortalButton, CustomAppBar }
@@ -56,6 +75,42 @@ import CustomAppBar from './main/appbar/components/CustomAppBar.vue';
 export default class Login extends Vue {
   public email = '';
   public password = '';
+  private environments = [];
+  public env = env;
+
+  public get apiUrl() {
+    return apiUrl;
+  }
+
+  public set apiUrl(value) {
+    changeApi(value);
+  }
+
+  public async loadUrls() {
+    const token = process.env.VUE_APP_GITLAB_TOKEN;
+    const response = await axios.get('https://gitlab.cct-ev.de/api/v4/projects', { 
+      headers: {
+        'PRIVATE-TOKEN': token
+      },
+      params: {
+        search: 'backend'
+      }
+    });
+    
+    for (const project of response.data) {
+      const response = await axios.get(`https://gitlab.cct-ev.de/api/v4/projects/${project.id}/environments`, { 
+        headers: {
+          'PRIVATE-TOKEN': token
+        },
+        params: {
+          states: 'available'
+        }
+      });
+      const environments = response.data.filter(env => env.external_url);
+      this.environments = environments;
+      break;
+    }
+  }
 
   public get loginError() {
     return readLoginError(this.$store);

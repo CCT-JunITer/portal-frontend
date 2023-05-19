@@ -64,8 +64,12 @@ build:
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   variables:
-    IMAGE: "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG" 
+    IMAGE: "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
   script:
+    - |
+      cat <<EOF >.env
+      VUE_APP_GITLAB_TOKEN=$GITLAB_PRIVATE_TOKEN
+      EOF
     - docker pull $IMAGE || true
     - docker build --cache-from $IMAGE -t $IMAGE .
     - docker push $IMAGE

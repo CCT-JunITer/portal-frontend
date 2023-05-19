@@ -10,6 +10,10 @@ export const getLocalUserStatus = getLocal('userstate');
 export const saveLocalUserStatus = saveLocal('userstate');
 export const removeLocalUserStatus = removeLocal('userstate');
 
+export const getLocalBackendUrl = getLocal('backendurl');
+export const saveLocalBackendUrl = saveLocal('backendurl');
+export const removeLocalBackendUrl = removeLocal('backendurl');
+
 export function dataURItoBlob(dataURI) {
   // convert base64/URLEncoded data component to raw binary data held in a string
   let byteString;
