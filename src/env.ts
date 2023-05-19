@@ -47,19 +47,19 @@ const findUrl = () => {
       envMode = 'dev';
     }
   }
+  console.log(`%cbackend url: ${envApiUrl}, env: ${envMode}`, 'color: red;');
   return { apiUrl: envApiUrl, env: envMode }
 }
 
 export let { apiUrl, env } = findUrl();
-console.log(`%cbackend url: ${apiUrl}, env: ${env}`, 'color: red;');
 
 
 export const changeApi = (url?: string, save=true) => {
   if (!url) {
+    removeLocalBackendUrl();
     const envApi = findUrl();
     apiUrl = envApi.apiUrl;
     env = envApi.env;
-    removeLocalBackendUrl();
     return;
   }
   apiUrl = url;

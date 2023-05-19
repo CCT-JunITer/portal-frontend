@@ -28,7 +28,8 @@
                 </v-text-field>
                 <div v-if="env !== 'production'">
                   <v-combobox
-                    v-model="apiUrl"
+                    v-model="url"
+                    clearable
                     label="Backend URL"
                     prepend-icon="mdi-earth"
                     :items="environments"
@@ -37,8 +38,8 @@
                     :return-object="false"
                   >
                     <template v-slot:append-outer>
-                      <v-btn small @click="loadUrls" color="cctGreen" dark>
-                        Load URLs
+                      <v-btn small @click="useDefault" color="cctPurple" dark>
+                        Default
                       </v-btn>
                     </template>
                   </v-combobox>
@@ -61,7 +62,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import { readLoginError } from '@/store/main/getters';
 import { dispatchLogIn } from '@/store/main/actions';
 import PortalButton from './main/appbar/components/PortalButton.vue';
@@ -77,13 +78,23 @@ export default class Login extends Vue {
   public password = '';
   private environments = [];
   public env = env;
+  public url = '';
 
-  public get apiUrl() {
-    return apiUrl;
+  @Watch('url')
+  public onUrlChange(newUrl?: string) {
+    changeApi(newUrl);
   }
 
-  public set apiUrl(value) {
-    changeApi(value);
+  public mounted() {
+    this.url = apiUrl;
+    if (env !== 'production') {
+      this.loadUrls();
+    }
+  }
+
+  public useDefault() {
+    changeApi();
+    this.url = apiUrl;
   }
 
   public async loadUrls() {
