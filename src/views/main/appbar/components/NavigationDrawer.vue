@@ -233,6 +233,15 @@
         </v-list-item-content>
       </v-list-item>
 
+      <v-list-item href="https://cct-ev-pm.monday.com" color="cctBlue" target="_blank">
+        <v-list-item-icon>
+          <v-icon>mdi-television</v-icon>
+        </v-list-item-icon>
+        <v-list-item-content>
+          <v-list-item-title>CRM-Tool</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>      
+
       <!-- value:false highlightet nicht als wäre es geklickt -->
 
       <v-list-group :value="false" prepend-icon="mdi-menu">
