@@ -258,7 +258,7 @@ export default class ProjectDetail extends Vue {
       },
       {
         name: 'Projektart',
-        key: this.project.subtype,
+        key: this.project.subtype?.join(', '),
       },
       {
         name: 'Projektstatus',
@@ -282,9 +282,24 @@ export default class ProjectDetail extends Vue {
   get calculationDetails() {
     return [
       {
-        name: 'Angebotsannahme (Projektbeginn)',
+        name: 'Erstmalige Angebotsabgabe',
+        key: this.$common.format(this.project.proposal_date),
+        value: this.project.proposal_date,
+      },
+      {
+        name: 'Angebotsannahme',
         key: this.$common.format(this.project.acceptance_date),
         value: this.project.acceptance_date,
+      },
+      {
+        name: 'Projektstart (soll)',
+        key: this.$common.format(this.project.project_start_date_expected),
+        value: this.project.project_start_date_expected,
+      },
+      {
+        name: 'Projektstart (ist)',
+        key: this.$common.format(this.project.project_start_date_actual),
+        value: this.project.project_start_date_actual,
       },
       {
         name: 'Projektende (soll)',
@@ -322,13 +337,13 @@ export default class ProjectDetail extends Vue {
         value: this.project.surcharge_amount_documentation,
       },
       {
-        name: 'Reisekostenzuschlag',
-        key: this.$common.decimal2Text(this.project.surcharge_amount_travel) + '%',
+        name: 'Reisekosten',
+        key: this.$common.decimal2Text(this.project.surcharge_amount_travel) + '€',
         value: this.project.surcharge_amount_travel,
       },
       {
         name: 'Zuschlag durch Sonstiges',
-        key: this.$common.decimal2Text(this.project.surcharge_amount_other) + '%',
+        key: this.$common.decimal2Text(this.project.surcharge_amount_other) + '€',
         value: this.project.surcharge_amount_other,
       },
       {
@@ -352,9 +367,29 @@ export default class ProjectDetail extends Vue {
         value: this.project.reference_status,
       },
       {
+        name: 'Grund, wenn Referenzfreigabe nicht erteilt',
+        key: this.project.reference_no_approval_cause,
+        value: this.project.reference_no_approval_cause,
+      },
+      {
+        name: 'Grund, wenn Referenzfreigabe nicht angefragt',
+        key: this.project.reference_no_inquiry_cause,
+        value: this.project.reference_no_inquiry_cause,
+      },
+      {
         name: 'KFB Status',
         key: this.$enum('KFBStatusEnum', this.project.kfb_status),
         value: this.project.kfb_status,
+      },
+      {
+        name: 'Grund, dass KFB nicht versendet',
+        key: this.project.kfb_not_sent_cause,
+        value: this.project.kfb_not_sent_cause,
+      },
+      {
+        name: 'Grund, dass KFB abgelehnt',
+        key: this.project.kfb_rejected_cause,
+        value: this.project.kfb_rejected_cause,
       },
     ].filter(c => c && c.value);
   }

@@ -137,30 +137,37 @@ export const formatRange = (date_from: string, date_to: string): string => {
 }
 
 
-export const formatDateRange = (date_from: string, date_to: string): string => {
-  const from = new Date(date_from);
-  const to = new Date(date_to);
-  if (isSameDay(from, to)) {
-    return format(from, 'dd.MM.yyyy \'bis\' ')
+export const formatDateRange = (date_from?: string, date_to?: string): string => {
+  const dateFormat = 'dd.MM.yyyy';
+  const from = date_from && new Date(date_from);
+  const to = date_to && new Date(date_to);
+  if (!to && !from) {
+    return '';
   }
-  return format(from, 'dd.MM.yyyy \'bis\' ') + format(to, 'dd.MM.yyyy')
+  if (!to) {
+    return format(from, `'ab' ${dateFormat}`)
+  }
+  if (!from) {
+    return format(to, `'bis' ${dateFormat}`)
+  }
+  if (isSameDay(from, to)) {
+    return format(from, `'ab' ${dateFormat}`)
+  }
+  return format(from, `${dateFormat} 'bis' `) + format(to, dateFormat)
 }
 
 export const decimal2Text = (decimal?: number, fixed?: number): string => {
   if (!decimal) {
     return '';
   }
-  if (fixed) {
-    return decimal.toFixed(fixed).replace('.', ',');
-  }
-  return decimal.toString().replace('.', ',');
+  return decimal.toLocaleString('de-DE', { maximumFractionDigits: fixed, minimumFractionDigits: fixed })
 }
 
 export const text2Decimal = (text?: string) => {
   if (!text) {
     return NaN;
   }
-  return +text.replace(',', '.');
+  return +text.replace('.', '').replace(',', '.');
 }
 
 

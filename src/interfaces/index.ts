@@ -101,7 +101,8 @@ export interface VersionedFolder {
 }
 
 export interface LabelledFile {
-    file_id: string;
+    file_id?: string;
+    cause?: string;
     label?: string;
 }
 

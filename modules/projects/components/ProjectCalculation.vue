@@ -63,8 +63,8 @@ export default class ProjectCalculation extends Vue {
     return bt 
       + (bt * (this.project.surcharge_amount_project_management || 0) / 100)
       + (bt * (this.project.surcharge_amount_documentation || 0) / 100)
-      + (bt * (this.project.surcharge_amount_travel || 0) / 100)
-      + (bt * (this.project.surcharge_amount_other || 0) / 100)
+      + (this.project.surcharge_amount_travel || 0)
+      + (this.project.surcharge_amount_other || 0)
   }
 
   public get total_volume() {
@@ -84,12 +84,12 @@ export default class ProjectCalculation extends Vue {
             },
             {
               name: 'Reisekostenzuschlag',
-              key: this.$common.decimal2Text(this.project.surcharge_amount_travel) + '%',
+              key: this.$common.decimal2Text(this.project.surcharge_amount_travel) + '€',
               value: this.project.surcharge_amount_travel,
             },
             {
               name: 'Zuschlag durch Sonstiges',
-              key: this.$common.decimal2Text(this.project.surcharge_amount_other) + '%',
+              key: this.$common.decimal2Text(this.project.surcharge_amount_other) + '€',
               value: this.project.surcharge_amount_other,
             },
             {

@@ -6,7 +6,7 @@
         Projekte
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn disabled color="cctGreen" style="color: white" :to="{name: 'project-create'}">
+      <v-btn color="cctGreen" style="color: white" :to="{name: 'project-create'}">
         <v-icon left>
           mdi-account-tie
         </v-icon>
@@ -105,7 +105,7 @@ import { readAutocompleteValues, readProjects } from '../store/getters';
 import { dispatchGetAutocompleteValues, dispatchGetProjects } from '../store/actions';
 import ProjectTable from './ProjectTable.vue';
 import { Route } from 'vue-router';
-import { ProjectTypeEnum } from '../types';
+import { Project, ProjectTypeEnum } from '../types';
 
 @Component({
   components: {EmployeeProfilePicture, FileManager, ProjectTable },
@@ -167,6 +167,12 @@ export default class ProjectMain extends Vue {
         values: readAutocompleteValues(this.$store)('methods')?.map(method => ({ text: method, value: method })),
         multiple: true,
       },
+      {
+        value: 'tags',
+        text: 'Tags',
+        values: readAutocompleteValues(this.$store)('tags')?.map(method => ({ text: method, value: method })),
+        multiple: true,
+      },
     ];
   }
 
@@ -203,10 +209,13 @@ export default class ProjectMain extends Vue {
   }
 
   get projects() {
+    const filterBy = (filters: string[], key: keyof Project) => (project: Project) => !filters?.length || filters.some(f => (project[key] as string[] || []).indexOf(f) !== -1)
+    const filter = (key: keyof Project) => filterBy(this.filters[key] as string[], key);
+
     return readProjects(this.$store)(this.filters.type as ProjectTypeEnum || 'all')
-      ?.filter(project => !this.filters.subtype?.length || this.filters.subtype.indexOf(project.subtype || '') !== -1)
-      ?.filter(project => !this.filters.categories?.length || (this.filters.categories as string[]).some((category) => (project.categories || []).indexOf(category) !== -1))
-      ?.filter(project => !this.filters.methods?.length || (this.filters.methods as string[]).some((method) => (project.methods || []).indexOf(method) !== -1))
+      ?.filter(filter('subtype'))
+      ?.filter(filter('categories'))
+      ?.filter(filter('methods'))
       
   }
 

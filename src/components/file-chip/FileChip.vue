@@ -3,12 +3,17 @@
     <v-chip 
       v-bind="$attrs" 
       v-on="$listeners" 
-      :color="file && !error ? color : 'error'"
+      :color="file && file.file_id ? (!error ? color : 'error') : 'cctPurple'"
       outlined
     >
-      <v-icon left size="20">
-        {{ fileIcon }}
-      </v-icon>
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on, attrs }">
+          <v-icon left size="20" v-on="on" v-bind="attrs">
+            {{ fileIcon }}
+          </v-icon>
+        </template>
+        {{ file.cause && 'Grund für fehlende Datei' }}
+      </v-tooltip>
       <v-avatar left v-if="isDownloading">
         <v-progress-circular
           :size="20"
@@ -23,14 +28,14 @@
       <span class="text-truncate file-chip__displayname">
         {{ displayName }}
       </span>
-      <v-avatar right>
+      <v-avatar right v-if="isDownloadable">
         <v-btn @click="preview" icon right style="color: currentColor;" small>
           <v-icon size="20">
             mdi-eye
           </v-icon>
         </v-btn>
       </v-avatar>
-      <v-avatar right>
+      <v-avatar right v-if="isDownloadable">
         <v-btn @click="downloadAndSave" icon style="color: currentColor;" small>
           <v-icon size="20">
             mdi-download
@@ -119,13 +124,23 @@ export default class FileChip extends Vue {
     return this.file;
   }
 
+  public get isDownloadable() {
+    return this.file.file_id && !this.error;
+  }
+
   public get displayName() {
+    if(!this.file.file_id) {
+      return this.file.cause;
+    }
     const split = this.file.file_id.indexOf('.')
     return this.file.file_id.substring(split + 1);
   }
 
 
   public get fileIcon() {
+    if (!this.file.file_id) {
+      return 'mdi-file-alert';
+    }
     switch(this.file.file_id.split('.')[this.file.file_id.split('.').length-1]) {
     case 'pdf':
       return 'mdi-file-document';
@@ -160,13 +175,16 @@ export default class FileChip extends Vue {
     document.body.appendChild(link);
     link.href = this.fileUrl;
     link.setAttribute('type', 'hidden');
-    link.setAttribute('download', this.displayName);
+    link.setAttribute('download', this.displayName || 'unknown');
     link.click();
 
     this.dialog = false;
   }
 
   public async download() {
+    if (!this.file.file_id) {
+      return;
+    }
     this.isDownloading = true;
     this.error = false;
     try {

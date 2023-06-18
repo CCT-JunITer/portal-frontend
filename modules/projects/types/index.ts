@@ -17,7 +17,7 @@ export type ProjectRoleEnum = 'controller' | 'leader' | 'worker';
 export type ProjectStatusEnum = 'running' | 'completed' | 'aborted' | 'rejected';
 export type KFBStatusEnum = 'open_status' | 'send_status' | 'closed_status' | 'rejected_status';
 export type ProjectAcquisitionType = 'internal' | 'external' | 'general' | 'acquisition_team' | 'follow_up';
-export type ProjectReferenceStatusEnum = 'closed_status' | 'rejected_status' | 'open_status' | 'basis' | 'default' | 'extended';
+export type ProjectReferenceStatusEnum = 'basis' | 'default' | 'extended';
 
 export interface ProjectUser {
   participant: IUserProfile;
@@ -26,12 +26,14 @@ export interface ProjectUser {
 
 export interface ProjectCreate {
   participant_ids: { [k: string]: number[] };
+  applications_ids: { [k: string]: number[] };
   parent_project_id?: number;
 
   type: ProjectTypeEnum;
   status: ProjectStatusEnum;
   title?: string;
-  subtype?: string;
+  subtype?: string[];
+  tags?: string[];
   description?: string;
   categories?: string[];
   methods?: string[];
@@ -40,7 +42,10 @@ export interface ProjectCreate {
   files?: string; // UUID4
 
   // 'Calculation' Properties:;
+  proposal_date: string;
   acceptance_date: string; // Angebotsannahme
+  project_start_date_expected?: string; // Projektstart(soll)
+  project_start_date_actual?: string; // Projektstart(ist)
   project_end_date_expected?: string; // Projektende(soll)
   project_end_date_actual?: string; // Projektende(ist)
   bt_amount_expected?: number; // Anzahl BT(soll)
@@ -54,8 +59,15 @@ export interface ProjectCreate {
   // 'Acquisition' Properties
   customer_name?: string;
   reference_code?: string;
-  kfb_status: KFBStatusEnum;
+  reference_quote?: string;
+  reference_no_approval_cause?: string; // Check-Box "Nicht erteilt" mit Begründung
+  reference_no_inquiry_cause?: string; // Check-Box "Nicht angefragt" mit Begründung
   reference_status?: ProjectReferenceStatusEnum;
+
+  kfb_status: KFBStatusEnum;
+  kfb_not_sent_cause?: string;
+  kfb_rejected_cause?: string;
+
   acquisition_type?: ProjectAcquisitionType;
   acquisition_by?: string;
   acquisition_by_user_id?: number; // IUserProfile;
@@ -65,6 +77,7 @@ type Modify<T, R> = Omit<T, keyof R> & R;
 
 export type ProjectCreation = Modify<Omit<ProjectCreate, 'participant_ids'>, {
   participants: { [k: string]: number[] };
+  applications: { [k: string]: number[] };
 
   // convert to strings for creation / update (to number)
   bt_amount_expected?: string; // Anzahl BT(soll)
@@ -90,6 +103,7 @@ export interface Project {
   
   versioned_folder?: VersionedFolder;
   participants?: { [k: string]: ProjectUser[] };
+  applications?: { [k: string]: ProjectUser[] };
 
   author?: IUserProfile;
 
@@ -99,7 +113,8 @@ export interface Project {
 
   type: ProjectTypeEnum;
   status: ProjectStatusEnum;
-  subtype?: string;
+  subtype?: string[];
+  tags?: string[];
   description?: string;
   categories?: string[];
   methods?: string[];
@@ -108,7 +123,10 @@ export interface Project {
   files?: string; // UUID4
 
   // 'Calculation' Properties:;
+  proposal_date?: string;
   acceptance_date: string; // Angebotsannahme
+  project_start_date_expected?: string; // Projektstart(soll)
+  project_start_date_actual?: string; // Projektstart(ist)
   project_end_date_expected?: string; // Projektende(soll)
   project_end_date_actual?: string; // Projektende(ist)
   bt_amount_expected?: number; // Anzahl BT(soll)
@@ -123,7 +141,14 @@ export interface Project {
   customer_name?: string;
   reference_code?: string;
   reference_status?: ProjectReferenceStatusEnum;
+  reference_quote?: string;
+  reference_no_approval_cause?: string; // Check-Box "Nicht erteilt" mit Begründung
+  reference_no_inquiry_cause?: string; // Check-Box "Nicht angefragt" mit Begründung
+
   kfb_status: KFBStatusEnum;
+  kfb_not_sent_cause?: string;
+  kfb_rejected_cause?: string;
+
   acquisition_type?: ProjectAcquisitionType;
   acquisition_by?: string;
   acquisition_by_user?: IUserProfile;

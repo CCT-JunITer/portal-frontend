@@ -37,6 +37,10 @@
             :items="getAutocompleteItems('subtype')"
             :search-input.sync="searchSubType"
             label="Projektart"
+            dense
+            multiple
+            chips
+            deletable-chips
             :rules="[$common.required]" 
           >
             <template v-slot:no-data>
@@ -72,6 +76,29 @@
               </v-list-item>
             </template>
           </v-combobox>
+
+          <v-combobox
+            v-model="project.tags"
+            prepend-icon="mdi-tag"
+            class="input-lg"
+            :items="getAutocompleteItems('tags')"
+            :search-input.sync="searchTags"
+            label="Tags"
+            dense
+            multiple
+            chips
+            deletable-chips
+          >
+            <template v-slot:no-data>
+              <v-list-item>
+                <v-list-item-content>
+                  <v-list-item-title>
+                    "<strong>{{ searchTags }}</strong>" nicht gefunden. Drücke <kbd>enter</kbd>, um einen neuen Tag zu erstellen
+                  </v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+            </template>
+          </v-combobox>
           <v-select
             label="Projektstatus"
             v-model ="project.status"
@@ -85,13 +112,41 @@
           <v-textarea
             label="Beschreibung"
             v-model="project.description"
-            prepend-icon="mdi-text-subject"
+            prepend-icon="mdi-card-text"
             class="input-lg"
             hint="Hier soll eine kurze Beschreibung der Schulung eingegeben werden."
             required
             :rules="[$common.required]"
           ></v-textarea>
           
+        </v-col>
+      </v-row>
+
+
+      <v-divider class="my-5"></v-divider>
+
+      <v-row>
+        <v-col cols="12" md="4" class="px-5">
+          <h4 class="text-h4 text--primary mb-3">Bewerber</h4>
+          <p class="text-body-2 text--secondary"></p>
+        </v-col>
+
+        <v-col cols="12" md="8" class="px-5">
+
+          <div
+            v-for="role in $enums('ProjectRoleEnum')"
+            :key="role.value"
+          >
+            <user-select 
+              multiple
+              class="input-lg"
+              prepend-icon="mdi-school"
+              filled
+              :label="role.text"
+              v-model="project.applications[role.value]">
+            </user-select>
+
+          </div>
         </v-col>
       </v-row>
 
@@ -218,7 +273,14 @@
         </v-col>
 
         <v-col cols="12" md="8" class="px-5">
-          <file-manager v-model="project.files" :folder="project.versioned_folder" :multiple="true" :labels="fileLabels"></file-manager>
+          <file-manager 
+            v-model="project.files" 
+            :folder="project.versioned_folder" 
+            :multiple="true"
+            :labels="fileLabels"
+            :requiredLabels="fileLabels"
+          >
+          </file-manager>
         </v-col>
       </v-row>
 
@@ -232,6 +294,26 @@
 
         <v-col cols="12" md="4" class="px-5">
           <date-picker-menu
+            v-model ="project.proposal_date"
+            defaultPicker="MONTH"
+            :pickerProps="{
+              min: '2000-01-01',
+              max: '2025-01-01'
+            }"
+          >
+            <template v-slot:activator="{ on, attrs, }">
+              <v-text-field
+                label="Erstmalige Angebotsabgabe"
+                class="input-lg"
+                v-bind="attrs"
+                v-on="on"
+                prepend-icon="mdi-calendar-range"
+                :rules="attrs.rules"
+              ></v-text-field>
+            </template>
+          </date-picker-menu>
+
+          <date-picker-menu
             v-model ="project.acceptance_date"
             defaultPicker="MONTH"
             :pickerProps="{
@@ -241,7 +323,27 @@
           >
             <template v-slot:activator="{ on, attrs, }">
               <v-text-field
-                label="Angebotsdatum"
+                label="Angebotsannahme"
+                class="input-lg"
+                v-bind="attrs"
+                v-on="on"
+                prepend-icon="mdi-calendar-range"
+                :rules="attrs.rules"
+              ></v-text-field>
+            </template>
+          </date-picker-menu>
+
+          <date-picker-menu
+            v-model ="project.project_start_date_expected"
+            defaultPicker="MONTH"
+            :pickerProps="{
+              min: '2000-01-01',
+              max: '2025-01-01'
+            }"
+          >
+            <template v-slot:activator="{ on, attrs, }">
+              <v-text-field
+                label="Projektbeginn (soll)"
                 class="input-lg"
                 v-bind="attrs"
                 v-on="on"
@@ -251,6 +353,28 @@
               ></v-text-field>
             </template>
           </date-picker-menu>
+
+          <date-picker-menu
+            v-model ="project.project_start_date_actual"
+            defaultPicker="MONTH"
+            :pickerProps="{
+              min: '2000-01-01',
+              max: '2025-01-01'
+            }"
+          >
+            <template v-slot:activator="{ on, attrs, }">
+              <v-text-field
+                label="Projektbeginn (ist)"
+                class="input-lg"
+                v-bind="attrs"
+                v-on="on"
+                prepend-icon="mdi-calendar-range"
+                required
+                :rules="attrs.rules"
+              ></v-text-field>
+            </template>
+          </date-picker-menu>
+
          
           <date-picker-menu
             v-model ="project.project_end_date_expected"
@@ -288,7 +412,7 @@
                 v-bind="attrs"
                 v-on="on"
                 prepend-icon="mdi-calendar-range"
-                :rules="[...attrs.rules]"
+                :rules="attrs.rules"
               ></v-text-field>
             </template>
           </date-picker-menu>
@@ -366,23 +490,23 @@
             ></v-text-field>
 
             <v-text-field
-              label="Reisekostenzuschlag"
+              label="Reisekosten"
               v-model="project.surcharge_amount_travel"
               class="input-lg"
-              prepend-icon="mdi-percent"
-              suffix="%"
+              prepend-icon="mdi-numeric"
+              suffix="€"
               required
-              :rules="[$common.isDecimal]" 
+              :rules="[$common.isCurrency]" 
             ></v-text-field>
 
             <v-text-field
               label="Zuschlag für Sonstiges"
               v-model="project.surcharge_amount_other"
               class="input-lg"
-              prepend-icon="mdi-percent"
-              suffix="%"
+              prepend-icon="mdi-numeric"
+              suffix="€"
               required
-              :rules="[$common.isDecimal]" 
+              :rules="[$common.isCurrency]" 
             ></v-text-field>
           </div>
         </v-col>
@@ -402,13 +526,25 @@
         </v-col>
 
         <v-col cols="12" md="8" class="px-5">
-          
-          <v-text-field
-            label="Kund:innenname"
+          <v-combobox
             v-model="project.customer_name"
+            label="Kund:innenname"
             class="input-lg"
             prepend-icon="mdi-account"
-          ></v-text-field>
+            :items="getAutocompleteItems('customer_name')"
+            :search-input.sync="searchCustomerName"
+            :rules="[$common.required]" 
+          >
+            <template v-slot:no-data>
+              <v-list-item>
+                <v-list-item-content>
+                  <v-list-item-title>
+                    "<strong>{{ searchCustomerName }}</strong>" nicht gefunden. Drücke <kbd>enter</kbd>, um eine:n neue:n Kund:in zu erstellen
+                  </v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+            </template>
+          </v-combobox>
           
           <v-select
             label="Status der Referenzfreigabe"
@@ -419,6 +555,41 @@
             item-text="text"
             :items="$enums('ProjectReferenceStatusEnum')"
           ></v-select>
+          <v-expand-transition>
+            <v-textarea
+              label="Zitat"
+              v-model="project.reference_quote"
+              class="input-lg"
+              prepend-icon="mdi-format-quote-close"
+              required
+              v-show="project.reference_status === 'extended' || project.reference_quote"
+              :rules="[v => project.reference_status !== 'extended' ? $common.isEmpty(v) : $common.required(v)]"
+            ></v-textarea>
+          </v-expand-transition>
+
+          <v-expand-transition>
+            <v-textarea
+              label="Grund, wenn Referenzfreigabe nicht erteilt"
+              v-model="project.reference_no_approval_cause"
+              class="input-lg"
+              prepend-icon="mdi-help"
+              required
+              v-show="project.reference_status === 'basis' || project.reference_no_approval_cause"
+              :rules="[v => project.reference_status !== 'basis' ? $common.isEmpty(v) : true]"
+            ></v-textarea>
+          </v-expand-transition>
+
+          <v-expand-transition>
+            <v-textarea
+              label="Grund, wenn Referenzfreigabe nicht angefragt"
+              v-model="project.reference_no_inquiry_cause"
+              class="input-lg"
+              prepend-icon="mdi-help"
+              required
+              v-show="project.reference_status === 'basis' || project.reference_no_inquiry_cause"
+              :rules="[v => project.reference_status !== 'basis' ? $common.isEmpty(v) : true]"
+            ></v-textarea>
+          </v-expand-transition>
 
           <v-select
             label="KFB Status"
@@ -429,6 +600,30 @@
             item-text="text"
             :items="$enums('KFBStatusEnum')"
           ></v-select>
+
+          <v-expand-transition>
+            <v-textarea
+              label="Grund, dass KFB nicht versendet"
+              v-model="project.kfb_not_sent_cause"
+              class="input-lg"
+              prepend-icon="mdi-help"
+              required
+              v-show="project.kfb_status === 'open_status' || project.kfb_not_sent_cause"
+              :rules="[v => project.kfb_status !== 'open_status' ? $common.isEmpty(v) : $common.required(v)]"
+            ></v-textarea>
+          </v-expand-transition>
+
+          <v-expand-transition>
+            <v-textarea
+              label="Grund, dass KFB abgelehnt"
+              v-model="project.kfb_rejected_cause"
+              class="input-lg"
+              prepend-icon="mdi-help"
+              required
+              v-show="project.kfb_status === 'rejected_status' || project.kfb_rejected_cause"
+              :rules="[v => project.kfb_status !== 'rejected_status' ? $common.isEmpty(v) : $common.required(v)]"
+            ></v-textarea>
+          </v-expand-transition>
 
           <v-select
             label="Akquise durch"
@@ -540,12 +735,15 @@ export default class EditProject extends Vue {
   public fileLabels = FILE_LABELS;
   public valid = true;
   public project: Partial<ProjectCreation> = {
-    participants: {}
+    participants: {},
+    applications: {},
   }
 
   public searchSubType = '';
+  public searchCustomerName = '';
   public searchCategories = '';
   public searchMethods = '';
+  public searchTags = '';
 
 
   async deleteProject() {
@@ -587,6 +785,7 @@ export default class EditProject extends Vue {
     const newProject: ProjectCreate = {
       ...this.project as ProjectCreation,
       participant_ids: this.project.participants!,
+      applications_ids: this.project.applications!,
       bt_amount_expected: this.$common.text2Decimal(this.project.bt_amount_expected), // Anzahl BT(soll)
       bt_amount_actual: this.$common.text2Decimal(this.project.bt_amount_actual), // Anzahl BT(ist)
       bt_rate: this.$common.text2Decimal(this.project.bt_rate),
@@ -627,13 +826,14 @@ export default class EditProject extends Vue {
       this.project = {
         ...this.editProject,
         participants: Object.fromEntries(Object.entries(this.editProject.participants!).map(([k,v]) => [k, v.map(u => u.participant.id)])),
+        applications: Object.fromEntries(Object.entries(this.editProject.applications!).map(([k,v]) => [k, v.map(u => u.participant.id)])),
         bt_amount_expected: this.$common.decimal2Text(this.editProject.bt_amount_expected), // Anzahl BT(soll)
         bt_amount_actual: this.$common.decimal2Text(this.editProject.bt_amount_actual), // Anzahl BT(ist)
         bt_rate: this.$common.decimal2Text(this.editProject.bt_rate, 2),
         surcharge_amount_project_management: this.$common.decimal2Text(this.editProject.surcharge_amount_project_management), // PM - Zuschla,
         surcharge_amount_documentation: this.$common.decimal2Text(this.editProject.surcharge_amount_documentation), // Dokumentationzuschla,
-        surcharge_amount_travel: this.$common.decimal2Text(this.editProject.surcharge_amount_travel), // Reisekostenzuschla,
-        surcharge_amount_other: this.$common.decimal2Text(this.editProject.surcharge_amount_other), // Sonstige,
+        surcharge_amount_travel: this.$common.decimal2Text(this.editProject.surcharge_amount_travel, 2), // Reisekostenzuschla,
+        surcharge_amount_other: this.$common.decimal2Text(this.editProject.surcharge_amount_other, 2), // Sonstige,
         bt_amount_bid_preparation: this.$common.decimal2Text(this.editProject.bt_amount_bid_preparation),
       };
     }

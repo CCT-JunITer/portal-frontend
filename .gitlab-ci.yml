@@ -58,9 +58,10 @@ test:
 
 build:
   stage: build
-  image: docker:latest
+  image: docker@sha256:c8bb6fa5388b56304dd770c4bc0478de81ce18540173b1a589178c0d31bfce90
   services:
-    - docker:dind
+    - docker:dind@sha256:c8bb6fa5388b56304dd770c4bc0478de81ce18540173b1a589178c0d31bfce90
+
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   variables:
@@ -129,7 +130,7 @@ stop review:
     DOMAIN: "$CI_ENVIRONMENT_SLUG.portal.stag.${BASE_DOMAIN}"
 
 deploy production:
-  image: docker:latest
+  image: docker@sha256:c8bb6fa5388b56304dd770c4bc0478de81ce18540173b1a589178c0d31bfce90
   stage: deploy
   needs: 
     - job: build
@@ -164,7 +165,7 @@ stop production:
 # templates
 
 .deploy base:
-  image: docker:latest
+  image: docker@sha256:c8bb6fa5388b56304dd770c4bc0478de81ce18540173b1a589178c0d31bfce90
   stage: deploy
   needs: 
     - job: build
@@ -182,7 +183,7 @@ stop production:
     - *docker-stack-run
 
 .stop base:
-  image: docker:latest
+  image: docker@sha256:c8bb6fa5388b56304dd770c4bc0478de81ce18540173b1a589178c0d31bfce90
   stage: deploy
   needs: 
     - job: build

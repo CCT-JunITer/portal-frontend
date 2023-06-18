@@ -10,6 +10,7 @@
         Historie
       </v-btn>
       <upload-button
+        ref="fileUpload"
         v-if="!readonly"
         :loading="this.isUploading"
         :disabled="this.isUploading"
@@ -28,108 +29,13 @@
         </v-icon>
         Datei{{ multiple ? 'en' : '' }} hochladen
       </upload-button>
-      <v-dialog
+      <file-upload-dialog
         v-model="dialog"
-        persistent
-        max-width="600px"
+        :files="files"
+        @uploadFiles="uploadFiles"
+        :labels="labels"
       >
-        <v-card v-if="this.files">
-          <v-card-title>
-            <span class="text-h5">Dateien umbenennen</span>
-          </v-card-title>
-          <v-card-text>
-            <v-alert type="info" text dense v-if="labels">
-              Du kannst den Dateien <code>labels</code> zuordnen, indem du auf die Dateivorschau klickst.
-            </v-alert>
-            <file-chip-group>
-              <v-form v-model="file.formValid" ref="forms" v-for="file in this.files" :key="file.key">
-                <v-menu
-                  :close-on-content-click="false"
-                  v-model="file.menu"
-                  bottom
-                  right
-                  transition="scale-transition"
-                  offset-y
-                  eager
-                >
-                  <template v-slot:activator="{ on, attrs}">
-                    <v-chip 
-                      v-bind="attrs"
-                      v-on="on"
-                      :color="file.formValid ? 'cctBlue' : 'error'"
-                      outlined
-                    >
-                      <v-icon left size="20">
-                        mdi-file
-                      </v-icon>
-                      <span class="text-truncate file-chip__label" v-if="file.label">
-                        {{ file.label + '/'}}
-                      </span>
-                      <span class="text-truncate file-chip__displayname">
-                        {{ file.fileName }}.{{ file.fileExtention }}
-                      </span>
-                    </v-chip>
-                  </template>
-                  <v-card>
-                    <v-card-text>
-                      <v-select
-                        label="Label"
-                        filled
-                        v-model="file.label"
-                        :items="labels"
-                        v-if="labels && labels.length"
-                        :rules="[$common.required]"
-                      >
-                      </v-select>
-                      <v-text-field
-                        label="Dateiname"
-                        filled
-                        v-model="file.fileName"
-                        :rules="[$common.required]"
-                      >
-                        <template #append>
-                          <span class="text-button">.{{file.fileExtention}}</span>
-                        </template>
-                      </v-text-field>
-                    </v-card-text>
-                    <v-card-actions>
-                      <v-spacer></v-spacer>
-                      <v-btn icon @click="files = files.filter(f => f.key !== file.key)" color="red">
-                        <v-icon>mdi-delete</v-icon>
-                      </v-btn>
-                      <v-btn
-                        color="primary"
-                        text
-                        :disabled="!file.formValid"
-                        @click="file.menu = false"
-                      >
-                        Speichern
-                      </v-btn>
-                    </v-card-actions>
-                  </v-card>
-                </v-menu>
-              </v-form>
-            </file-chip-group>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn
-              color="blue darken-1"
-              text
-              @click="dialog = false"
-            >
-              Abbrechen
-            </v-btn>
-            <v-btn
-              color="blue darken-1"
-              text
-              @click="uploadFiles"
-            >
-              Hochladen
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
+      </file-upload-dialog>
     </div>
     <div>
       <v-expand-transition>
@@ -144,19 +50,70 @@
           </div>
         </v-sheet>
       </v-expand-transition>
-      <p v-if="!this.versionedFolder || !this.versionedFolder.effective_files.length">
-        Noch keine Dateien hochgeladen
-      </p>
-
-
-      <file-chip-group 
-        v-else 
-        v-for="[category, files] of Object.entries(effectiveFiles)"
-        :label="category"
-        :key="category">
-        <file-chip :key="file.file_id" :file="file" v-for="file in files" @[readonly?null:`delete-file`]="removeFile" :noLabel="true">
-        </file-chip>
-      </file-chip-group>
+      <div v-if="readonly">
+        <file-chip-group 
+          v-for="[category, files] of Object.entries(effectiveFiles)"
+          :label="category"
+          :key="category">
+          <file-chip :key="file.file_id" :file="file" v-for="file in files" @[readonly?null:`delete-file`]="removeFile" :noLabel="true">
+          </file-chip>
+        </file-chip-group>
+      </div>
+      <div
+        v-else
+        v-for="category of allLabels"
+        :key="category"
+      >
+        <file-chip-group 
+          :label="category">
+          <file-chip
+            :key="file.file_id"
+            :file="file"
+            v-for="file in effectiveFiles[category]"
+            @[readonly?null:`delete-file`]="removeFile"
+            :noLabel="true"
+          >
+          </file-chip>
+        </file-chip-group>
+        <div class="d-flex align-center ml-3">
+          <v-btn
+            small
+            rounded
+            color="cctOrange"
+            outlined
+            @click="(defaultLabel = category) && $refs.fileUpload.trigger()"
+          >
+            <v-icon left>
+              cloud_upload
+            </v-icon>
+            Datei{{ multiple ? 'en' : '' }} hochladen
+          </v-btn>
+          <template
+            v-if="!effectiveFiles[category] && requiredLabels && requiredLabels.indexOf(category) !== -1"
+          >
+            <span class="mx-4 text-caption">oder</span>
+            <v-text-field
+              v-model="missingFiles[category]"
+              outlined
+              label="Grund für fehlende Datei"
+              dense
+              :rules="[v => !!v || 'Diese Datei wird benötigt']"
+            >
+              <template v-slot:append-outer>
+                <v-btn
+                  :disabled="!missingFiles[category]" 
+                  icon
+                  color="green"
+                  @click="addMissingFile(category, missingFiles[category])">
+                  <v-icon>
+                    mdi-plus
+                  </v-icon>
+                </v-btn>
+              </template>
+            </v-text-field>
+          </template>
+        </div>
+      </div>
     </div>
   </v-sheet>
   <div v-else-if="versionedFolder">
@@ -179,9 +136,10 @@ import FileChip from '../file-chip/FileChip.vue';
 import FileChipGroup from '../file-chip/FileChipGroup.vue';
 import UploadButton from '../UploadButton.vue';
 import FileChangeComponent from './FileChangeComponent.vue';
+import FileUploadDialog from './FileUploadDialog.vue';
 
 @Component({
-  components: { FileChipGroup, FileChip, UploadButton, FileChangeComponent }
+  components: { FileChipGroup, FileChip, UploadButton, FileChangeComponent, FileUploadDialog }
 })
 export default class FileManager extends Vue {
 
@@ -191,8 +149,17 @@ export default class FileManager extends Vue {
 
   public versionedFolder: VersionedFolder | null = null;
   public showHistory = false;
+  public defaultLabel = '';
+  public missingFiles = {};
 
-  get effectiveFiles(): { [k: string]: LabelledFile[] } {
+  get allLabels() {
+    return new Set(
+      [...(this.labels || []), ...(this.versionedFolder?.effective_files.map(file => file.label) || [])]
+        .filter(c => c !== null)
+    )
+  }
+
+  get effectiveFiles() {
     if (!this.versionedFolder) {
       return {};
     }
@@ -208,7 +175,7 @@ export default class FileManager extends Vue {
       files.push(curr)
       prev[label] = files
       return prev;
-    }, {}) || {}
+    }, {} as { [k: string]: LabelledFile[] }) || {}
   }
 
   @Watch('showHistory')
@@ -226,6 +193,9 @@ export default class FileManager extends Vue {
 
   @Prop({ required: false })
   public labels?: string[];
+
+  @Prop({ required: false })
+  public requiredLabels?: string[];
 
   @Prop({ default: false })
   public noManager!: boolean;
@@ -251,32 +221,9 @@ export default class FileManager extends Vue {
     if (!newValue) {
       this.versionedFolder = null;
     }
-    if (newValue !== oldValue && newValue) {
-      let value = newValue;
-      if (value) {
-        if (Array.isArray(value)) {
-          value = value.join(',');
-        }
-        const isNewFormat = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(value);
-        if (!isNewFormat) {
-          const files = value.split('/').flatMap(v => v.split(',')).filter(i => i)
-          const fileIds: string[] = [];
-          for (const file of files) {
-            fileIds.push(file);
-          }
-          if (fileIds.length) {
-            // this.versionedFolder = await dispatchCreateVersionedFolder(this.$store, { fileIds: fileIds });
-            // this.input(this.versionedFolder.id);
-            this.versionedFolder = { id: '', effective_files: fileIds.map(id => ({ file_id: id })), file_changes: []}
-          }
-          console.warn('Using old file-manager, consider using versioned files')
-          return;
-        }
-      }
-      if (this.versionedFolder?.id !== newValue) {
-        this.versionedFolder = await dispatchGetVersionedFolder(this.$store, { folderId: newValue });
-        console.warn('Had to fetch versioned folder, consider joining versioned files in backend and using prop "folder"')
-      }
+    if (newValue !== oldValue && newValue && this.versionedFolder?.id !== newValue) {
+      this.versionedFolder = await dispatchGetVersionedFolder(this.$store, { folderId: newValue });
+      console.warn('Had to fetch versioned folder, consider joining versioned files in backend and using prop "folder"')
     }
   }
 
@@ -290,16 +237,30 @@ export default class FileManager extends Vue {
       const fileExtentionIndex = file.name.lastIndexOf('.');
       const fileName = file.name.substring(0, fileExtentionIndex);
       const fileExtention = file.name.substring(fileExtentionIndex + 1);
-      return { file, fileName, fileExtention, key: i, label: '', formValid: false }
+      return { file, fileName, fileExtention, key: i, label: this.defaultLabel, formValid: false }
     });
+    this.defaultLabel = '';
     this.dialog = true;
   }
 
-  public async uploadFiles() {
-    const valid = (this.$refs as any).forms.every(form => form.validate())
-    if (!valid) {
-      return;
+  async addMissingFile(category: string, cause: string) {
+    this.isUploading = true;
+    const files = [{
+      cause: cause,
+      label: category
+    }]
+
+    if (!this.versionedFolder?.id) {
+      this.versionedFolder = await dispatchCreateVersionedFolder(this.$store, { files: [...(this.versionedFolder?.effective_files || []), ...files] })
+    } else {
+      this.versionedFolder = await dispatchAddFileToVersionedFolder(this.$store, { folderId: this.versionedFolder.id, files: files})
     }
+    this.input(this.versionedFolder.id)
+    this.isUploading = false;
+  }
+
+  public async uploadFiles() {
+
     if (!this.files) {
       return;
     }
