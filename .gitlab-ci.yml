@@ -88,7 +88,7 @@ deploy stag:
     url: https://portal.stag.$BASE_DOMAIN
     on_stop: stop stag
   variables:
-    DOCKER_HOST: 'ssh://gitlab-ci@portal.stag.${BASE_DOMAIN}'
+    DOCKER_HOST: 'ssh://gitlab-ci@portal.stag.${BASE_DOMAIN}:23'
     DOMAIN: "portal.stag.${BASE_DOMAIN}"
   only: 
     - master
@@ -101,7 +101,7 @@ stop stag:
   environment:
     name: stag
   variables:
-    DOCKER_HOST: 'ssh://gitlab-ci@portal.stag.${BASE_DOMAIN}'
+    DOCKER_HOST: 'ssh://gitlab-ci@portal.stag.${BASE_DOMAIN}:23'
     DOMAIN: "portal.stag.${BASE_DOMAIN}"
 
 deploy review: 
@@ -112,7 +112,7 @@ deploy review:
     url: https://$CI_ENVIRONMENT_SLUG.portal.stag.$BASE_DOMAIN
     on_stop: stop review
   variables:
-    DOCKER_HOST: 'ssh://gitlab-ci@portal.stag.${BASE_DOMAIN}'
+    DOCKER_HOST: 'ssh://gitlab-ci@portal.stag.${BASE_DOMAIN}:23'
     DOMAIN: "$CI_ENVIRONMENT_SLUG.portal.stag.${BASE_DOMAIN}"
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
@@ -126,7 +126,7 @@ stop review:
   environment:
     name: review/$CI_COMMIT_REF_NAME
   variables:
-    DOCKER_HOST: 'ssh://gitlab-ci@portal.stag.${BASE_DOMAIN}'
+    DOCKER_HOST: 'ssh://gitlab-ci@portal.stag.${BASE_DOMAIN}:23'
     DOMAIN: "$CI_ENVIRONMENT_SLUG.portal.stag.${BASE_DOMAIN}"
 
 deploy production:
@@ -144,7 +144,7 @@ deploy production:
   extends: 
     - .deploy base
   variables:
-    DOCKER_HOST: 'ssh://gitlab-ci@portal.${BASE_DOMAIN}'
+    DOCKER_HOST: 'ssh://gitlab-ci@portal.${BASE_DOMAIN}:23'
     DOMAIN: "portal.${BASE_DOMAIN}"
     IMAGE: "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
 
@@ -157,7 +157,7 @@ stop production:
   environment:
     name: prod
   variables:
-    DOCKER_HOST: 'ssh://gitlab-ci@portal.${BASE_DOMAIN}'
+    DOCKER_HOST: 'ssh://gitlab-ci@portal.${BASE_DOMAIN}:23'
     DOMAIN: "portal.${BASE_DOMAIN}"
 
 
