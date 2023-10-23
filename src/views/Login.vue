@@ -81,13 +81,15 @@ export default class Login extends Vue {
   public url = '';
 
   @Watch('url')
-  public onUrlChange(newUrl?: string) {
-    changeApi(newUrl);
+  public onUrlChange(oldUrl?: string, newUrl?: string) {
+    if (oldUrl !== newUrl) {
+      changeApi(newUrl);
+    }
   }
 
   public mounted() {
-    this.url = apiUrl;
     if (env !== 'production') {
+      this.url = apiUrl;
       this.loadUrls();
     }
   }
