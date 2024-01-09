@@ -15,7 +15,7 @@
         :loading="this.isUploading"
         :disabled="this.isUploading"
         :multiple="multiple"
-        accept=".pdf,.docx,.doc,.jpg,.jpeg,.png"
+        accept=".pdf,.docx,.doc,.jpg,.jpeg,.png,.xlsx,.xls,.pptx,.ppt"
         @files="onFileChanged"
         class="upload-button"
         color="cctOrange"
