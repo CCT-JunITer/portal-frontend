@@ -426,7 +426,9 @@ export default new Router({
             },
             {
               path: 'hochladen',
-              component: () => import('./views/main/hochladen/Hochladen.vue')
+              beforeEnter() {
+                window.location.href = 'https://cloud.cct-ev.de/s/gaypBRxt7MBmq93';
+              }
             },
             {
               path: 'tower-anwesenheit',
