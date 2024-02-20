@@ -107,7 +107,7 @@
             <v-list-item-title>Quality Management</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item to="" disabled class="ml-2">
+        <v-list-item to="/main/wms/boards" class="ml-2">
           <v-list-item-icon>
             <v-icon>mdi-crown</v-icon>
           </v-list-item-icon>

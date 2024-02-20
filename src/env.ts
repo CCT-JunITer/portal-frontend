@@ -26,7 +26,7 @@ const findUrl = () => {
   } else if (getLocalBackendUrl()) {
     envApiUrl = getLocalBackendUrl() || '';
     envMode = 'staging';
-  } else if (hostname.startsWith('portal') || hostname.startsWith('stag')) {
+  } else if (hostname.startsWith('portal') || hostname.indexOf('stag') !== -1) {
     // production or staging portal
     envApiUrl = origin.replace('portal', 'api');
     envMode = hostname.startsWith('portal') ? 'production' : 'staging';
