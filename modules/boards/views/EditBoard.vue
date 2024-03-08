@@ -21,6 +21,44 @@
             required
             :rules="[$common.required]" 
           ></v-text-field>
+          <date-picker-menu
+            v-model ="board.start_date"
+            defaultPicker="MONTH"
+            :pickerProps="{
+              min: '1993-01-01',
+              max: '2069-12-31'
+            }"
+          >
+            <template v-slot:activator="{ on, attrs, }">
+              <v-text-field
+                label="Vorstandszeit Beginn"
+                class="input-lg"
+                v-bind="attrs"
+                v-on="on"
+                prepend-icon="mdi-calendar-start"
+                :rules="attrs.rules"
+              ></v-text-field>
+            </template>
+          </date-picker-menu>
+          <date-picker-menu
+            v-model ="board.end_date"
+            defaultPicker="MONTH"
+            :pickerProps="{
+              min: '1993-01-01',
+              max: '2069-12-31'
+            }"
+          >
+            <template v-slot:activator="{ on, attrs, }">
+              <v-text-field
+                label="Vorstandszeit Ende"
+                class="input-lg"
+                v-bind="attrs"
+                v-on="on"
+                prepend-icon="mdi-calendar-end"
+                :rules="attrs.rules"
+              ></v-text-field>
+            </template>
+          </date-picker-menu>
         </v-col>
       </v-row>
 
@@ -41,7 +79,7 @@
             <user-select 
               multiple
               class="input-lg"
-              prepend-icon="mdi-school"
+              prepend-icon="mdi-account-multiple"
               filled
               :label="role.text"
               v-model="board.participants[role.value]">

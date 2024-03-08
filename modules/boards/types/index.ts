@@ -45,7 +45,8 @@ export interface Board {
   // General Properties:
   title: string;
   id: number;
-
+  start_date: string; //Vorstandsbeginndatum
+  end_date: string; //Vorstandenddatum
   
   versioned_folder?: VersionedFolder;
   participants?: { [k: string]: BoardUser[] };

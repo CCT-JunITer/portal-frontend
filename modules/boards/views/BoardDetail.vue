@@ -7,6 +7,12 @@
       </h1>
       <div class="d-flex align-center">
         <div>
+          <div>
+            <div class="text-subtitle 1 mb-4">
+              <b>{{ $common.format(new Date(board.start_date), 'dd.MM.yyyy') }}</b>
+              <span v-if="board.end_date"> bis <b>{{ $common.format(new Date(board.end_date), 'dd.MM.yyyy') }}</b></span>
+            </div>
+          </div>
           <div class="text-caption mb-1" v-if="board.author">
             erstellt von <user-chip :user="board.author" small></user-chip>
           </div>
@@ -58,6 +64,31 @@
       <v-divider class="my-5"></v-divider>
 
       <v-row>
+        <!-- add overview of meetings occured between start_date and end_date -->
+        <v-col cols="12" md="4" class="px-5">
+          <h2 class="text-h4 text--primary mb-3">Mitglieder-
+            versammlungen</h2>
+          <p class="text-body-2 text--secondary">
+            Mitgliederversammlungen im Zeitraum dieses Vorstandsjahres
+          </p>
+        </v-col>
+        <v-col cols="12" md="8" class="px-5">
+          <v-card outlined>
+            <v-list dense>
+              <v-list-item-group> 
+                <v-list-item v-for="event in filteredEvents" :key="event.id" :to="'/main/events/'+event.id">
+                  <v-list-item-title>{{ event.title }}</v-list-item-title>
+                  <v-list-item-subtitle>{{ $common.format(new Date(event.date_from), 'dd.MM.yyyy') }}</v-list-item-subtitle>
+                </v-list-item>
+              </v-list-item-group>
+            </v-list>
+          </v-card>
+        </v-col>
+      </v-row>
+
+      <v-divider class="my-5"></v-divider>
+
+      <v-row>
         <v-col cols="12" md="4" class="px-5">
           <h2 class="text-h4 text--primary mb-3">Dokumente</h2>
           <p class="text-body-2 text--secondary">
@@ -87,6 +118,10 @@ import ConsentDialog from '@/components/consent-dialog/ConsentDialog.vue';
 import { FILE_LABELS, Board, BoardCreate, BoardCreation,BoardRoleEnum } from '../types';
 import { dispatchGetOneBoard,dispatchDeleteBoard,dispatchUpdateBoard,dispatchCreateBoard } from '../store/actions';
 import { readoneboard } from '../store/getters';
+import { dispatchGetEvents } from '@/store/event/actions';
+import { readEvents } from '@/store/event/getters';
+import { isAfter, isBefore } from 'date-fns';
+import { IEvent } from '@/interfaces';
 
 
 
@@ -101,13 +136,26 @@ export default class EditBoard extends Vue {
     participants: {}
   }
 
-
-
-
-  
-
   get userProfiles() {
     return readUsers(this.$store);
+  }
+
+  get filteredEvents() {
+    const allEvents = readEvents(this.$store)('meeting');
+    if (!allEvents) {
+      return [];
+    }
+    if(!this.board.end_date) {
+      return allEvents.filter(event => {
+        return isAfter(new Date(event.date_from), new Date(this.board.start_date)) &&
+          event.subtype === 'Mitgliederversammlung';
+      });
+    }
+    return allEvents.filter(event => {
+      return isAfter(new Date(event.date_from), new Date(this.board.start_date)) &&
+        isBefore(new Date(event.date_to), new Date(this.board.end_date)) &&
+        event.subtype === 'Mitgliederversammlung';
+    });
   }
 
   @Watch('$route', {immediate: true})
@@ -121,6 +169,7 @@ export default class EditBoard extends Vue {
 
   public async mounted() {
     await dispatchGetUsers(this.$store);
+    await dispatchGetEvents(this.$store, 'meeting');
     this.valid = false;
   }
 
