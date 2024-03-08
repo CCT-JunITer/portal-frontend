@@ -6,9 +6,9 @@ import '@fontsource/lato/400.css';
 import '@fontsource/lato/300.css'; 
 import Vuetify from 'vuetify';
 import CCTIcon from '@/common/icons/cctIcon.vue';
+import CCTCanabis from '@/common/icons/cctCanabis.vue';
 import de from 'vuetify/lib/locale/de'
 import DatetimePicker from 'vuetify-datetime-picker'
-
 
 Vue.use(Vuetify);
 Vue.use(DatetimePicker)
@@ -23,6 +23,9 @@ export default new Vuetify({
     values: {
       cct: {
         component: CCTIcon
+      },
+      cctCanabis: {
+        component: CCTCanabis,
       }
     }
   },

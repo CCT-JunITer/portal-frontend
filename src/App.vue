@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" :class="{'april-fools': $common.isAprilFools()}">
     <v-app>
       <router-view />
       <NotificationsManager></NotificationsManager>
@@ -72,6 +72,10 @@ export default class App extends Vue {
 
 html
   overflow-y: auto!important
+
+
+.april-fools
+  filter:  hue-rotate(233deg)
 
 
 @media #{map-get($display-breakpoints, 'md-and-up')}

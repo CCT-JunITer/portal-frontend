@@ -171,6 +171,11 @@ export const text2Decimal = (text?: string) => {
 }
 
 
+export const isAprilFools = (today = new Date()) => {
+  return today.getMonth() === 3 && today.getDate() === 1;
+}
+
+
 export const DOCUMENT_TYPES: { name: string; value: IDocumentType }[] = [
   {
     name: 'Mitgliedswerdegang',

@@ -1,7 +1,7 @@
 <template>
   <v-btn :to="to" exact text :icon="small">
     <v-badge :value="env !== 'production'" :content="env" light color="cctOrange">
-      <v-icon :left="!small">$cct</v-icon>
+      <v-icon :left="!small">{{ $common.isAprilFools() ? '$cctCanabis' : '$cct' }}</v-icon>
       {{ small ? '' : 'Portal' }}
     </v-badge>
   </v-btn>
