@@ -16,6 +16,7 @@
       fixed-header
       sort-by="date_from"
       sort-desc
+      multi-sort
     >
       <template v-slot:top>
         <slot name="top"></slot>
