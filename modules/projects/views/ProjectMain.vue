@@ -2,7 +2,6 @@
   <div>
     <v-toolbar flat elevation="2" color="cctPurple darken-1" dark>
       <v-toolbar-title>
-        <v-icon color="cyan">mdi-flask-outline</v-icon>
         Projekte
       </v-toolbar-title>
       <v-spacer></v-spacer>

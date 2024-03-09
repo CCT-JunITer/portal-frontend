@@ -1,14 +1,10 @@
 import { RouteConfig } from 'vue-router';
 import RouterComponent from '@/components/RouterComponent.vue';
-import ProjectGate from './views/ProjectGate.vue';
 
 export const routes: RouteConfig[] = [
   {
     path: 'wms/projects',
-    component: ProjectGate,
-    meta: {
-      featureFlag: 'projects',
-    },
+    component: RouterComponent,
     children: [
       {
         path: '',
