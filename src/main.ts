@@ -2,6 +2,7 @@
 import './component-hooks';
 import Vue from 'vue';
 import vuetify from './plugins/vuetify';
+import './plugins/tiptap-plugin';
 import './plugins/common-plugin';
 import './plugins/doc-enum-plugin';
 import App from './App.vue';
