@@ -20,6 +20,11 @@
             required
             :rules="[$common.required]" 
           ></v-text-field>
+          <editor-component
+            v-model="project.description"
+            required
+            :rules="[$common.required]"
+          ></editor-component>
           <v-select
             label="Projektrahmen"
             v-model ="project.type"
@@ -109,15 +114,6 @@
             :items="$enums('ProjectStatusEnum')"
             :rules="[$common.required]"
           ></v-select>
-          <v-textarea
-            label="Beschreibung"
-            v-model="project.description"
-            prepend-icon="mdi-card-text"
-            class="input-lg"
-            hint="Hier soll eine kurze Beschreibung der Schulung eingegeben werden."
-            required
-            :rules="[$common.required]"
-          ></v-textarea>
           
         </v-col>
       </v-row>
@@ -132,6 +128,34 @@
         </v-col>
 
         <v-col cols="12" md="8" class="px-5">
+          <v-select
+            label="Projektausschreibung"
+            v-model="project.project_tender_id"
+            class="input-lg"
+            required
+            prepend-icon="mdi-animation"
+            :items="projectTenders"
+            item-text="title"
+            item-value="id"
+            clearable
+          >
+          </v-select>
+
+          <template v-if="projectApplicationsForTender">
+            <v-card outlined>
+              <v-list>
+                <project-application-list-item
+                  v-for="application in projectApplicationsForTender"
+                  :key="application.id"
+                  :projectApplication="application">
+                </project-application-list-item>
+              </v-list>
+            </v-card>
+            <v-divider class="my-5"></v-divider>
+
+            <p class="text-body-2 text--secondary">Weitere Bewerber:innen:</p>
+          </template>
+
 
           <div
             v-for="role in $enums('ProjectRoleEnum')"
@@ -255,7 +279,7 @@
 
           <v-checkbox
             v-model="project.qm_feedback"
-            label="QM-Feedback erfolgt"
+            label="360° Feedback erfolgt"
             class="input-lg"
             prepend-icon="mdi-check-decagram"
             required
@@ -278,7 +302,7 @@
             :folder="project.versioned_folder" 
             :multiple="true"
             :labels="fileLabels"
-            :requiredLabels="fileLabels"
+            :requiredLabels="requiredLabels"
           >
           </file-manager>
         </v-col>
@@ -725,10 +749,13 @@ import { dispatchCreateProject, dispatchDeleteProject, dispatchGetAutocompleteVa
 import { readAutocompleteValues, readOneProject } from '../store/getters';
 import ProjectCalculation from '../components/ProjectCalculation.vue';
 import ProjectSelect from '../components/project-select/ProjectSelect.vue';
-
+import { dispatchGetProjectApplicationsFor, dispatchGetProjectTenders } from '@modules/project-application/store/actions';
+import { readProjectTenders, readRouteProjectApplicationsFor } from '@modules/project-application/store/getters';
+import ProjectApplicationListItem from '@modules/project-application/components/ProjectApplicationListItem.vue';
+import EditorComponent from '@/components/editor/EditorComponent.vue';
 
 @Component({
-  components: { DatePickerMenu, DateTimePickerMenu, FileManager, UserSelect, ConsentDialog, ProjectCalculation, ProjectSelect },
+  components: { DatePickerMenu, DateTimePickerMenu, FileManager, UserSelect, ConsentDialog, ProjectCalculation, ProjectSelect, ProjectApplicationListItem, EditorComponent },
 })
 export default class EditProject extends Vue {
 
@@ -744,6 +771,13 @@ export default class EditProject extends Vue {
   public searchCategories = '';
   public searchMethods = '';
   public searchTags = '';
+
+  public get requiredLabels() {
+    if (this.project.status !== 'completed') {
+      return [];
+    }
+    return this.fileLabels;
+  }
 
 
   async deleteProject() {
@@ -762,8 +796,30 @@ export default class EditProject extends Vue {
     return readUsers(this.$store);
   }
 
+  get projectTenders() {
+    return readProjectTenders(this.$store);
+  }
+
+  @Watch('project.project_tender_id', {immediate: true})
+  public async fetchProjectApplications() {
+    if (this.project.project_tender_id) {
+      await dispatchGetProjectApplicationsFor(this.$store, this.project.project_tender_id);
+    }
+  }
+
+  public get projectApplicationsForTender() {
+    if (!this.project.project_tender_id) {
+      return null;
+    }
+    return readRouteProjectApplicationsFor(this.$store)(this.project.project_tender_id);
+  }
+
   @Watch('$route', {immediate: true})
   public async onRouteChange(newRoute?: Route, oldRoute?: Route) {
+    if (newRoute?.params.from !== oldRoute?.params.from && newRoute?.params.from) {
+      this.project = this.convertToProjectCreation(JSON.parse(newRoute.params.from));
+      return;
+    }
     if (newRoute?.params.id !== oldRoute?.params.id) {
       await dispatchGetOneProject(this.$store, +this.$route.params.id)
       this.reset();
@@ -774,6 +830,7 @@ export default class EditProject extends Vue {
   public async mounted() {
     await dispatchGetUsers(this.$store);
     await dispatchGetAutocompleteValues(this.$store);
+    await dispatchGetProjectTenders(this.$store);
     this.valid = false;
   }
 
@@ -823,20 +880,24 @@ export default class EditProject extends Vue {
 
   public reset() {
     if (this.editProject) {
-      this.project = {
-        ...this.editProject,
-        participants: Object.fromEntries(Object.entries(this.editProject.participants!).map(([k,v]) => [k, v.map(u => u.participant.id)])),
-        applications: Object.fromEntries(Object.entries(this.editProject.applications!).map(([k,v]) => [k, v.map(u => u.participant.id)])),
-        bt_amount_expected: this.$common.decimal2Text(this.editProject.bt_amount_expected), // Anzahl BT(soll)
-        bt_amount_actual: this.$common.decimal2Text(this.editProject.bt_amount_actual), // Anzahl BT(ist)
-        bt_rate: this.$common.decimal2Text(this.editProject.bt_rate, 2),
-        surcharge_amount_project_management: this.$common.decimal2Text(this.editProject.surcharge_amount_project_management), // PM - Zuschla,
-        surcharge_amount_documentation: this.$common.decimal2Text(this.editProject.surcharge_amount_documentation), // Dokumentationzuschla,
-        surcharge_amount_travel: this.$common.decimal2Text(this.editProject.surcharge_amount_travel, 2), // Reisekostenzuschla,
-        surcharge_amount_other: this.$common.decimal2Text(this.editProject.surcharge_amount_other, 2), // Sonstige,
-        bt_amount_bid_preparation: this.$common.decimal2Text(this.editProject.bt_amount_bid_preparation),
-      };
+      this.project = this.convertToProjectCreation(this.editProject); 
     }
+  }
+
+  public convertToProjectCreation(project: Project) {
+    return {
+      ...project,
+      participants: Object.fromEntries(Object.entries(project.participants || {}).map(([k,v]) => [k, v.map(u => u.participant.id)])),
+      applications: Object.fromEntries(Object.entries(project.applications || {}).map(([k,v]) => [k, v.map(u => u.participant.id)])),
+      bt_amount_expected: this.$common.decimal2Text(project.bt_amount_expected), // Anzahl BT(soll)
+      bt_amount_actual: this.$common.decimal2Text(project.bt_amount_actual), // Anzahl BT(ist)
+      bt_rate: this.$common.decimal2Text(project.bt_rate, 2),
+      surcharge_amount_project_management: this.$common.decimal2Text(project.surcharge_amount_project_management), // PM - Zuschla,
+      surcharge_amount_documentation: this.$common.decimal2Text(project.surcharge_amount_documentation), // Dokumentationzuschla,
+      surcharge_amount_travel: this.$common.decimal2Text(project.surcharge_amount_travel, 2), // Reisekostenzuschla,
+      surcharge_amount_other: this.$common.decimal2Text(project.surcharge_amount_other, 2), // Sonstige,
+      bt_amount_bid_preparation: this.$common.decimal2Text(project.bt_amount_bid_preparation),
+    };
   }
 }
 </script>

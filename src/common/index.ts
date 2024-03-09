@@ -92,17 +92,20 @@ export const isLinkedIn = (url: string) => {
   return LINKED_IN_REGEX.test(url);
 }
 
-export const required = (v: string) => !!v || 'Dieses Feld wird benötigt.';
+
+export const required = (v: string) => (Array.isArray(v) ? !!v.length : !!v) || 'Dieses Feld wird benötigt.';
+
+export const getRequired = (isRequired: boolean) => isRequired ? required : () => true;
 
 export const isEmpty = (v: string) => !v || 'Dieses Feld muss leer sein.';
 
 export const isNumber = (v: string) => (!v || !!v.match(/^[0-9]+$/)) || 'Dies ist keine Zahl.';
 
-export const isDecimal = (v: string) => (!v || !!v.match(/^\d+(,\d+)?$/)) || 'Dies ist keine Zahl.';
+export const isDecimal = (v: string) => (!v || !!v.match(/^-?\d+(\.\d+)*(,\d+(e\d+)?)?$/)) || 'Dies ist keine Zahl.';
 
 export const isEmail = (v: string) => (v && !!v.match(/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/)) || 'Dies ist keine E-Mail.';
 
-export const isCurrency = (v: string) => (!v || !!v.match(/^\d+$|^\d+,\d{2}$/) || 'Dies ist kein gültiger Geldbetrag.')
+export const isCurrency = (v: string) => (!v || !!v.match(/^\d+(\.\d+)*(,\d{2}){0,1}$/) || 'Dies ist kein gültiger Geldbetrag.')
 
 export const isIBAN = (v: string) => (!v || !!v.match(/[A-Z]{2}[0-9]{2}(?:[ ]?[0-9]{4}){4}(?!(?:[ ]?[0-9]){3})(?:[ ]?[0-9]{1,2})?/)) || 'Dies ist keine IBAN.';
 
@@ -157,7 +160,7 @@ export const formatDateRange = (date_from?: string, date_to?: string): string =>
 }
 
 export const decimal2Text = (decimal?: number, fixed?: number): string => {
-  if (!decimal) {
+  if (!decimal && decimal !== 0) {
     return '';
   }
   return decimal.toLocaleString('de-DE', { maximumFractionDigits: fixed, minimumFractionDigits: fixed })

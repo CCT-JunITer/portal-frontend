@@ -5,6 +5,8 @@
         <v-icon v-if="this.project.approved" color="cctGreen" x-large>mdi-check-decagram</v-icon>
         {{ project.title }}
       </h1>
+      <view-component :value="project.description">
+      </view-component>
       <v-chip
         v-for="category in project.categories" 
         :key="category"
@@ -40,7 +42,7 @@
           <div class="text-caption mb-1" v-if="project.author">
             erstellt von <user-chip :user="project.author" small></user-chip>
           </div>
-          <div class="text-caption">
+          <div class="text-caption mb-1">
             zuletzt bearbeitet
             <span v-if="project.last_updated_by">von <user-chip :user="project.last_updated_by" small></user-chip></span>
             <span v-if="project.approved_by && project.approved">
@@ -50,9 +52,12 @@
               {{ $common.format(new Date(project.date_last_updated), `'am' dd.MM.yyyy 'um' HH:mm`) }}
             </span>
           </div>
+          <div class="text-caption" v-if="project.project_tender">
+            und wurde im Portal ausgeschrieben <v-chip color="cctPurple" dark small :to="{ name: 'project-tender-detail', params: { id: project.project_tender_id}}">Projektausschreibung: {{ project.project_tender.title }}</v-chip>
+          </div>
         </div>
         <v-spacer></v-spacer>
-        <v-btn color="cctOrange" outlined :to="{ name: 'project-edit', params: { id: this.project.id } }">
+        <v-btn color="cctOrange" outlined :to="{ name: 'project-edit', params: { id: this.project.id } }" v-if="hasEditPermission()">
           <v-icon left>
             edit
           </v-icon>
@@ -210,7 +215,7 @@
 <script lang="ts">
 import ProjectCard from '../components/ProjectCard.vue'
 import { Component, Vue, Watch } from 'vue-property-decorator';
-import { readUserProfile } from '@/store/main/getters';
+import { readHasAnyPermission, readUserProfile } from '@/store/main/getters';
 import FileManager from '@/components/file-manager/FileManager.vue';
 import { Route } from 'vue-router';
 import UserChip from '@/components/user-chip/UserChip.vue';
@@ -219,14 +224,22 @@ import { dispatchGetOneProject } from '../store/actions';
 import { readRouteProject } from '../store/getters';
 import UserListItem from '@/components/user-list-item/UserListItem.vue';
 import ProjectCalculation from '../components/ProjectCalculation.vue';
+import ViewComponent from '@/components/editor/ViewComponent.vue';
 
 @Component({
-  components: { FileManager, UserChip, UserListItem, ProjectCalculation, ProjectCard },
+  components: { FileManager, UserChip, UserListItem, ProjectCalculation, ProjectCard, ViewComponent },
 })
 export default class ProjectDetail extends Vue {
 
   public fileLabels = FILE_LABELS;
   public error = false;
+  
+  public hasEditPermission() {
+    if (this.user?.id === this.project?.author?.id) {
+      return true;
+    }
+    return readHasAnyPermission(this.$store)(['project.project.admin']);
+  }
 
   get project() {
     return readRouteProject(this.$store)(this.$route) as Project;
@@ -271,10 +284,6 @@ export default class ProjectDetail extends Vue {
       {
         name: 'Zeitraum',
         key: this.project.acceptance_date && this.project.project_end_date_expected && this.$common.formatDateRange(this.project.acceptance_date, this.project.project_end_date_actual || this.project.project_end_date_expected),
-      },
-      {
-        name: 'Projektbeschreibung',
-        key: this.project.description,
       },
     ].filter(c => c);
   }

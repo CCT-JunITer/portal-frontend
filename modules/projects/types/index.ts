@@ -1,4 +1,5 @@
 import { IUserProfile, VersionedFolder } from '@/interfaces';
+import { ProjectTender } from '@modules/project-application/types';
 
 export const FILE_LABELS = [
   'Teaser',
@@ -28,6 +29,7 @@ export interface ProjectCreate {
   participant_ids: { [k: string]: number[] };
   applications_ids: { [k: string]: number[] };
   parent_project_id?: number;
+  project_tender_id?: number;
 
   type: ProjectTypeEnum;
   status: ProjectStatusEnum;
@@ -42,8 +44,8 @@ export interface ProjectCreate {
   files?: string; // UUID4
 
   // 'Calculation' Properties:;
-  proposal_date: string;
-  acceptance_date: string; // Angebotsannahme
+  proposal_date?: string;
+  acceptance_date?: string; // Angebotsannahme
   project_start_date_expected?: string; // Projektstart(soll)
   project_start_date_actual?: string; // Projektstart(ist)
   project_end_date_expected?: string; // Projektende(soll)
@@ -96,6 +98,9 @@ export interface Project {
   title: string;
   id: number;
 
+  project_tender_id?: number;
+  project_tender?: ProjectTender;
+
   parent_project_id?: number;
   parent_project?: Project;
 
@@ -119,6 +124,7 @@ export interface Project {
   categories?: string[];
   methods?: string[];
   approved?: boolean;
+  approved_by?: IUserProfile;
   qm_feedback?: boolean;
   files?: string; // UUID4
 

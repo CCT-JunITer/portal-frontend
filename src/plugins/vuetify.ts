@@ -11,9 +11,9 @@ import de from 'vuetify/lib/locale/de'
 import DatetimePicker from 'vuetify-datetime-picker'
 
 Vue.use(Vuetify);
-Vue.use(DatetimePicker)
+Vue.use(DatetimePicker);
 
-export default new Vuetify({
+const vuetify = new Vuetify({
   lang: {
     locales: { de },
     current: 'de'
@@ -45,3 +45,5 @@ export default new Vuetify({
     },
   },
 });
+
+export default vuetify;

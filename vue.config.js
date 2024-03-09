@@ -3,7 +3,8 @@ const { GenerateSW } = require('workbox-webpack-plugin');
 const { TsconfigPathsPlugin } = require('tsconfig-paths-webpack-plugin');
 
 module.exports = {
-  'transpileDependencies': true,
+  transpileDependencies: ['vuetify'],
+
   // Fix Vuex-typescript in prod: https://github.com/istrib/vuex-typescript/issues/13#issuecomment-409869231
   configureWebpack: (config) => {
     config.plugins.push(new GenerateSW());

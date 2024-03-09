@@ -70,6 +70,9 @@ export default class App extends Vue {
 <style lang="sass">
 @import '~vuetify/src/styles/styles.sass'
 
+.flex-1 
+  flex: 1 1
+
 html
   overflow-y: auto!important
 
