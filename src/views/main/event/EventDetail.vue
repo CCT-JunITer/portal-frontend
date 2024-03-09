@@ -252,8 +252,8 @@
       <v-row>
         <v-col cols="12" md="4" class="px-5">
           <h2 class="text-h4 text--primary mb-3">Teilnehmer:innen</h2>
-          <p class="text-body-2 text--secondary">
-            Teilnehmer:innen
+          <p v-if='userCount' class="text-body-2 text--secondary">
+            Anzahl der Teilnehmer:innen auf der Sitzung: {{ userCount }}
           </p>
           <v-btn color="cctBlue" @click="exportParticipants" dark outlined small>
             <v-icon left>
@@ -337,6 +337,10 @@ export default class TrainingDetail extends Vue {
     return readUserProfile(this.$store);
   }
 
+  get userCount() {
+    return this.event.participants.length;
+  }
+
   public get isSuperuser() {
     return (
       this.user?.is_superuser ||
@@ -367,9 +371,16 @@ export default class TrainingDetail extends Vue {
 
 
   public async exportParticipants() {
+    // Combine participants and leaders
+    const combinedData = [...this.event.participants, ...this.event.leaders];
+
+    // Remove duplicates based on the 'email' property
+    const uniqueData = combinedData.filter((item, index, self) =>
+      index === self.findIndex((t) => t.email === item.email)
+    );
 
     await dispatchSaveAsCsv(this.$store, {
-      data: this.event.participants,
+      data: uniqueData,
       fileName: 'Teilnehmendenliste_' + this.event.title.replace(' ', '_'),
       headers: ['firstname', 'lastname', 'email'],
       renderRow: (item: IUserProfile) => [item.first_name, item.last_name, item.email]

@@ -5,7 +5,7 @@
       @input="displayUsersFor = $event"
       :users="displayUsersFor && displayUsersFor.participants"
       :title="`Teilnehmerliste ${displayUsersFor && displayUsersFor.title}`"
-      subtitle="Teilnehmer:innen"
+      :subtitle="`${userCount} Teilnehmer:innen`"
     ></show-user-dialog>
     <v-data-table
       :class="`elevation-2 my-5`"
@@ -148,6 +148,13 @@ export default class EventTable extends Vue {
 
   get userProfile() {
     return readUserProfile(this.$store);
+  }
+
+  get userCount() {
+    if (!this.displayUsersFor) {
+      return 0;
+    }
+    return this.displayUsersFor.participants.length;
   }
 
   public get headers() {
