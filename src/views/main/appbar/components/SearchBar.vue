@@ -87,6 +87,9 @@
           <v-list-item-subtitle v-text="item.target.description"></v-list-item-subtitle>
         </v-list-item-content>
       </template>
+      <v-list-item-action>
+        <pre class="text-caption cctPurple--text">{{ item.target.search_type }}</pre>
+      </v-list-item-action>
     </template>
   </v-autocomplete>
 </template>
