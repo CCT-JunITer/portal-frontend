@@ -12,15 +12,28 @@
           {{ key === 'passed' ? 'Abgelaufene Ausschreibungen' : 'Laufende Ausschreibungen'}}
         </h6>
       </v-col>
-      <v-col
-        cols="12"
-        md="6"
-        v-for="projectTender in tenders"
-        :key="projectTender.id"
+      <template
+        v-if="tenders && tenders.length"
       >
-        <project-tender-card :project-tender="projectTender">
-        </project-tender-card>
-      </v-col>
+        <v-col
+          cols="12"
+          md="6"
+          v-for="projectTender in tenders"
+          :key="projectTender.id"
+        >
+          <project-tender-card :project-tender="projectTender">
+          </project-tender-card>
+        </v-col>
+      </template>
+      <template v-else>
+        <v-col cols="12">
+          <v-alert color="cctGrey" dark outlined>
+            Keine 
+            {{ key === 'passed' ? 'abgelaufenen Ausschreibungen' : 'laufenden Ausschreibungen'}}
+            vorhanden
+          </v-alert>
+        </v-col>
+      </template>
     </v-row>
   </v-container>
 </template>

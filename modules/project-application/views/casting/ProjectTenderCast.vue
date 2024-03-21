@@ -273,7 +273,6 @@ export default class ProjectTenderCast extends Vue {
       description: this.projectTender.description,
       participants: Object.fromEntries(Object.entries(this.finalSelection).map(([role, applications]) => [role, applications.map(a => ({ role, participant: a.project_application.participant } as ProjectUser))])),
       status: 'running',
-      kfb_status: 'open_status',
       bt_amount_expected: this.projectTender.max_bt,
       bt_rate: this.projectTender.bt_rate,
       project_start_date_expected: this.projectTender.project_start_date_expected,

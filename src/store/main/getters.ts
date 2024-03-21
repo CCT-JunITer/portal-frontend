@@ -38,7 +38,7 @@ export const getters = {
   },
   hasAdminAccess: (state: MainState) => {
     return (
-      state.userProfile && state.userProfile.permissions.find(p => p.indexOf('admin') !== -1));
+      state.userProfile && state.userProfile.permissions.find(p => p.indexOf('admin') !== -1 || p.indexOf('*') !== -1));
   },
   hasAnyPermission: (state: MainState) => (permissions: string[]) => {
     const user = state.userProfile;
