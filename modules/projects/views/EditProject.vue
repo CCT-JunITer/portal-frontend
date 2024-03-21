@@ -557,7 +557,10 @@
             prepend-icon="mdi-account"
             :items="getAutocompleteItems('customer_name')"
             :search-input.sync="searchCustomerName"
-            :rules="[$common.required]" 
+            :rules="[
+              v => ['internal', 'membership_project'].indexOf(project.type || '') !== -1 ?
+                $common.isEmpty(v) : $common.required(v)
+            ]" 
           >
             <template v-slot:no-data>
               <v-list-item>

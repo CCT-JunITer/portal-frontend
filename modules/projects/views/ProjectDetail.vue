@@ -235,10 +235,14 @@ export default class ProjectDetail extends Vue {
   public error = false;
   
   public hasEditPermission() {
-    if (this.user?.id === this.project?.author?.id) {
+    const userId = this.user?.id || 0;
+    if (Object.values(this.project?.participants || {}).flatMap(p => p.flatMap(u => u.participant.id)).indexOf(userId) !== -1) {
       return true;
     }
-    return readHasAnyPermission(this.$store)(['project.project.admin']);
+    if (userId === this.project?.author?.id) {
+      return true;
+    }
+    return readHasAnyPermission(this.$store)(['portal.project.admin']);
   }
 
   get project() {
