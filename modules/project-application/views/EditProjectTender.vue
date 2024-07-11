@@ -12,6 +12,14 @@
           </p>
         </v-col>
         <v-col cols="12" md="8" class="px-5">
+
+          <v-checkbox
+            v-model="projectTender.draft"
+            prepend-icon="mdi-file-edit-outline"
+            label="Projektausschreibung als Entwurf speichern"
+          >
+          </v-checkbox>
+
           <v-text-field
             label="Titel"
             v-model="projectTender.title"
@@ -64,7 +72,7 @@
 
           <v-select
             label="Projektrahmen"
-            v-model ="projectTender.type"
+            v-model="projectTender.type"
             class="input-lg"
             required
             prepend-icon="mdi-animation"
@@ -74,7 +82,7 @@
           ></v-select>
 
           <date-time-picker-menu
-            v-model ="projectTender.date_deadline"
+            v-model="projectTender.date_deadline"
             defaultPicker="MONTH"
             :pickerProps="{
               min: '2000-01-01',
@@ -93,7 +101,7 @@
           </date-time-picker-menu>
 
           <date-picker-menu
-            v-model ="projectTender.project_start_date_expected"
+            v-model="projectTender.project_start_date_expected"
             defaultPicker="MONTH"
             :pickerProps="{
               min: '2000-01-01',
@@ -112,7 +120,7 @@
           </date-picker-menu>
 
           <date-picker-menu
-            v-model ="projectTender.project_end_date_expected"
+            v-model="projectTender.project_end_date_expected"
             defaultPicker="MONTH"
             :pickerProps="{
               min: '2000-01-01',
@@ -142,46 +150,52 @@
 
         <v-col cols="12" md="8" class="px-5">
           <v-expansion-panels multiple>
-            <v-expansion-panel
-              v-for="question in projectTender.questions"
-              :key="question.id"
-
+            <draggable
+              :list="projectTender.questions"
+              tag="div"
+              style="width: 100%"
+              handle=".handle"
             >
-              <v-expansion-panel-header>
-                <template v-slot:default="{  }">
-                  <v-row no-gutters>
-                    <v-col cols="4">
+              <v-expansion-panel
+                v-for="question in projectTender.questions"
+                :key="question.id"
+              >
+                <v-expansion-panel-header>
+                  <template v-slot:default="{  }">
+                    <v-icon class="handle flex-grow-0 mr-2">drag_handle</v-icon>
+                    <h5>
                       {{ question.title }}
-                    </v-col>
-                  </v-row>
-                </template>
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <v-text-field
-                  v-model="question.title"
-                  placeholder="Titel"
-                ></v-text-field>
-                <v-text-field
-                  v-model="question.description"
-                  placeholder="Beschreibung"
-                ></v-text-field>
-                <v-checkbox 
-                  v-model="question.required" 
-                  label="Pflichtfeld"
-                >
-                </v-checkbox>
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn
-                    text
-                    color="error"
-                    @click="deleteQuestion(question)"
+                    </h5>
+                  </template>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                  <v-text-field
+                    v-model="question.title"
+                    placeholder="Titel"
+                  ></v-text-field>
+                  <editor-component
+                    v-model="question.description"
+                    placeholder="Beschreibung">
+                  </editor-component>
+                  <v-checkbox 
+                    v-model="question.required" 
+                    label="Pflichtfeld"
                   >
-                    Löschen
-                  </v-btn>
-                </v-card-actions>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
+                  </v-checkbox>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                      text
+                      color="error"
+                      @click="deleteQuestion(question)"
+                    >
+                      Löschen
+                    </v-btn>
+                  </v-card-actions>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+
+            </draggable>
           </v-expansion-panels>
 
           <v-btn @click="addQuestion" class="ma-2" color="cctGreen" dark>Frage hinzufügen</v-btn>
@@ -262,9 +276,11 @@ import { readOneProjectTender } from '../store/getters';
 import { dispatchGetAutocompleteValues } from '@modules/projects/store/actions';
 import { ProjectRoleEnum } from '@modules/projects/types';
 import EditorComponent from '@/components/editor/EditorComponent.vue';
+import Draggable from 'vuedraggable';
+
 
 @Component({
-  components: { DatePickerMenu, DateTimePickerMenu, FileManager, UserSelect, ConsentDialog, EditorComponent },
+  components: { DatePickerMenu, DateTimePickerMenu, FileManager, UserSelect, ConsentDialog, EditorComponent, Draggable },
 })
 export default class EditProjectTender extends Vue {
 
@@ -272,12 +288,12 @@ export default class EditProjectTender extends Vue {
   public projectTender: Partial<ProjectTenderCreation> = {
     needed_project_roles_counts: {},
     questions: [
-      { title: '', description: '', required: false}
+      { title: '', description: '', required: false, order: 0}
     ],
   }
 
   public addQuestion() {
-    this.projectTender?.questions?.push({ title: '', description: '', required: false });
+    this.projectTender?.questions?.push({ title: '', description: '', required: false, order: 0 });
   }
 
   public deleteQuestion(question: ProjectTenderQuestion) {
@@ -313,6 +329,11 @@ export default class EditProjectTender extends Vue {
       max_bt: this.$common.text2Decimal(this.projectTender.max_bt),
       min_bt: this.$common.text2Decimal(this.projectTender.min_bt),
       bt_rate: this.$common.text2Decimal(this.projectTender.bt_rate),
+
+      questions: this.projectTender.questions!.map((question, index) => ({
+        ...question,
+        order: index
+      })),
 
       needed_project_roles_counts: Object.fromEntries(
         Object.entries(this.projectTender.needed_project_roles_counts!)
@@ -350,6 +371,7 @@ export default class EditProjectTender extends Vue {
     if (this.editProjectTender) {
       this.projectTender = {
         ...this.editProjectTender,
+        questions: this.editProjectTender.questions.slice().sort((a, b) => a.order - b.order),
         max_bt: this.$common.decimal2Text(this.editProjectTender.max_bt),
         min_bt: this.$common.decimal2Text(this.editProjectTender.min_bt),
         bt_rate: this.$common.decimal2Text(this.editProjectTender.bt_rate, 2),

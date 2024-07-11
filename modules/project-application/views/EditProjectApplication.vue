@@ -21,7 +21,7 @@
           outlined
           v-model="projectApplication.role"
           label="Projektrolle"
-          :items="$enums('ProjectRoleEnum')"
+          :items="filteredRoles"
           class="input-lg"
         >
         </v-select>
@@ -59,14 +59,14 @@
           </v-btn>
         </v-btn-toggle>
 
+
+        <v-divider class="my-5"></v-divider>
+
+        <p class="text-h6">
+          Projektbewerbungsfragen
+        </p>
+
         <template v-if="projectApplication.status === 'completed' || projectApplication.status === 'draft'">
-
-          <v-divider class="my-5"></v-divider>
-
-          <p class="text-h6">
-            Projektbewerbungsfragen
-          </p>
-
           <div>
             <v-card
               v-for="question in projectApplication.answered_questions"
@@ -78,7 +78,7 @@
                 {{ question.project_tender_question.title }}
               </v-card-title>
               <v-card-subtitle>
-                {{ question.project_tender_question.description }}
+                <view-component :value="question.project_tender_question.description"></view-component>
               </v-card-subtitle>
               <v-card-text>
                 <v-textarea
@@ -102,15 +102,17 @@
 
           <v-divider class="my-5"></v-divider>
 
-          <project-available-time
-            :fromDate="projectTender.project_start_date_expected"
-            :toDate="projectTender.project_end_date_expected"
-            v-model="projectApplication.available_time"
-          >
-          </project-available-time>
-
-
         </template>
+
+        <project-available-time
+          :fromDate="projectTender.project_start_date_expected"
+          :toDate="projectTender.project_end_date_expected"
+          v-model="projectApplication.available_time"
+          outlined
+        >
+        </project-available-time>
+
+
         <div v-if="!projectTender.is_deadline_passed" class="d-flex">
           <v-spacer></v-spacer>
           <v-btn 
@@ -156,6 +158,12 @@ export default class EditProjectApplication extends Vue {
   public get editProjectApplication() {
     return readRouteProjectApplication(this.$store)(this.$route);
   }
+  
+  public get filteredRoles() {
+    return Object.entries(this.projectTender?.needed_project_roles_counts || {})
+      .filter(([_, count]) => count > 0)
+      .map(([role, _]) => (this.$enums('ProjectRoleEnum') || []).find(r => r.value === role));
+  }
 
   @Watch('$route', { immediate: true })
   public async onRouteChange(newRoute?: Route, oldRoute?: Route) {
@@ -178,6 +186,9 @@ export default class EditProjectApplication extends Vue {
           });
         }
       });
+
+      // add order to questions
+      newAnsweredQuestions.sort((a, b) => a.project_tender_question.order - b.project_tender_question.order);
 
       this.projectApplication = {
         ...this.editProjectApplication,

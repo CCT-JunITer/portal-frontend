@@ -32,8 +32,20 @@
             <tbody>
               <tr>
               </tr>
-              <tr v-for="question in projectTender.questions" :key="question.id">
-                <td>{{ question.title }}</td>
+              <tr v-for="question in sortedQuestions" :key="question.id">
+                <td>
+                  <v-tooltip top>
+                    <template v-slot:activator="{ on, attrs }">
+                      <div class="text-body-2" v-on="on" v-bind="attrs">
+                        {{ question.title }}
+                      </div>
+                    </template>
+                    <span>
+                      <view-component :value="question.description">
+                      </view-component>
+                    </span>
+                  </v-tooltip>
+                </td>
                 <td v-for="application in applications" :key="application.id">
                   <div class="pre-formatted text-body-2">{{ getAnswer(application, question.id) }}</div>
                 </td>
@@ -79,6 +91,7 @@
 </template>
 
 <script lang="ts">
+import ViewComponent from '@/components/editor/ViewComponent.vue';
 import FileManager from '@/components/file-manager/FileManager.vue';
 import ProjectApplicationListItem from '@modules/project-application/components/ProjectApplicationListItem.vue';
 import ProjectAvailableTime from '@modules/project-application/components/ProjectAvailableTime.vue';
@@ -86,8 +99,9 @@ import { ProjectApplication, ProjectTender } from '@modules/project-application/
 import { weeksArray } from '@modules/project-application/util';
 import { Vue, Component, Prop, VModel } from 'vue-property-decorator'
 
+
 @Component({
-  components: { ProjectApplicationListItem, FileManager, ProjectAvailableTime }
+  components: { ProjectApplicationListItem, FileManager, ProjectAvailableTime, ViewComponent }
 })
 export default class ProjectCastCompareDialog extends Vue{
 
@@ -99,6 +113,10 @@ export default class ProjectCastCompareDialog extends Vue{
 
   @Prop()
   public projectTender!: ProjectTender;
+
+  public get sortedQuestions() {
+    return this.projectTender.questions.sort((a, b) => a.order - b.order);
+  }
 
   public get weeks() {
     return weeksArray(this.projectTender.project_start_date_expected, this.projectTender.project_end_date_expected);

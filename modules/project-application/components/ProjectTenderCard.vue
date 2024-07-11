@@ -6,6 +6,12 @@
     <v-card-text>
       <v-list-item three-line class="align-start">
         <div class="flex-1"> 
+          <v-chip v-if="projectTender.draft" small color="secondary">
+            <v-avatar left>
+              <v-icon small>mdi-file-edit-outline</v-icon>
+            </v-avatar>
+            Entwurf
+          </v-chip>
           <h5 class="text-h5 mb-1">
             {{ projectTender.title }}
           </h5>

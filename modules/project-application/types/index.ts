@@ -62,11 +62,13 @@ export interface ProjectTenderQuestion {
   title: string;
   description: string;
   required: boolean;
+  order: number;
 }
 
 
 export interface ProjectTender {
   id: number;
+  draft: boolean;  
   title: string;
   type: ProjectTypeEnum;
   description?: string
@@ -90,6 +92,7 @@ export interface ProjectTender {
 }
 
 export interface ProjectTenderCreate {
+  draft: boolean;
   title: string;
   type: ProjectTypeEnum;
   description?: string
@@ -109,6 +112,7 @@ export interface ProjectTenderCreate {
 
 
 export interface ProjectTenderCreation {
+  draft: boolean;
   title: string;
   type: ProjectTypeEnum;
   description?: string
