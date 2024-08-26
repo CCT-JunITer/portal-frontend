@@ -24,8 +24,8 @@
 <script lang="ts">
 import { UserStreak } from '@/interfaces';
 import { Vue, Component, Prop } from 'vue-property-decorator'
-import { readEvents } from '@/store/event/getters';
-import { MEETINGMAPPING } from '@/common';
+import { readLastDoSi } from '@/store/event/getters';
+import { dispatchGetEvents } from '@/store/event/actions';
 
 @Component({})
 export default class StreakIcon extends Vue {
@@ -37,19 +37,8 @@ export default class StreakIcon extends Vue {
     return this.streaks.sort((a, b) => new Date(b.streak_start).getTime() - new Date(a.streak_start).getTime()) || [];
   }
 
-  get events() {
-    return readEvents(this.$store)('meeting');
-  }
-
   get lastDoSi() {
-    if (!this.events) {
-      return null;
-    }
-
-    // MEETINGMAPING[0].type contains 'Donnerstagssitzung'
-    return this.events
-      .filter(event => event.subtype === MEETINGMAPPING[0].type)
-      .sort((a, b) => new Date(b.date_from).getTime() - new Date(a.date_from).getTime())[0];
+    return readLastDoSi(this.$store);
   }
 
   get hasStreak() {
@@ -60,6 +49,14 @@ export default class StreakIcon extends Vue {
     return this.streaksSorted.length > 0 && 
       new Date(this.streaksSorted[0].streak_end) === new Date(this.lastDoSi.date_from)
       && this.streaksSorted[0].streak_length >= 3;
+  }
+
+  public async mounted() {
+    if (this.lastDoSi != null) {
+      return;
+    }
+
+    await dispatchGetEvents(this.$store, 'meeting')
   }
 }
 </script>
