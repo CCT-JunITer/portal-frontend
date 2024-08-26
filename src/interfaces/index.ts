@@ -40,6 +40,8 @@ export interface IUserProfile {
     features: string[];
 
     admin_comment?: string;
+
+    user_streaks: UserStreak[];
 }
 
 export interface IUserProfileUpdate {
@@ -331,3 +333,10 @@ export interface IDocumentUpdate {
 }
 
 export type IDocumentType = 'member-progression' | 'recruiting' | 'archive' | 'public-affairs' | 'quality-management' | 'project-work';
+
+export interface UserStreak {
+    user_id: number;
+    streak_length: number;
+    streak_start: string;
+    streak_end: string;
+}

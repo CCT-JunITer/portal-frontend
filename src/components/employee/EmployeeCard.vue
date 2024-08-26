@@ -15,6 +15,7 @@
           <div class="text-subtitle-1 text--primary d-flex align-content-start justify-center">
             {{ employee.full_name || 'Kein Name' }}
             <v-icon v-if="hasBirthday" color="cctOrange" size="20">mdi-cake-variant</v-icon>
+            <streak-icon :streaks="employee.user_streaks"></streak-icon>
           </div>
           <div v-if="!isAlumni">
             <div class="text-subtitle-2 mb-2">
@@ -72,11 +73,12 @@ import {IUserProfile} from '@/interfaces';
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 import Backdrop from '@/components/Backdrop.vue';
 import GroupIcon from './GroupIcon.vue';
+import StreakIcon from './StreakIcon.vue';
 import { format, formatDistance } from 'date-fns';
 import { de } from 'date-fns/locale';
 
 @Component({
-  components: { Backdrop, EmployeeProfilePicture, GroupIcon }
+  components: { Backdrop, EmployeeProfilePicture, GroupIcon, StreakIcon }
 })
 export default class EmployeeCard extends Vue {
   @Prop()
