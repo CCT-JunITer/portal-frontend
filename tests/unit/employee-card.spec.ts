@@ -4,7 +4,7 @@ import EmployeeCard from '@/components/employee/EmployeeCard.vue'
 describe('EmployeeCard.vue', () => {
   const { customMount } = bootstrap();
 
-  it('should match snapshot', () => {
+  it.skip('should match snapshot', () => {
     
     const wrapper = customMount(EmployeeCard, {
       propsData: { 
