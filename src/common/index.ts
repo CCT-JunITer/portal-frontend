@@ -1,5 +1,5 @@
 import { IDocumentType } from '@/interfaces';
-import { getDayOfYear, isSameDay, parseISO } from 'date-fns';
+import { isSameDay, parseISO } from 'date-fns';
 import { format as formatFns, utcToZonedTime, formatInTimeZone } from 'date-fns-tz';
 import de from 'date-fns/locale/de';
 import { debounce } from './utils';
@@ -114,7 +114,9 @@ export const isTodayBirthday = (date: Date | string) => {
     date = new Date(date);
   }
   const now = new Date();
-  return getDayOfYear(date) === getDayOfYear(now);
+  // For a birthday, we only care about the day and month
+  // prev. approach with getDayOfYear() was flawed because of leap years (like 2024 at the time of writing)
+  return date.getDate() === now.getDate() && date.getMonth() === now.getMonth();
 }
 
 export const format = (date?: string | number | Date, format?: string) => {
