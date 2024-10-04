@@ -59,61 +59,62 @@
           </file-chip>
         </file-chip-group>
       </div>
-      <div
-        v-else
-        v-for="category of allLabels"
-        :key="category"
-      >
-        <file-chip-group 
-          :label="category">
-          <file-chip
-            :key="file.file_id"
-            :file="file"
-            v-for="file in effectiveFiles[category]"
-            @[readonly?null:`delete-file`]="removeFile"
-            :noLabel="true"
-          >
-          </file-chip>
-        </file-chip-group>
-        <div class="d-flex align-center ml-3">
-          <v-btn
-            small
-            rounded
-            color="cctOrange"
-            outlined
-            @click="(defaultLabel = category) && $refs.fileUpload.trigger()"
-          >
-            <v-icon left>
-              cloud_upload
-            </v-icon>
-            Datei{{ multiple ? 'en' : '' }} hochladen
-          </v-btn>
-          <template
-            v-if="!effectiveFiles[category] && requiredLabels && requiredLabels.indexOf(category) !== -1"
-          >
-            <span class="mx-4 text-caption">oder</span>
-            <v-text-field
-              v-model="missingFiles[category]"
-              outlined
-              label="Grund für fehlende Datei"
-              dense
-              :rules="[v => !!v || 'Diese Datei wird benötigt']"
+      <template v-else>
+        <div
+          v-for="category of allLabels"
+          :key="category"
+        >
+          <file-chip-group 
+            :label="category">
+            <file-chip
+              :key="file.file_id"
+              :file="file"
+              v-for="file in effectiveFiles[category]"
+              @[readonly?null:`delete-file`]="removeFile"
+              :noLabel="true"
             >
-              <template v-slot:append-outer>
-                <v-btn
-                  :disabled="!missingFiles[category]" 
-                  icon
-                  color="green"
-                  @click="addMissingFile(category, missingFiles[category])">
-                  <v-icon>
-                    mdi-plus
-                  </v-icon>
-                </v-btn>
-              </template>
-            </v-text-field>
-          </template>
+            </file-chip>
+          </file-chip-group>
+          <div class="d-flex align-center ml-3">
+            <v-btn
+              small
+              rounded
+              color="cctOrange"
+              outlined
+              @click="(defaultLabel = category) && $refs.fileUpload.trigger()"
+            >
+              <v-icon left>
+                cloud_upload
+              </v-icon>
+              Datei{{ multiple ? 'en' : '' }} hochladen
+            </v-btn>
+            <template
+              v-if="!effectiveFiles[category] && requiredLabels && requiredLabels.indexOf(category) !== -1"
+            >
+              <span class="mx-4 text-caption">oder</span>
+              <v-text-field
+                v-model="missingFiles[category]"
+                outlined
+                label="Grund für fehlende Datei"
+                dense
+                :rules="[v => !!v || 'Diese Datei wird benötigt']"
+              >
+                <template v-slot:append-outer>
+                  <v-btn
+                    :disabled="!missingFiles[category]" 
+                    icon
+                    color="green"
+                    @click="addMissingFile(category, missingFiles[category])">
+                    <v-icon>
+                      mdi-plus
+                    </v-icon>
+                  </v-btn>
+                </template>
+              </v-text-field>
+            </template>
+          </div>
         </div>
-      </div>
+      </template>
     </div>
   </v-sheet>
   <div v-else-if="versionedFolder">

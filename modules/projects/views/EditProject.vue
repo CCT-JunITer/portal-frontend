@@ -777,7 +777,7 @@ export default class EditProject extends Vue {
 
   public get requiredLabels() {
     if (this.project.status !== 'completed') {
-      return [];
+      return this.fileLabels.filter(label => label === 'Angebotspräsentation');
     }
     return this.fileLabels;
   }
