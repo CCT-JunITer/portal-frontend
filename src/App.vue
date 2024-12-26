@@ -55,14 +55,18 @@ export default class App extends Vue {
     }
   }
 
-  async errorCaptured(err, vm, info) {
+  /**
+   * Disable error capturing for now
+   * since it's not needed and causes overhead
+   */
+  /*async errorCaptured(err, vm, info) {
     await api.trackError(this.$store.state.main.token, {
       error: err.message,
       info: info,
       state: this.$store.state,
       route: this.$route.fullPath
     });
-  }
+  }*/
   
 }
 </script>
