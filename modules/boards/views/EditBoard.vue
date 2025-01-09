@@ -26,7 +26,6 @@
             defaultPicker="MONTH"
             :pickerProps="{
               min: '1993-01-01',
-              max: '2069-12-31'
             }"
           >
             <template v-slot:activator="{ on, attrs, }">
@@ -45,7 +44,6 @@
             defaultPicker="MONTH"
             :pickerProps="{
               min: '1993-01-01',
-              max: '2069-12-31'
             }"
           >
             <template v-slot:activator="{ on, attrs, }">

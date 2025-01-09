@@ -82,7 +82,7 @@ export default class DateTimePickerMenu extends Vue {
   @Prop({ required: false, default: null })
   public value!: string | null;
 
-  @Prop()
+  @Prop({ required: false, default: {} })
   public pickerProps!: object;
 
   @Prop({ required: false, default: false })

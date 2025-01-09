@@ -320,10 +320,6 @@
           <date-picker-menu
             v-model ="project.proposal_date"
             defaultPicker="MONTH"
-            :pickerProps="{
-              min: '2000-01-01',
-              max: '2025-01-01'
-            }"
           >
             <template v-slot:activator="{ on, attrs, }">
               <v-text-field
@@ -340,10 +336,6 @@
           <date-picker-menu
             v-model ="project.acceptance_date"
             defaultPicker="MONTH"
-            :pickerProps="{
-              min: '2000-01-01',
-              max: '2025-01-01'
-            }"
           >
             <template v-slot:activator="{ on, attrs, }">
               <v-text-field
@@ -360,10 +352,6 @@
           <date-picker-menu
             v-model ="project.project_start_date_expected"
             defaultPicker="MONTH"
-            :pickerProps="{
-              min: '2000-01-01',
-              max: '2025-01-01'
-            }"
           >
             <template v-slot:activator="{ on, attrs, }">
               <v-text-field
@@ -381,10 +369,6 @@
           <date-picker-menu
             v-model ="project.project_start_date_actual"
             defaultPicker="MONTH"
-            :pickerProps="{
-              min: '2000-01-01',
-              max: '2025-01-01'
-            }"
           >
             <template v-slot:activator="{ on, attrs, }">
               <v-text-field
@@ -403,10 +387,6 @@
           <date-picker-menu
             v-model ="project.project_end_date_expected"
             defaultPicker="MONTH"
-            :pickerProps="{
-              min: '2000-01-01',
-              max: '2025-01-01'
-            }"
           >
             <template v-slot:activator="{ on, attrs, }">
               <v-text-field
@@ -424,10 +404,6 @@
           <date-picker-menu
             v-model ="project.project_end_date_actual"
             defaultPicker="MONTH"
-            :pickerProps="{
-              min: '2000-01-01',
-              max: '2025-01-01'
-            }"
           >
             <template v-slot:activator="{ on, attrs, }">
               <v-text-field

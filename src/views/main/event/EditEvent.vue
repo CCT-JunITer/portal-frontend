@@ -62,10 +62,6 @@
             :is="!allday ? 'date-time-picker-menu' : 'date-picker-menu'"
             v-model ="event.date_from"
             defaultPicker="MONTH"
-            :pickerProps="{
-              min: '2000-01-01',
-              max: '2025-01-01'
-            }"
           >
             <template v-slot:activator="{ on, attrs, }">
               <v-text-field
@@ -84,10 +80,6 @@
             :is="!allday ? 'date-time-picker-menu' : 'date-picker-menu'"
             v-model ="event.date_to"
             defaultPicker="MONTH"
-            :pickerProps="{
-              min: '2000-01-01',
-              max: '2025-01-01'
-            }"
           >
             <template v-slot:activator="{ on, attrs }">
               <v-text-field
