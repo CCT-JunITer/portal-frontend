@@ -36,6 +36,9 @@ const vuetify = new Vuetify({
     themes: {
       light: {
         cctBlue: '#1D457C',
+        info: '#1D457C',
+        primary: '#1D457C',
+
         cctPurple: '#762258',
         cctOrange: '#FF6400',
         cctGreen: '#3E8A83',

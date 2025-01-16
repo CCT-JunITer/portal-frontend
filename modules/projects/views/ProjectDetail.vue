@@ -278,6 +278,10 @@ export default class ProjectDetail extends Vue {
         key: this.project.subtype?.join(', '),
       },
       {
+        name: 'Branche',
+        key: this.$enum('IndustryEnum', this.project.industry),
+      },
+      {
         name: 'Projektstatus',
         key: this.$enum('ProjectStatusEnum', this.project.status),
       },
@@ -288,6 +292,10 @@ export default class ProjectDetail extends Vue {
       {
         name: 'Zeitraum',
         key: this.project.acceptance_date && this.project.project_end_date_expected && this.$common.formatDateRange(this.project.acceptance_date, this.project.project_end_date_actual || this.project.project_end_date_expected),
+      },
+      {
+        name: 'NDA',
+        key: this.project.nda ? 'Ja' : 'Nein',
       },
     ].filter(c => c);
   }
@@ -340,6 +348,16 @@ export default class ProjectDetail extends Vue {
         value: this.project.bt_rate,
       },
       {
+        name: 'Vereinsprovision',
+        key: this.$common.decimal2Text(this.project.club_bonus_amount) + '%',
+        value: this.project.club_bonus_amount,
+      },
+      {
+        name: 'Akquisebonus',
+        key: this.$common.decimal2Text(this.project.acquisition_bonus_amount) + '%',
+        value: this.project.acquisition_bonus_amount,
+      },
+      {
         name: 'PM-Zuschlag',
         key: this.$common.decimal2Text(this.project.surcharge_amount_project_management) + '%',
         value: this.project.surcharge_amount_project_management,
@@ -378,6 +396,11 @@ export default class ProjectDetail extends Vue {
         name: 'Status der Referenzfreigabe',
         key: this.$enum('ProjectReferenceStatusEnum', this.project.reference_status),
         value: this.project.reference_status,
+      },
+      {
+        name: 'Gültigkeitsdatum der Referenzfreigabe',
+        key: this.$common.format(this.project.reference_approval_valid_until) + (new Date((this.project.reference_approval_valid_until ?? '')) < new Date() ? ' (Abgelaufen)' : ''),
+        value: this.project.reference_approval_valid_until,
       },
       {
         name: 'Grund, wenn Referenzfreigabe nicht erteilt',

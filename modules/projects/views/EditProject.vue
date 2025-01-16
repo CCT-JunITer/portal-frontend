@@ -39,7 +39,7 @@
             v-model="project.subtype"
             prepend-icon="mdi-animation"
             class="input-lg"
-            :items="getAutocompleteItems('subtype')"
+            :items="getAutocompleteItems('subtype').filter(subtype => !subtype.trim().startsWith('old'))"
             :search-input.sync="searchSubType"
             label="Projektart"
             dense
@@ -58,6 +58,19 @@
               </v-list-item>
             </template>
           </v-combobox>
+
+          <!-- Branche des Projekts -->
+          <v-select
+            label="Branche"
+            v-model="project.industry"
+            class="input-lg"
+            required
+            prepend-icon="mdi-factory"
+            item-text="text"
+            :items="$enums('IndustryEnum')"
+            :rules="[$common.required]"
+          ></v-select>
+
           <v-combobox
             v-model="project.categories"
             prepend-icon="mdi-animation"
@@ -297,6 +310,15 @@
         </v-col>
 
         <v-col cols="12" md="8" class="px-5">
+          <v-checkbox
+            v-model="project.nda"
+            label="NDA unterschrieben?"
+            class="input-lg"
+            prepend-icon="mdi-pen-lock"
+            required
+          >
+          </v-checkbox>
+
           <file-manager 
             v-model="project.files" 
             :folder="project.versioned_folder" 
@@ -465,6 +487,28 @@
             :rules="[$common.isDecimal]" 
           ></v-text-field>
 
+          <!-- Vereinsprovision -->
+          <v-text-field
+            label="Vereinsprovision"
+            v-model="project.club_bonus_amount"
+            class="input-lg"
+            prepend-icon="mdi-percent"
+            suffix="%"
+            required
+            :rules="[$common.isDecimal]"
+          ></v-text-field>
+
+          <!-- Akquisebonus -->
+          <v-text-field
+            label="Akquisebonus"
+            v-model="project.acquisition_bonus_amount"
+            class="input-lg"
+            prepend-icon="mdi-percent"
+            suffix="%"
+            required
+            :rules="[$common.isDecimal]"
+          ></v-text-field>
+
           <p class="text-overline">Zuschläge</p>
           
           <div class="ml-5">
@@ -593,6 +637,27 @@
               :rules="[v => project.reference_status !== 'basis' ? $common.isEmpty(v) : true]"
             ></v-textarea>
           </v-expand-transition>
+
+          <!-- Referenzfreigabe valide bis: ... -->
+          <date-picker-menu
+            v-model ="project.reference_approval_valid_until"
+            defaultPicker="MONTH"
+            :pickerProps="{
+              min: '2000-01-01',
+              max: '2125-01-01'
+            }"
+          >
+            <template v-slot:activator="{ on, attrs, }">
+              <v-text-field
+                label="Referenzfreigabe gültig bis"
+                class="input-lg"
+                v-bind="attrs"
+                v-on="on"
+                prepend-icon="mdi-calendar-range"
+                :rules="attrs.rules"
+              ></v-text-field>
+            </template>
+          </date-picker-menu>
 
           <v-select
             label="KFB Status"
@@ -752,9 +817,18 @@ export default class EditProject extends Vue {
   public searchTags = '';
 
   public get requiredLabels() {
+    if (this.project.nda && this.project.status !== 'completed') {
+      return [];
+    }
+
+    if (this.project.nda) {
+      return this.fileLabels.filter(label => label !== 'Angebotspräsentation' && label !== 'Referenzfreigabe' && label !== 'Referenzfolien');
+    }
+
     if (this.project.status !== 'completed') {
       return this.fileLabels.filter(label => label === 'Angebotspräsentation');
     }
+
     return this.fileLabels;
   }
 
@@ -764,7 +838,7 @@ export default class EditProject extends Vue {
       return;
     }
     await dispatchDeleteProject(this.$store, this.editProject.id);
-    this.$router.push('/main/wms/projects');
+    this.$router.replace('/main/wms/projects');
   }
   
   getAutocompleteItems(property: string) {
@@ -825,6 +899,8 @@ export default class EditProject extends Vue {
       bt_amount_expected: this.$common.text2Decimal(this.project.bt_amount_expected), // Anzahl BT(soll)
       bt_amount_actual: this.$common.text2Decimal(this.project.bt_amount_actual), // Anzahl BT(ist)
       bt_rate: this.$common.text2Decimal(this.project.bt_rate),
+      club_bonus_amount: this.$common.text2Decimal(this.project.club_bonus_amount),
+      acquisition_bonus_amount: this.$common.text2Decimal(this.project.acquisition_bonus_amount),
       surcharge_amount_project_management: this.$common.text2Decimal(this.project.surcharge_amount_project_management), // PM - Zuschla,
       surcharge_amount_documentation: this.$common.text2Decimal(this.project.surcharge_amount_documentation), // Dokumentationzuschla,
       surcharge_amount_travel: this.$common.text2Decimal(this.project.surcharge_amount_travel), // Reisekostenzuschla,
@@ -843,7 +919,7 @@ export default class EditProject extends Vue {
       } else {
         project = await dispatchCreateProject(this.$store, newProject);
       }
-      this.$router.push(`/main/wms/projects/${project?.id}`);
+      this.$router.replace(`/main/wms/projects/${project?.id}`);
       
     }
   }
@@ -871,6 +947,8 @@ export default class EditProject extends Vue {
       bt_amount_expected: this.$common.decimal2Text(project.bt_amount_expected), // Anzahl BT(soll)
       bt_amount_actual: this.$common.decimal2Text(project.bt_amount_actual), // Anzahl BT(ist)
       bt_rate: this.$common.decimal2Text(project.bt_rate, 2),
+      club_bonus_amount: this.$common.decimal2Text(project.club_bonus_amount),
+      acquisition_bonus_amount: this.$common.decimal2Text(project.acquisition_bonus_amount),
       surcharge_amount_project_management: this.$common.decimal2Text(project.surcharge_amount_project_management), // PM - Zuschla,
       surcharge_amount_documentation: this.$common.decimal2Text(project.surcharge_amount_documentation), // Dokumentationzuschla,
       surcharge_amount_travel: this.$common.decimal2Text(project.surcharge_amount_travel, 2), // Reisekostenzuschla,

@@ -23,6 +23,14 @@
           <v-icon small>mdi-briefcase</v-icon>
           <span class="text-caption">{{ projectTender.min_bt + 'BT' }} {{ (projectTender.max_bt && projectTender.max_bt !== projectTender.min_bt) ? (' - ' +  projectTender.max_bt + 'BT') : '' }}</span>
         </div>
+        <div v-if="projectTender.offer_needed">
+          <v-icon small>mdi-presentation</v-icon>
+          <span class="text-caption">Angebot notwendig</span>
+        </div>
+        <div>
+          <v-icon small>mdi-briefcase-download</v-icon>
+          <span class="text-caption">{{ ((projectTender.min_bt + projectTender.max_bt)/2)/sumRoles(projectTender) }} BT/Person</span>
+        </div>
       </div>
     </div>
 
@@ -53,6 +61,15 @@ import ViewComponent from '@/components/editor/ViewComponent.vue';
 export default class ProjectTenderDetailComponent extends Vue {
 
   public formatDistanceStrict = formatDistanceStrict;
+
+  public sumRoles = (tender:ProjectTender): number => {
+    let sum  = 0;
+    const x = tender.needed_project_roles_counts;
+    Object.keys(x).forEach(key => {
+      sum += x[key]
+    });
+    return sum;
+  };
 
   @Prop()
   public projectTender!: ProjectTender;

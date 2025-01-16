@@ -1,5 +1,5 @@
 import { IUserProfile, VersionedFolder } from '@/interfaces';
-import { ProjectTender } from '@modules/project-application/types';
+import { ProjectTender, IndustryEnum } from '@modules/project-application/types';
 
 export const FILE_LABELS = [
   'Teaser',
@@ -14,11 +14,12 @@ export const FILE_LABELS = [
 ]
 
 export type ProjectTypeEnum = 'external' | 'internal' | 'membership_project' | 'staffing';
-export type ProjectRoleEnum = 'controller' | 'leader' | 'worker';
+export type ProjectRoleEnum = 'controller' | 'leader' | 'worker' | 'committee' | 'expert';
 export type ProjectStatusEnum = 'running' | 'completed' | 'aborted' | 'rejected';
 export type KFBStatusEnum = 'open_status' | 'send_status' | 'closed_status' | 'rejected_status';
 export type ProjectAcquisitionType = 'internal' | 'external' | 'general' | 'acquisition_team' | 'follow_up';
-export type ProjectReferenceStatusEnum = 'basis' | 'default' | 'extended';
+export type ProjectReferenceStatusEnum = 'basis' | 'default' | 'extended' | 'contradiction' | 'missing_approval';
+
 
 export interface ProjectUser {
   participant: IUserProfile;
@@ -38,10 +39,14 @@ export interface ProjectCreate {
   tags?: string[];
   description?: string;
   categories?: string[];
+  industry: IndustryEnum;
   methods?: string[];
   approved?: boolean;
   qm_feedback?: boolean;
   files?: string; // UUID4
+
+  // NDA
+  nda?: boolean;
 
   // 'Calculation' Properties:;
   proposal_date?: string;
@@ -58,6 +63,8 @@ export interface ProjectCreate {
   surcharge_amount_travel?: number; // Reisekostenzuschlag
   surcharge_amount_other?: number; // Sonstiges
   bt_amount_bid_preparation?: number;
+  acquisition_bonus_amount?: number;
+  club_bonus_amount?: number;
   // 'Acquisition' Properties
   customer_name?: string;
   reference_code?: string;
@@ -65,6 +72,7 @@ export interface ProjectCreate {
   reference_no_approval_cause?: string; // Check-Box "Nicht erteilt" mit Begründung
   reference_no_inquiry_cause?: string; // Check-Box "Nicht angefragt" mit Begründung
   reference_status?: ProjectReferenceStatusEnum;
+  reference_approval_valid_until?: string;
 
   kfb_status: KFBStatusEnum;
   kfb_not_sent_cause?: string;
@@ -85,6 +93,8 @@ export type ProjectCreation = Modify<Omit<ProjectCreate, 'participant_ids'>, {
   bt_amount_expected?: string; // Anzahl BT(soll)
   bt_amount_actual?: string; // Anzahl BT(ist)
   bt_rate?: string;
+  club_bonus_amount?: string;
+  acquisition_bonus_amount?: string;
   surcharge_amount_project_management?: string; // PM - Zuschlag
   surcharge_amount_documentation?: string; // Dokumentationzuschlag
   surcharge_amount_travel?: string; // Reisekostenzuschlag
@@ -122,11 +132,15 @@ export interface Project {
   tags?: string[];
   description?: string;
   categories?: string[];
+  industry: IndustryEnum;
   methods?: string[];
   approved?: boolean;
   approved_by?: IUserProfile;
   qm_feedback?: boolean;
   files?: string; // UUID4
+
+  // NDA
+  nda?: boolean;
 
   // 'Calculation' Properties:;
   proposal_date?: string;
@@ -138,6 +152,8 @@ export interface Project {
   bt_amount_expected?: number; // Anzahl BT(soll)
   bt_amount_actual?: number; // Anzahl BT(ist)
   bt_rate?: number;
+  club_bonus_amount?: number;
+  acquisition_bonus_amount?: number;
   surcharge_amount_project_management?: number; // PM - Zuschlag
   surcharge_amount_documentation?: number; // Dokumentationzuschlag
   surcharge_amount_travel?: number; // Reisekostenzuschlag
@@ -150,6 +166,7 @@ export interface Project {
   reference_quote?: string;
   reference_no_approval_cause?: string; // Check-Box "Nicht erteilt" mit Begründung
   reference_no_inquiry_cause?: string; // Check-Box "Nicht angefragt" mit Begründung
+  reference_approval_valid_until?: string;
 
   kfb_status: KFBStatusEnum;
   kfb_not_sent_cause?: string;

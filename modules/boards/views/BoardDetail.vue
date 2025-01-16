@@ -66,8 +66,7 @@
       <v-row>
         <!-- add overview of meetings occured between start_date and end_date -->
         <v-col cols="12" md="4" class="px-5">
-          <h2 class="text-h4 text--primary mb-3">Mitglieder-
-            versammlungen</h2>
+          <h2 class="text-h4 text--primary mb-3">Mitgliederversammlungen</h2>
           <p class="text-body-2 text--secondary">
             Mitgliederversammlungen im Zeitraum dieses Vorstandsjahres
           </p>

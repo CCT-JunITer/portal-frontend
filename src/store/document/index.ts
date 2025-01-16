@@ -11,6 +11,7 @@ const defaultState: DocumentState = {
     archive: null,
     recruiting: null,
     'project-work': null,
+    templates:null,
   }
 };
 

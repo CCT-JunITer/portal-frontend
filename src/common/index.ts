@@ -103,6 +103,8 @@ export const isNumber = (v: string) => (!v || !!v.match(/^[0-9]+$/)) || 'Dies is
 
 export const isDecimal = (v: string) => (!v || !!v.match(/^-?\d+(\.\d+)*(,\d+(e\d+)?)?$/)) || 'Dies ist keine Zahl.';
 
+export const isPositiveInteger = (v: string|number) =>  (!v || !!v.toString().match(/^\d+$/)) || 'Dies ist keine Zahl.';
+
 export const isEmail = (v: string) => (v && !!v.match(/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/)) || 'Dies ist keine E-Mail.';
 
 export const isCurrency = (v: string) => (!v || !!v.match(/^\d+(\.\d+)*(,\d{2}){0,1}$/) || 'Dies ist kein gültiger Geldbetrag.')
@@ -205,5 +207,9 @@ export const DOCUMENT_TYPES: { name: string; value: IDocumentType }[] = [
   {
     name: 'Projektarbeit',
     value: 'project-work',
+  },
+  {
+    name: 'Vorlagen',
+    value: 'templates',
   }
 ]

@@ -19,10 +19,12 @@
       <div class="pa-5">
         <v-select
           outlined
-          v-model="projectApplication.role"
+          v-model="projectApplication.roles"
           label="Projektrolle"
           :items="filteredRoles"
           class="input-lg"
+          multiple
+          chips
         >
         </v-select>
 
@@ -107,6 +109,7 @@
         <project-available-time
           :fromDate="projectTender.project_start_date_expected"
           :toDate="projectTender.project_end_date_expected"
+          :offerNeeded="projectTender.offer_needed"
           v-model="projectApplication.available_time"
           outlined
         >

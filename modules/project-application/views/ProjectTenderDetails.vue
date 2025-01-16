@@ -117,7 +117,7 @@ export default class ProjectApplicationDetails extends Vue {
   }
 
   public async createApplication() {
-    const application = await dispatchCreateProjectApplication(this.$store, { project_tender_id: this.projectTender!.id, role: 'worker' });
+    const application = await dispatchCreateProjectApplication(this.$store, { project_tender_id: this.projectTender!.id, roles: ['worker'] });
     this.$router.push({ name: 'project-application-edit', params: { id: `${application.id}`}});
   }
 

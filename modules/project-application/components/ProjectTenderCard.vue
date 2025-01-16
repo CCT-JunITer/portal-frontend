@@ -33,6 +33,10 @@
             <v-icon small>mdi-briefcase</v-icon>
             <span class="text-caption">{{ projectTender.min_bt + 'BT' }} {{ (projectTender.max_bt && projectTender.max_bt !== projectTender.min_bt) ? (' - ' +  projectTender.max_bt + 'BT') : '' }}</span>
           </div>
+          <div>
+            <v-icon small>mdi-briefcase-download</v-icon>
+            <span class="text-caption">{{ ((projectTender.min_bt + projectTender.max_bt)/2)/sumRoles(projectTender) }} BT/Person</span>
+          </div>
         </div>
       </v-list-item>
     </v-card-text>
@@ -41,7 +45,10 @@
     </div>
     <v-card-actions>
       <v-spacer></v-spacer>
-      <v-btn small outlined color="cctPurple" :to="{ name: 'project-tender-detail', params: { id: projectTender.id }}">
+      <v-btn small dark color="cctPurple" :to="{ name: 'project-tender-create', params: { from: projectTender.id }}" v-if="hasProjectTenderPermission()">
+        Duplizieren
+      </v-btn>
+      <v-btn small outlined color="cctPurple" :to="{ name: 'project-tender-detail', params: { id: projectTender.id }}" >
         Details
       </v-btn>
     </v-card-actions>
@@ -53,13 +60,27 @@ import ViewComponent from '@/components/editor/ViewComponent.vue';
 import UserChip from '@/components/user-chip/UserChip.vue';
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import { ProjectTender } from '../types'
+import { readHasAnyPermission } from '@/store/main/getters';
 
 @Component({
   components: { UserChip, ViewComponent }
 })
 export default class ProjectTenderCard extends Vue {
+
+  public sumRoles = (tender:ProjectTender): number => {
+    let sum  = 0;
+    const x = tender.needed_project_roles_counts;
+    Object.keys(x).forEach(key => {
+      sum += x[key]
+    });
+    return sum;
+  };
   @Prop()
   public projectTender!: ProjectTender;
+
+  public hasProjectTenderPermission() {
+    return readHasAnyPermission(this.$store)(['portal.project-tender.create']);
+  }
 }
 </script>
 

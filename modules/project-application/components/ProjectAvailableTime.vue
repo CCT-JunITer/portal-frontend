@@ -4,6 +4,18 @@
       Verfügbarkeit
     </v-card-title>
     <v-card-text>
+      <!-- Angebot notwendig -->
+      <div class="row">
+        <div class="col-md-12">
+          <v-checkbox
+            v-model="offerNeeded"
+            prepend-icon="mdi-presentation"
+            label="Angebot notwendig"
+            :disabled="true"
+          >
+          </v-checkbox>
+        </div>
+      </div>
       <div class="row">
         <div v-for="week in weeks" :key="week.label" class="col-md-3 col-sm-6 col-12 py-1">
           <template v-if="!readonly">
@@ -26,6 +38,16 @@
         </div>
       </div>
     </v-card-text>
+    <v-card-text>
+      Anmerkung zu Zeitangaben
+      <v-textarea
+        placeholder="Hier antworten"
+        v-model= "textarea"
+        filled
+        outlined
+        dense
+      ></v-textarea>
+    </v-card-text>
   </v-card>
 </template>
 
@@ -38,6 +60,7 @@ export default class ProjectAvailableTime extends Vue {
 
   public btValues = new Array(16).fill(0).map((_, i) => ({ value: (i)/2, text: `${this.$common.decimal2Text((i)/2)}`}));
   public localValue = {}
+  public textarea = ''
 
   @Prop()
   public fromDate!: string;
@@ -46,19 +69,29 @@ export default class ProjectAvailableTime extends Vue {
   public toDate!: string;
 
   @Prop()
+  public readonly offerNeeded!: boolean;
+
+  @Prop()
   public readonly value!: object;
 
   @Prop({ default: false})
   public readonly readonly!: boolean;
+
+  @Watch('textarea')
+  public onTextareaChange(newValue: string) {
+    this.setTimeSlotAt('Anmerkungen', newValue);
+  } 
 
 
   @Watch('value', { immediate: true })
   public onValueChange(value: object) {
     if (!value) {
       this.localValue = {};
+      this.textarea = '';  // Initialize textarea
       return;
     }
     this.localValue = value;
+    this.textarea = this.localValue['Anmerkungen'] || '';  // Populate textarea
   }
 
 
@@ -68,6 +101,7 @@ export default class ProjectAvailableTime extends Vue {
 
   public setTimeSlotAt(key: string, value: string) {
     this.localValue[key] = value;
+    console.log(this.localValue);
     this.$emit('input', this.localValue);
   }
 

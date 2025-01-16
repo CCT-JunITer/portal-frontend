@@ -47,26 +47,27 @@
 
             <v-divider></v-divider>
           
-            <div class="d-flex flex-wrap">
-
-              <div class="flex-1 ma-3" v-for="role in Object.keys(filteredProjectCasts)" :key="role">
-                <v-card outlined>
-                  <v-list v-if="projectCast">
-                    <v-subheader>{{ $enum('ProjectRoleEnum', role) || 'nicht besetzt' }} ({{ projectCast.cast_applications[role].length }}{{ projectTender.needed_project_roles_counts[role] ? ('/' + projectTender.needed_project_roles_counts[role]) : '' }})</v-subheader>
-                    <draggable class="list-group" v-model="projectCast.cast_applications[role]" group="people">
-                      <project-application-list-item
-                        class="list-group-item"
-                        v-for="application in filteredProjectCasts[role]" 
-                        :key="application.project_application_id"
-                        :projectApplication="application.project_application"
-                      >
-                        <template v-slot:actions>
-                          <v-checkbox @change="changeComparing($event, application.project_application)" :input-value="!!comparingApplications.find(a => a.id === application.project_application_id)">Vergleichen</v-checkbox>
-                        </template>
-                      </project-application-list-item>
-                    </draggable>
-                  </v-list>
-                </v-card>
+            <div class="container">
+              <div class="row g-3">
+                <div class="col-12 col-md-6" v-for="role in Object.keys(filteredProjectCasts)" :key="role" style="min-width: 300px;">
+                  <v-card outlined>
+                    <v-list v-if="projectCast">
+                      <v-subheader>{{ $enum('ProjectRoleEnum', role) || 'nicht besetzt' }} ({{ projectCast.cast_applications[role].length }}{{ projectTender.needed_project_roles_counts[role] ? ('/' + projectTender.needed_project_roles_counts[role]) : '' }})</v-subheader>
+                      <draggable class="list-group" v-model="projectCast.cast_applications[role]" group="people">
+                        <project-application-list-item
+                          class="list-group-item"
+                          v-for="application in filteredProjectCasts[role]" 
+                          :key="application.project_application_id"
+                          :projectApplication="application.project_application"
+                        >
+                          <template v-slot:actions>
+                            <v-checkbox @change="changeComparing($event, application.project_application)" :input-value="!!comparingApplications.find(a => a.id === application.project_application_id)">Vergleichen</v-checkbox>
+                          </template>
+                        </project-application-list-item>
+                      </draggable>
+                    </v-list>
+                  </v-card>
+                </div>
               </div>
             </div>
           </v-card>

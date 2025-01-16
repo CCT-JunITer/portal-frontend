@@ -172,6 +172,17 @@ export default class ProjectMain extends Vue {
         values: readAutocompleteValues(this.$store)('tags')?.map(method => ({ text: method, value: method })),
         multiple: true,
       },
+      {
+        value: 'reference_status',
+        text: 'Status der Referenzfreigabe',
+        values: this.$enums('ProjectReferenceStatusEnum'),
+      },
+      {
+        value: 'customer_name',
+        text: 'Kunde',
+        values: readAutocompleteValues(this.$store)('customer_name')?.map(method => ({ text: method, value: method })),
+        multiple: true,
+      },
     ];
   }
 
@@ -215,6 +226,8 @@ export default class ProjectMain extends Vue {
       ?.filter(filter('subtype'))
       ?.filter(filter('categories'))
       ?.filter(filter('methods'))
+      ?.filter(filter('tags'))
+      ?.filter(filter('customer_name'))
       
   }
 

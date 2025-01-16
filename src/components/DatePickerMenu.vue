@@ -15,7 +15,7 @@
       <slot 
         name="activator" 
         v-bind:on="{...on, change: onInputChange}" 
-        v-bind:attrs="{...attrs, value: dateFormatted, rules: [v => (!v || isValid(v)) || 'Falsches Datumsformat']}">
+        v-bind:attrs="{...attrs, value: dateFormatted, rules: [v => (!!v || isValid(v)) || 'Falsches Datumsformat']}">
       </slot>
     </template>
     <v-date-picker

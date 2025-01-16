@@ -26,7 +26,7 @@ stages:
   - deploy
 
 lint:
-  image: node:lts
+  image: node:18
   stage: lint
   needs: []
   cache:
@@ -42,15 +42,14 @@ lint:
 
 
 test:
-  image: node:lts
+  image: mcr.microsoft.com/playwright:v1.48.1-noble
   stage: test
-  needs: []
   cache:
     paths:
       - node_modules
   script:
-    - npm install --progress=false
-    - VUE_APP_ENV=dev npm run test:unit
+    - npm ci
+    - VUE_APP_ENV=dev npm run test
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
     - if: $CI_COMMIT_REF_PROTECTED == "true"

@@ -48,20 +48,36 @@
             prepend-icon="mdi-briefcase"
             suffix="BT"
             required
-            :rules="[$common.required, $common.isDecimal]" 
+            :rules="[$common.required, $common.isDecimal,isBiggerBT]" 
           ></v-text-field>
 
 
 
           <v-expand-transition>
             <v-text-field
-              label="BT-Satz in Euro"
-              v-model="projectTender.bt_rate"
+              label="Minimaler BT-Satz in Euro"
+              v-model="projectTender.min_bt_rate"
               class="input-lg"
               prepend-icon="mdi-tag-text"
               suffix="€"
               required
-              v-show="['internal', 'membership_project'].indexOf(projectTender.type || '') === -1 || projectTender.bt_rate"
+              v-show="['internal', 'membership_project'].indexOf(projectTender.type || '') === -1 || projectTender.min_bt_rate"
+              :rules="[
+                $common.isCurrency,
+                v => ['internal', 'membership_project'].indexOf(projectTender.type || '') !== -1 ?
+                  $common.isEmpty(v) : $common.required(v)
+              ]" 
+            ></v-text-field>
+          </v-expand-transition>
+          <v-expand-transition>
+            <v-text-field
+              label="Maximaler BT-Satz in Euro"
+              v-model="projectTender.max_bt_rate"
+              class="input-lg"
+              prepend-icon="mdi-tag-text"
+              suffix="€"
+              required
+              v-show="['internal', 'membership_project'].indexOf(projectTender.type || '') === -1 || projectTender.max_bt_rate"
               :rules="[
                 $common.isCurrency,
                 v => ['internal', 'membership_project'].indexOf(projectTender.type || '') !== -1 ?
@@ -78,6 +94,17 @@
             prepend-icon="mdi-animation"
             item-text="text"
             :items="$enums('ProjectTypeEnum')"
+            :rules="[$common.required]"
+          ></v-select>
+
+          <v-select
+            label="Branche"
+            v-model="projectTender.industry"
+            class="input-lg"
+            required
+            prepend-icon="mdi-factory"
+            item-text="text"
+            :items="$enums('IndustryEnum')"
             :rules="[$common.required]"
           ></v-select>
 
@@ -137,6 +164,13 @@
               ></v-text-field>
             </template>
           </date-picker-menu>
+
+          <v-checkbox
+            v-model="projectTender.offer_needed"
+            prepend-icon="mdi-presentation"
+            label="Angebot notwendig"
+          >
+          </v-checkbox>
         </v-col>
       </v-row>
 
@@ -236,6 +270,7 @@
               :label="role.text"
               value="0"
               v-model="projectTender.needed_project_roles_counts[role.value]"
+              :rules="[$common.isPositiveInteger]" 
             >
             </v-text-field>
           </div>
@@ -286,6 +321,7 @@ export default class EditProjectTender extends Vue {
 
   public valid = true;
   public projectTender: Partial<ProjectTenderCreation> = {
+    draft: false,
     needed_project_roles_counts: {},
     questions: [
       { title: '', description: '', required: false, order: 0}
@@ -304,15 +340,43 @@ export default class EditProjectTender extends Vue {
     return readUsers(this.$store);
   }
 
+  public async copyfromotherTender(id:number){
+    await dispatchGetProjectTender(this.$store,id)
+    const basetender = await readOneProjectTender(this.$store)(id);
+    this.projectTender = {
+      draft: basetender?.draft,
+      title:basetender?.title,
+      description:basetender?.description,
+      needed_project_roles_counts: basetender?.needed_project_roles_counts,
+      questions: basetender?.questions.map((question) => {return{
+        title: question.title,
+        description: question.description,
+        order: question.order,
+        required: question.required
+      }}),
+      max_bt: this.$common.decimal2Text(basetender?.max_bt),
+      min_bt: this.$common.decimal2Text(basetender?.min_bt),
+      min_bt_rate: this.$common.decimal2Text(basetender?.min_bt_rate, 2),
+      max_bt_rate: this.$common.decimal2Text(basetender?.max_bt_rate, 2),
+      files: basetender?.files,
+      type: basetender?.type,
+      versioned_folder: basetender?.versioned_folder
+    }
+  }
+
+
   @Watch('$route', {immediate: true})
   public async onRouteChange(newRoute?: Route, oldRoute?: Route) {
     if (newRoute?.params.id !== oldRoute?.params.id) {
       await dispatchGetProjectTender(this.$store, +this.$route.params.id)
       this.reset();
     }
+    if (newRoute?.params.from !== oldRoute?.params.from) {
+      this.copyfromotherTender(+this.$route.params.from)
+    }
   }
 
-
+  public isBiggerBT = (v: string) =>  (!v || parseInt(v) >= parseInt(this.projectTender.min_bt || '0') ) || 'Kleiner als min BT.';
   public async mounted() {
     await dispatchGetUsers(this.$store);
     await dispatchGetAutocompleteValues(this.$store);
@@ -328,7 +392,8 @@ export default class EditProjectTender extends Vue {
       ...this.projectTender as ProjectTenderCreate,
       max_bt: this.$common.text2Decimal(this.projectTender.max_bt),
       min_bt: this.$common.text2Decimal(this.projectTender.min_bt),
-      bt_rate: this.$common.text2Decimal(this.projectTender.bt_rate),
+      min_bt_rate: this.$common.text2Decimal(this.projectTender.min_bt_rate),
+      max_bt_rate: this.$common.text2Decimal(this.projectTender.max_bt_rate),
 
       questions: this.projectTender.questions!.map((question, index) => ({
         ...question,
@@ -353,7 +418,7 @@ export default class EditProjectTender extends Vue {
       } else {
         project = await dispatchCreateProjectTender(this.$store, newProjectTender);
       }
-      this.$router.push({ name: 'project-tender-detail', params: { id: `${project?.id}` } });
+      this.$router.replace({ name: 'project-tender-detail', params: { id: `${project?.id}` } });
       
     }
   }
@@ -374,7 +439,8 @@ export default class EditProjectTender extends Vue {
         questions: this.editProjectTender.questions.slice().sort((a, b) => a.order - b.order),
         max_bt: this.$common.decimal2Text(this.editProjectTender.max_bt),
         min_bt: this.$common.decimal2Text(this.editProjectTender.min_bt),
-        bt_rate: this.$common.decimal2Text(this.editProjectTender.bt_rate, 2),
+        min_bt_rate: this.$common.decimal2Text(this.editProjectTender.min_bt_rate, 2),
+        max_bt_rate: this.$common.decimal2Text(this.editProjectTender.max_bt_rate, 2),
       };
     }
   }

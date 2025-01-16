@@ -5,17 +5,15 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "test:unit": "vue-cli-service test:unit",
+    "test": "playwright test",
     "lint": "vue-cli-service lint src tests modules",
-    "lint-fix": "vue-cli-service lint src tests modules --fix",
-    "test": "vue-cli-service test:unit --watch"
+    "lint-fix": "vue-cli-service lint src tests modules --fix"
   },
   "dependencies": {
     "@fontsource/lato": "^4.5.9",
     "@fontsource/roboto": "^4.5.7",
     "@mdi/font": "^6.7.96",
     "@mdi/svg": "^6.7.96",
-    "@vue/vue2-jest": "^27.0.0",
     "axios": "^0.27.2",
     "color-convert": "^2.0.1",
     "compressorjs": "^1.1.1",
@@ -41,14 +39,14 @@
   "devDependencies": {
     "@babel/core": "^7.18.5",
     "@babel/preset-env": "^7.18.2",
-    "@types/jest": "^27.0.4",
+    "@playwright/test": "^1.48.2",
+    "@types/node": "^22.9.0",
     "@typescript-eslint/eslint-plugin": "^5.28.0",
     "@typescript-eslint/parser": "^5.28.0",
     "@vue/cli-plugin-babel": "^5.0.4",
     "@vue/cli-plugin-eslint": "^5.0.4",
     "@vue/cli-plugin-router": "^5.0.4",
     "@vue/cli-plugin-typescript": "^5.0.4",
-    "@vue/cli-plugin-unit-jest": "^5.0.8",
     "@vue/cli-plugin-vuex": "^5.0.4",
     "@vue/cli-service": "^5.0.4",
     "@vue/eslint-config-typescript": "^11.0.0",
@@ -60,11 +58,9 @@
     "material-design-icons-iconfont": "^6.7.0",
     "sass": "~1.32.6",
     "sass-loader": "^13.0.0",
-    "ts-jest": "^27.0.4",
     "tsconfig-paths-webpack-plugin": "^4.0.0",
     "typescript": "^4.7.3",
     "vue-cli-plugin-vuetify": "^2.5.1",
-    "vue-jest": "^3.0.7",
     "vue-template-compiler": "^2.6.14",
     "vuetify-loader": "^1.7.3"
   },

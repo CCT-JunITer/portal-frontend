@@ -8,7 +8,7 @@
 
     <v-list-item-content>
       <v-list-item-title>{{ projectApplication.participant.full_name }}</v-list-item-title>
-      <v-list-item-subtitle>{{ $enum('ProjectRoleEnum', projectApplication.role) }}</v-list-item-subtitle>
+      <v-list-item-subtitle v-for="role in projectApplication.roles" :key="role">{{ $enum('ProjectRoleEnum', role) }}</v-list-item-subtitle>
       <v-list-item-subtitle><v-chip small>{{ $enum('ProjectApplicationStatusEnum', projectApplication.status) }}</v-chip></v-list-item-subtitle>
     </v-list-item-content>
     <v-list-item-action>

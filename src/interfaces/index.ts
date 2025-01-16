@@ -332,7 +332,7 @@ export interface IDocumentUpdate {
     approved: boolean;
 }
 
-export type IDocumentType = 'member-progression' | 'recruiting' | 'archive' | 'public-affairs' | 'quality-management' | 'project-work';
+export type IDocumentType = 'member-progression' | 'recruiting' | 'archive' | 'public-affairs' | 'quality-management' | 'project-work' | 'templates';
 
 export interface UserStreak {
     user_id: number;

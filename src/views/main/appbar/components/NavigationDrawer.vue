@@ -68,6 +68,14 @@
             <v-list-item-title>CCT-Sitzungen</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
+        <v-list-item to="/main/wms/documents/templates" class="ml-2">
+          <v-list-item-icon>
+            <v-icon>mdi-file-powerpoint</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Vorlagen</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
         <v-list-item to="/main/wms/documents/member-progression" class="ml-2">
           <v-list-item-icon>
             <v-icon>mdi-account-arrow-up</v-icon>

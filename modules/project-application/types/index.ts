@@ -4,6 +4,37 @@ import { ProjectRoleEnum, ProjectTypeEnum } from '@modules/projects/types';
 
 export type ProjectApplicationStatusEnum = 'draft' | 'interest' | 'completed'
 
+export type IndustryEnum = 
+  | 'automotive'
+  | 'banking_finance'
+  | 'insurance'
+  | 'healthcare'
+  | 'pharma_biotech'
+  | 'energy_utilities'
+  | 'renewable_energy'
+  | 'technology_it'
+  | 'telecommunication'
+  | 'retail_ecommerce'
+  | 'logistics_transport'
+  | 'aviation'
+  | 'construction_real_estate'
+  | 'media_entertainment'
+  | 'education'
+  | 'public_sector'
+  | 'defense_security'
+  | 'tourism_hospitality'
+  | 'consumer_goods'
+  | 'manufacturing'
+  | 'agriculture'
+  | 'chemicals'
+  | 'fashion_textiles'
+  | 'non_profit'
+  | 'startups_vc'
+  | 'sports_leisure'
+  | 'creative_industries'
+  | 'other';
+
+
 export interface ProjectCastCreate {
   project_tender_id: number;
   applications_ids?: { [k in ProjectRoleEnum]?: number[] };
@@ -38,7 +69,7 @@ export interface ProjectApplication {
   project_tender: ProjectTender;
   project_tender_id: number;
   project_id?: number;
-  role: ProjectRoleEnum;
+  roles: ProjectRoleEnum[];
   status: ProjectApplicationStatusEnum;
   files?: string;
   versioned_folder?: VersionedFolder;
@@ -51,7 +82,7 @@ export interface ProjectApplicationCreate {
   project_tender_id: number;
   files?: string;
   versioned_folder?: VersionedFolder;
-  role: ProjectRoleEnum;
+  roles: ProjectRoleEnum[];
   status?: ProjectApplicationStatusEnum;
   answered_questions?: ProjectApplicationAnsweredQuestion[];
   available_time?: object;
@@ -74,9 +105,11 @@ export interface ProjectTender {
   description?: string
   min_bt?: number;
   max_bt?: number;
-  bt_rate?: number;
+  min_bt_rate?: number;
+  max_bt_rate?: number;
   date_deadline: string;
   is_deadline_passed: boolean;
+  offer_needed: boolean;
 
   project_start_date_expected: string;
   project_end_date_expected: string;
@@ -89,6 +122,8 @@ export interface ProjectTender {
   author: IUserProfile;
   files?: string;
   versioned_folder?: VersionedFolder;
+
+  industry: IndustryEnum[];
 }
 
 export interface ProjectTenderCreate {
@@ -98,8 +133,10 @@ export interface ProjectTenderCreate {
   description?: string
   min_bt?: number;
   max_bt?: number;
-  bt_rate?: number;
+  min_bt_rate?: number;
+  max_bt_rate?: number;
   date_deadline: string;
+  offer_needed: boolean;
 
   project_start_date_expected: string;
   project_end_date_expected: string;
@@ -107,6 +144,8 @@ export interface ProjectTenderCreate {
   questions: ProjectTenderQuestion[];
 
   needed_project_roles_counts: { [k in ProjectRoleEnum]: number };
+
+  industry: IndustryEnum[];
 
 }
 
@@ -118,8 +157,10 @@ export interface ProjectTenderCreation {
   description?: string
   min_bt?: string;
   max_bt?: string;
-  bt_rate?: string;
+  min_bt_rate?: string;
+  max_bt_rate?: string;
   date_deadline: string;
+  offer_needed: boolean;
 
   project_start_date_expected: string;
   project_end_date_expected: string;
@@ -129,4 +170,6 @@ export interface ProjectTenderCreation {
 
   files?: string;
   versioned_folder?: VersionedFolder;
+
+  industry: IndustryEnum[];
 }
