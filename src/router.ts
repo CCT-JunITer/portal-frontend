@@ -71,6 +71,7 @@ export default new Router({
                 },
                 {
                   path: 'finance-requests',
+                  name: 'main-admin-finanz-request',
                   component: () => import(/* webpackChunkName: "admin-user-invite" */ './views/main/admin/AdminFinanceRequests.vue')
                 },
                 {

@@ -1,7 +1,10 @@
 <template>
-  <v-container v-if="this.financeRequest">
+  
+  <v-container v-if="this.financeRequest">    
+    <v-btn v-if="isAdmin" class="bck-btn" color="secondary" :to="{ name: 'main-admin-finanz-request',}">Zurück</v-btn>
     <div>
       <div class="d-flex">
+        
         <h1 class="text-md-h2 text-sm-h3 text-h4 text--primary mb-3">Finanzantrag</h1>
         <v-spacer></v-spacer>
         <div class="d-flex align-center">
@@ -501,6 +504,11 @@ export default class AdminUsers extends Vue {
 </script>
 
 <style scoped>
+.bck-btn{
+  position:sticky;
+  top: 7%;
+  left: 1%;
+}
 
 .btn-accept-active {
   background: #66BB6A;
