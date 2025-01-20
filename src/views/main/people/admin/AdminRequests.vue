@@ -37,6 +37,8 @@ import RequestCard from '@/components/request/RequestCard.vue';
 import { dispatchAdminRequests, dispatchApplyRequest } from '@/store/admin/actions';
 import { readAdminRequests } from '@/store/admin/getters';
 import { Vue, Component } from 'vue-property-decorator';
+import { Request } from '@/interfaces';
+
 
 @Component({
   components: {
@@ -56,8 +58,12 @@ export default class AdminRequests extends Vue {
     await dispatchAdminRequests(this.$store, undefined);
   }
 
-  async applyRequest(requestId: number, accepted: boolean) {
-    await dispatchApplyRequest(this.$store, { requestId, accepted });
+  async applyRequest(request: Request, accepted: boolean) {
+    if (request.description === 'Alumni') {
+      //tbd: show alumnisierungs-form popoup (same as in profile when clicking "Alumnisieren")
+      return;
+    }
+    await dispatchApplyRequest(this.$store, { requestId: request.id, accepted });
   }
 }
 </script>

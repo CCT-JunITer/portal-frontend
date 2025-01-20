@@ -29,6 +29,10 @@ export const actions = {
     const response = await apiCallNotify(context, (token) => api.deleteUser(token, id));
     commitSetUser(context, response.data);
   },
+  async actionUpdateUserState(context: MainContext, payload: { id: number; state: 'activate' | 'deactivate', new_password?: string }) {
+    const response = await apiCallNotify(context, (token) => api.updateUserState(token, payload.id, payload.state, payload.new_password));
+    return response.data;
+  },
   async actionUpdateUser(context: MainContext, payload: { id: number; user: IUserProfileUpdate }) {
     const response = await apiCallNotify(context, (token) => api.updateUser(token, payload.id, payload.user));
     commitSetUser(context, response.data);
@@ -116,6 +120,7 @@ export const dispatchGetOneAdminUser = dispatch(actions.actionGetOneAdminUser);
 export const dispatchCreateUser = dispatch(actions.actionCreateUser);
 export const dispatchUpdateUser = dispatch(actions.actionUpdateUser);
 export const dispatchDeleteUser = dispatch(actions.actionDeleteUser);
+export const dispatchUpdateUserState = dispatch(actions.actionUpdateUserState);
 export const dispatchSendInvites = dispatch(actions.actionSendInvites);
 export const dispatchAdminRequests = dispatch(actions.actionGetRequests);
 export const dispatchGetAdminGroups = dispatch(actions.actionGetAdminGroups);

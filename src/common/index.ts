@@ -112,6 +112,9 @@ export const isCurrency = (v: string) => (!v || !!v.match(/^\d+(\.\d+)*(,\d{2}){
 export const isIBAN = (v: string) => (!v || !!v.match(/[A-Z]{2}[0-9]{2}(?:[ ]?[0-9]{4}){4}(?!(?:[ ]?[0-9]){3})(?:[ ]?[0-9]{1,2})?/)) || 'Dies ist keine IBAN.';
 
 export const isTodayBirthday = (date: Date | string) => {
+  if (!date) {
+    return false;
+  }
   if (typeof date === 'string') {
     date = new Date(date);
   }

@@ -129,6 +129,9 @@ export const api = {
   async deleteUser(token: string, userId: number) {
     return axios.delete(`${apiUrl}/api/v1/users/${userId}`, authHeaders(token));
   },
+  async updateUserState(token: string, userId: number, state: 'activate' | 'deactivate', new_password?: string) {
+    return axios.put(`${apiUrl}/api/v1/users/state/${userId}`, { state, new_password }, authHeaders(token));
+  },
   async updateUser(token: string, userId: number, data: IUserProfileUpdate) {
     return axios.put(`${apiUrl}/api/v1/users/${userId}`, data, authHeaders(token));
   },

@@ -16,12 +16,13 @@
       <v-row>
         <v-col cols="12" class="d-flex">
           <v-spacer></v-spacer>
-          <v-btn @click="impersonate" outlined color="cctBlue">
+          <v-btn @click="impersonate" outlined color="cctBlue mr-2">
             <v-icon left>
               account_box
             </v-icon>
             Imitieren
           </v-btn>
+          <delete-dialog :userProfile="userProfile"></delete-dialog>
         </v-col>
       </v-row>
 
@@ -381,7 +382,6 @@
 
           <v-card-actions>
             <group-dialog :userProfile="userProfile"></group-dialog> 
-            <delete-dialog :userProfile="userProfile" v-if="userProfile && !userProfile.is_alumni"></delete-dialog>
             <edit-group-dialog :userProfile="userProfile" ref="edit"></edit-group-dialog>
           </v-card-actions>
           <v-row v-if="userProfile">
