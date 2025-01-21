@@ -123,7 +123,7 @@ export interface ProjectTender {
   files?: string;
   versioned_folder?: VersionedFolder;
 
-  industry: IndustryEnum[];
+  industry: IndustryEnum;
 }
 
 export interface ProjectTenderCreate {
@@ -145,7 +145,7 @@ export interface ProjectTenderCreate {
 
   needed_project_roles_counts: { [k in ProjectRoleEnum]: number };
 
-  industry: IndustryEnum[];
+  industry: IndustryEnum;
 
 }
 
@@ -171,5 +171,5 @@ export interface ProjectTenderCreation {
   files?: string;
   versioned_folder?: VersionedFolder;
 
-  industry: IndustryEnum[];
+  industry: IndustryEnum;
 }

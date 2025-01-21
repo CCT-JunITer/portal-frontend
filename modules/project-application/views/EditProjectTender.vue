@@ -48,7 +48,7 @@
             prepend-icon="mdi-briefcase"
             suffix="BT"
             required
-            :rules="[$common.required, $common.isDecimal,isBiggerBT]" 
+            :rules="[$common.required, $common.isDecimal]" 
           ></v-text-field>
 
 
@@ -343,6 +343,7 @@ export default class EditProjectTender extends Vue {
   public async copyfromotherTender(id:number){
     await dispatchGetProjectTender(this.$store,id)
     const basetender = await readOneProjectTender(this.$store)(id);
+    console.log(basetender)
     this.projectTender = {
       draft: basetender?.draft,
       title:basetender?.title,
@@ -356,8 +357,10 @@ export default class EditProjectTender extends Vue {
       }}),
       max_bt: this.$common.decimal2Text(basetender?.max_bt),
       min_bt: this.$common.decimal2Text(basetender?.min_bt),
-      min_bt_rate: this.$common.decimal2Text(basetender?.min_bt_rate, 2),
-      max_bt_rate: this.$common.decimal2Text(basetender?.max_bt_rate, 2),
+      min_bt_rate: this.$common.decimal2Text(basetender?.min_bt_rate),
+      max_bt_rate: this.$common.decimal2Text(basetender?.max_bt_rate),
+      offer_needed: basetender?.offer_needed,
+      industry: basetender?.industry,
       files: basetender?.files,
       type: basetender?.type,
       versioned_folder: basetender?.versioned_folder

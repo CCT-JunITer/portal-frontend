@@ -275,9 +275,11 @@ export default class ProjectTenderCast extends Vue {
       status: 'running',
       bt_amount_expected: this.projectTender.max_bt,
       bt_rate: this.projectTender.max_bt_rate,
+      industry: this.projectTender.industry,
       project_start_date_expected: this.projectTender.project_start_date_expected,
       project_end_date_expected: this.projectTender.project_end_date_expected,
     }
+    console.log(project_create);
     this.$router.push({ name: 'project-create', params: { from: JSON.stringify(project_create) } });  
   }
   

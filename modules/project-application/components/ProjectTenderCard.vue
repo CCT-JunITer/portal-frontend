@@ -33,6 +33,10 @@
             <v-icon small>mdi-briefcase</v-icon>
             <span class="text-caption">{{ projectTender.min_bt + 'BT' }} {{ (projectTender.max_bt && projectTender.max_bt !== projectTender.min_bt) ? (' - ' +  projectTender.max_bt + 'BT') : '' }}</span>
           </div>
+          <div v-if="projectTender.offer_needed">
+            <v-icon small>mdi-presentation</v-icon>
+            <span class="text-caption">Angebot notwendig</span>
+          </div>
           <div>
             <v-icon small>mdi-briefcase-download</v-icon>
             <span class="text-caption">{{ ((projectTender.min_bt + projectTender.max_bt)/2)/sumRoles(projectTender) }} BT/Person</span>
