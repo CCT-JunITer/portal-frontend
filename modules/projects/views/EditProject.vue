@@ -295,6 +295,7 @@
             label="360° Feedback erfolgt"
             class="input-lg"
             prepend-icon="mdi-check-decagram"
+            hint="Durch das Qualitätsmanagement bestätigt"
             required
           >
           </v-checkbox>

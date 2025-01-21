@@ -52,7 +52,7 @@
                 <div class="col-12 col-md-6" v-for="role in Object.keys(filteredProjectCasts)" :key="role" style="min-width: 300px;">
                   <v-card outlined>
                     <v-list v-if="projectCast">
-                      <v-subheader>{{ $enum('ProjectRoleEnum', role) || 'nicht besetzt' }} ({{ projectCast.cast_applications[role].length }}{{ projectTender.needed_project_roles_counts[role] ? ('/' + projectTender.needed_project_roles_counts[role]) : '' }})</v-subheader>
+                      <v-subheader>{{ $enum('ProjectRoleEnum', role) || 'Nicht besetzt' }} ({{ projectCast.cast_applications[role].length }}{{ projectTender.needed_project_roles_counts[role] ? ('/' + projectTender.needed_project_roles_counts[role]) : '' }})</v-subheader>
                       <draggable class="list-group" v-model="projectCast.cast_applications[role]" group="people">
                         <project-application-list-item
                           class="list-group-item"

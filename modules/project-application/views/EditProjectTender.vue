@@ -111,6 +111,7 @@
           <date-time-picker-menu
             v-model="projectTender.date_deadline"
             defaultPicker="MONTH"
+            required
             :pickerProps="{
               min: '2000-01-01',
             }"
@@ -122,7 +123,7 @@
                 v-bind="attrs"
                 v-on="on"
                 prepend-icon="mdi-calendar-range"
-                :rules="attrs.rules"
+                :rules="[$common.required, attrs.rules]"
               ></v-text-field>
             </template>
           </date-time-picker-menu>
@@ -130,6 +131,7 @@
           <date-picker-menu
             v-model="projectTender.project_start_date_expected"
             defaultPicker="MONTH"
+            required
             :pickerProps="{
               min: '2000-01-01',
             }"
@@ -140,8 +142,9 @@
                 class="input-lg"
                 v-bind="attrs"
                 v-on="on"
+                required
                 prepend-icon="mdi-calendar-range"
-                :rules="attrs.rules"
+                :rules="[$common.required, attrs.rules]"
               ></v-text-field>
             </template>
           </date-picker-menu>
@@ -149,6 +152,7 @@
           <date-picker-menu
             v-model="projectTender.project_end_date_expected"
             defaultPicker="MONTH"
+            required
             :pickerProps="{
               min: '2000-01-01',
             }"
@@ -159,8 +163,9 @@
                 class="input-lg"
                 v-bind="attrs"
                 v-on="on"
+                required
                 prepend-icon="mdi-calendar-range"
-                :rules="attrs.rules"
+                :rules="[$common.required, attrs.rules]"
               ></v-text-field>
             </template>
           </date-picker-menu>
@@ -248,6 +253,11 @@
             :folder="projectTender.versioned_folder"
           >
           </file-manager>
+          <v-checkbox 
+            v-model="projectTender.offer_needed" 
+            label="Angebot notwendig"
+          >
+          </v-checkbox>
         </v-col>
       </v-row>
 
@@ -321,7 +331,7 @@ export default class EditProjectTender extends Vue {
 
   public valid = true;
   public projectTender: Partial<ProjectTenderCreation> = {
-    draft: false,
+    draft:false,
     needed_project_roles_counts: {},
     questions: [
       { title: '', description: '', required: false, order: 0}

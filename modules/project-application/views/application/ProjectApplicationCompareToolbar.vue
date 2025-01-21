@@ -1,5 +1,6 @@
 <template>
   <v-toolbar
+    v-if="projectApplications && projectApplications.length"
     :color="comparingApplications.length ? 'cctPurple' : 'grey'"
     v-bind="$attrs"
     v-on="$listeners"
@@ -44,6 +45,9 @@
       outlined
       @click="$emit('compare')">Vergleichen</v-btn>
   </v-toolbar>
+  <div v-else class="no-applications-message">
+    <p>Keine Bewerbungen vorhanden</p>
+  </div>
 </template>
 
 <script lang="ts">
@@ -63,5 +67,11 @@ export default class ProjectApplicationCompareToolbar extends Vue {
 </script>
 
 <style lang="scss">
-
+.no-applications-message {
+  text-align: center;
+  color: grey;
+  padding: 20px;
+  font-weight: bold;  /* Fett gedruckt */
+  font-size: 18px;    /* Schriftgröße etwas erhöht */
+}
 </style>

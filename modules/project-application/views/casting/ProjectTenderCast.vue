@@ -59,7 +59,7 @@
               <tbody>
                 <tr v-for="role in [''].concat(projectRoles)" :key="role">
                   <td class="vertical-text">
-                    {{ $enum('ProjectRoleEnum', role) || 'nicht besetzt' }}
+                    {{ $enum('ProjectRoleEnum', role) || 'Nicht besetzt' }}
                     <template v-if="role">
                       ({{ finalSelection[role].length }}/{{ projectTender.needed_project_roles_counts[role] || 0 }})
                     </template>
@@ -324,7 +324,9 @@ export default class ProjectTenderCast extends Vue {
 
   .vertical-text {
     writing-mode: vertical-rl;
-    text-orientation: mixed;
+     text-align: center;  
+     text-orientation: mixed;
+     padding: 10px;  
   }
 
   .list {
