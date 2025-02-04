@@ -1,3 +1,4 @@
+import { ProjectApplication } from './../../project-application/types/index';
 import { IUserProfile, VersionedFolder } from '@/interfaces';
 import { ProjectTender, IndustryEnum } from '@modules/project-application/types';
 
@@ -24,6 +25,11 @@ export type ProjectReferenceStatusEnum = 'basis' | 'default' | 'extended' | 'con
 export interface ProjectUser {
   participant: IUserProfile;
   role: ProjectRoleEnum;
+}
+
+export interface ProjectApplicationUser {
+  roles: ProjectRoleEnum[];
+  participant_id: number;
 }
 
 export interface ProjectCreate {
@@ -118,7 +124,7 @@ export interface Project {
   
   versioned_folder?: VersionedFolder;
   participants?: { [k: string]: ProjectUser[] };
-  applications?: { [k: string]: ProjectUser[] };
+  applications?: ProjectApplicationUser[];
 
   author?: IUserProfile;
 

@@ -789,7 +789,7 @@ import { Route } from 'vue-router';
 import UserSelect from '@/components/user-select/UserSelect.vue';
 import ConsentDialog from '@/components/consent-dialog/ConsentDialog.vue';
 import DatePickerMenu from '@/components/DatePickerMenu.vue';
-import { FILE_LABELS, Project, ProjectCreate, ProjectCreation } from '../types';
+import { FILE_LABELS, Project, ProjectApplicationUser, ProjectCreate, ProjectCreation, ProjectRoleEnum, ProjectUser } from '../types';
 import { dispatchCreateProject, dispatchDeleteProject, dispatchGetAutocompleteValues, dispatchGetOneProject, dispatchUpdateProject } from '../store/actions';
 import { readAutocompleteValues, readOneProject } from '../store/getters';
 import ProjectCalculation from '../components/ProjectCalculation.vue';
@@ -944,7 +944,7 @@ export default class EditProject extends Vue {
     return {
       ...project,
       participants: Object.fromEntries(Object.entries(project.participants || {}).map(([k,v]) => [k, v.map(u => u.participant.id)])),
-      applications: Object.fromEntries(Object.entries(project.applications || {}).map(([k,v]) => [k, v.map(u => u.participant.id)])),
+      applications: this.convertApplicationsToRoleIds(project.applications || []),
       bt_amount_expected: this.$common.decimal2Text(project.bt_amount_expected), // Anzahl BT(soll)
       bt_amount_actual: this.$common.decimal2Text(project.bt_amount_actual), // Anzahl BT(ist)
       bt_rate: this.$common.decimal2Text(project.bt_rate, 2),
@@ -956,6 +956,14 @@ export default class EditProject extends Vue {
       surcharge_amount_other: this.$common.decimal2Text(project.surcharge_amount_other, 2), // Sonstige,
       bt_amount_bid_preparation: this.$common.decimal2Text(project.bt_amount_bid_preparation),
     };
+  }
+
+  convertApplicationsToRoleIds(projectUser: ProjectApplicationUser[]) {
+    const applications: {[key: string]: number[]} = {};
+    for (const role of this.$enums('ProjectRoleEnum')) {
+      applications[role.value] = projectUser.filter(user => user.roles.includes(role.value as ProjectRoleEnum)).map(user => user.participant_id);
+    }
+    return applications;
   }
 }
 </script>
