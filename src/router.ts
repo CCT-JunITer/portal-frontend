@@ -300,6 +300,11 @@ export default new Router({
               component: RouterComponent,
               children: [
                 {
+                  path: 'legacy',
+                  name: 'legacy',
+                  component: () => import('./views/main/wms/LegacyWMSRedirect.vue'),
+                },
+                {
                   path: 'meetings',
                   name: 'meetings',
                   component: RouterComponent,

@@ -191,17 +191,9 @@ export default class SearchBar extends Vue {
 
   public goToProfile(e) {
     this.clearInput();
-    if (e?.searchType === 'user') {
-      return this.$router.push({ path: '/main/people/profile/view/' + e.id })
-    }
-    if (e?.searchType === 'training' || e?.searchType === 'meeting') {
-      return this.$router.push({ path: '/main/events/' + e.id })
-    }
-    if (e?.searchType === 'document') {
-      return this.$router.push({ path: '/main/wms/documents/edit/' + e.id })
-    }
-    if (e?.searchType === 'project') {
-      return this.$router.push({ path: '/main/wms/projects/' + e.id })
+    const route = this.$common.findRouteForId(e?.searchType, e.id);
+    if (route) {
+      return this.$router.push(route);
     }
     console.error(`unhandled searchtype '${e.searchType}'`);
   }

@@ -3,6 +3,7 @@ import { isSameDay, parseISO } from 'date-fns';
 import { format as formatFns, utcToZonedTime, formatInTimeZone } from 'date-fns-tz';
 import de from 'date-fns/locale/de';
 import { debounce } from './utils';
+import { RawLocation } from 'vue-router';
 
 export { debounce }
 export { formatInTimeZone, parseISO, de, utcToZonedTime };
@@ -216,3 +217,14 @@ export const DOCUMENT_TYPES: { name: string; value: IDocumentType }[] = [
     value: 'templates',
   }
 ]
+
+
+export const findRouteForId = (searchType: string, id: number): RawLocation | null => {
+  return {
+    user: { path: '/main/people/profile/view/' + id },
+    training: { path: '/main/events/' + id },
+    meeting: { path: '/main/events/' + id },
+    document: { path: '/main/wms/documents/edit/' + id },
+    project: { path: '/main/wms/projects/' + id },
+  }[searchType] || null;
+}
