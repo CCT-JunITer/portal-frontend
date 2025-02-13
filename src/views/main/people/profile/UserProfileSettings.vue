@@ -176,7 +176,7 @@
                   v-bind="attrs"
                   v-on="on"
                   required
-                  :rules="[$common.required]"
+                  :rules="[$common.required,...attrs.rules]"
                 ></v-text-field>
               </template>
             </date-picker-menu>
@@ -196,7 +196,7 @@
                   v-bind="attrs"
                   v-on="on"
                   required
-                  :rules="[$common.required]"
+                  :rules="[$common.required,...attrs.rules]"
                 ></v-text-field>
               </template>
             </date-picker-menu>

@@ -24,6 +24,7 @@
           <date-picker-menu
             v-model ="board.start_date"
             defaultPicker="MONTH"
+            
             :pickerProps="{
               min: '1993-01-01',
             }"
@@ -35,7 +36,7 @@
                 v-bind="attrs"
                 v-on="on"
                 prepend-icon="mdi-calendar-start"
-                :rules="attrs.rules"
+                :rules="[...attrs.rules,$common.required]"
               ></v-text-field>
             </template>
           </date-picker-menu>
@@ -53,7 +54,7 @@
                 v-bind="attrs"
                 v-on="on"
                 prepend-icon="mdi-calendar-end"
-                :rules="attrs.rules"
+                :rules="[...attrs.rules,$common.required]"
               ></v-text-field>
             </template>
           </date-picker-menu>

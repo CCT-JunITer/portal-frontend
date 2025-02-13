@@ -26,6 +26,7 @@
                   required
                   v-bind="attrs"
                   v-on="on"
+                  :rules="[...attrs.rules,$common.required]"
                 >
                 </v-text-field>
               </template>
@@ -44,6 +45,7 @@
                   required
                   v-bind="attrs"
                   v-on="on"
+                  :rules="[...attrs.rules]"
                 >
                 </v-text-field>
               </template>

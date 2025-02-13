@@ -25,6 +25,7 @@
             required
             :rules="[$common.required]"
           ></editor-component>
+
           <v-select
             label="Projektrahmen"
             v-model ="project.type"
@@ -35,6 +36,7 @@
             :items="$enums('ProjectTypeEnum')"
             :rules="[$common.required]"
           ></v-select>
+          
           <v-combobox
             v-model="project.subtype"
             prepend-icon="mdi-animation"
@@ -59,18 +61,6 @@
             </template>
           </v-combobox>
 
-          <!-- Branche des Projekts -->
-          <v-select
-            label="Branche"
-            v-model="project.industry"
-            class="input-lg"
-            required
-            prepend-icon="mdi-factory"
-            item-text="text"
-            :items="$enums('IndustryEnum')"
-            :rules="[$common.required]"
-          ></v-select>
-
           <v-combobox
             v-model="project.categories"
             prepend-icon="mdi-animation"
@@ -94,6 +84,20 @@
               </v-list-item>
             </template>
           </v-combobox>
+
+          <!-- Branche des Projekts -->
+          <v-select
+            label="Branche"
+            v-model="project.industry"
+            class="input-lg"
+            required
+            prepend-icon="mdi-factory"
+            item-text="text"
+            :items="$enums('IndustryEnum')"
+            :rules="[onlyRequiredIfExternal]"
+          ></v-select>
+
+          
 
           <v-combobox
             v-model="project.tags"
@@ -351,7 +355,7 @@
                 v-bind="attrs"
                 v-on="on"
                 prepend-icon="mdi-calendar-range"
-                :rules="attrs.rules"
+                :rules="[...attrs.rules, $common.required]"
               ></v-text-field>
             </template>
           </date-picker-menu>
@@ -367,7 +371,7 @@
                 v-bind="attrs"
                 v-on="on"
                 prepend-icon="mdi-calendar-range"
-                :rules="attrs.rules"
+                :rules="[...attrs.rules,onlyRequiredIfStatusIsAborted,onlyRequiredIfStatusIsCompleted]"
               ></v-text-field>
             </template>
           </date-picker-menu>
@@ -401,7 +405,7 @@
                 v-on="on"
                 prepend-icon="mdi-calendar-range"
                 required
-                :rules="attrs.rules"
+                :rules="[...attrs.rules,onlyRequiredIfStatusIsCompleted,onlyRequiredIfStatusIsAborted]"
               ></v-text-field>
             </template>
           </date-picker-menu>
@@ -419,7 +423,7 @@
                 v-on="on"
                 prepend-icon="mdi-calendar-range"
                 required
-                :rules="[$common.required, ...attrs.rules]"
+                :rules="[$common.required, ...attrs.rules,]"
               ></v-text-field>
             </template>
           </date-picker-menu>
@@ -435,7 +439,7 @@
                 v-bind="attrs"
                 v-on="on"
                 prepend-icon="mdi-calendar-range"
-                :rules="attrs.rules"
+                :rules="[...attrs.rules,onlyRequiredIfStatusIsAborted,onlyRequiredIfStatusIsCompleted]"
               ></v-text-field>
             </template>
           </date-picker-menu>
@@ -457,7 +461,7 @@
             prepend-icon="mdi-briefcase"
             suffix="BT"
             required
-            :rules="[$common.isDecimal]" 
+            :rules="[$common.isDecimal,onlyRequiredIfStatusIsCompleted,onlyRequiredIfStatusIsAborted]" 
           ></v-text-field>
 
 
@@ -655,7 +659,7 @@
                 v-bind="attrs"
                 v-on="on"
                 prepend-icon="mdi-calendar-range"
-                :rules="attrs.rules"
+                :rules="[...attrs.rules, referenceDaterequired]"
               ></v-text-field>
             </template>
           </date-picker-menu>
@@ -965,6 +969,29 @@ export default class EditProject extends Vue {
     }
     return applications;
   }
+
+  public get onlyRequiredIfStatusIsCompleted(){
+    return this.project.status === 'completed'
+      ? this.$common.required
+      : v => true;
+  }
+  public get onlyRequiredIfStatusIsAborted(){
+    return this.project.status === 'aborted'
+      ? this.$common.required
+      : v => true;
+  }
+  public get referenceDaterequired(){
+    return (this.project.reference_status !== 'contradiction' && this.project.reference_status !== 'missing_approval' && this.project.status === 'completed' && this.project.type!=='internal' && this.project.type!=='membership_project')
+      ? this.$common.required
+      : v => true;
+  }
+
+  public get onlyRequiredIfExternal(){
+    return (this.project.type === 'external' || this.project.type === 'staffing')
+      ? this.$common.required
+      : v => true;
+  }
+  
 }
 </script>
 

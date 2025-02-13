@@ -95,7 +95,7 @@
                           hide-details
                           v-on="on"
                           required
-                          :rules="[$common.required]"
+                          :rules="[$common.required,...attrs.rules]"
                           :disabled="endtype != 'UNTIL'"
                         ></v-text-field>
                       </template>
