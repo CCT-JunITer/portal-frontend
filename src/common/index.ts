@@ -38,6 +38,7 @@ export const SCHULUNGSMAPPING = [
   { type: 'Zusatzschulung', topics: ['Human Resources', 'Information Technology', 'Marketing & Strategy', 'Quality & Operations', 'Softskills', 'EDV-Fertigkeiten', 'Diversity', 'Sustainability', 'Finanzen'] },
   { type: 'Organisatorische Schulung', topics: ['MP-Schulungen', 'Sonstige', 'AC-Schulung'] },
   { type: 'Ressortskills', topics: ['EC', 'IT', 'QM', 'HR'] },
+  { type: 'Workshop', topics: ['Kurator', 'Sonstige'] },
 ];
 
 export const MEETINGMAPPING = [

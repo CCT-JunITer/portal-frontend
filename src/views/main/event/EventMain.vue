@@ -116,7 +116,7 @@ export default class EventMain extends Vue {
 
   public get typeName() {
     return {
-      'training': 'Training',
+      'training': 'Wissenvermittlung',
       'meeting': 'Meeting'
     }[this.type];
   }
