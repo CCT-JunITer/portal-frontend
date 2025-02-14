@@ -61,7 +61,7 @@
       </div>
       <template v-else>
         <div
-          v-for="category of allLabels"
+          v-for="[category, files] of Object.entries(effectiveFiles)"
           :key="category"
         >
           <file-chip-group 
@@ -69,7 +69,7 @@
             <file-chip
               :key="file.file_id"
               :file="file"
-              v-for="file in effectiveFiles[category]"
+              v-for="file in files"
               @[readonly?null:`delete-file`]="removeFile"
               :noLabel="true"
             >
@@ -154,10 +154,11 @@ export default class FileManager extends Vue {
   public missingFiles = {};
 
   get allLabels() {
-    return new Set(
+    const labelset = new Set(
       [...(this.labels || []), ...(this.versionedFolder?.effective_files.map(file => file.label) || [])]
         .filter(c => c !== null)
     )
+    return labelset;
   }
 
   get effectiveFiles() {
