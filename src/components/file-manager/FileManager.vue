@@ -75,7 +75,7 @@
             >
             </file-chip>
           </file-chip-group>
-          <div class="d-flex align-center ml-3">
+          <div class="d-flex align-center ml-3" v-if="category">
             <v-btn
               small
               rounded
