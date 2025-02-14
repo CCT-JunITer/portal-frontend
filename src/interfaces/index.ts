@@ -41,7 +41,7 @@ export interface IUserProfile {
 
     admin_comment?: string;
 
-    user_streaks: UserStreak[];
+    user_streaks?: UserStreak[];
 }
 
 export interface IUserProfileUpdate {

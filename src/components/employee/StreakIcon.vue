@@ -34,7 +34,7 @@ export default class StreakIcon extends Vue {
   public streaks!: UserStreak[];
 
   get streaksSorted() {
-    return this.streaks.sort((a, b) => new Date(b.streak_start).getTime() - new Date(a.streak_start).getTime()) || [];
+    return this.streaks?.sort((a, b) => new Date(b.streak_start).getTime() - new Date(a.streak_start).getTime()) || [];
   }
 
   get lastDoSi() {
@@ -46,7 +46,7 @@ export default class StreakIcon extends Vue {
       return false;
     }
 
-    return this.streaksSorted.length > 0 && 
+    return this.streaksSorted?.length > 0 && 
       new Date(this.streaksSorted[0].streak_end) === new Date(this.lastDoSi.date_from)
       && this.streaksSorted[0].streak_length >= 3;
   }
