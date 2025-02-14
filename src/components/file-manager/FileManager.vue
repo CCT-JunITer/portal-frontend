@@ -59,7 +59,7 @@
           </file-chip>
         </file-chip-group>
       </div>
-      <template v-else>
+      <template v-else-if="allLabels.size !== 0">
         <div
           v-for="category of allLabels"
           :key="category"
@@ -69,7 +69,7 @@
             <file-chip
               :key="file.file_id"
               :file="file"
-              v-for="file in files"
+              v-for="file in effectiveFiles[category]"
               @[readonly?null:`delete-file`]="removeFile"
               :noLabel="true"
             >
@@ -115,6 +115,24 @@
           </div>
         </div>
       </template>
+      <template v-else>
+        <div
+          v-for="[category, files] of Object.entries(effectiveFiles)"
+          :key="category"
+        >
+          <file-chip-group 
+            :label="category">
+            <file-chip
+              :key="file.file_id"
+              :file="file"
+              v-for="file in files"
+              @[readonly?null:`delete-file`]="removeFile"
+              :noLabel="true"
+            >
+            </file-chip>
+          </file-chip-group>
+        </div>
+      </template>
     </div>
   </v-sheet>
   <div v-else-if="versionedFolder">
@@ -154,13 +172,10 @@ export default class FileManager extends Vue {
   public missingFiles = {};
 
   get allLabels() {
-    let labelset = new Set(
+    const labelset = new Set(
       [...(this.labels || []), ...(this.versionedFolder?.effective_files.map(file => file.label) || [])]
         .filter(c => c !== null)
     )
-    if(labelset.size === 0){
-      labelset = new Set([''])
-    }
     return labelset;
   }
 
@@ -171,6 +186,7 @@ export default class FileManager extends Vue {
     if (!this.labels) {
       return { '': this.versionedFolder.effective_files };
     }
+    console.log(this.versionedFolder.effective_files)
     return this.versionedFolder.effective_files.reduce((prev, curr) => {
       if (this.labels && !this.labels.includes(curr.label || '')) {
         return prev;
