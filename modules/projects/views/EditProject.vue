@@ -94,7 +94,7 @@
             prepend-icon="mdi-factory"
             item-text="text"
             :items="$enums('IndustryEnum')"
-            :rules="[onlyRequiredIfExternal]"
+            :rules="[$common.required]"
           ></v-select>
 
           
