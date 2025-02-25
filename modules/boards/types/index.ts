@@ -9,6 +9,8 @@ export const FILE_LABELS = [
   'Managementbericht',
   'Internes Audit',
   'BDSU Audit',
+  'ISO Audit',
+  'Sonstiges',
 ]
 
 export const FILE_LABELS_TABLE = [
