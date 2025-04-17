@@ -14,26 +14,11 @@
         <div class="d-flex align-center">
           <div>
             <div class="text-caption mb-1" v-if="document.author">
-              erstellt von <span v-if="document.last_updated_by">
-                <v-chip
-                  class="trainer-chip"
-                  color="lightgrey"
-                >
-                  <v-avatar left>
-                    <employee-profile-picture
-                      :employee="document.last_updated_by"
-                    ></employee-profile-picture>
-                  </v-avatar>
-                  {{ document.last_updated_by.full_name }}
-                </v-chip>
-              </span>
+              erstellt von <user-chip :user="document.author" small></user-chip>
             </div>
             <div class="text-caption">
               zuletzt bearbeitet
               <span v-if="document.last_updated_by">von <user-chip :user="document.last_updated_by" small></user-chip></span>
-              <!-- <span v-if="board.approved_by && board.approved">
-              und zuletzt bestätigt durch <user-chip :user="board.approved_by" small></user-chip>
-            </span> -->
               <span v-if="document.date_last_updated">
                 {{ $common.format(new Date(document.date_last_updated), `'am' dd.MM.yyyy 'um' HH:mm`) }}
               </span>
@@ -74,9 +59,10 @@ import FileManager from '@/components/file-manager/FileManager.vue';
 import DateTimePickerMenu from '@/components/DateTimePickerMenu.vue';
 import { Route } from 'vue-router';
 import ConsentDialog from '@/components/consent-dialog/ConsentDialog.vue';
+import UserChip from '@/components/user-chip/UserChip.vue';
 
 @Component({
-  components: {VueTelInputVuetify, UploadButton, DateTimePickerMenu, EmployeeProfilePicture, FileManager, ConsentDialog },
+  components: {VueTelInputVuetify, UploadButton, DateTimePickerMenu, EmployeeProfilePicture, FileManager, ConsentDialog, UserChip },
 })
 export default class EditDocument extends Vue {
   public valid = false;
