@@ -250,7 +250,7 @@ export default class UserProfileRessortChange extends Vue {
     if ((this.$refs.form as HTMLFormElement).validate()) {
       //
       const requestCreate: RequestCreate = {
-        description: 'Alumnisierung',
+        description: 'requestype: Alumnisierung',
         groups: [],
       };
       const updatedProfile: IUserProfileUpdate = {

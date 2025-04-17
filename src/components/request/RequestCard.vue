@@ -21,7 +21,8 @@
       </v-list-item>
     </v-list>
     <v-card-text>
-      <div v-text="request.description" class="pre-formatted"></div>
+      <div v-if="request.description==='requestype: Alumnisierung'" v-text="'Alumnisierung'" class="pre-formatted"></div>
+      <div v-else v-text="request.description" class="pre-formatted"></div>
     </v-card-text>
     <v-card-actions>
       <v-list-item>

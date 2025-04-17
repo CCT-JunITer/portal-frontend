@@ -5,13 +5,18 @@
     max-width="600px"
   >
     <template v-slot:activator="{ on, attrs }">
-      <v-btn color="cctOrange" outlined v-on="on" v-bind="attrs">
+      <v-btn v-if="request" outlined color="green" small v-on="on" v-bind="attrs">
+        Annehmen
+      </v-btn>
+      <v-btn v-else color="cctOrange" outlined v-on="on" v-bind="attrs">
         <v-icon left>
           mdi-school
         </v-icon>
         Alumnisierung und Account
       </v-btn>
+      
     </template>
+    
     <v-card>
       <v-card-title>
         <span class="text-h5">Alumnisierung</span>
@@ -146,8 +151,9 @@
 </template>
 
 <script lang="ts">
-import { Group, IUserProfile } from '@/interfaces';
+import { Group, IUserProfile,Request } from '@/interfaces';
 import { dispatchDeleteUser, dispatchUpdateUserState } from '@/store/admin/actions';
+import {  dispatchApplyRequest } from '@/store/admin/actions';
 import { Vue, Component, Prop } from 'vue-property-decorator'
 
 @Component({})
@@ -167,11 +173,17 @@ export default class DeleteDialog extends Vue {
   @Prop()
   public userProfile!: IUserProfile;
 
+  @Prop()
+  public request:Request|null = null;
+
   public async deleteAccount() {
     if ((this.$refs.groupForm as HTMLFormElement).validate()){
       await dispatchDeleteUser(this.$store, this.userProfile.id)
       if (!this.skipDeactivate) {
         await dispatchUpdateUserState(this.$store, { id: this.userProfile.id, state: 'deactivate' })
+      }
+      if(this.request){
+        await dispatchApplyRequest(this.$store, { requestId: this.request.id, accepted:true });
       }
       this.dialogOpen = false;
     }

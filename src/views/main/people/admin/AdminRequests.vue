@@ -17,13 +17,16 @@
       <v-row>
         <v-col v-for="request in requests" :key="request.id" cols="12" md="6">
           <request-card :request="request">
-            <template v-slot:actions>
-              <v-btn outlined color="green" small @click="applyRequest(request.id, true)">
+            <template v-slot:actions v-if="request.description !=='requestype: Alumnisierung'">
+              <v-btn outlined color="green" small @click="applyRequest(request, true)">
                 Annehmen
               </v-btn>
-              <v-btn outlined color="red" small @click="applyRequest(request.id, false)">
+              <v-btn outlined color="red" small @click="applyRequest(request, false)">
                 Ablehnen
               </v-btn>
+            </template>
+            <template v-slot:actions v-else>
+              <delete-dialog :userProfile="request.user" :request="request"/>
             </template>
           </request-card>
         </v-col>
@@ -33,6 +36,7 @@
 </template>
 
 <script lang="ts">
+import DeleteDialog from './DeleteDialog.vue'
 import RequestCard from '@/components/request/RequestCard.vue';
 import { dispatchAdminRequests, dispatchApplyRequest } from '@/store/admin/actions';
 import { readAdminRequests } from '@/store/admin/getters';
@@ -42,7 +46,7 @@ import { Request } from '@/interfaces';
 
 @Component({
   components: {
-    RequestCard
+    RequestCard, DeleteDialog
   }
 })
 export default class AdminRequests extends Vue {
@@ -59,10 +63,7 @@ export default class AdminRequests extends Vue {
   }
 
   async applyRequest(request: Request, accepted: boolean) {
-    if (request.description === 'Alumni') {
-      //tbd: show alumnisierungs-form popoup (same as in profile when clicking "Alumnisieren")
-      return;
-    }
+    
     await dispatchApplyRequest(this.$store, { requestId: request.id, accepted });
   }
 }
