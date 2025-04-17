@@ -341,6 +341,11 @@ export default new Router({
                       name: 'document-edit',
                       component: () => import('./views/main/document/EditDocument.vue'),
                     },
+                    {
+                      path: 'detail/:id',
+                      name: 'document-detail',
+                      component: () => import('./views/main/document/DocumentDetail.vue'),
+                    },
                   ]
                 }
               ]

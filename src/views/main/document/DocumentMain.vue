@@ -31,7 +31,7 @@
           <v-btn 
             color="cctGrey"
             outlined
-            :to="{ name: 'document-edit', params: { id: item.id } }"
+            :to="{ name: 'document-detail', params: { id: item.id } }"
           >
             <v-icon>
               mdi-text
