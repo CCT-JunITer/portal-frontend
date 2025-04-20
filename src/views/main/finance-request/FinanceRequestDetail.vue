@@ -174,13 +174,15 @@
               >
                 {{this.financeRequest.author.full_name}} hat einen Finanzantrag gestellt. Prüfe die Angaben und drücke auf annehmen/ablehnen.
               </v-alert>
-              <div class="d-flex justify-space-around">
-                <v-btn outlined large :class="{'btn-accept-active': isAccepted}" color="#66BB6A" small @click="isAccepted = true">
-                  Annehmen
-                </v-btn>
-                <v-btn outlined large color="#EF5350" :class="{'btn-decline-active': !isAccepted}" small @click="isAccepted = false">
-                  Ablehnen
-                </v-btn>
+              <div class="d-flex ">
+                <v-btn-toggle >
+                  <v-btn outlined large :class="{'btn-accept-active': isAccepted}" color="#66BB6A" small @click="isAccepted = true">
+                    Annehmen
+                  </v-btn>
+                  <v-btn outlined large color="#EF5350" :class="{'btn-decline-active': !isAccepted}" small @click="isAccepted = false">
+                    Ablehnen
+                  </v-btn>
+                </v-btn-toggle>
               </div>
               
               <v-textarea 
@@ -191,7 +193,7 @@
               
               <div class="d-flex justify-end">
                 <v-btn color="primary" @click="changeStatusCreated()">
-                  Abschicken
+                  Status Update Abschicken
                 </v-btn>
               </div>
             </div>
@@ -267,12 +269,14 @@
               </v-alert>
               <file-manager :value="this.currentFiles" class="my-2" :readonly="true" v-if="this.financeRequest.files"></file-manager>
               <div class="d-flex justify-space-around">
-                <v-btn outlined large :class="{'btn-accept-active': isAccepted}" color="#66BB6A" small @click="isAccepted = true">
-                  Annehmen
-                </v-btn>
-                <v-btn outlined large color="#EF5350" :class="{'btn-decline-active': !isAccepted}" small @click="isAccepted = false">
-                  Ablehnen
-                </v-btn>
+                <v-btn-toggle >
+                  <v-btn outlined large :class="{'btn-accept-active': isAccepted}" color="#66BB6A" small @click="isAccepted = true">
+                    Annehmen
+                  </v-btn>
+                  <v-btn outlined large color="#EF5350" :class="{'btn-decline-active': !isAccepted}" small @click="isAccepted = false">
+                    Ablehnen
+                  </v-btn>
+                </v-btn-toggle>
               </div>
               <v-textarea 
                 :disabled="isAccepted"
@@ -281,7 +285,7 @@
               ></v-textarea>
               <div class="d-flex justify-end">
                 <v-btn color="primary" @click="changeStatusFileUploaded()">
-                  Abschicken
+                  Status Update Abschicken
                 </v-btn>
               </div>
             </div>
