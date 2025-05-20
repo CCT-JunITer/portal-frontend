@@ -327,6 +327,7 @@ export default class FileManager extends Vue {
   border-radius: 8px;
   width: 100%;
   position: relative;
+  padding-bottom:10px;
 }
 
 </style>

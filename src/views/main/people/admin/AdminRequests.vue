@@ -42,6 +42,7 @@ import { dispatchAdminRequests, dispatchApplyRequest } from '@/store/admin/actio
 import { readAdminRequests } from '@/store/admin/getters';
 import { Vue, Component } from 'vue-property-decorator';
 import { Request } from '@/interfaces';
+import test from '@playwright/test';
 
 
 @Component({

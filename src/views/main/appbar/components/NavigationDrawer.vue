@@ -142,6 +142,21 @@
           <v-list-item-title>Finanzanträge</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
+      <v-list-group group="qm" style="pa-0" prepend-icon="mdi-folder-open">
+        <template v-slot:activator>
+          <v-list-item-content>
+            <v-list-item-title>QM-Tools</v-list-item-title>
+          </v-list-item-content>
+        </template>
+        <v-list-item to="/main/qmsa" class="ml-2">
+          <v-list-item-icon>
+            <v-icon>mdi-check-decagram</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>QM Checker</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list-group>
 
       <v-list-item to="/main/admin/dashboard" color="cctOrange" v-if="hasAdminAccess">
         <v-list-item-icon>
