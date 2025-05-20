@@ -822,19 +822,22 @@ export default class EditProject extends Vue {
   public searchTags = '';
 
   public get requiredLabels() {
+    if(this.project.type === 'membership_project' && this.project.status === 'completed'){
+      return this.fileLabels.filter(label => label !== 'KFB' && label !== 'Referenzfreigabe' && label !== 'Referenzfolien')
+    }
     if (this.project.nda && this.project.status !== 'completed') {
       return [];
     }
 
     if (this.project.nda) {
-      return this.fileLabels.filter(label => label !== 'Angebotspräsentation' && label !== 'Referenzfreigabe' && label !== 'Referenzfolien');
+      return this.fileLabels.filter(label => label !== 'Angebotspräsentation' && label !== 'Referenzfreigabe' && label !== 'Referenzfolien').filter(label => (label === 'KFB'? this.project.kfb_status === 'closed_status':true));
     }
 
     if (this.project.status !== 'completed') {
       return this.fileLabels.filter(label => label === 'Angebotspräsentation');
     }
 
-    return this.fileLabels;
+    return this.fileLabels.filter(label => (label === 'KFB'? this.project.kfb_status === 'closed_status':true));
   }
 
 

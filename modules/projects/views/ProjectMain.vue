@@ -176,6 +176,7 @@ export default class ProjectMain extends Vue {
         value: 'reference_status',
         text: 'Status der Referenzfreigabe',
         values: this.$enums('ProjectReferenceStatusEnum'),
+        multiple: true,
       },
       {
         value: 'customer_name',
@@ -228,6 +229,7 @@ export default class ProjectMain extends Vue {
       ?.filter(filter('methods'))
       ?.filter(filter('tags'))
       ?.filter(filter('customer_name'))
+      ?.filter(filter('reference_status'))
       
   }
 

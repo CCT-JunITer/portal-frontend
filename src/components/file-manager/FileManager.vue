@@ -97,7 +97,8 @@
                 outlined
                 label="Grund für fehlende Datei"
                 dense
-                :rules="[v => !!v || 'Diese Datei wird benötigt']"
+                :rules="[v => !!v || 'Diese Datei wird benötigt',
+                         effectiveFiles[category]||'Klicke das Plus!']"
               >
                 <template v-slot:append-outer>
                   <v-btn
