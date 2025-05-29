@@ -8,7 +8,7 @@
 
       <v-col cols="12" md="8" class="px-5">
         <h1 class="text-h2 text--primary mb-3">
-          <!-- <v-icon v-if="this.board.approved" color="cctGreen" x-large>mdi-check-decagram</v-icon> -->
+          <v-icon v-if="document.approved" color="cctGreen" x-large>mdi-check-decagram</v-icon> 
           {{ document.title }}
         </h1>
         <div class="d-flex align-center">

@@ -156,6 +156,14 @@
             <v-list-item-title>QM Checker</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
+        <v-list-item to="/main/dokumentenlenkung" class="ml-2" v-if="hasAnyPermission(['portal.approve'])">
+          <v-list-item-icon>
+            <v-icon>mdi-file-check</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Dokumentenlenkung</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
       </v-list-group>
 
       <v-list-item to="/main/admin/dashboard" color="cctOrange" v-if="hasAdminAccess">
