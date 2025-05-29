@@ -6,11 +6,85 @@
       </v-toolbar-title>
     </v-toolbar>
     <v-container class="mb-0 pb-0">
-      <h6 class="text-overline mb-1" v-if="projects.length > 0">Sitzungen / Schulungen</h6>
+      <h6 class="text-overline mb-1" v-if="projects.length > 0">Schulungen</h6>
       <v-expansion-panels
         multiple
       >
-        <v-expansion-panel v-for="event in events" :key="'e'+event.id">
+        <v-expansion-panel v-for="event in trainings" :key="'e'+event.id">
+          <v-expansion-panel-header>{{event.title}}({{event.subtype}})</v-expansion-panel-header>
+          <v-expansion-panel-content>
+            <div class="text-caption">
+              zuletzt bearbeitet
+              <span v-if="event.last_updated_by">von <user-chip :user="event.last_updated_by" small></user-chip></span>
+              <span v-if="event.date_last_updated">
+                {{ $common.format(new Date(event.date_last_updated), `'am' dd.MM.yyyy 'um' HH:mm`) }}
+              </span>
+            </div>
+            <v-row>
+              <v-col>{{event.description}}</v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="12" md="4">
+                <v-card outlined>
+                  
+                  <v-list dense>
+                    <div>
+                      
+                      <v-subheader>Leitung</v-subheader>
+                      <user-list-item 
+                        v-for="leader in event.leaders" 
+                        :key="leader.id"
+                        :user="leader"
+                        dense
+                      >
+                      </user-list-item>
+                    </div>
+                    <div>
+                      <v-divider inset></v-divider>
+                      <v-subheader>Teilnemende</v-subheader>
+                      <user-list-item 
+                        v-for="participant in event.participants" 
+                        :key="participant.id"
+                        :user="participant"
+                        dense
+                      >
+                      </user-list-item>
+                    </div>
+                  </v-list>
+                </v-card>
+              </v-col>
+              <v-col cols="12" md="4">
+                <file-manager v-model="event.files" :folder="event.versioned_folder" :labels="fileLabels" :readonly="true" class="full-height">
+                </file-manager>
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-card outlined>
+                  
+                  <v-list dense>
+                    <v-subheader>Agenda</v-subheader>
+                    <v-list-item v-for="(element, index) in event.agenda" :key="index">
+                      <b>{{ index + 1 }}</b> {{ element }}
+                    </v-list-item>
+                  </v-list>
+                </v-card>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-spacer></v-spacer>
+              <v-btn outlined color="cctGreen" small @click="approveEvent(event.id)">
+                Approve <v-icon color="cctGreen" x-small>mdi-check-decagram</v-icon> 
+              </v-btn>
+            </v-row>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-expansion-panels>
+    </v-container>
+    <v-container class="mb-0 pb-0">
+      <h6 class="text-overline mb-1" v-if="projects.length > 0">Sitzungen</h6>
+      <v-expansion-panels
+        multiple
+      >
+        <v-expansion-panel v-for="event in meetings" :key="'e'+event.id">
           <v-expansion-panel-header>{{event.title}}({{event.subtype}})</v-expansion-panel-header>
           <v-expansion-panel-content>
             <div class="text-caption">
@@ -231,8 +305,11 @@ export default class DokumentenlenkungView extends Vue {
   get projects(){
     return readUnapprovedProjects(this.$store);
   }
-  get events(){
-    return readUnapprovedEvents(this.$store);
+  get trainings(){
+    return readUnapprovedEvents(this.$store).filter(event => event.type === 'training');
+  }
+  get meetings(){
+    return readUnapprovedEvents(this.$store).filter(event => event.type === 'meeting');
   }
 
   public async approveProject(projectid:number){
@@ -259,7 +336,6 @@ export default class DokumentenlenkungView extends Vue {
       await dispatchGetUnapprovedDocuments(this.$store);
       await dispatchGetUnapprovedProjects(this.$store);
       await dispatchGetUnapprovedEvents(this.$store);
-      console.log(this.events)
     }
   }
 
