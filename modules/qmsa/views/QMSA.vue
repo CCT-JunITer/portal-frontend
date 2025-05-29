@@ -401,7 +401,8 @@ export default class QmsaView extends Vue {
       let text ={};
 
       let slideguides =[...this.guides]
-      let sldobjects = slide_json['p:sld']['p:cSld']['p:spTree']['p:sp'];
+      let sldobjects = Array.isArray(slide_json['p:sld']['p:cSld']['p:spTree']['p:sp'])? slide_json['p:sld']['p:cSld']['p:spTree']['p:sp']:[slide_json['p:sld']['p:cSld']['p:spTree']['p:sp']]
+      
       //console.log('sptree',slide_json['p:sld']['p:cSld']['p:spTree'])
       if(slide_json['p:sld']['p:cSld']['p:spTree']['p:grpSp']){
         if(Array.isArray(slide_json['p:sld']['p:cSld']['p:spTree']['p:grpSp'])){
@@ -476,7 +477,7 @@ export default class QmsaView extends Vue {
           
           slidetype = layoutJson['p:sldLayout']['p:cSld']['_attributes']['name']
           
-          const layoutsp = layoutJson['p:sldLayout']['p:cSld']['p:spTree']['p:sp']
+          const layoutsp = Array.isArray(layoutJson['p:sldLayout']['p:cSld']['p:spTree']['p:sp'])? layoutJson['p:sldLayout']['p:cSld']['p:spTree']['p:sp']:[layoutJson['p:sldLayout']['p:cSld']['p:spTree']['p:sp']]
           let layoutguides = layoutJson['p:sldLayout']?.['p:extLst']?.['p:ext']?.['p15:sldGuideLst']?.['p15:guide']
           subtitle = this.extracttitles(slide_json,layoutJson)
           if(layoutguides){
@@ -518,7 +519,8 @@ export default class QmsaView extends Vue {
 
   private analyseActiontitle(slide_json){
     const actiotitle_object = {'hasTitle':false,'correctAlignment':false,'noEndChar':false,'text':'','doublespaces':false,id:'','iscorrect':false}
-    const action_title =slide_json['p:sld']['p:cSld']['p:spTree']['p:sp'].find((slideobject) => slideobject['p:nvSpPr']?.['p:nvPr']?.['p:ph']?.['_attributes']?.['type'] === 'title')
+    const slidesp = Array.isArray(slide_json['p:sld']['p:cSld']['p:spTree']['p:sp'])? slide_json['p:sld']['p:cSld']['p:spTree']['p:sp']:[slide_json['p:sld']['p:cSld']['p:spTree']['p:sp']]
+    const action_title =slidesp.find((slideobject) => slideobject['p:nvSpPr']?.['p:nvPr']?.['p:ph']?.['_attributes']?.['type'] === 'title')
     let action_title_text ='';
     let action_title_object =action_title?.['p:txBody']?.['a:p']?.['a:r']
     if(Array.isArray(action_title?.['p:txBody']?.['a:p'])){
@@ -552,8 +554,12 @@ export default class QmsaView extends Vue {
 
   private extracttitles(slide_json,layoutJson){
     const subtitle = {'id':'','text':'','size':0,'color':'','correct':false,'allcaps':false}
-    const ph = layoutJson['p:sldLayout']['p:cSld']['p:spTree']['p:sp'].find((slideobject) => (slideobject['p:txBody']?.['a:p']?.['a:r']?.['a:t']?.['_text'] === 'Überschrift')||(slideobject['p:txBody']?.['a:p']?.['a:r']?.['a:t']?.['_text'] === 'PROJEKTBESETZUNG'));
-    const sldsp = slide_json['p:sld']['p:cSld']['p:spTree']['p:sp']
+    let ph = null;
+    const layoutsp = Array.isArray(layoutJson['p:sldLayout']['p:cSld']['p:spTree']['p:sp'])? layoutJson['p:sldLayout']['p:cSld']['p:spTree']['p:sp']:[layoutJson['p:sldLayout']['p:cSld']['p:spTree']['p:sp']]
+    if(layoutsp){
+      ph = layoutsp?.find((slideobject) => (slideobject['p:txBody']?.['a:p']?.['a:r']?.['a:t']?.['_text'] === 'Überschrift')||(slideobject['p:txBody']?.['a:p']?.['a:r']?.['a:t']?.['_text'] === 'PROJEKTBESETZUNG'));
+    }
+    const sldsp = Array.isArray(slide_json['p:sld']['p:cSld']['p:spTree']['p:sp'])? slide_json['p:sld']['p:cSld']['p:spTree']['p:sp']:[slide_json['p:sld']['p:cSld']['p:spTree']['p:sp']]
     //console.log(sldsp)
     if(ph){
       const subtitle_object = sldsp.find(object => object['p:nvSpPr']?.['p:nvPr']?.['p:ph']?.['_attributes']?.['type'] === ph?.['p:nvSpPr']?.['p:nvPr']?.['p:ph']?.['_attributes']?.['type']  && object['p:nvSpPr']?.['p:nvPr']?.['p:ph']?.['_attributes']?.['idx'] === ph?.['p:nvSpPr']?.['p:nvPr']?.['p:ph']?.['_attributes']?.['idx']  )
