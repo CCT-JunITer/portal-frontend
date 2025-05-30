@@ -6,7 +6,7 @@
       </v-toolbar-title>
     </v-toolbar>
     <v-container class="mb-0 pb-0">
-      <h6 class="text-overline mb-1" v-if="projects.length > 0">Schulungen</h6>
+      <h6 class="text-overline mb-1" v-if="trainings.length > 0">Schulungen</h6>
       <v-expansion-panels
         multiple
       >
@@ -80,7 +80,7 @@
       </v-expansion-panels>
     </v-container>
     <v-container class="mb-0 pb-0">
-      <h6 class="text-overline mb-1" v-if="projects.length > 0">Sitzungen</h6>
+      <h6 class="text-overline mb-1" v-if="meetings.length > 0">Sitzungen</h6>
       <v-expansion-panels
         multiple
       >
