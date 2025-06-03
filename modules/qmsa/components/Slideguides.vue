@@ -1,5 +1,13 @@
 <template>
   <div class="line-container">
+    
+    <div 
+      v-for="(item, index) in sideobjects"
+      :key="item.id+ 'and' + index"
+      class="box"
+      :style="boxStyle(item)"
+      :class="{'errorbox': objektIntersect(item)}"
+    ></div>
     <div
       v-for="item in guides"
       :key="item.id+ ' ' + item.pos"
@@ -15,13 +23,6 @@
         :style="lineStyle(item.pos,'vertical')">
       </div>
     </div>
-    <div 
-      v-for="(item, index) in sideobjects"
-      :key="item.id+ 'and' + index"
-      class="box"
-      :style="boxStyle(item)"
-      :class="{'errorbox': objektIntersect(item)}"
-    ></div>
   </div>
 </template>
 
@@ -180,8 +181,8 @@ export default class SlideguidesView extends Vue {
   border: 2p solid black;
 }
 .errorbox{
-  border: 2px solid red !important;
-  background-color: rgba(255, 133, 133, 0.9) !important;
+  border: 2px solid rgb(255, 0, 0,0.7) !important;
+  background-color: rgba(255, 0, 0, 0.3) !important;
 }
 .box.test{
   top: 0%;
