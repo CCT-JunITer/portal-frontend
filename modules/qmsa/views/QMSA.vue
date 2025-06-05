@@ -19,7 +19,7 @@
         v-model="files"
       ></v-file-input>
     </template>
-    <v-container class="grey lighten-5">
+    <v-container class="grey lighten-5" v-if="slidelist.length > 0">
       <v-expansion-panels
         v-model="panel"
         multiple
@@ -228,6 +228,19 @@
         </v-expansion-panel>
       </v-expansion-panels>
     </v-container>
+    <v-container
+      class="d-flex justify-center align-center"
+      style="height: 70vh;"
+      v-else
+    >
+      <span v-if="!loading">No Presetation is Selected</span>
+      <v-progress-circular
+        v-else
+        indeterminate
+        color="primary"
+        size="100"
+      ></v-progress-circular>
+    </v-container>
   </div>  
   
 </template>
@@ -250,6 +263,7 @@ export default class QmsaView extends Vue {
   public panel:any = [];
   public mastersz = 0;
   public masterfont = ''
+  public loading = false
 
 
   public close(){
@@ -261,12 +275,17 @@ export default class QmsaView extends Vue {
   // Handle File Selection
   private async onFileChange(event:any): Promise<any> {
     if (this.files ) {
+      this.loading = true
       const file = this.files
       const zip = new JSZip();
       const zipData = await file.arrayBuffer();
       const zipContents =  zip.load(zipData)
       this.parsepres(zipContents.files)
       this.parseslides(zipContents.files)
+      this.loading = false
+    }
+    else{
+      this.slidelist = []
     }
     
   }
@@ -538,7 +557,7 @@ export default class QmsaView extends Vue {
   private analyseActiontitle(slide_json){
     const actiotitle_object = {'hasTitle':false,'correctAlignment':false,'noEndChar':false,'text':'','doublespaces':false,id:'','iscorrect':false}
     const slidesp = Array.isArray(slide_json['p:sld']['p:cSld']['p:spTree']['p:sp'])? slide_json['p:sld']['p:cSld']['p:spTree']['p:sp']:[slide_json['p:sld']['p:cSld']['p:spTree']['p:sp']]
-    const action_title =slidesp.find((slideobject) => slideobject['p:nvSpPr']?.['p:nvPr']?.['p:ph']?.['_attributes']?.['type'] === 'title')
+    const action_title =slidesp.find((slideobject) => slideobject?.['p:nvSpPr']?.['p:nvPr']?.['p:ph']?.['_attributes']?.['type'] === 'title')
     let action_title_text ='';
     let action_title_object =action_title?.['p:txBody']?.['a:p']?.['a:r']
     if(Array.isArray(action_title?.['p:txBody']?.['a:p'])){
@@ -575,11 +594,12 @@ export default class QmsaView extends Vue {
     let ph = null;
     const layoutsp = Array.isArray(layoutJson['p:sldLayout']['p:cSld']['p:spTree']['p:sp'])? layoutJson['p:sldLayout']['p:cSld']['p:spTree']['p:sp']:[layoutJson['p:sldLayout']['p:cSld']['p:spTree']['p:sp']]
     if(layoutsp){
-      ph = layoutsp?.find((slideobject) => (slideobject['p:txBody']?.['a:p']?.['a:r']?.['a:t']?.['_text'] === 'Überschrift')||(slideobject['p:txBody']?.['a:p']?.['a:r']?.['a:t']?.['_text'] === 'PROJEKTBESETZUNG'));
+      ph = layoutsp?.find((slideobject) => (slideobject?.['p:txBody']?.['a:p']?.['a:r']?.['a:t']?.['_text'] === 'Überschrift')||(slideobject?.['p:txBody']?.['a:p']?.['a:r']?.['a:t']?.['_text'] === 'PROJEKTBESETZUNG'));
     }
-    const sldsp = Array.isArray(slide_json['p:sld']['p:cSld']['p:spTree']['p:sp'])? slide_json['p:sld']['p:cSld']['p:spTree']['p:sp']:[slide_json['p:sld']['p:cSld']['p:spTree']['p:sp']]
+    let sldsp = Array.isArray(slide_json['p:sld']['p:cSld']['p:spTree']['p:sp'])? slide_json['p:sld']['p:cSld']['p:spTree']['p:sp']:[slide_json['p:sld']['p:cSld']['p:spTree']['p:sp']]
+    sldsp = sldsp.filter(a => a)
     if(ph){
-      const subtitle_object = sldsp.find(object => object['p:nvSpPr']?.['p:nvPr']?.['p:ph']?.['_attributes']?.['type'] === ph?.['p:nvSpPr']?.['p:nvPr']?.['p:ph']?.['_attributes']?.['type']  && object['p:nvSpPr']?.['p:nvPr']?.['p:ph']?.['_attributes']?.['idx'] === ph?.['p:nvSpPr']?.['p:nvPr']?.['p:ph']?.['_attributes']?.['idx']  )
+      const subtitle_object = sldsp.find(object => object?.['p:nvSpPr']?.['p:nvPr']?.['p:ph']?.['_attributes']?.['type'] === ph?.['p:nvSpPr']?.['p:nvPr']?.['p:ph']?.['_attributes']?.['type']  && object?.['p:nvSpPr']?.['p:nvPr']?.['p:ph']?.['_attributes']?.['idx'] === ph?.['p:nvSpPr']?.['p:nvPr']?.['p:ph']?.['_attributes']?.['idx']  )
       if(!subtitle_object){
         return subtitle;
       }
@@ -595,7 +615,7 @@ export default class QmsaView extends Vue {
 
     }
     else{
-      const subtitle_object = sldsp.find(object => (680000 <= parseInt(object['p:spPr']?.['a:xfrm']?.['a:off']?.['_attributes']?.['x']))  && (parseInt(object['p:spPr']?.['a:xfrm']?.['a:off']?.['_attributes']?.['x']) <= 780000 ) && (1230000 <= parseInt(object['p:spPr']?.['a:xfrm']?.['a:off']?.['_attributes']?.['y']))  && (parseInt(object['p:spPr']?.['a:xfrm']?.['a:off']?.['_attributes']?.['x']) <= 1330000 ))
+      const subtitle_object = sldsp.find(object => (680000 <= parseInt(object?.['p:spPr']?.['a:xfrm']?.['a:off']?.['_attributes']?.['x']))  && (parseInt(object?.['p:spPr']?.['a:xfrm']?.['a:off']?.['_attributes']?.['x']) <= 780000 ) && (1230000 <= parseInt(object['p:spPr']?.['a:xfrm']?.['a:off']?.['_attributes']?.['y']))  && (parseInt(object['p:spPr']?.['a:xfrm']?.['a:off']?.['_attributes']?.['x']) <= 1330000 ))
       if(!subtitle_object){
         return subtitle;
       }
@@ -621,15 +641,15 @@ export default class QmsaView extends Vue {
   public layoutobject(slideobject,layoutsp){
     const ph = slideobject['p:nvSpPr']?.['p:nvPr']?.['p:ph']?.['_attributes']
     if(ph){
-      return layoutsp.find(object => object['p:nvSpPr']?.['p:nvPr']?.['p:ph']?.['_attributes']?.['type'] === ph.type && object['p:nvSpPr']?.['p:nvPr']?.['p:ph']?.['_attributes']?.['idx'] === ph.idx )
+      return layoutsp.find(object => object?.['p:nvSpPr']?.['p:nvPr']?.['p:ph']?.['_attributes']?.['type'] === ph.type && object?.['p:nvSpPr']?.['p:nvPr']?.['p:ph']?.['_attributes']?.['idx'] === ph.idx )
     }
     return {}
     
   }
 
   public extraktTextandsizes(slideobjects,slidegraphics,layoutsp){
-    slideobjects = [...slideobjects.filter((slideobject) => slideobject['p:nvSpPr']?.['p:nvPr']?.['p:ph']?.['_attributes']?.['type'] === 'body'),...slideobjects.filter((slideobject) => !slideobject['p:nvSpPr']?.['p:nvPr']?.['p:ph'])]
-    const slidegraphicsobjects = slidegraphics.map(a => a['a:graphic']?.['a:graphicData']?.['a:tbl'])
+    slideobjects = [...slideobjects.filter((slideobject) => slideobject?.['p:nvSpPr']?.['p:nvPr']?.['p:ph']?.['_attributes']?.['type'] === 'body'),...slideobjects.filter((slideobject) => !slideobject?.['p:nvSpPr']?.['p:nvPr']?.['p:ph'])]
+    const slidegraphicsobjects = slidegraphics.map(a => a?.['a:graphic']?.['a:graphicData']?.['a:tbl'])
       .filter(a => a?.['a:tr'])
       .map(obj => Array.isArray(obj['a:tr'])?obj['a:tr']:[obj['a:tr']])
       .reduce((a,b) => [...a,...b],[])
@@ -673,7 +693,7 @@ export default class QmsaView extends Vue {
         std_div =((slideobjects.length - slideojectunique.length)/(slideobjects.length-1))*100
       }
       
-      const toosmall = slideobjects.filter( a => parseInt(a['size']) <= 999)
+      const toosmall = slideobjects.filter( a => parseInt(a['size']) <= 899)
       const wrongfont = slideobjects.filter( a => a['font'] !== 'Arial')
       const nodoublespaces = slideobjects.filter( a => a['text'].includes('  '))
       const iscorrect = (toosmall.length === 0) && (wrongfont.length === 0) && (nodoublespaces.length === 0) && (wrongbuchars.length === 0)
