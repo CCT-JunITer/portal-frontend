@@ -82,7 +82,9 @@ export const api = {
   async getPersonalEvents(token: string, userId: number) {
     return axios.get<IEvent[]>(`${apiUrl}/api/v1/event/participants/events/${userId}`, { ...authHeaders(token)});
   },
-
+  async getLeaderEvents(token: string, leaderId: number) {
+    return axios.get<IEvent[]>(`${apiUrl}/api/v1/event/leaders/events/${leaderId}`, { ...authHeaders(token) });
+  },
 
   async uploadFile(token: string, file: File | string | Blob, fileName?: string) {
     const formData = new FormData();

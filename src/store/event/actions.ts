@@ -18,7 +18,15 @@ type MainContext = ActionContext<EventState, State>;
 export const actions = {
   async actionGetEventsFor(context: MainContext, userId: number) {
     const response = await apiCall(context, token => api.getPersonalEvents(token, userId));
-    commitSetEventsFor(context, {userId: userId, payload: response.data});
+    commitSetEventsFor(context, { userId: userId, payload: response.data });
+  },
+  async actionGetLeadAndParticipatedEventsFor(context: MainContext, userId: number) {
+    const [participantResponse, leaderResponse] = await Promise.all([
+      apiCall(context, token => api.getPersonalEvents(token, userId)),
+      apiCall(context, token => api.getLeaderEvents(token, userId)),
+    ]);
+    const responseData = [...participantResponse.data, ...leaderResponse.data];
+    commitSetEventsFor(context, { userId: userId, payload: responseData });
   },
   async actionGetEvents(context: MainContext, eventType: IEventType) {
     const response = await apiCall(context, (token) => api.getEvents(token, eventType));
@@ -61,7 +69,8 @@ const { dispatch } = getStoreAccessors<EventState | any, State>('');
 
 export const dispatchGetEvents = dispatch(actions.actionGetEvents);
 export const dispatchGetOneEvent = dispatch(actions.actionGetOneEvent);
-export const dispatchGetEventsFor = dispatch(actions.actionGetEventsFor); 
+export const dispatchGetEventsFor = dispatch(actions.actionGetEventsFor);
+export const dispatchGetAllEventsFor = dispatch(actions.actionGetLeadAndParticipatedEventsFor);
 export const dispatchCreateEvent = dispatch(actions.actionCreateEvent);
 export const dispatchDeleteEvent = dispatch(actions.actionDeleteEvent);
 export const dispatchUpdateEvent = dispatch(actions.actionUpdateEvent);
