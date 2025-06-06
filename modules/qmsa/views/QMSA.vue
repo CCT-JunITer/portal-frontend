@@ -24,208 +24,211 @@
         v-model="panel"
         multiple
       >
-        <v-expansion-panel
-          v-for="(slide, index) in slidelist"
-          :key="index + slide.name"
-          class="padding5">
-          <v-expansion-panel-header><div>{{slide.name}}({{ slide.type}}) </div></v-expansion-panel-header>
-          <v-expansion-panel-content>
-            <v-row>
-              <v-col cols="12" lg="8">
-                <slideguides :guides="slide.guides" :sideobjects="slide.objects" :shrink="shrink" :sizes="sizes"></slideguides>
-              </v-col>
-              <v-col cols="12" lg="4">
-                <h6 class="text-overline mb-1" >Action Title</h6>
-                <div v-if="slide.title.text">
-                  <v-row>
-                    <v-col cols="12" sm="6">
-                      <v-row class="my-3">
-                        <span class="col-xs-12 col-md-6 col-lg-8 col-xl-9 my-0 py-1" style="font-weight: 300; font-size: 0.9rem;">
-                          Linksbündig
-                        </span>
+        <template v-for=" (chapter, index) of slidelist" >
+          <h6 class="text-overline mb-1" :key="chapter.name + index">{{chapter.name}}</h6>
+          <v-expansion-panel
+            v-for="(slide, index) in chapter.slds"
+            :key="index + slide.name"
+            class="padding5">
+            <v-expansion-panel-header><div>{{slide.name}}({{ slide.type}}) </div></v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <v-row>
+                <v-col cols="12" lg="8">
+                  <slideguides :guides="slide.guides" :sideobjects="slide.objects" :shrink="shrink" :sizes="sizes"></slideguides>
+                </v-col>
+                <v-col cols="12" lg="4">
+                  <h6 class="text-overline mb-1" >Action Title</h6>
+                  <div v-if="slide.title.text">
+                    <v-row>
+                      <v-col cols="12" sm="6">
+                        <v-row class="my-3">
+                          <span class="col-xs-12 col-md-6 col-lg-8 col-xl-9 my-0 py-1" style="font-weight: 300; font-size: 0.9rem;">
+                            Linksbündig
+                          </span>
 
-                        <span class="col-xs-12 col-md-6 col-lg-4 col-xl-3 my-0 py-1" >
-                          <v-icon v-if="slide.title.correctAlignment" color="cctGreen" >mdi-check-decagram</v-icon>
-                          <v-icon color="red" v-else>mdi-alert-decagram</v-icon>
-                        </span>
-                      </v-row>
-                    </v-col>
-                    <v-col cols="12" sm="6">
-                      <v-row class="my-3">
-                        <span class="col-xs-12 col-md-6 col-lg-8 col-xl-9 my-0 py-1" style="font-weight: 300; font-size: 0.9rem;">
-                          Kein Satztschlusszeichen
-                        </span>
+                          <span class="col-xs-12 col-md-6 col-lg-4 col-xl-3 my-0 py-1" >
+                            <v-icon v-if="slide.title.correctAlignment" color="cctGreen" >mdi-check-decagram</v-icon>
+                            <v-icon color="red" v-else>mdi-alert-decagram</v-icon>
+                          </span>
+                        </v-row>
+                      </v-col>
+                      <v-col cols="12" sm="6">
+                        <v-row class="my-3">
+                          <span class="col-xs-12 col-md-6 col-lg-8 col-xl-9 my-0 py-1" style="font-weight: 300; font-size: 0.9rem;">
+                            Kein Satztschlusszeichen
+                          </span>
 
-                        <span  class="col-xs-12 col-md-6 col-lg-4 col-xl-3 my-0 py-1">
-                          <v-icon v-if="slide.title.noEndChar" color="cctGreen" >mdi-check-decagram</v-icon>
-                          <v-icon color="red" v-else>mdi-alert-decagram</v-icon>
-                        </span>
-                      </v-row>
-                    </v-col>
-                  </v-row>
-                </div>
-                <div class="text-center" v-else>
-                  <p style="font-weight: 300; font-size: 0.9rem;">Kein Action Title gefunden <v-icon color="red">mdi-alert-decagram</v-icon></p>
-                </div>
-                <h6 class="text-overline mb-1" >Überschrift</h6>
-                <div v-if="slide.text.hastext && slide.subtitle.text">
-                  <v-row>
-                    <v-col cols="12" sm="4">
-                      <v-row class="my-3">
-                        <span class="col-xs-12 col-md-6 col-lg-8 col-xl-9 my-0 py-1" style="font-weight: 300; font-size: 0.9rem;">
-                          Textgröße
-                        </span>
+                          <span  class="col-xs-12 col-md-6 col-lg-4 col-xl-3 my-0 py-1">
+                            <v-icon v-if="slide.title.noEndChar" color="cctGreen" >mdi-check-decagram</v-icon>
+                            <v-icon color="red" v-else>mdi-alert-decagram</v-icon>
+                          </span>
+                        </v-row>
+                      </v-col>
+                    </v-row>
+                  </div>
+                  <div class="text-center" v-else>
+                    <p style="font-weight: 300; font-size: 0.9rem;">Kein Action Title gefunden <v-icon color="red">mdi-alert-decagram</v-icon></p>
+                  </div>
+                  <h6 class="text-overline mb-1" >Überschrift</h6>
+                  <div v-if="slide.text.hastext && slide.subtitle.text">
+                    <v-row>
+                      <v-col cols="12" sm="4">
+                        <v-row class="my-3">
+                          <span class="col-xs-12 col-md-6 col-lg-8 col-xl-9 my-0 py-1" style="font-weight: 300; font-size: 0.9rem;">
+                            Textgröße
+                          </span>
 
-                        <span class="col-xs-12 col-md-6 col-lg-4 col-xl-3 my-0 py-1" >
-                          {{slide.subtitle.size}}
-                        </span>
-                      </v-row>
-                    </v-col>
-                    <v-col cols="12" sm="4">
-                      <v-row class="my-3">
-                        <span class="col-xs-12 col-md-6 col-lg-8 col-xl-9 my-0 py-1" style="font-weight: 300; font-size: 0.9rem;">
-                          Großbuchstaben
-                        </span>
+                          <span class="col-xs-12 col-md-6 col-lg-4 col-xl-3 my-0 py-1" >
+                            {{slide.subtitle.size}}
+                          </span>
+                        </v-row>
+                      </v-col>
+                      <v-col cols="12" sm="4">
+                        <v-row class="my-3">
+                          <span class="col-xs-12 col-md-6 col-lg-8 col-xl-9 my-0 py-1" style="font-weight: 300; font-size: 0.9rem;">
+                            Großbuchstaben
+                          </span>
 
-                        <span  class="col-xs-12 col-md-6 col-lg-4 col-xl-3 my-0 py-1">
-                          <v-icon v-if="slide.subtitle.allcaps" color="cctGreen" >mdi-check-decagram</v-icon>
-                          <v-icon color="red" v-else>mdi-alert-decagram</v-icon>
-                        </span>
-                      </v-row>
-                    </v-col>
-                    <v-col cols="12" sm="4">
-                      <v-row class="my-3">
-                        <span class="col-xs-12 col-md-6 col-lg-8 col-xl-9 my-0 py-1" style="font-weight: 300; font-size: 0.9rem;">
-                          Farbe Korrekt
-                        </span>
+                          <span  class="col-xs-12 col-md-6 col-lg-4 col-xl-3 my-0 py-1">
+                            <v-icon v-if="slide.subtitle.allcaps" color="cctGreen" >mdi-check-decagram</v-icon>
+                            <v-icon color="red" v-else>mdi-alert-decagram</v-icon>
+                          </span>
+                        </v-row>
+                      </v-col>
+                      <v-col cols="12" sm="4">
+                        <v-row class="my-3">
+                          <span class="col-xs-12 col-md-6 col-lg-8 col-xl-9 my-0 py-1" style="font-weight: 300; font-size: 0.9rem;">
+                            Farbe Korrekt
+                          </span>
 
-                        <span  class="col-xs-12 col-md-6 col-lg-4 col-xl-3 my-0 py-1">
-                          <v-icon v-if="slide.subtitle.color == 'tx2'" color="cctGreen" >mdi-check-decagram</v-icon>
-                          <v-icon color="red" v-else>mdi-alert-decagram</v-icon>
-                        </span>
-                      </v-row>
-                    </v-col>
-                  </v-row>
+                          <span  class="col-xs-12 col-md-6 col-lg-4 col-xl-3 my-0 py-1">
+                            <v-icon v-if="slide.subtitle.color == 'tx2'" color="cctGreen" >mdi-check-decagram</v-icon>
+                            <v-icon color="red" v-else>mdi-alert-decagram</v-icon>
+                          </span>
+                        </v-row>
+                      </v-col>
+                    </v-row>
               
-                </div>
-                <div class="text-center" v-else>
-                  <p style="font-weight: 300; font-size: 0.9rem;">Keine Überschrift gefunden <v-icon color="red">mdi-alert-decagram</v-icon></p>
-                </div>
-                <h6 class="text-overline mb-1" >Schrift</h6>
-                <div v-if="slide.text.hastext">
-                  <v-row>
-                    <v-col cols="12" sm="4">
-                      <v-row class="my-3">
-                        <span class="col-xs-12 col-md-6 col-lg-8 col-xl-8 my-0 py-1" style="font-weight: 300; font-size: 0.9rem;">
-                          ⌀-größe
-                        </span>
+                  </div>
+                  <div class="text-center" v-else>
+                    <p style="font-weight: 300; font-size: 0.9rem;">Keine Überschrift gefunden <v-icon color="red">mdi-alert-decagram</v-icon></p>
+                  </div>
+                  <h6 class="text-overline mb-1" >Schrift</h6>
+                  <div v-if="slide.text.hastext">
+                    <v-row>
+                      <v-col cols="12" sm="4">
+                        <v-row class="my-3">
+                          <span class="col-xs-12 col-md-6 col-lg-8 col-xl-8 my-0 py-1" style="font-weight: 300; font-size: 0.9rem;">
+                            ⌀-größe
+                          </span>
 
-                        <span class="col-xs-12 col-md-6 col-lg-4 col-xl-4 my-0 py-1" >
-                          {{Math.round(slide.text.average_sz)/100}}
-                        </span>
-                      </v-row>
-                    </v-col>
-                    <v-col cols="12" sm="4">
-                      <v-row class="my-3">
-                        <span class="col-xs-12 col-md-6 col-lg-8 col-xl-8 my-0 py-1" style="font-weight: 300; font-size: 0.9rem;">
-                          Uniformität(%)
-                        </span>
+                          <span class="col-xs-12 col-md-6 col-lg-4 col-xl-4 my-0 py-1" >
+                            {{Math.round(slide.text.average_sz)/100}}
+                          </span>
+                        </v-row>
+                      </v-col>
+                      <v-col cols="12" sm="4">
+                        <v-row class="my-3">
+                          <span class="col-xs-12 col-md-6 col-lg-8 col-xl-8 my-0 py-1" style="font-weight: 300; font-size: 0.9rem;">
+                            Uniformität(%)
+                          </span>
 
-                        <span  class="col-xs-12 col-md-6 col-lg-4 col-xl-4 my-0 py-1">
-                          {{Math.round(slide.text.std_div)}}
-                        </span>
-                      </v-row>
-                    </v-col>
-                    <v-col cols="12" sm="4">
-                      <v-row class="my-3">
-                        <span class="col-xs-12 col-md-6 col-lg-8 col-xl-9 my-0 py-1" style="font-weight: 300; font-size: 0.9rem;">
-                          Kein Text zu klein
-                        </span>
+                          <span  class="col-xs-12 col-md-6 col-lg-4 col-xl-4 my-0 py-1">
+                            {{Math.round(slide.text.std_div)}}
+                          </span>
+                        </v-row>
+                      </v-col>
+                      <v-col cols="12" sm="4">
+                        <v-row class="my-3">
+                          <span class="col-xs-12 col-md-6 col-lg-8 col-xl-9 my-0 py-1" style="font-weight: 300; font-size: 0.9rem;">
+                            Kein Text zu klein
+                          </span>
 
-                        <span  class="col-xs-12 col-md-6 col-lg-4 col-xl-3 my-0 py-1">
-                          <v-icon  color="cctGreen" v-if="slide.text.toosmall.length === 0">mdi-check-decagram</v-icon>
-                          <v-icon color="red" v-else>mdi-alert-decagram</v-icon>
-                        </span>
-                      </v-row>
-                    </v-col>
-                  </v-row>
-                  <v-row class="my-3">
-                    <span class="col-xs-12 col-md-6 col-lg-4 col-xl-3 my-0 py-1" style="font-weight: 300; font-size: 0.9rem;">
-                      Zukleiner Text
-                    </span>
-
-                    <span class="col-xs-12 col-md-6 col-lg-8 col-xl-9 my-0 py-1 textrestricktor">
-                      {{slide.text.toosmall.map(obj => obj['text']).join(";   ")}}
-                    </span>
-                  </v-row>
-                  <v-row>
-                    <v-col cols="12" sm="4">
-                      <v-row class="my-3">
-                        <span class="col-xs-12 col-md-6 col-lg-8 col-xl-9 my-0 py-1" style="font-weight: 300; font-size: 0.9rem;">
-                          Alles Arial
-                        </span>
-
-                        <span class="col-xs-12 col-md-6 col-lg-4 col-xl-3 my-0 py-1" >
-                          <v-icon color="cctGreen" v-if="slide.text.wrongfont.length === 0">mdi-check-decagram</v-icon>
-                          <v-icon color="red" v-else>mdi-alert-decagram</v-icon>
-                        </span>
-                      </v-row>
-                    </v-col>
-                    <v-col cols="12" sm="4">
-                      <v-row class="my-3">
-                        <span class="col-xs-12 col-md-6 col-lg-8 col-xl-9 my-0 py-1" style="font-weight: 300; font-size: 0.9rem;">
-                          Richtige Stichpunktzeichen
-                        </span>
-
-                        <span  class="col-xs-12 col-md-6 col-lg-4 col-xl-3 my-0 py-1">
-                          <v-icon color="cctGreen" v-if="slide.text.wrongbuchars.length === 0">mdi-check-decagram</v-icon>
-                          <v-icon color="red" v-else>mdi-alert-decagram</v-icon>
-                        </span>
-                      </v-row>
-                    </v-col>
-                    <v-col cols="12" sm="4">
-                      <v-row class="my-3">
-                        <span class="col-xs-12 col-md-6 col-lg-8 col-xl-9 my-0 py-1" style="font-weight: 300; font-size: 0.9rem;">
-                          Keine Doppelte Leerzeichen
-                        </span>
-
-                        <span  class="col-xs-12 col-md-6 col-lg-4 col-xl-3 my-0 py-1">
-                          <v-icon color="cctGreen" v-if="slide.text.nodoublespaces.length === 0">mdi-check-decagram</v-icon>
-                          <v-icon color="red" v-else>mdi-alert-decagram</v-icon>
-                        </span>
-                      </v-row>
-                    </v-col>
-                  </v-row>
-                  <v-row>
-                    <span class="col-xs-12 col-md-6 col-lg-4 col-xl-3 my-0 py-1" style="font-weight: 300; font-size: 0.9rem;">
-                      Text ohne Arial
-                    </span>
-
-                    <span class="col-xs-12 col-md-6 col-lg-8 col-xl-9 my-0 py-1 textrestricktor">
-                      {{slide.text.wrongfont.map(obj => obj['text']).join(";   ")}}
-                    </span>
-                  </v-row>
-                  <v-row>
-                    <span class="col-xs-12 col-md-6 col-lg-4 col-xl-3 my-0 py-1" style="font-weight: 300; font-size: 0.9rem;">
-                      Doppelte Leerzeichen(Text)
-                    </span>
-
-                    <span class="col-xs-12 col-md-6 col-lg-8 col-xl-9 my-0 py-1 textrestricktor">
-                      {{slide.text.nodoublespaces.map(obj => obj['text']).join(";   ")}}
-                      <span v-if="!slide.title.doublespaces">
-                        {{slide.title.text}}
+                          <span  class="col-xs-12 col-md-6 col-lg-4 col-xl-3 my-0 py-1">
+                            <v-icon  color="cctGreen" v-if="slide.text.toosmall.length === 0">mdi-check-decagram</v-icon>
+                            <v-icon color="red" v-else>mdi-alert-decagram</v-icon>
+                          </span>
+                        </v-row>
+                      </v-col>
+                    </v-row>
+                    <v-row class="my-3">
+                      <span class="col-xs-12 col-md-6 col-lg-4 col-xl-3 my-0 py-1" style="font-weight: 300; font-size: 0.9rem;">
+                        Zukleiner Text
                       </span>
-                    </span>
-                  </v-row>
 
-                </div>
-                <div class="text-center" v-else>
-                  <p style="font-weight: 300; font-size: 0.9rem;">Kein Text gefunden <v-icon color="red">mdi-alert-decagram</v-icon></p>
-                </div>
-              </v-col>
-            </v-row>
-          </v-expansion-panel-content>
-        </v-expansion-panel>
+                      <span class="col-xs-12 col-md-6 col-lg-8 col-xl-9 my-0 py-1 textrestricktor">
+                        {{slide.text.toosmall.map(obj => obj['text']).join(";   ")}}
+                      </span>
+                    </v-row>
+                    <v-row>
+                      <v-col cols="12" sm="4">
+                        <v-row class="my-3">
+                          <span class="col-xs-12 col-md-6 col-lg-8 col-xl-9 my-0 py-1" style="font-weight: 300; font-size: 0.9rem;">
+                            Alles Arial
+                          </span>
+
+                          <span class="col-xs-12 col-md-6 col-lg-4 col-xl-3 my-0 py-1" >
+                            <v-icon color="cctGreen" v-if="slide.text.wrongfont.length === 0">mdi-check-decagram</v-icon>
+                            <v-icon color="red" v-else>mdi-alert-decagram</v-icon>
+                          </span>
+                        </v-row>
+                      </v-col>
+                      <v-col cols="12" sm="4">
+                        <v-row class="my-3">
+                          <span class="col-xs-12 col-md-6 col-lg-8 col-xl-9 my-0 py-1" style="font-weight: 300; font-size: 0.9rem;">
+                            Richtige Stichpunktzeichen
+                          </span>
+
+                          <span  class="col-xs-12 col-md-6 col-lg-4 col-xl-3 my-0 py-1">
+                            <v-icon color="cctGreen" v-if="slide.text.wrongbuchars.length === 0">mdi-check-decagram</v-icon>
+                            <v-icon color="red" v-else>mdi-alert-decagram</v-icon>
+                          </span>
+                        </v-row>
+                      </v-col>
+                      <v-col cols="12" sm="4">
+                        <v-row class="my-3">
+                          <span class="col-xs-12 col-md-6 col-lg-8 col-xl-9 my-0 py-1" style="font-weight: 300; font-size: 0.9rem;">
+                            Keine Doppelte Leerzeichen
+                          </span>
+
+                          <span  class="col-xs-12 col-md-6 col-lg-4 col-xl-3 my-0 py-1">
+                            <v-icon color="cctGreen" v-if="slide.text.nodoublespaces.length === 0">mdi-check-decagram</v-icon>
+                            <v-icon color="red" v-else>mdi-alert-decagram</v-icon>
+                          </span>
+                        </v-row>
+                      </v-col>
+                    </v-row>
+                    <v-row>
+                      <span class="col-xs-12 col-md-6 col-lg-4 col-xl-3 my-0 py-1" style="font-weight: 300; font-size: 0.9rem;">
+                        Text ohne Arial
+                      </span>
+
+                      <span class="col-xs-12 col-md-6 col-lg-8 col-xl-9 my-0 py-1 textrestricktor">
+                        {{slide.text.wrongfont.map(obj => obj['text']).join(";   ")}}
+                      </span>
+                    </v-row>
+                    <v-row>
+                      <span class="col-xs-12 col-md-6 col-lg-4 col-xl-3 my-0 py-1" style="font-weight: 300; font-size: 0.9rem;">
+                        Doppelte Leerzeichen(Text)
+                      </span>
+
+                      <span class="col-xs-12 col-md-6 col-lg-8 col-xl-9 my-0 py-1 textrestricktor">
+                        {{slide.text.nodoublespaces.map(obj => obj['text']).join(";   ")}}
+                        <span v-if="!slide.title.doublespaces">
+                          {{slide.title.text}}
+                        </span>
+                      </span>
+                    </v-row>
+
+                  </div>
+                  <div class="text-center" v-else>
+                    <p style="font-weight: 300; font-size: 0.9rem;">Kein Text gefunden <v-icon color="red">mdi-alert-decagram</v-icon></p>
+                  </div>
+                </v-col>
+              </v-row>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </template>
       </v-expansion-panels>
     </v-container>
     <v-container
@@ -281,7 +284,7 @@ export default class QmsaView extends Vue {
       const zipData = await file.arrayBuffer();
       const zipContents =  zip.load(zipData)
       this.parsepres(zipContents.files)
-      this.parseslides(zipContents.files)
+      //this.parseslides(zipContents.files)
       this.loading = false
     }
     else{
@@ -422,7 +425,37 @@ export default class QmsaView extends Vue {
   private async parsepres(zipFiles) {
     const pres_json_string = xml2json(zipFiles['ppt/presentation.xml'].asText(), { compact: true, spaces: 2 });
     const pres_json = JSON.parse(pres_json_string)
+
+    const pres_rels_json_string = xml2json(zipFiles['ppt/_rels/presentation.xml.rels'].asText(), { compact: true, spaces: 2 });
+    const pres_rels_json = JSON.parse(pres_rels_json_string)
+    const xmlmapping = pres_rels_json['Relationships']['Relationship'].map(x => {
+      const obj = {}
+      obj[x['_attributes']['Id']] = x['_attributes']['Target']
+      return obj
+    }
+    ).reduce((acc, obj) => ({ ...acc, ...obj }), {})
     this.sizes= pres_json['p:presentation']['p:sldSz']['_attributes']
+
+    const ridmapping = pres_json['p:presentation']['p:sldIdLst']['p:sldId'].map(x => {
+      const obj = {}
+      obj[x['_attributes']['id']] = x['_attributes']['r:id']
+      return obj
+    }).reduce((acc, obj) => ({ ...acc, ...obj }), {});
+
+    const slidelist = await this.parseslides(zipFiles)
+    
+    if(Array.isArray(pres_json['p:presentation']?.['p:extLst']?.['p:ext'].find(a => Object.keys(a).includes('p14:sectionLst'))?.['p14:sectionLst']['p14:section'])){
+      this.slidelist = pres_json['p:presentation']?.['p:extLst']?.['p:ext'].find(a => Object.keys(a).includes('p14:sectionLst'))?.['p14:sectionLst']['p14:section'].map((x) => { 
+        const slideids = Array.isArray(x['p14:sldIdLst']['p14:sldId'])? x['p14:sldIdLst']['p14:sldId'].map(y => y['_attributes']['id']) : [x['p14:sldIdLst']['p14:sldId']].map(y => y['_attributes']['id'])
+        return {'name': x['_attributes']['name'],
+                'slds': slidelist.filter( y => slideids.map(z => ridmapping[z]).map(z => xmlmapping[z]).includes(y.xmlname)),
+        }
+      })
+    }
+    else{
+      this.slidelist = [{'name':'Standardabschnitt','slds':slidelist}]
+    }
+    
 
   }
 
@@ -547,10 +580,10 @@ export default class QmsaView extends Vue {
       sldobjects = sldobjects.map((sldobject)  => {return{'pos':{'x': sldobject['a:off']['_attributes']['x'],'y': sldobject['a:off']['_attributes']['y']},
                                                           'ext':{'cy':sldobject['a:ext']['_attributes']['cy'],'cx':sldobject['a:ext']['_attributes']['cx']},
                                                           'deg': sldobject['_attributes']?.['rot']? sldobject['_attributes']?.['rot']/60000 : 0  }})
-      slidelist_local.push({'name':'Folie' + filepath.replace('ppt/slides/slide', '').replace('.xml', ''), 'objects':sldobjects,'guides':slideguides,'type':slidetype,'title': this.analyseActiontitle(slide_json),'subtitle':subtitle,'text':text})
+      slidelist_local.push({'xmlname':filepath.replace('ppt/', ''),'name':'Folie' + filepath.replace('ppt/slides/slide', '').replace('.xml', ''), 'objects':sldobjects,'guides':slideguides,'type':slidetype,'title': this.analyseActiontitle(slide_json),'subtitle':subtitle,'text':text})
     }
     slidelist_local.sort((a,b)=> parseInt(a['name'].replace('Folie', '')) - parseInt(b['name'].replace('Folie', '')))
-    this.slidelist = slidelist_local;
+    return slidelist_local;
 
   }
 
