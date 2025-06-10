@@ -121,15 +121,7 @@
                   <td>Anmerkungen</td>
                   <td v-for="application in applications" :key="application.id">
                     <div class="pre-formatted text-body-2">
-                      {{  application.available_time['Anmerkungen'] || "" }}
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td>Anmerkungen</td>
-                  <td v-for="application in applications" :key="application.id">
-                    <div class="pre-formatted text-body-2">
-                      {{  application.available_time['Anmerkungen'] || "" }}
+                      {{  (application.available_time && (application.available_time['Anmerkungen'])) || "" }}
                     </div>
                   </td>
                 </tr>
