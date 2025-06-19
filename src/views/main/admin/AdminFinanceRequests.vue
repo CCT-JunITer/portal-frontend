@@ -52,7 +52,7 @@
 
         <v-data-table
           @click:row="handleClickRow"
-          :headers="headers"
+          :headers="headers_uncomplete"
           :items="openFinanceRequests"
           v-else
         >
@@ -70,6 +70,12 @@
               {{ item.association }}
             </span>
             <span v-else class="font-weight-medium">X</span>
+          </template>
+          <template  v-slot:item.files="{ item }">
+            <file-manager 
+              v-model="item.files"
+              :readonly="true">
+            </file-manager>
           </template>
         </v-data-table>
       </div>
@@ -85,8 +91,8 @@
         </v-row>
         <v-data-table
           @click:row="handleClickRow"
-          :headers="headers"
-          :items="openFinanceRequests"
+          :headers="headers_uncomplete"
+          :items="openFinanceRequests.filter(request => request.status == this.filterkey)"
           v-else
         >
           <template v-slot:item.date_created="{ item }">
@@ -103,6 +109,12 @@
               {{ item.association }}
             </span>
             <span v-else class="font-weight-medium">X</span>
+          </template>
+          <template  v-slot:item.files="{ item }">
+            <file-manager 
+              v-model="item.files"
+              :readonly="true">
+            </file-manager>
           </template>
         </v-data-table>
       </div>
@@ -135,6 +147,7 @@
 
 <script lang="ts">
 import AdminFinanceRequestCard from '@/components/request/AdminFinanceRequestCard.vue';
+import FileManager from '@/components/file-manager/FileManager.vue';
 import { dispatchAdminFinanceRequests } from '@/store/admin/actions';
 import { readAdminFinanceRequests } from '@/store/admin/getters';
 import { dispatchSaveAsCsv } from '@/store/main/actions';
@@ -144,7 +157,8 @@ import { financeRequestNextStep, translateFinanceRequestStatus } from '@/utils';
 
 @Component({
   components: {
-    AdminFinanceRequestCard
+    AdminFinanceRequestCard,
+    FileManager
   },
   methods: {
     format,
@@ -208,11 +222,24 @@ export default class AdminFinanceRequests extends Vue {
     { text: 'zuletzte bearbeitet', align: 'left', filterable: true, value: 'date_last_update' },
     { text: 'IBAN', align: 'left', filterable: false, value: 'iban' },
   ]
+  public headers_uncomplete =  [
+    { text: 'ID', align: 'center', filterable: true, value: 'id' },
+    { text: 'Antragssteller', align: 'left', filterable: true, value: 'author.full_name' },
+    { text: 'Typ', align: 'left', filterable: true, value: 'type' },
+    { text: 'Verwendungszweck', align: 'left', filterable: false, value: 'purpose' },
+    { text: 'Betrag', align: 'center', filterable: true, value: 'amount' },
+    { text: 'Ressortbudget', align: 'center', filterable: true, value: 'association' },
+    { text: 'Status', align: 'left', filterable: true, value: 'status' },
+    { text: 'Erstellungsdatum', align: 'left', filterable: true, value: 'date_created' },
+    { text: 'zuletzte bearbeitet', align: 'left', filterable: true, value: 'date_last_update' },
+    { text: 'Rechnung', align: 'left', filterable: false, value: 'files' },
+  ]
 
 
 }
 </script>
 
 <style>
+
 
 </style>
