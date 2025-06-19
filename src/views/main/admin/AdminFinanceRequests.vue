@@ -25,9 +25,23 @@
         v-model="filterkey"
       ></v-select>
 
+      <div class="d-flex justify-space-around">
+        <v-btn-toggle >
+          <v-btn outlined large small @click="showtable = false">
+            Karten
+          </v-btn>
+          <v-btn outlined large small @click="showtable = true">
+            Tabelle
+          </v-btn>
+        </v-btn-toggle>
+      </div>
+
+
+      
+
 
       <div v-if="filterkey == 'all'">
-        <v-row>
+        <v-row v-if="showtable == false">
           <v-col v-for="financeRequest in openFinanceRequests" :key="financeRequest.id" cols="12" md="6" lg="4">
             <admin-finance-request-card class="my-2" :request="financeRequest">
               <template v-slot:actions>
@@ -35,10 +49,33 @@
             </admin-finance-request-card>
           </v-col>
         </v-row>
+
+        <v-data-table
+          @click:row="handleClickRow"
+          :headers="headers"
+          :items="openFinanceRequests"
+          v-else
+        >
+          <template v-slot:item.date_created="{ item }">
+            {{ format(new Date(String(item.date_created)), 'dd.MM.yyyy - HH:mm') }}
+          </template>
+          <template v-slot:item.date_last_update="{ item }">
+            {{ format(new Date(String(item.date_last_update)), 'dd.MM.yyyy - HH:mm') }}
+          </template>
+          <template v-slot:item.status="{ item }">
+            {{ translateFinanceRequestStatus(item.status)}}
+          </template>
+          <template v-slot:item.association="{ item }">
+            <span v-if="item.association">
+              {{ item.association }}
+            </span>
+            <span v-else class="font-weight-medium">X</span>
+          </template>
+        </v-data-table>
       </div>
       
-      <div>
-        <v-row>
+      <div v-else>
+        <v-row v-if="showtable == false">
           <v-col v-for="financeRequest in openFinanceRequests.filter(request => request.status == this.filterkey)" :key="financeRequest.id" cols="12" md="6" lg="4">
             <admin-finance-request-card class="my-2" :request="financeRequest">
               <template v-slot:actions>
@@ -46,6 +83,28 @@
             </admin-finance-request-card>
           </v-col>
         </v-row>
+        <v-data-table
+          @click:row="handleClickRow"
+          :headers="headers"
+          :items="openFinanceRequests"
+          v-else
+        >
+          <template v-slot:item.date_created="{ item }">
+            {{ format(new Date(String(item.date_created)), 'dd.MM.yyyy - HH:mm') }}
+          </template>
+          <template v-slot:item.date_last_update="{ item }">
+            {{ format(new Date(String(item.date_last_update)), 'dd.MM.yyyy - HH:mm') }}
+          </template>
+          <template v-slot:item.status="{ item }">
+            {{ translateFinanceRequestStatus(item.status)}}
+          </template>
+          <template v-slot:item.association="{ item }">
+            <span v-if="item.association">
+              {{ item.association }}
+            </span>
+            <span v-else class="font-weight-medium">X</span>
+          </template>
+        </v-data-table>
       </div>
 
       <h4 class="text-h4 mb-3 mt-5">Archivierte Anträge</h4>
@@ -59,6 +118,9 @@
         </template>
         <template v-slot:item.date_last_update="{ item }">
           {{ format(new Date(String(item.date_last_update)), 'dd.MM.yyyy - HH:mm') }}
+        </template>
+        <template v-slot:item.status="{ item }">
+          {{ translateFinanceRequestStatus(item.status)}}
         </template>
         <template v-slot:item.association="{ item }">
           <span v-if="item.association">
@@ -78,19 +140,23 @@ import { readAdminFinanceRequests } from '@/store/admin/getters';
 import { dispatchSaveAsCsv } from '@/store/main/actions';
 import { format, isAfter } from 'date-fns';
 import { Vue, Component } from 'vue-property-decorator';
+import { financeRequestNextStep, translateFinanceRequestStatus } from '@/utils';
 
 @Component({
   components: {
     AdminFinanceRequestCard
   },
   methods: {
-    format
+    format,
+    translateFinanceRequestStatus,
+    financeRequestNextStep
   }
 })
 export default class AdminFinanceRequests extends Vue {
 
   public filterkey = 'all';
   public statuslist = ['all', 'created','request_rejected', 'request_accepted', 'file_uploaded', 'file_rejected', 'file_accepted'];
+  public showtable = false;
 
   public handleClickRow(value) {
     this.$router.push({ name: 'finance-request-detail', params: { id: value.id } })

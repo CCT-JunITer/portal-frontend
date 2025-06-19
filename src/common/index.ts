@@ -225,7 +225,7 @@ export const findRouteForId = (searchType: string, id: number): RawLocation | nu
     user: { path: '/main/people/profile/view/' + id },
     training: { path: '/main/events/' + id },
     meeting: { path: '/main/events/' + id },
-    document: { path: '/main/wms/documents/edit/' + id },
+    document: { path: '/main/wms/documents/detail/' + id },
     project: { path: '/main/wms/projects/' + id },
   }[searchType] || null;
 }
