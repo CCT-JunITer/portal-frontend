@@ -13,7 +13,7 @@
 <script lang="ts">
 import { api } from '@/api';
 import LoadingPage from '@/components/loading-cct/LoadingPage.vue';
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
+import { Vue, Component, Watch } from 'vue-property-decorator'
 import { Route } from 'vue-router';
 
 @Component({components: {LoadingPage}})

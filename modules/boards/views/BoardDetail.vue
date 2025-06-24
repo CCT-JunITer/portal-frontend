@@ -114,13 +114,12 @@ import UserSelect from '@/components/user-select/UserSelect.vue';
 import UserChip from '@/components/user-chip/UserChip.vue';
 import UserListItem from '@/components/user-list-item/UserListItem.vue';
 import ConsentDialog from '@/components/consent-dialog/ConsentDialog.vue';
-import { FILE_LABELS, Board, BoardCreate, BoardCreation,BoardRoleEnum } from '../types';
-import { dispatchGetOneBoard,dispatchDeleteBoard,dispatchUpdateBoard,dispatchCreateBoard } from '../store/actions';
+import { FILE_LABELS, Board, BoardCreation} from '../types';
+import { dispatchGetOneBoard } from '../store/actions';
 import { readoneboard } from '../store/getters';
 import { dispatchGetEvents } from '@/store/event/actions';
 import { readEvents } from '@/store/event/getters';
 import { isAfter, isBefore } from 'date-fns';
-import { IEvent } from '@/interfaces';
 
 
 

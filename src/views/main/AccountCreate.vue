@@ -355,7 +355,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component } from 'vue-property-decorator';
 import { IUserProfileCreate } from '@/interfaces';
 import {
   dispatchCreateUserOpen,
@@ -441,7 +441,7 @@ export default class AccountCreate extends Vue {
 
   public get email() {
     const token = this.getToken();
-    const names = (token?.invite.name || '').split(' ');
+    //const names = (token?.invite.name || '').split(' ');
 
     return token?.sub || '';
   }

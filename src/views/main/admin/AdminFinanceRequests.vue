@@ -25,13 +25,13 @@
         v-model="filterkey"
       ></v-select>
 
-      <div class="d-flex justify-space-around">
+      <div class="d-flex justify-space-around my-1">
         <v-btn-toggle >
-          <v-btn outlined large small @click="showtable = false">
-            Karten
-          </v-btn>
           <v-btn outlined large small @click="showtable = true">
             Tabelle
+          </v-btn>
+          <v-btn outlined large small @click="showtable = false">
+            Karten
           </v-btn>
         </v-btn-toggle>
       </div>
@@ -54,6 +54,7 @@
           @click:row="handleClickRow"
           :headers="headers_uncomplete"
           :items="openFinanceRequests"
+          :items-per-page="-1"
           v-else
         >
           <template v-slot:item.date_created="{ item }">
@@ -93,6 +94,7 @@
           @click:row="handleClickRow"
           :headers="headers_uncomplete"
           :items="openFinanceRequests.filter(request => request.status == this.filterkey)"
+          :items-per-page="-1"
           v-else
         >
           <template v-slot:item.date_created="{ item }">
@@ -170,7 +172,7 @@ export default class AdminFinanceRequests extends Vue {
 
   public filterkey = 'all';
   public statuslist = ['all', 'created','request_rejected', 'request_accepted', 'file_uploaded', 'file_rejected', 'file_accepted'];
-  public showtable = false;
+  public showtable = true;
 
   public handleClickRow(value) {
     this.$router.push({ name: 'finance-request-detail', params: { id: value.id } })
