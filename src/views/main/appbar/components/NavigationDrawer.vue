@@ -148,7 +148,7 @@
             <v-list-item-title>QM-Tools</v-list-item-title>
           </v-list-item-content>
         </template>
-        <v-list-item to="/main/qmsa" class="ml-2" disabled>
+        <v-list-item to="/main/qmsa" class="ml-2" >
           <v-list-item-icon>
             <v-icon>mdi-check-decagram</v-icon>
           </v-list-item-icon>
@@ -156,7 +156,7 @@
             <v-list-item-title>QM Checker</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item to="/main/dokumentenlenkung" class="ml-2" v-if="hasAnyPermission(['portal.approve'])" disabled>
+        <v-list-item to="/main/dokumentenlenkung" class="ml-2" v-if="hasAnyPermission(['portal.approve'])">
           <v-list-item-icon>
             <v-icon>mdi-file-check</v-icon>
           </v-list-item-icon>
