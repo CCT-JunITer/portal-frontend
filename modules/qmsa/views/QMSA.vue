@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-toolbar class="sticky-sub-toolbar">
+    <v-toolbar >
       <v-toolbar-title>
         QM Powerpoint Checker
       </v-toolbar-title>
@@ -273,7 +273,7 @@ export default class QmsaView extends Vue {
     this.panel = []
   }
   public open(){
-    this.panel = [...this.slidelist.keys()].map((k, i) => i)
+    this.panel = this.slidelist.map(x => x['slds']).reduce((a,b) => [...a,...b],[]).map((k, i) => i)
   }
   // Handle File Selection
   private async onFileChange(event:any): Promise<any> {

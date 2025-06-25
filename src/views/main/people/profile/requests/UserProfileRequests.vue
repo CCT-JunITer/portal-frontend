@@ -5,12 +5,12 @@
         <h4 class="text-h4 my-5">Meine Anträge</h4>
       </v-flex>
       <div class="d-flex align-center">
-        <!--<v-btn outlined color="cctBlue" :to="{ name: 'profile-request-create' }">
+        <v-btn outlined color="cctBlue" :to="{ name: 'profile-request-create' }">
           <v-icon left>
             mdi-clipboard-text
           </v-icon>
           Antrag stellen
-        </v-btn>-->
+        </v-btn>
       </div>
     </div>
     <v-divider></v-divider>
