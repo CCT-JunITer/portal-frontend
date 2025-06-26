@@ -28,7 +28,7 @@
       <span class="text-truncate file-chip__displayname">
         {{ displayName }}
       </span>
-      <v-avatar right v-if="isDownloadable">
+      <v-avatar right v-if="isPreviewable">
         <v-btn @click="preview" icon right style="color: currentColor;" small>
           <v-icon size="20">
             mdi-eye
@@ -126,6 +126,17 @@ export default class FileChip extends Vue {
 
   public get isDownloadable() {
     return this.file.file_id && !this.error;
+  }
+  
+  public get isPreviewable() {
+    if(!this.file.file_id) {
+      return false;
+    }
+    switch(this.file.file_id.split('.')[this.file.file_id.split('.').length-1]) {
+    case 'pdf':
+      return true && !this.error;
+    }
+    return false;
   }
 
   public get displayName() {
