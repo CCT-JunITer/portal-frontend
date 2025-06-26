@@ -113,6 +113,40 @@ export const isCurrency = (v: string) => (!v || !!v.match(/^\d+(\.\d+)*(,\d{2}){
 
 export const isIBAN = (v: string) => (!v || !!v.match(/[A-Z]{2}[0-9]{2}(?:[ ]?[0-9]{4}){4}(?!(?:[ ]?[0-9]){3})(?:[ ]?[0-9]{1,2})?/)) || 'Dies ist keine IBAN.';
 
+export const isLongEnough = (v: string) => (v && v.length >= 10) || 'Passwort ist nicht lang genug (mindestens 10 Zeichen)';
+
+export const hasThreeUpperCase = (v: string) => ((v.match(/[A-Z]/g) || []).length >= 3) || 'Mindestens 3 Großbuchstaben erforderlich';
+
+export const hasThreeLowerCase = (v: string) => ((v.match(/[a-z]/g) || []).length >= 3)|| 'Mindestens 3 Kleinbuchstaben erforderlich';
+
+export const hasNumber = (v: string) => (/\d/.test(v)) || 'Mindestens eine Zahl erforderlich';
+
+export const hasAllowedSpecialChars = (v: string) => {
+  // Erlaubte Sonderzeichen: /-_#*+!§,()=:.@äöüÄÖÜß
+  const allowedSpecialChars = /^[a-zA-Z0-9/\\-_#*+!§,()=:.@äöüÄÖÜß]+$/;
+  return allowedSpecialChars.test(v) || 'Nur folgende Sonderzeichen sind erlaubt: /-_#*+!§,()=:.@äöüÄÖÜß';
+};
+
+export const hasSpecialChar = (v: string) => (/[/\\-_#*+!§,()=:.@äöüÄÖÜß]/.test(v)) || 'Mindestens ein Sonderzeichen erforderlich';
+
+export const containsForbiddenWords = (v: string) => {
+  const forbiddenWords = [
+    '12345', 'password', 'passwort', 'qwertz',
+    '11111', 'abc', 'admin', 'iloveyou',
+    'fussball', 'hallo', 'geheim', 'test',
+    'asdfghjkl;', '54321', 'master', 'superman',
+    'willkommen', '0000'
+  ];
+
+  const lowerCaseInput = v.toLowerCase();
+  const foundWords = forbiddenWords.filter(word =>
+    lowerCaseInput.includes(word.toLowerCase())
+  );
+
+  return foundWords.length === 0 || `Passwort enthält folgende unsichere Wörter/Sequenzen: ${foundWords.join(', ')}`;
+};
+
+
 export const isTodayBirthday = (date: Date | string) => {
   if (!date) {
     return false;
