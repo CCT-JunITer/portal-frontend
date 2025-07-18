@@ -63,12 +63,12 @@ export default class ProjectCalculation extends Vue {
     return bt 
       + (bt * (this.project.surcharge_amount_project_management || 0) / 100)
       + (bt * (this.project.surcharge_amount_documentation || 0) / 100)
-      + (this.project.surcharge_amount_travel || 0)
-      + (this.project.surcharge_amount_other || 0)
   }
 
   public get total_volume() {
-    return this.total_bt * (this.project.bt_rate || 0);
+    return this.total_bt * (this.project.bt_rate || 0) 
+      + (this.project.surcharge_amount_travel || 0)
+      + (this.project.surcharge_amount_other || 0);
   }
 
   public get values() {
