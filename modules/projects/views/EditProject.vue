@@ -323,7 +323,7 @@
             required
           >
           </v-checkbox>
-          
+
           <file-manager 
             v-model="project.files" 
             :folder="project.versioned_folder" 
@@ -345,6 +345,7 @@
 
         <v-col cols="12" md="4" class="px-5">
           <date-picker-menu
+            v-if="project.type != 'internal'"
             v-model ="project.proposal_date"
             defaultPicker="MONTH"
           >
@@ -361,6 +362,7 @@
           </date-picker-menu>
 
           <date-picker-menu
+            v-if="project.type != 'internal'"
             v-model ="project.acceptance_date"
             defaultPicker="MONTH"
           >
@@ -483,6 +485,7 @@
           </v-expand-transition>
 
           <v-text-field
+            v-if="project.type !== 'internal'"
             label="Aufwand Angebotserstellung"
             v-model="project.bt_amount_bid_preparation"
             class="input-lg"
@@ -494,6 +497,7 @@
 
           <!-- Vereinsprovision -->
           <v-text-field
+            v-if="project.type !== 'internal'"
             label="Vereinsprovision"
             v-model="project.club_bonus_amount"
             class="input-lg"
@@ -505,6 +509,7 @@
 
           <!-- Akquisebonus -->
           <v-text-field
+            v-if="project.type !== 'internal'"
             label="Akquisebonus"
             v-model="project.acquisition_bonus_amount"
             class="input-lg"
@@ -514,9 +519,15 @@
             :rules="[$common.isDecimal]"
           ></v-text-field>
 
-          <p class="text-overline">Zuschläge</p>
+          <p 
+            v-if="project.type !== 'internal'" 
+            class="text-overline">Zuschläge
+          </p>
           
-          <div class="ml-5">
+          <div 
+            v-if="project.type !== 'internal'"
+            class="ml-5"
+          >
             <v-text-field
               label="PM-Zuschlag"
               v-model="project.surcharge_amount_project_management"
@@ -566,9 +577,16 @@
       </v-row>
 
 
-      <v-divider class="my-5"></v-divider>
+      <v-divider 
+        v-if="project.type !== 'internal' 
+          && project.type !== 'membership_project'"
+        class="my-5"
+      ></v-divider>
 
-      <v-row>
+      <v-row 
+        v-if="project.type !== 'internal' 
+          && project.type !== 'membership_project'"
+      >
         <v-col cols="12" md="4" class="px-5">
           <h4 class="text-h4 text--primary mb-3">Akquise</h4>
           <p class="text-body-2 text--secondary"></p>
@@ -750,6 +768,8 @@
           </v-expand-transition>
         </v-col>
       </v-row>
+
+      <v-divider class="my-5"></v-divider>
 
       <v-card-actions>
         <v-spacer></v-spacer>
