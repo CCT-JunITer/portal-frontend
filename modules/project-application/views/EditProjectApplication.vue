@@ -211,6 +211,9 @@ export default class EditProjectApplication extends Vue {
         projectApplication = await dispatchCreateProjectApplication(this.$store, newProjectApplication);
       }
       this.reset();
+      if (this?.projectTender?.id != null) {
+        this.$router.push({ name: 'project-tender-detail', params: { id: String(this.projectTender.id) } });
+      }
     }
   }
 }
