@@ -323,7 +323,7 @@
             required
           >
           </v-checkbox>
-
+          
           <file-manager 
             v-model="project.files" 
             :folder="project.versioned_folder" 
@@ -808,7 +808,13 @@ import EditorComponent from '@/components/editor/EditorComponent.vue';
 })
 export default class EditProject extends Vue {
 
-  public fileLabels = FILE_LABELS;
+  public get fileLabels() {
+    if (this.project.type === 'internal') {
+      const onlyOptions = ['Abschlussdokumentation'];
+      return FILE_LABELS.filter(label => onlyOptions.includes(label));
+    }
+    return FILE_LABELS;
+  }
   public valid = true;
   public project: Partial<ProjectCreation> = {
     participants: {},
