@@ -446,7 +446,8 @@ export default class QmsaView extends Vue {
     
     if(Array.isArray(pres_json['p:presentation']?.['p:extLst']?.['p:ext'].find(a => Object.keys(a).includes('p14:sectionLst'))?.['p14:sectionLst']['p14:section'])){
       this.slidelist = pres_json['p:presentation']?.['p:extLst']?.['p:ext'].find(a => Object.keys(a).includes('p14:sectionLst'))?.['p14:sectionLst']['p14:section'].map((x) => { 
-        const slideids = Array.isArray(x['p14:sldIdLst']['p14:sldId'])? x['p14:sldIdLst']['p14:sldId'].map(y => y['_attributes']['id']) : [x['p14:sldIdLst']['p14:sldId']].map(y => y['_attributes']['id'])
+        console.log(x)
+        const slideids = Array.isArray(x['p14:sldIdLst']['p14:sldId'])? x['p14:sldIdLst']['p14:sldId'].map(y => y['_attributes']['id']) : [x['p14:sldIdLst']['p14:sldId']].map(y => y?.['_attributes']?.['id']).filter( x=> x)
         return {'name': x['_attributes']['name'],
                 'slds': slidelist.filter( y => slideids.map(z => ridmapping[z]).map(z => xmlmapping[z]).includes(y.xmlname)),
         }
