@@ -14,9 +14,13 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
+          <tr v-if="project.status!='completed'">
             <td>BT (soll)</td>
             <td class="text-right">{{ project.bt_amount_expected }} BT</td>
+          </tr>
+          <tr v-else>
+            <td>BT (ist)</td>
+            <td class="text-right">{{project.bt_amount_actual}} BT</td>
           </tr>
           <tr
             v-for="v in values"
@@ -59,7 +63,10 @@ export default class ProjectCalculation extends Vue {
   public project!: Project;
 
   public get total_bt() {
-    const bt = this.project.bt_amount_expected || 0;
+    const bt = this.project.status === 'completed'
+      ? this.project.bt_amount_actual || 0
+      : this.project.bt_amount_expected || 0;
+
     return bt 
       + (bt * (this.project.surcharge_amount_project_management || 0) / 100)
       + (bt * (this.project.surcharge_amount_documentation || 0) / 100)
