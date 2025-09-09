@@ -332,7 +332,7 @@
 
           <file-manager 
             v-model="project.files" 
-            :folder="(project as any).versioned_folder" 
+            :folder="versionedFolder" 
             :multiple="true"
             :labels="fileLabels"
             :requiredLabels="requiredLabels"
@@ -1064,6 +1064,9 @@ export default class EditProject extends Vue {
     }
     (this.project.participants as Record<string, number[]>)[role] = val;
   }
+
+  // Access potentially missing backend-provided folder without TS cast in template
+  public get versionedFolder() { return (this.project as Record<string, unknown> | undefined)?.['versioned_folder']; }
   
 }
 </script>
