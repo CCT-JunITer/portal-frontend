@@ -145,6 +145,8 @@ export interface IEvent {
     author: IUserProfile;
     protocol_id: number;
     protocol: IUserProfile;
+    application_possible?: boolean;
+    versioned_folder?: VersionedFolder;
 }
 export interface IEventCreate {
     title: string;
@@ -166,6 +168,8 @@ export interface IEventCreate {
     last_updated_id: number;
     author_id: number;
     protocol_id: number;
+    application_possible?: boolean;
+    versioned_folder?: VersionedFolder;
 }
 
 export type UserType = 'alumni' | 'all' | 'members';
