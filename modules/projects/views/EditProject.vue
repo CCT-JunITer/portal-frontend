@@ -184,8 +184,9 @@
               prepend-icon="mdi-school"
               filled
               :label="role.text"
-              v-model="project.applications[role.value]">
-            </user-select>
+              :value="(project.applications && project.applications[role.value]) || []"
+              @input="val => ensureApplications(role.value, val)"
+            ></user-select>
 
           </div>
         </v-col>
@@ -211,8 +212,9 @@
               prepend-icon="mdi-school"
               filled
               :label="role.text"
-              v-model="project.participants[role.value]">
-            </user-select>
+              :value="(project.participants && project.participants[role.value]) || []"
+              @input="val => ensureParticipants(role.value, val)"
+            ></user-select>
 
           </div>
         </v-col>
@@ -290,6 +292,8 @@
             prepend-icon="mdi-check-decagram"
             hint="Durch das Qualitätsmanagement bestätigt"
             persistent-hint
+            :disabled="!canChangeApproval"
+            @change="onApprovalChange('approved')"
             required
           >
           </v-checkbox>
@@ -300,6 +304,8 @@
             class="input-lg"
             prepend-icon="mdi-check-decagram"
             hint="Durch das Qualitätsmanagement bestätigt"
+            :disabled="!canChangeApproval"
+            @change="onApprovalChange('qm_feedback')"
             required
           >
           </v-checkbox>
@@ -326,7 +332,7 @@
 
           <file-manager 
             v-model="project.files" 
-            :folder="project.versioned_folder" 
+            :folder="(project as any).versioned_folder" 
             :multiple="true"
             :labels="fileLabels"
             :requiredLabels="requiredLabels"
@@ -813,9 +819,10 @@ import { Route } from 'vue-router';
 import UserSelect from '@/components/user-select/UserSelect.vue';
 import ConsentDialog from '@/components/consent-dialog/ConsentDialog.vue';
 import DatePickerMenu from '@/components/DatePickerMenu.vue';
-import { FILE_LABELS, Project, ProjectApplicationUser, ProjectCreate, ProjectCreation, ProjectRoleEnum, ProjectUser } from '../types';
+import { FILE_LABELS, Project, ProjectApplicationUser, ProjectCreate, ProjectCreation, ProjectRoleEnum } from '../types';
 import { dispatchCreateProject, dispatchDeleteProject, dispatchGetAutocompleteValues, dispatchGetOneProject, dispatchUpdateProject } from '../store/actions';
 import { readAutocompleteValues, readOneProject } from '../store/getters';
+import { readHasAnyPermission } from '@/store/main/getters';
 import ProjectCalculation from '../components/ProjectCalculation.vue';
 import ProjectSelect from '../components/project-select/ProjectSelect.vue';
 import { dispatchGetProjectApplicationsFor, dispatchGetProjectTenders } from '@modules/project-application/store/actions';
@@ -919,6 +926,10 @@ export default class EditProject extends Vue {
     await dispatchGetAutocompleteValues(this.$store);
     await dispatchGetProjectTenders(this.$store);
     this.valid = false;
+    this.originalApprovalState = {
+      approved: this.project.approved,
+      qm_feedback: this.project.qm_feedback,
+    };
   }
 
   public cancel() {
@@ -928,8 +939,8 @@ export default class EditProject extends Vue {
   public get newProject() {
     const newProject: ProjectCreate = {
       ...this.project as ProjectCreation,
-      participant_ids: this.project.participants!,
-      applications_ids: this.project.applications!,
+      participant_ids: this.project.participants || {},
+      applications_ids: this.project.applications || {},
       bt_amount_expected: this.$common.text2Decimal(this.project.bt_amount_expected), // Anzahl BT(soll)
       bt_amount_actual: this.$common.text2Decimal(this.project.bt_amount_actual), // Anzahl BT(ist)
       bt_rate: this.$common.text2Decimal(this.project.bt_rate),
@@ -1002,23 +1013,56 @@ export default class EditProject extends Vue {
   public get onlyRequiredIfStatusIsCompleted(){
     return this.project.status === 'completed'
       ? this.$common.required
-      : v => true;
+      : () => true;
   }
   public get onlyRequiredIfStatusIsAborted(){
     return this.project.status === 'aborted'
       ? this.$common.required
-      : v => true;
+      : () => true;
   }
   public get referenceDaterequired(){
     return (this.project.reference_status !== 'contradiction' && this.project.reference_status !== 'missing_approval' && this.project.status === 'completed' && this.project.type!=='internal' && this.project.type!=='membership_project')
       ? this.$common.required
-      : v => true;
+      : () => true;
   }
 
   public get onlyRequiredIfExternal(){
     return (this.project.type === 'external' || this.project.type === 'staffing')
       ? this.$common.required
-      : v => true;
+      : () => true;
+  }
+
+  // QM permission (re-using approve permissions as in backend)
+  public get canChangeApproval() {
+    return readHasAnyPermission(this.$store)(['portal.approve', 'portal.approve.project']);
+  }
+
+  private originalApprovalState: { approved?: boolean; qm_feedback?: boolean } = {};
+
+  onApprovalChange(field: 'approved' | 'qm_feedback') {
+    if (!this.canChangeApproval) {
+      // revert change silently
+      (this.project as Record<string, unknown>)[field] = (this.originalApprovalState as Record<string, unknown>)[field];
+      return;
+    }
+    // store last valid state
+    this.originalApprovalState = {
+      approved: this.project.approved,
+      qm_feedback: this.project.qm_feedback,
+    };
+  }
+
+  ensureApplications(role: string, val: number[]) {
+    if (!this.project.applications) {
+      this.project.applications = {} as Record<string, number[]>;
+    }
+    (this.project.applications as Record<string, number[]>)[role] = val;
+  }
+  ensureParticipants(role: string, val: number[]) {
+    if (!this.project.participants) {
+      this.project.participants = {} as Record<string, number[]>;
+    }
+    (this.project.participants as Record<string, number[]>)[role] = val;
   }
   
 }
