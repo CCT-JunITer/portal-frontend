@@ -22,7 +22,7 @@
         <slot name="top"></slot>
       </template>
       <template v-slot:item.title="{ item }">
-        <v-icon v-if="item.approved || isAutoApproved(item)" color="cctGreen" small>mdi-check-decagram</v-icon>
+        <v-icon v-if="item.approved" color="cctGreen" small>mdi-check-decagram</v-icon>
         {{ item.title }}
       </template>
       <template v-slot:item.custom_agenda="{ item }">
@@ -36,7 +36,7 @@
         </ul>
       </template>
       <template v-slot:item.subtype="{ item }">
-        <v-icon v-if="item.type==='meeting' && (item.approved || isAutoApproved(item))" color="cctGreen" small>mdi-check-decagram</v-icon>
+        <v-icon v-if="item.approved && item.type==='meeting'" color="cctGreen" small>mdi-check-decagram</v-icon>
         {{ item.subtype }}
       </template>
       <template v-slot:item.external="{ item }">
@@ -155,41 +155,6 @@ export default class EventTable extends Vue {
       return 0;
     }
     return this.displayUsersFor.participants.length;
-  }
-
-  /**
-   * Automatischer QM-Haken für Donnerstagssitzung.
-   * Bedingungen:
-   *  - Typ: meeting
-   *  - Subtype: Donnerstagssitzung
-   *  - Agenda hat mindestens einen Eintrag
-   *  - Datei mit Label "Protokoll" vorhanden
-   *  - Datei mit Label "Präsentation" oder "Folien" vorhanden
-   */
-  public isAutoApproved(event: IEvent & { versioned_folder?: { effective_files?: { label?: string | null }[] } }) {
-    if (!event || event.type !== 'meeting' || event.subtype !== 'Donnerstagssitzung') {
-      return false;
-    }
-    const hasAgenda = Array.isArray(event.agenda) && event.agenda.length > 0;
-    const labels = (event.versioned_folder?.effective_files || [])
-      .map(f => f.label)
-      .filter((l): l is string => typeof l === 'string' && l.length > 0);
-    const hasProtocol = labels.includes('Protokoll');
-    const hasSlides = labels.includes('Präsentation') || labels.includes('Folien');
-    return hasAgenda && hasProtocol && hasSlides;
-  }
-
-  // Prüft, ob aktueller User bereits Teilnehmer:in ist
-  public isParticipant(event: IEvent) {
-    const user = this.userProfile;
-    if (!user) return false;
-    return !!event.participants.find(p => p.id === user.id);
-  }
-
-  // Öffnet Anmeldedialog / Seite (Platzhalter – konkrete Implementierung abhängig vom restlichen Code)
-  public openRegisterEvent(event: IEvent) {
-    // Falls es eine Route für Event-Anmeldung gibt, dort hin navigieren
-    this.$emit('register-event', event);
   }
 
   public get headers() {
