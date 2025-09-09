@@ -121,8 +121,14 @@
             hint="Durch das Qualitätsmanagement bestätigt"
             persistent-hint
             required
-          >
-          </v-checkbox>
+          ></v-checkbox>
+          <v-alert
+            type="info"
+            outlined
+            dense
+            class="input-lg"
+            v-if="isDonnerstagssitzung"
+          >Bei Donnerstagssitzungen: Der Haken wird automatisch gesetzt sobald Agenda, Protokoll und Präsentation/Folien vorhanden sind. Manuelles Setzen ist weiterhin möglich.</v-alert>
 
           <v-checkbox
             v-model="event.application_possible"
@@ -262,6 +268,7 @@ export default class AdminViewEvent extends Vue {
     } else if(this.type === 'meeting') {
       return ['Präsentation', 'Protokoll'];
     }
+    return [];
   }
 
 
@@ -327,6 +334,9 @@ export default class AdminViewEvent extends Vue {
 
   get editEvent() {
     return readOneEvent(this.$store)(+this.$router.currentRoute.params.id);
+  }
+  get isDonnerstagssitzung() {
+    return (this.subtype?.type || this.event.subtype) === 'Donnerstagssitzung';
   }
   public reset() {
     if(this.editEvent) {
