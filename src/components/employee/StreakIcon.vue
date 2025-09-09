@@ -45,10 +45,14 @@ export default class StreakIcon extends Vue {
     if (!this.lastDoSi) {
       return false;
     }
-
-    return this.streaksSorted?.length > 0 && 
-      new Date(this.streaksSorted[0].streak_end) === new Date(this.lastDoSi.date_from)
-      && this.streaksSorted[0].streak_length >= 3;
+    if (!this.streaksSorted?.length) {
+      return false;
+    }
+    const latest = this.streaksSorted[0];
+    // Compare timestamps instead of Date object identity
+    const latestEndTs = new Date(latest.streak_end).getTime();
+    const lastDoSiTs = new Date(this.lastDoSi.date_from).getTime();
+    return latestEndTs === lastDoSiTs && latest.streak_length >= 3;
   }
 
   public async mounted() {
