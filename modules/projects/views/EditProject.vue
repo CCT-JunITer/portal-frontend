@@ -237,7 +237,7 @@
             color="cctOrange"
             class="mb-4"
           >
-            Dieser Eintrag ist aktuell durch {{ editProject?.approved_by?.full_name }} bestätigt. Änderungen am Eintrag führen dazu, dass die Bestätigung zurückgesetzt wird.
+            Dieser Eintrag ist aktuell durch {{ approvedByName }} bestätigt. Änderungen am Eintrag führen dazu, dass die Bestätigung zurückgesetzt wird.
           </v-alert>
           <v-combobox
             v-model="project.methods"
@@ -1091,6 +1091,10 @@ export default class EditProject extends Vue {
   get showAutoRevokeHint() {
     // Show when project currently approved, user part of team/author, and user can NOT change approval (treated as participant)
     return !!(this.editProject && this.editProject.approved && this.isParticipantOrAuthor);
+  }
+
+  get approvedByName() {
+    return this.editProject?.approved_by?.full_name || 'Unbekannt';
   }
 }
 </script>

@@ -181,7 +181,7 @@ export default class ProjectMain extends Vue {
       {
         value: 'customer_name',
         text: 'Kunde',
-        values: readAutocompleteValues(this.$store)('customer_name')?.map(method => ({ text: method, value: method })),
+        values: readAutocompleteValues(this.$store)('customer_name')?.map(method => ({ text: method, value: method })).sort((a, b) => a.text.localeCompare(b.text)),
         multiple: true,
       },
     ];

@@ -74,6 +74,12 @@
         {{ item.bt_amount_actual ? $common.decimal2Text(item.bt_amount_actual) + ' BT' : $common.decimal2Text(item.bt_amount_expected) + ' BT (soll)'}}
       </template>
 
+      <template v-slot:item.project_end_date_sort="{ item }">
+        <span>
+          {{ $common.format(item.project_end_date_actual || item.project_end_date_expected || '') }}
+        </span>
+      </template>
+
       <template v-slot:item.custom_details="{ item }">
         <v-btn
           color="cctGrey"
@@ -115,6 +121,7 @@ export default class ProjectTable extends Vue {
       return {
         ...project, 
         type: this.$enum('ProjectTypeEnum', project.type),
+        project_end_date_sort: project.project_end_date_actual || project.project_end_date_expected || '',
       }
     });
   }
@@ -149,6 +156,18 @@ export default class ProjectTable extends Vue {
       {
         text: 'Projektgröße (BT)',
         value: 'bt_amount_expected',
+      },
+      {
+        text: 'Projektende',
+        value: 'project_end_date_sort',
+        sortable: true,
+        align: 'left',
+        sort: (a, b) => {
+          if(!a && !b) return 0;
+          if(!a) return -1;
+          if(!b) return 1;
+          return new Date(a).getTime() - new Date(b).getTime();
+        }
       },
       {
         text: 'Projektzeitraum',
