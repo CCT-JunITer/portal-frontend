@@ -229,7 +229,16 @@
         </v-col>
 
         <v-col cols="12" md="8" class="px-5">
-
+          <v-alert
+            v-if="showAutoRevokeHint"
+            dense
+            outlined
+            type="info"
+            color="cctOrange"
+            class="mb-4"
+          >
+            Dieser Eintrag ist aktuell durch {{ editProject?.approved_by?.full_name }} bestätigt. Änderungen am Eintrag führen dazu, dass die Bestätigung zurückgesetzt wird.
+          </v-alert>
           <v-combobox
             v-model="project.methods"
             prepend-icon="mdi-animation"
@@ -822,7 +831,7 @@ import DatePickerMenu from '@/components/DatePickerMenu.vue';
 import { FILE_LABELS, Project, ProjectApplicationUser, ProjectCreate, ProjectCreation, ProjectRoleEnum } from '../types';
 import { dispatchCreateProject, dispatchDeleteProject, dispatchGetAutocompleteValues, dispatchGetOneProject, dispatchUpdateProject } from '../store/actions';
 import { readAutocompleteValues, readOneProject } from '../store/getters';
-import { readHasAnyPermission } from '@/store/main/getters';
+import { readHasAnyPermission, readUserProfile } from '@/store/main/getters';
 import ProjectCalculation from '../components/ProjectCalculation.vue';
 import ProjectSelect from '../components/project-select/ProjectSelect.vue';
 import { dispatchGetProjectApplicationsFor, dispatchGetProjectTenders } from '@modules/project-application/store/actions';
@@ -1068,6 +1077,21 @@ export default class EditProject extends Vue {
   // Access potentially missing backend-provided folder without TS cast in template
   public get versionedFolder() { return (this.project as Record<string, unknown> | undefined)?.['versioned_folder']; }
   
+  get currentUserId() {
+    return readUserProfile(this.$store)?.id;
+  }
+
+  get isParticipantOrAuthor() {
+    if (!this.currentUserId || !this.editProject) return false;
+    const participantIds = Object.values(this.editProject.participants || {})
+      .flatMap(uList => uList.map(u => u.participant.id));
+    return participantIds.includes(this.currentUserId) || this.editProject.author?.id === this.currentUserId;
+  }
+
+  get showAutoRevokeHint() {
+    // Show when project currently approved, user part of team/author, and user can NOT change approval (treated as participant)
+    return !!(this.editProject && this.editProject.approved && this.isParticipantOrAuthor);
+  }
 }
 </script>
 
