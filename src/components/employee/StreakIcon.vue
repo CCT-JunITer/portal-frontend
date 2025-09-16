@@ -1,12 +1,12 @@
 <template>
-  <v-tooltip bottom content-class="tooltip">
+  <v-tooltip bottom content-class="tooltip" :disabled="!hasStreak">
     <template v-slot:activator="{ on, attrs }">
       <v-icon
         color="cctGrey"
         size="20"           
         v-bind="attrs"
         v-on="on"
-        v-if="hasStreak"
+        v-show="hasStreak"
       >
         mdi-fire
       </v-icon>
@@ -34,7 +34,13 @@ export default class StreakIcon extends Vue {
   public streaks!: UserStreak[];
 
   get streaksSorted() {
-    return this.streaks?.sort((a, b) => new Date(b.streak_start).getTime() - new Date(a.streak_start).getTime()) || [];
+    const list = this.streaks || [];
+    // Avoid mutating props; sort a shallow copy for predictable reactivity
+    const parseTs = (d: string | number | Date) => {
+      const ts = new Date(d).getTime();
+      return Number.isFinite(ts) ? ts : 0;
+    };
+    return [...list].sort((a, b) => parseTs(b.streak_start) - parseTs(a.streak_start));
   }
 
   get lastDoSi() {
