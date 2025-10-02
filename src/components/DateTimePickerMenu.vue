@@ -16,7 +16,7 @@
       <slot 
         name="activator" 
         v-bind:on="{...on, input: onInputChange, change: onInputChange, 'click:append': () => menu = true}" 
-        v-bind:attrs="{...attrs, value: dateFormatted, 'append-icon': 'mdi-calendar', 'rules': [v => (!!v && isValid(v)) || 'Falsches Datumsformat']}">
+        v-bind:attrs="{...attrs, value: dateFormatted, 'append-icon': 'mdi-calendar', 'rules': [v => (!v || !isValid(v)) ? 'Falsches Datumsformat' : true]}">
       </slot>
     </template>
     <v-card tile>

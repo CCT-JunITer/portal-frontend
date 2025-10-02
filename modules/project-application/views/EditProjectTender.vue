@@ -123,7 +123,7 @@
                 v-bind="attrs"
                 v-on="on"
                 prepend-icon="mdi-calendar-range"
-                :rules="[$common.required, attrs.rules]"
+                :rules="[$common.required, ...(attrs.rules || [])]"
               ></v-text-field>
             </template>
           </date-time-picker-menu>
@@ -144,7 +144,7 @@
                 v-on="on"
                 required
                 prepend-icon="mdi-calendar-range"
-                :rules="[$common.required, ...attrs.rules]"
+                :rules="[$common.required, ...(attrs.rules || [])]"
               ></v-text-field>
             </template>
           </date-picker-menu>
@@ -165,7 +165,7 @@
                 v-on="on"
                 required
                 prepend-icon="mdi-calendar-range"
-                :rules="[$common.required, ...attrs.rules]"
+                :rules="[$common.required, ...(attrs.rules || [])]"
               ></v-text-field>
             </template>
           </date-picker-menu>
