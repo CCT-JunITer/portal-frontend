@@ -39,7 +39,7 @@
           </div>
           <div>
             <v-icon small>mdi-briefcase-download</v-icon>
-            <span class="text-caption">{{ ((projectTender.min_bt + projectTender.max_bt)/2)/sumRoles(projectTender) }} BT/Person</span>
+            <span class="text-caption">{{ (((projectTender.min_bt + projectTender.max_bt)/2)/sumRoles(projectTender)).toFixed(2) }} BT/Person</span>
           </div>
         </div>
       </v-list-item>
