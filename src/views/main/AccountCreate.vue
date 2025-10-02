@@ -458,45 +458,50 @@ export default class AccountCreate extends Vue {
       return null;
     }
     if ((this.$refs.form as HTMLFormElement).validate()) {
-      const createProfile: IUserProfileCreate = {
-        email: this.email,
-        private_email: this.privateEmail,
-        first_name: this.firstName,
-        last_name: this.lastName,
-        password: this.password1,
-        birthdate: this.birthdate,
-        phonenumber: this.phonenumber,
-        memberstatus: this.memberstatus,
-        entrydate: this.entrydate,
-        major: this.major,
-        university: this.university,
-        studylevel: this.studylevel,
-        district: this.district,
-        linkedin: this.linkedin,
-        ressort: this.ressort,
-        gender: this.gender,      
-        street: this.street,
-        city: this.city,
-        postcode: this.postcode,
-        matriculation_number: this.matriculationNumber,
-        iban: this.iban,
-        bic: this.bic,
-        bank: this.bank,
-      };
-      if (this.avatar) {
-        const upload = await dispatchUploadFile(this.$store, {
-          file: this.avatar,
-        });
-        createProfile.profile_picture = upload?.filename;
-      }
-      // explicitly set profile_picture to null
-      // to remove current avatar
-      if (this.avatar === null) {
-        createProfile.profile_picture = '';
-      }
+      try {
+        const createProfile: IUserProfileCreate = {
+          email: this.email,
+          private_email: this.privateEmail,
+          first_name: this.firstName,
+          last_name: this.lastName,
+          password: this.password1,
+          birthdate: this.birthdate,
+          phonenumber: this.phonenumber,
+          memberstatus: this.memberstatus,
+          entrydate: this.entrydate,
+          major: this.major,
+          university: this.university,
+          studylevel: this.studylevel,
+          district: this.district,
+          linkedin: this.linkedin,
+          ressort: this.ressort,
+          gender: this.gender,      
+          street: this.street,
+          city: this.city,
+          postcode: this.postcode,
+          matriculation_number: this.matriculationNumber,
+          iban: this.iban,
+          bic: this.bic,
+          bank: this.bank,
+        };
+        if (this.avatar) {
+          const upload = await dispatchUploadFile(this.$store, {
+            file: this.avatar,
+          });
+          createProfile.profile_picture = upload?.filename;
+        }
+        // explicitly set profile_picture to null
+        // to remove current avatar
+        if (this.avatar === null) {
+          createProfile.profile_picture = '';
+        }
 
-      
-      await dispatchCreateUserOpen(this.$store, {user: createProfile, token: token});
+        
+        await dispatchCreateUserOpen(this.$store, {user: createProfile, token: token});
+      } catch (error) {
+        // Error notification is already shown by apiCallNotify
+        console.error('Failed to create account:', error);
+      }
     }
   }
 }

@@ -167,8 +167,13 @@ export default class EditBoard extends Vue {
     if (!this.editBoard) {
       return;
     }
-    await dispatchDeleteBoard(this.$store, this.editBoard.id);
-    this.$router.push('/main/wms/boards');
+    try {
+      await dispatchDeleteBoard(this.$store, this.editBoard.id);
+      this.$router.push('/main/wms/boards');
+    } catch (error) {
+      // Error notification is already shown by apiCallNotify
+      console.error('Failed to delete board:', error);
+    }
   }
   
 
@@ -204,15 +209,19 @@ export default class EditBoard extends Vue {
 
   public async submit() {
     if ((this.$refs.form as HTMLFormElement).validate()) {
-      const newBoard = this.newBoard;
-      let board: Board | undefined;
-      if (this.editBoard?.id) {
-        board = await dispatchUpdateBoard(this.$store, {id: this.editBoard.id, board: newBoard});
-      } else {
-        board = await dispatchCreateBoard(this.$store, newBoard);
+      try {
+        const newBoard = this.newBoard;
+        let board: Board | undefined;
+        if (this.editBoard?.id) {
+          board = await dispatchUpdateBoard(this.$store, {id: this.editBoard.id, board: newBoard});
+        } else {
+          board = await dispatchCreateBoard(this.$store, newBoard);
+        }
+        this.$router.push('/main/wms/boards');
+      } catch (error) {
+        // Error notification is already shown by apiCallNotify
+        console.error('Failed to save board:', error);
       }
-      this.$router.push('/main/wms/boards');
-      
     }
   }
 

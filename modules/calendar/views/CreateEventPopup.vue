@@ -431,20 +431,31 @@ export default {
     },
 
     async deleteExdate() {
-      if (!this.selectedEventInternal.rrule.exdate) this.selectedEventInternal.rrule.exdate = []
-      this.selectedEventInternal.rrule.exdate.push(this.selectedEventInternal.viewStart)
-      this.save()
+      try {
+        if (!this.selectedEventInternal.rrule.exdate) this.selectedEventInternal.rrule.exdate = []
+        this.selectedEventInternal.rrule.exdate.push(this.selectedEventInternal.viewStart)
+        this.save()
+      } catch (error) {
+        // Error notification is already shown by apiCallNotify
+        console.error('Failed to delete exception date:', error);
+      }
     },
 
     async deleteEvent() {
-      this.loading = true
-      await dispatchRemoveEvent(this.$store, this.selectedEventInternal, false)
-      if (this.selectedEvent.locationId == 'tower') {
-        commitRemoveCalendarEvent(this.$store, {calendarId:this.towerCalendar.uid, uid:this.selectedEvent.towerId});
+      try {
+        this.loading = true
+        await dispatchRemoveEvent(this.$store, this.selectedEventInternal, false)
+        if (this.selectedEvent.locationId == 'tower') {
+          commitRemoveCalendarEvent(this.$store, {calendarId:this.towerCalendar.uid, uid:this.selectedEvent.towerId});
+        }
+        commitRemoveCalendarEvent(this.$store, this.selectedEventInternal);
+        this.$emit('changed') 
+        this.close()
+      } catch (error) {
+        // Error notification is already shown by apiCallNotify
+        console.error('Failed to delete event:', error);
+        this.loading = false;
       }
-      commitRemoveCalendarEvent(this.$store, this.selectedEventInternal);
-      this.$emit('changed') 
-      this.close()
     },
 
     setFullscreen(value) {

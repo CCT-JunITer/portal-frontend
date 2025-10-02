@@ -419,31 +419,51 @@ export default class AdminUsers extends Vue {
   }
 
   public async changeStatusCreated() {
-    const message = this.message_request;
-    let newStatus = 'request_rejected';
-    if (this.isAccepted) newStatus = 'request_accepted'
-    await dispatchUpdateFinanceRequestState(this.$store, {financeId: this.financeRequest.id, updated_status: newStatus, updated_message_file: '', updated_message_request: message });
-    await this.loadFinanceRequests();
+    try {
+      const message = this.message_request;
+      let newStatus = 'request_rejected';
+      if (this.isAccepted) newStatus = 'request_accepted'
+      await dispatchUpdateFinanceRequestState(this.$store, {financeId: this.financeRequest.id, updated_status: newStatus, updated_message_file: '', updated_message_request: message });
+      await this.loadFinanceRequests();
+    } catch (error) {
+      // Error notification is already shown by apiCallNotify
+      console.error('Failed to update finance request status:', error);
+    }
   }
 
   public async changeStatusRequestAccepted() {
-    const newStatus = 'file_uploaded';
-    await dispatchUpdateFinanceRequestStateFile(this.$store, {financeId: this.financeRequest.id, updated_status: newStatus, updated_receipt: this.files });
-    await this.loadFinanceRequests();
+    try {
+      const newStatus = 'file_uploaded';
+      await dispatchUpdateFinanceRequestStateFile(this.$store, {financeId: this.financeRequest.id, updated_status: newStatus, updated_receipt: this.files });
+      await this.loadFinanceRequests();
+    } catch (error) {
+      // Error notification is already shown by apiCallNotify
+      console.error('Failed to upload file:', error);
+    }
   }
 
   public async changeStatusFileUploaded() {
-    const message = this.message_file;
-    let newStatus = 'file_rejected';
-    if (this.isAccepted) newStatus = 'file_accepted'
-    await dispatchUpdateFinanceRequestState(this.$store, {financeId: this.financeRequest.id, updated_status: newStatus, updated_message_file: message, updated_message_request: '' });
-    await this.loadFinanceRequests();
+    try {
+      const message = this.message_file;
+      let newStatus = 'file_rejected';
+      if (this.isAccepted) newStatus = 'file_accepted'
+      await dispatchUpdateFinanceRequestState(this.$store, {financeId: this.financeRequest.id, updated_status: newStatus, updated_message_file: message, updated_message_request: '' });
+      await this.loadFinanceRequests();
+    } catch (error) {
+      // Error notification is already shown by apiCallNotify
+      console.error('Failed to update file status:', error);
+    }
   }
   
   public async changeStatusFileRejected() {
-    const newStatus = 'file_uploaded';
-    await dispatchUpdateFinanceRequestStateFile(this.$store, {financeId: this.financeRequest.id, updated_status: newStatus, updated_receipt: this.files });
-    await this.loadFinanceRequests();
+    try {
+      const newStatus = 'file_uploaded';
+      await dispatchUpdateFinanceRequestStateFile(this.$store, {financeId: this.financeRequest.id, updated_status: newStatus, updated_receipt: this.files });
+      await this.loadFinanceRequests();
+    } catch (error) {
+      // Error notification is already shown by apiCallNotify
+      console.error('Failed to resubmit file:', error);
+    }
   }
   
   public isCurrentStatus(statusArr: string[]): boolean {
@@ -451,8 +471,13 @@ export default class AdminUsers extends Vue {
   }
 
   public async deleteFinanceRequest() {
-    await dispatchDeleteFinanceRequest(this.$store, this.financeRequest.id);
-    this.$router.back();
+    try {
+      await dispatchDeleteFinanceRequest(this.$store, this.financeRequest.id);
+      this.$router.back();
+    } catch (error) {
+      // Error notification is already shown by apiCallNotify
+      console.error('Failed to delete finance request:', error);
+    }
   }
 
   public async loadFinanceRequests() {

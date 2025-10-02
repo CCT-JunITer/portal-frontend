@@ -253,12 +253,17 @@ export default class AdminViewEvent extends Vue {
     if (!this.editEvent) {
       return;
     }
-    const oldEvent = this.editEvent;
-    await dispatchDeleteEvent(this.$store, oldEvent.id);
-    if (oldEvent.type === 'training') {
-      this.$router.push('/main/trainings');
-    } else {
-      this.$router.push('/main/wms/meetings');
+    try {
+      const oldEvent = this.editEvent;
+      await dispatchDeleteEvent(this.$store, oldEvent.id);
+      if (oldEvent.type === 'training') {
+        this.$router.push('/main/trainings');
+      } else {
+        this.$router.push('/main/wms/meetings');
+      }
+    } catch (error) {
+      // Error notification is already shown by apiCallNotify
+      console.error('Failed to delete event:', error);
     }
   }
 
@@ -314,21 +319,25 @@ export default class AdminViewEvent extends Vue {
 
   public async submit() {
     if ((this.$refs.form as HTMLFormElement).validate()) {
-      const new_event = {
-        ...this.event,
-        timed: !this.allday,
-        type: this.type,
-        subtype: this.subtype && this.subtype.type,
-      } as IEventCreate;
+      try {
+        const new_event = {
+          ...this.event,
+          timed: !this.allday,
+          type: this.type,
+          subtype: this.subtype && this.subtype.type,
+        } as IEventCreate;
 
-      let event: IEvent | undefined;
-      if (this.editEvent?.id) {
-        event = await dispatchUpdateEvent(this.$store, {id: this.editEvent.id, event: new_event});
-      } else {
-        event = await dispatchCreateEvent(this.$store, new_event);
+        let event: IEvent | undefined;
+        if (this.editEvent?.id) {
+          event = await dispatchUpdateEvent(this.$store, {id: this.editEvent.id, event: new_event});
+        } else {
+          event = await dispatchCreateEvent(this.$store, new_event);
+        }
+        this.$router.push(`/main/events/${event?.id}`);
+      } catch (error) {
+        // Error notification is already shown by apiCallNotify
+        console.error('Failed to save event:', error);
       }
-      this.$router.push(`/main/events/${event?.id}`);
-      
     }
   }
 

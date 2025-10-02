@@ -255,7 +255,12 @@ export default class UserProfileSettings extends Vue {
 
   public async submit() {
     if ((this.$refs.form as HTMLFormElement).validate()) {
-      await dispatchUpdateUserSettingsMe(this.$store, this.userSettings!);
+      try {
+        await dispatchUpdateUserSettingsMe(this.$store, this.userSettings!);
+      } catch (error) {
+        // Error notification is already shown by apiCallNotify
+        console.error('Failed to update user settings:', error);
+      }
     }
   }
 

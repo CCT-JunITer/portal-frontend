@@ -140,17 +140,22 @@ export default class EditDocument extends Vue {
 
   public async submit() {
     if ((this.$refs.form as HTMLFormElement).validate()) {
-      const new_document = {
-        ...this.document,
-      } as IDocumentCreate;
+      try {
+        const new_document = {
+          ...this.document,
+        } as IDocumentCreate;
 
-      let document: IDocument | undefined;
-      if (this.editDocument?.id) {
-        document = await dispatchUpdateDocument(this.$store, {id: this.editDocument.id, document: new_document});
-      } else {
-        document = await dispatchCreateDocument(this.$store, new_document);
+        let document: IDocument | undefined;
+        if (this.editDocument?.id) {
+          document = await dispatchUpdateDocument(this.$store, {id: this.editDocument.id, document: new_document});
+        } else {
+          document = await dispatchCreateDocument(this.$store, new_document);
+        }
+        this.$router.push(`/main/wms/documents/${document.type}`);
+      } catch (error) {
+        // Error notification is already shown by apiCallNotify
+        console.error('Failed to save document:', error);
       }
-      this.$router.push(`/main/wms/documents/${document.type}`);
     }
   }
 

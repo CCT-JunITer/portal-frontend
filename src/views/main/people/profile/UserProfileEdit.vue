@@ -468,44 +468,49 @@ export default class UserProfileEdit extends Vue {
 
   public async submit() {
     if ((this.$refs.form as HTMLFormElement).validate()) {
-      const updatedProfile: IUserProfileUpdate = {
-        first_name: this.firstName,
-        last_name: this.lastName,
-        email: this.email,
-        birthdate: this.birthdate,
-        phonenumber: this.phonenumber,
-        entrydate: this.entrydate,
-        major: this.major,
-        university: this.university,
-        studylevel: this.studylevel,
-        district: this.district,
-        linkedin: this.linkedin,
-        gender: this.gender,
-        street: this.street,
-        city: this.city,
-        postcode: this.postcode,
-        matriculation_number: this.matriculationNumber,
-        highest_project_position: this.highestProjectPosition,
-        iban: this.iban,
-        bic: this.bic,
-        bank: this.bank,
-        private_email: this.privateEmail,
-        contact: this.contact,
-      };
+      try {
+        const updatedProfile: IUserProfileUpdate = {
+          first_name: this.firstName,
+          last_name: this.lastName,
+          email: this.email,
+          birthdate: this.birthdate,
+          phonenumber: this.phonenumber,
+          entrydate: this.entrydate,
+          major: this.major,
+          university: this.university,
+          studylevel: this.studylevel,
+          district: this.district,
+          linkedin: this.linkedin,
+          gender: this.gender,
+          street: this.street,
+          city: this.city,
+          postcode: this.postcode,
+          matriculation_number: this.matriculationNumber,
+          highest_project_position: this.highestProjectPosition,
+          iban: this.iban,
+          bic: this.bic,
+          bank: this.bank,
+          private_email: this.privateEmail,
+          contact: this.contact,
+        };
 
-      if(this.avatar) {
-        const upload = await dispatchUploadFile(this.$store, {
-          file: this.avatar,
-        });
-        updatedProfile.profile_picture = upload?.filename;
+        if(this.avatar) {
+          const upload = await dispatchUploadFile(this.$store, {
+            file: this.avatar,
+          });
+          updatedProfile.profile_picture = upload?.filename;
+        }
+        // explicitly set profile_picture to null
+        // to remove current avatar
+        if (this.avatar === null) {
+          updatedProfile.profile_picture = '';
+        }
+        await dispatchUpdateUserProfile(this.$store, updatedProfile);
+        await dispatchRouteLoggedIn(this.$store);
+      } catch (error) {
+        // Error notification is already shown by apiCallNotify
+        console.error('Failed to update user profile:', error);
       }
-      // explicitly set profile_picture to null
-      // to remove current avatar
-      if (this.avatar === null) {
-        updatedProfile.profile_picture = '';
-      }
-      await dispatchUpdateUserProfile(this.$store, updatedProfile);
-      await dispatchRouteLoggedIn(this.$store);
     }
   }
 

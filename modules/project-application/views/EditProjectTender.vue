@@ -424,15 +424,19 @@ export default class EditProjectTender extends Vue {
 
   public async submit() {
     if ((this.$refs.form as HTMLFormElement).validate()) {
-      const newProjectTender = this.newProjectTender;
-      let project: ProjectTender | undefined;
-      if (this.editProjectTender?.id) {
-        project = await dispatchUpdateProjectTender(this.$store, {id: this.editProjectTender.id, data: newProjectTender});
-      } else {
-        project = await dispatchCreateProjectTender(this.$store, newProjectTender);
+      try {
+        const newProjectTender = this.newProjectTender;
+        let project: ProjectTender | undefined;
+        if (this.editProjectTender?.id) {
+          project = await dispatchUpdateProjectTender(this.$store, {id: this.editProjectTender.id, data: newProjectTender});
+        } else {
+          project = await dispatchCreateProjectTender(this.$store, newProjectTender);
+        }
+        this.$router.replace({ name: 'project-tender-detail', params: { id: `${project?.id}` } });
+      } catch (error) {
+        // Error notification is already shown by apiCallNotify
+        console.error('Failed to save project tender:', error);
       }
-      this.$router.replace({ name: 'project-tender-detail', params: { id: `${project?.id}` } });
-      
     }
   }
 

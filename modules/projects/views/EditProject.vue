@@ -887,8 +887,13 @@ export default class EditProject extends Vue {
     if (!this.editProject) {
       return;
     }
-    await dispatchDeleteProject(this.$store, this.editProject.id);
-    this.$router.replace('/main/wms/projects');
+    try {
+      await dispatchDeleteProject(this.$store, this.editProject.id);
+      this.$router.replace('/main/wms/projects');
+    } catch (error) {
+      // Error notification is already shown by apiCallNotify
+      console.error('Failed to delete project:', error);
+    }
   }
   
   getAutocompleteItems(property: string) {
@@ -966,15 +971,19 @@ export default class EditProject extends Vue {
 
   public async submit() {
     if ((this.$refs.form as HTMLFormElement).validate()) {
-      const newProject = this.newProject;
-      let project: Project | undefined;
-      if (this.editProject?.id) {
-        project = await dispatchUpdateProject(this.$store, {id: this.editProject.id, project: newProject});
-      } else {
-        project = await dispatchCreateProject(this.$store, newProject);
+      try {
+        const newProject = this.newProject;
+        let project: Project | undefined;
+        if (this.editProject?.id) {
+          project = await dispatchUpdateProject(this.$store, {id: this.editProject.id, project: newProject});
+        } else {
+          project = await dispatchCreateProject(this.$store, newProject);
+        }
+        this.$router.replace(`/main/wms/projects/${project?.id}`);
+      } catch (error) {
+        // Error notification is already shown by apiCallNotify
+        console.error('Failed to save project:', error);
       }
-      this.$router.replace(`/main/wms/projects/${project?.id}`);
-      
     }
   }
 

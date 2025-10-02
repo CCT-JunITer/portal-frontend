@@ -203,16 +203,21 @@ export default class EditProjectApplication extends Vue {
   public async submit() {
     if (!this.projectApplication) return;
     if ((this.$refs.form as HTMLFormElement).validate()) {
-      const newProjectApplication = { ...this.projectApplication };
-      let projectApplication: ProjectApplication | undefined;
-      if (this.editProjectApplication?.id) {
-        projectApplication = await dispatchUpdateProjectApplication(this.$store, {id: this.editProjectApplication.id, data: newProjectApplication});
-      } else {
-        projectApplication = await dispatchCreateProjectApplication(this.$store, newProjectApplication);
-      }
-      this.reset();
-      if (this?.projectTender?.id != null) {
-        this.$router.push({ name: 'project-tender-detail', params: { id: String(this.projectTender.id) } });
+      try {
+        const newProjectApplication = { ...this.projectApplication };
+        let projectApplication: ProjectApplication | undefined;
+        if (this.editProjectApplication?.id) {
+          projectApplication = await dispatchUpdateProjectApplication(this.$store, {id: this.editProjectApplication.id, data: newProjectApplication});
+        } else {
+          projectApplication = await dispatchCreateProjectApplication(this.$store, newProjectApplication);
+        }
+        this.reset();
+        if (this?.projectTender?.id != null) {
+          this.$router.push({ name: 'project-tender-detail', params: { id: String(this.projectTender.id) } });
+        }
+      } catch (error) {
+        // Error notification is already shown by apiCallNotify
+        console.error('Failed to save project application:', error);
       }
     }
   }

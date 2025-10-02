@@ -167,18 +167,23 @@ export default class EditGroup extends Vue {
 
   public async submit() {
     if ((this.$refs.form as HTMLFormElement).validate()) {
-      const updatedGroup: GroupCreate = {
-        name: this.name,
-        permissions: this.permissions,
-        type: this.type,
-        ldap_group: this.ldap_group,
-        kas_mailinglist: this.kas_mailinglist,
-        icon: this.icon,
-      }
-      if (this.group?.id) {
-        await dispatchUpdateGroup(this.$store, { id: this.group?.id, group: updatedGroup });
-      } else {
-        await dispatchCreateGroup(this.$store, updatedGroup);
+      try {
+        const updatedGroup: GroupCreate = {
+          name: this.name,
+          permissions: this.permissions,
+          type: this.type,
+          ldap_group: this.ldap_group,
+          kas_mailinglist: this.kas_mailinglist,
+          icon: this.icon,
+        }
+        if (this.group?.id) {
+          await dispatchUpdateGroup(this.$store, { id: this.group?.id, group: updatedGroup });
+        } else {
+          await dispatchCreateGroup(this.$store, updatedGroup);
+        }
+      } catch (error) {
+        // Error notification is already shown by apiCallNotify
+        console.error('Failed to save group:', error);
       }
     }
   }

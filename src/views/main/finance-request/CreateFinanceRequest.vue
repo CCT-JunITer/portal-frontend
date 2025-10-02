@@ -212,35 +212,40 @@ export default class CreateFinanceRequest extends Vue {
     if(this.association && this.type?.associations.length) newAssociation = this.association;
 
     if ((this.$refs.form as HTMLFormElement).validate()) {
-      const newFinanceRequest: IFinanceRequestCreate = {
-        amount: this.$common.text2Decimal(this.amount),
-        type: this.type?.name || 'unknown',
-        purpose: this.purpose,
-        files: this.files,
-        
-        association: newAssociation,
-        iban: this.iban,
-      };
-      const updatedFinanceRequest: IFinanceRequestUpdate = {
-        amount: this.$common.text2Decimal(this.amount),
-        type: this.type?.name || 'unknown',
-        purpose: this.purpose,
-        files: this.files,
-        status: this.status as IFinanceRequestStatus, 
-        message_file: this.message_file,
-        message_request: this.message_request,
-        association: newAssociation,
-        iban: this.iban,
-      };
-      if (this.editFinanceRequest) {
-        await dispatchUpdateFinanceRequest(this.$store, {id: this.editFinanceRequest.id, financeRequest: updatedFinanceRequest});
-      } else {
-        await dispatchAddFinanceRequest(this.$store, newFinanceRequest);
+      try {
+        const newFinanceRequest: IFinanceRequestCreate = {
+          amount: this.$common.text2Decimal(this.amount),
+          type: this.type?.name || 'unknown',
+          purpose: this.purpose,
+          files: this.files,
+          
+          association: newAssociation,
+          iban: this.iban,
+        };
+        const updatedFinanceRequest: IFinanceRequestUpdate = {
+          amount: this.$common.text2Decimal(this.amount),
+          type: this.type?.name || 'unknown',
+          purpose: this.purpose,
+          files: this.files,
+          status: this.status as IFinanceRequestStatus, 
+          message_file: this.message_file,
+          message_request: this.message_request,
+          association: newAssociation,
+          iban: this.iban,
+        };
+        if (this.editFinanceRequest) {
+          await dispatchUpdateFinanceRequest(this.$store, {id: this.editFinanceRequest.id, financeRequest: updatedFinanceRequest});
+        } else {
+          await dispatchAddFinanceRequest(this.$store, newFinanceRequest);
+        }
+        if(this.isRessortBudget) {
+          //changeStatusRessortBudget();
+        }
+        this.$router.back();
+      } catch (error) {
+        // Error notification is already shown by apiCallNotify
+        console.error('Failed to save finance request:', error);
       }
-      if(this.isRessortBudget) {
-        //changeStatusRessortBudget();
-      }
-      this.$router.back();
     }
   }
 

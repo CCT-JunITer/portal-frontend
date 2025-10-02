@@ -69,10 +69,15 @@ export default class UserProfileEditPassword extends Vue {
 
   public async submit() {
     if ((this.$refs.form as HTMLFormElement).validate()) {
-      const updateProfile: IUserProfileUpdate = { password: this.password1 };
+      try {
+        const updateProfile: IUserProfileUpdate = { password: this.password1 };
 
-      await dispatchUpdateUserProfile(this.$store, updateProfile);
-      this.$router.push('/main/people/profile');
+        await dispatchUpdateUserProfile(this.$store, updateProfile);
+        this.$router.push('/main/people/profile');
+      } catch (error) {
+        // Error notification is already shown by apiCallNotify
+        console.error('Failed to update password:', error);
+      }
     }
   }
 }

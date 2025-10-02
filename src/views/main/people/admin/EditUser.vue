@@ -542,47 +542,52 @@ export default class EditUser extends Vue {
 
   public async submit() {
     if ((this.$refs.form as HTMLFormElement).validate()) {
-      const updatedProfile: IUserProfileCreate = {
-        email: this.email,
-        first_name: this.firstName,
-        last_name: this.lastName,
-        birthdate: this.birthdate,
-        phonenumber: this.phonenumber,
-        entrydate: this.entrydate,
-        major: this.major,
-        university: this.university,
-        studylevel: this.studylevel,
-        district: this.district,
-        linkedin: this.linkedin,
-        gender: this.gender,
-        admin_comment: this.adminComment,
-        street: this.street,
-        city: this.city,
-        postcode: this.postcode,
-        matriculation_number: this.matriculationNumber,
-        highest_project_position: this.highestProjectPosition,
-        direct_debit_mandate: this.directDebitMandate,
-        iban: this.iban,
-        bic: this.bic,
-        bank: this.bank,
-        contact: this.contact,
-      };
+      try {
+        const updatedProfile: IUserProfileCreate = {
+          email: this.email,
+          first_name: this.firstName,
+          last_name: this.lastName,
+          birthdate: this.birthdate,
+          phonenumber: this.phonenumber,
+          entrydate: this.entrydate,
+          major: this.major,
+          university: this.university,
+          studylevel: this.studylevel,
+          district: this.district,
+          linkedin: this.linkedin,
+          gender: this.gender,
+          admin_comment: this.adminComment,
+          street: this.street,
+          city: this.city,
+          postcode: this.postcode,
+          matriculation_number: this.matriculationNumber,
+          highest_project_position: this.highestProjectPosition,
+          direct_debit_mandate: this.directDebitMandate,
+          iban: this.iban,
+          bic: this.bic,
+          bank: this.bank,
+          contact: this.contact,
+        };
 
-      if(this.avatar) {
-        const uploadObject = await dispatchUploadFile(this.$store, {
-          file: this.avatar,
-        })
-        updatedProfile.profile_picture = uploadObject?.filename;
+        if(this.avatar) {
+          const uploadObject = await dispatchUploadFile(this.$store, {
+            file: this.avatar,
+          })
+          updatedProfile.profile_picture = uploadObject?.filename;
+        }
+        if (this.setPassword) {
+          updatedProfile.password = this.password1;
+        }
+        if (this.userProfile?.id) {
+          await dispatchUpdateUser(this.$store, { id: this.userProfile?.id, user: updatedProfile });
+        } else {
+          await dispatchCreateUser(this.$store, updatedProfile);
+        }
+        this.$router.push('/main/people/admin/users');
+      } catch (error) {
+        // Error notification is already shown by apiCallNotify
+        console.error('Failed to save user:', error);
       }
-      if (this.setPassword) {
-        updatedProfile.password = this.password1;
-      }
-      if (this.userProfile?.id) {
-        await dispatchUpdateUser(this.$store, { id: this.userProfile?.id, user: updatedProfile });
-      } else {
-        await dispatchCreateUser(this.$store, updatedProfile);
-      }
-      this.$router.push('/main/people/admin/users');
     }
   }
 

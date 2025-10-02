@@ -167,20 +167,25 @@ export default class ProjectCastEdit extends Vue {
   public async submit() {
     if (!this.projectCast) return;
     if ((this.$refs.form as HTMLFormElement).validate()) {
-      const newProjectCast: ProjectCastCreate = {
-        ...this.projectCast, 
-        applications_ids: Object.fromEntries(Object.entries(this.projectCast.cast_applications)
-          .filter(([k, _]) => !!k)
-          .map(([k,v]) => [k, v.map(application => application.project_application_id)])
-        ) 
-      };
-      let projectCast: ProjectCast | undefined;
-      if (this.editProjectCast?.id) {
-        projectCast = await dispatchUpdateProjectCast(this.$store, {id: this.editProjectCast.id, data: newProjectCast});
-      } else {
-        projectCast = await dispatchCreateProjectCast(this.$store, newProjectCast);
+      try {
+        const newProjectCast: ProjectCastCreate = {
+          ...this.projectCast, 
+          applications_ids: Object.fromEntries(Object.entries(this.projectCast.cast_applications)
+            .filter(([k, _]) => !!k)
+            .map(([k,v]) => [k, v.map(application => application.project_application_id)])
+          ) 
+        };
+        let projectCast: ProjectCast | undefined;
+        if (this.editProjectCast?.id) {
+          projectCast = await dispatchUpdateProjectCast(this.$store, {id: this.editProjectCast.id, data: newProjectCast});
+        } else {
+          projectCast = await dispatchCreateProjectCast(this.$store, newProjectCast);
+        }
+        this.reset();
+      } catch (error) {
+        // Error notification is already shown by apiCallNotify
+        console.error('Failed to save project cast:', error);
       }
-      this.reset();
     }
   }
 }
