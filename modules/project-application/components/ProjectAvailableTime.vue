@@ -59,8 +59,8 @@ import { weeksArray } from '../util';
 export default class ProjectAvailableTime extends Vue {
 
   public btValues = new Array(16).fill(0).map((_, i) => ({ value: (i)/2, text: `${this.$common.decimal2Text((i)/2)}`}));
-  public localValue = {}
-  public textarea = ''
+  public localValue = {};
+  public textarea = '';
 
   @Prop()
   public fromDate!: string;
@@ -71,29 +71,13 @@ export default class ProjectAvailableTime extends Vue {
   @Prop()
   public readonly offerNeeded!: boolean;
 
-  @Prop()
-  public readonly value!: object;
-
   @Prop({ default: false})
   public readonly readonly!: boolean;
 
   @Watch('textarea')
   public onTextareaChange(newValue: string) {
     this.setTimeSlotAt('Anmerkungen', newValue);
-  } 
-
-
-  @Watch('value', { immediate: true })
-  public onValueChange(value: object) {
-    if (!value) {
-      this.localValue = {};
-      this.textarea = '';  // Initialize textarea
-      return;
-    }
-    this.localValue = value;
-    this.textarea = this.localValue['Anmerkungen'] || '';  // Populate textarea
   }
-
 
   public getTimeSlotAt(key: string) {
     return this.localValue[key];
