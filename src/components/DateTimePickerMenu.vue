@@ -61,7 +61,7 @@
           <v-btn color="green darken-1" text @click="okHandler">OK</v-btn>
         </slot>
       </v-card-actions>
-      <v-card-text v-if="!isDifferentTimezone && germanTimeFormatted" class="warning--text text-body-2 py-2">
+      <v-card-text v-if="isDifferentTimezone && germanTimeFormatted" class="warning--text text-body-2 py-2">
         <v-icon small color="warning" class="mr-1">mdi-alert</v-icon>
         Achtung du bist in einer anderen Zeitzone und entsprechend wird die von dir angegebene Zeit in Deutschland {{ germanTimeFormatted }} sein
       </v-card-text>
