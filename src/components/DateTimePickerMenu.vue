@@ -61,6 +61,10 @@
           <v-btn color="green darken-1" text @click="okHandler">OK</v-btn>
         </slot>
       </v-card-actions>
+      <v-card-text v-if="!isDifferentTimezone && germanTimeFormatted" class="warning--text text-body-2 py-2">
+        <v-icon small color="warning" class="mr-1">mdi-alert</v-icon>
+        Achtung du bist in einer anderen Zeitzone und entsprechend wird die von dir angegebene Zeit in Deutschland {{ germanTimeFormatted }} sein
+      </v-card-text>
     </v-card>
   </v-menu>
 </template>
@@ -152,12 +156,35 @@ export default class DateTimePickerMenu extends Vue {
     }
   }
 
-  get dateFormatted() {
+  public get dateFormatted() {
     if (!this.value) {
       return '';
     }
     try {
       return format(new Date(this.value), 'dd.MM.yyyy HH:mm');
+    } catch(e) {
+      return '';
+    }
+  }
+
+  public get isDifferentTimezone() {
+    const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    return userTimezone !== 'Europe/Berlin';
+  }
+
+  public get germanTimeFormatted() {
+    if (!this.date || !this.time) {
+      return '';
+    }
+    try {
+      const dateTimeString = this.date + ' ' + this.time;
+      const date = parse(dateTimeString, 'yyyy-MM-dd HH:mm', new Date());
+      if (!isValid(date)) {
+        return '';
+      }
+      // Convert to German time (Europe/Berlin)
+      const germanTime = new Date(date.toLocaleString('en-US', { timeZone: 'Europe/Berlin' }));
+      return format(germanTime, 'dd.MM.yyyy HH:mm');
     } catch(e) {
       return '';
     }
