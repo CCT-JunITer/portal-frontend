@@ -10,18 +10,23 @@ import { dispatchCheckLoggedIn } from '@/store/main/actions';
 
 const startRouteGuard = async (to, from, next) => {
   await dispatchCheckLoggedIn(store);
-  if (readIsLoggedIn(store)) {
+  const isLoggedIn = readIsLoggedIn(store);
+  
+  if (isLoggedIn === true) {
     if (!(to.path as string).startsWith('/main')) {
       next('/main');
     } else {
       next();
     }
-  } else if (readIsLoggedIn(store) === false) {
+  } else if (isLoggedIn === false) {
     if (to.path === '/' || (to.path as string).startsWith('/main')) {
       next({path: '/login', query: { redirect: to.fullPath }});
     } else {
       next();
     }
+  } else {
+    // Handle null/undefined case - should not happen after dispatchCheckLoggedIn, but handle it safely
+    next();
   }
 };
 
