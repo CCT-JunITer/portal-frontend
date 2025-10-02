@@ -110,6 +110,11 @@ export default new Router({
                   component: () => import(/* webpackChunkName: "main-search" */ './views/main/people/search/SearchView.vue'),
                 },
                 {
+                  path: 'streaks',
+                  name: 'streak-leaderboard',
+                  component: () => import(/* webpackChunkName: "streak-leaderboard" */ './views/main/people/search/StreakLeaderboard.vue'),
+                },
+                {
                   path: 'profile',
                   component: RouterComponent,
                   redirect: 'profile/view',

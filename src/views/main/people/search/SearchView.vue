@@ -68,6 +68,16 @@
             </v-btn>
           </v-fade-transition>
           <v-spacer></v-spacer>
+          <v-btn
+            to="/main/people/streaks"
+            color="cctOrange"
+            outlined
+            class="mr-2">
+            <v-icon left>
+              mdi-fire
+            </v-icon>
+            Streak Leaderboard
+          </v-btn>
           <v-select
             v-model="sortBy"
             :items="sortBys"

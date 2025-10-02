@@ -28,6 +28,15 @@
         </v-list-item-content>
       </v-list-item>
 
+      <v-list-item to="/main/people/streaks" color="cctOrange">
+        <v-list-item-icon>
+          <v-icon>mdi-fire</v-icon>
+        </v-list-item-icon>
+        <v-list-item-content>
+          <v-list-item-title>Streak Leaderboard</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+
       <v-list-item to="/main/project-tender" color="cctPurple">
         <v-list-item-icon>
           <v-icon>mdi-account</v-icon>
