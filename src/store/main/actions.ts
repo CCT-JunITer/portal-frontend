@@ -174,9 +174,11 @@ export const actions = {
         router.push('/main/welcome')
         return;
       }
-      const redirect = router.currentRoute.query.redirect;
-      if (redirect as string) {
-        router.push(redirect as string);
+      const redirect = router.currentRoute.query.redirect as string;
+      if (redirect) {
+        // If redirect is root path, go to main instead to avoid guard redirect conflict
+        const redirectPath = redirect === '/' ? '/main' : redirect;
+        router.push(redirectPath);
         return;
       }
       router.push('/main');
