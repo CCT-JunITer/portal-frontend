@@ -42,60 +42,66 @@
       </div>
 
       <v-container>
-        <v-card-actions>
-          <v-btn
-            @click="filtersOpen = !filtersOpen"
-            text
-            outlined>
-            <v-icon left>
-              mdi-filter-variant
-            </v-icon>
-            Filter
-            <v-icon right>
-              {{ filtersOpen ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
-            </v-icon>
-          </v-btn>
-          <v-fade-transition>
+        <v-card-actions class="flex-wrap">
+          <div class="d-flex align-center flex-wrap mb-2 mb-md-0">
             <v-btn
-              @click="filters = {}"
-              v-show="hasFilters()"
+              @click="filtersOpen = !filtersOpen"
               text
-              small>
+              outlined
+              class="mb-2 mb-sm-0">
               <v-icon left>
-                mdi-delete
+                mdi-filter-variant
               </v-icon>
-              Filter löschen
+              Filter
+              <v-icon right>
+                {{ filtersOpen ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
+              </v-icon>
             </v-btn>
-          </v-fade-transition>
-          <v-spacer></v-spacer>
-          <v-btn
-            to="/main/people/streaks"
-            color="cctOrange"
-            outlined
-            class="mr-2">
-            <v-icon left>
-              mdi-fire
-            </v-icon>
-            Streak Leaderboard
-          </v-btn>
-          <v-select
-            v-model="sortBy"
-            :items="sortBys"
-            filled
-            color="cctGreen"
-            class="sort-by"
-            menu-props="auto"
-            dense
-            label="Select"
-            hide-details
-            single-line
-          >
-            <template v-slot:prepend>
-              <v-btn icon small @click="ascending = !ascending">
-                <v-icon>{{ ascending ? 'mdi-sort-ascending' : 'mdi-sort-descending' }}</v-icon>
+            <v-fade-transition>
+              <v-btn
+                @click="filters = {}"
+                v-show="hasFilters()"
+                text
+                small
+                class="mb-2 mb-sm-0 ml-2">
+                <v-icon left>
+                  mdi-delete
+                </v-icon>
+                Filter löschen
               </v-btn>
-            </template>
-          </v-select>
+            </v-fade-transition>
+          </div>
+          <v-spacer class="d-none d-md-block"></v-spacer>
+          <div class="d-flex align-center flex-wrap" style="gap: 8px;" :style="$vuetify.breakpoint.mdAndUp ? '' : 'width: 100%;'">
+            <v-btn
+              to="/main/people/streaks"
+              color="cctOrange"
+              outlined
+              class="mb-2 mb-md-0 streak-btn">
+              <v-icon left>
+                mdi-fire
+              </v-icon>
+              Streak Leaderboard
+            </v-btn>
+            <v-select
+              v-model="sortBy"
+              :items="sortBys"
+              filled
+              color="cctGreen"
+              class="sort-by mb-2 mb-md-0"
+              menu-props="auto"
+              dense
+              label="Select"
+              hide-details
+              single-line
+            >
+              <template v-slot:prepend>
+                <v-btn icon small @click="ascending = !ascending">
+                  <v-icon>{{ ascending ? 'mdi-sort-ascending' : 'mdi-sort-descending' }}</v-icon>
+                </v-btn>
+              </template>
+            </v-select>
+          </div>
         </v-card-actions>
         <v-expand-transition>
           <div v-show="filtersOpen">
@@ -345,6 +351,25 @@ export default class EmployeesView extends Vue {
 .sort-by {
   flex-grow: 0;
   width: 250px;
+  min-width: 200px;
+  flex-shrink: 0;
+}
+
+.streak-btn {
+  flex-shrink: 1;
+  white-space: nowrap;
+}
+
+@media (max-width: 960px) {
+  .sort-by {
+    width: 100%;
+    max-width: 100%;
+    flex-shrink: 1;
+  }
+  
+  .streak-btn {
+    width: 100%;
+  }
 }
 
 </style>
