@@ -19,23 +19,29 @@
     <v-list dense nav>
       <v-subheader>Apps</v-subheader>
 
-      <v-list-item to="/main/people" color="cctBlue">
-        <v-list-item-icon>
-          <v-icon>people</v-icon>
-        </v-list-item-icon>
-        <v-list-item-content>
-          <v-list-item-title>Mitglieder</v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
-
-      <v-list-item to="/main/people/streaks" color="cctOrange">
-        <v-list-item-icon>
-          <v-icon>mdi-fire</v-icon>
-        </v-list-item-icon>
-        <v-list-item-content>
-          <v-list-item-title>Streak Leaderboard</v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
+      <v-list-group group="people" style="pa-0" prepend-icon="people">
+        <template v-slot:activator>
+          <v-list-item-content>
+            <v-list-item-title>Mitglieder</v-list-item-title>
+          </v-list-item-content>
+        </template>
+        <v-list-item to="/main/people" color="cctBlue" class="ml-2">
+          <v-list-item-icon>
+            <v-icon>people</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Mitgliedersuche</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item to="/main/people/streaks" color="cctOrange" class="ml-2">
+          <v-list-item-icon>
+            <v-icon>mdi-fire</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Streak Leaderboard</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list-group>
 
       <v-list-item to="/main/project-tender" color="cctPurple">
         <v-list-item-icon>
