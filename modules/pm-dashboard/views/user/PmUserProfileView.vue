@@ -155,7 +155,12 @@
                   <tr v-if="!projectHistory.length">
                     <td colspan="4" class="text-caption grey--text">Keine Projekte hinterlegt – Platzhalter</td>
                   </tr>
-                  <tr v-for="p in projectHistory" :key="p.id">
+                  <tr 
+                    v-for="p in projectHistory" 
+                    :key="p.id"
+                    @click="navigateToProject(p.projectId)"
+                    class="clickable-row"
+                  >
                     <td>{{ p.name }}</td>
                     <td>{{ $enum('ProjectRoleEnum', p.role) }}</td>
                     <td>{{ p.status }}</td>
@@ -384,10 +389,11 @@ export default class PmUserProfileView extends Vue {
     return this.profile?.work_experiences || [];
   }
 
-  get projectHistory(): { id: string | number; name: string; role: string; status: string; period: string }[] {
+  get projectHistory(): { id: string | number; projectId: number; name: string; role: string; status: string; period: string }[] {
     // Use project_history from backend
     return this.profile?.project_history?.map((p, index) => ({
       id: `${p.project_id}-${index}`,
+      projectId: p.project_id,
       name: p.project_title,
       role: p.role,
       status: p.end_date ? 'abgeschlossen' : 'aktiv',
@@ -558,6 +564,10 @@ export default class PmUserProfileView extends Vue {
     });
   }
 
+  navigateToProject(projectId: number) {
+    this.$router.push({ name: 'project', params: { id: projectId.toString() } });
+  }
+
   @Watch('$route.params.id')
   async onUserIdChange() {
     await this.refresh();
@@ -594,5 +604,14 @@ export default class PmUserProfileView extends Vue {
     .value { font-size: 0.85rem; }
   }
   .stat-value { font-weight: 600; font-size: 1.05rem; }
+  
+  .clickable-row {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.04);
+    }
+  }
 }
 </style>
