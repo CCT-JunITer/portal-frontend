@@ -324,9 +324,9 @@ export default class PmUserProfileView extends Vue {
   // ---- DERIVED DATA ----
   get statusChips() {
     const chips: { text: string; color: string }[] = [];
-    if (this.profile?.memberstatus) chips.push({ text: this.profile.memberstatus, color: 'cctGreen lighten-5' });
-    if (this.profile?.is_passive) chips.push({ text: 'Passiv', color: 'orange lighten-4' });
-    if (this.profile?.ressort) chips.push({ text: this.profile.ressort, color: 'blue lighten-5' });
+    if (this.profile?.memberstatus) chips.push({ text: this.profile.memberstatus, color: 'cctBlue' });
+    if (this.profile?.is_passive) chips.push({ text: 'Passiv', color: 'cctOrange' });
+    if (this.profile?.ressort) chips.push({ text: this.profile.ressort, color: 'cctPurple' });
     return chips;
   }
 
