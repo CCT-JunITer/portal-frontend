@@ -108,23 +108,6 @@
             </v-card-text>
           </v-card>
 
-          <!-- Skills -->
-          <v-card outlined class="grid-card">
-            <v-card-title class="pb-1 d-flex align-center">
-              Kompetenzen
-              <v-spacer></v-spacer>
-              <v-chip small outlined color="cctGreen" v-if="skills.length">{{ skills.length }} Skills</v-chip>
-            </v-card-title>
-            <v-card-text class="pt-0 flex-grow-1">
-              <div v-if="!skills.length" class="text-caption grey--text">Noch keine Skills hinterlegt – Platzhalter</div>
-              <div v-else class="d-flex flex-wrap">
-                <v-chip v-for="skill in skills" :key="skill.name" class="mr-1 mb-1" :color="skillColor(skill.level)" small label dark>
-                  {{ skill.name }}<span v-if="skill.level" class="ml-1">({{ $enum('SkillLevelEnum', skill.level) }})</span>
-                </v-chip>
-              </div>
-            </v-card-text>
-          </v-card>
-
           <!-- Education -->
           <v-card outlined class="grid-card">
             <v-card-title class="pb-1">Ausbildung</v-card-title>
@@ -140,7 +123,25 @@
             </v-card-text>
           </v-card>
 
-          <v-card outlined class="grid-card">
+          <!-- Skills -->
+          <v-card outlined class="grid-card span-full">
+            <v-card-title class="pb-1 d-flex align-center">
+              Kompetenzen
+              <v-spacer></v-spacer>
+              <v-chip small outlined color="cctGreen" v-if="skills.length">{{ skills.length }} Skills</v-chip>
+            </v-card-title>
+            <v-card-text class="pt-0 flex-grow-1">
+              <div v-if="!skills.length" class="text-caption grey--text">Noch keine Skills hinterlegt – Platzhalter</div>
+              <div v-else class="d-flex flex-wrap">
+                <v-chip v-for="skill in skills" :key="skill.name" class="mr-1 mb-1" :color="skillColor(skill.level)" small label dark>
+                  {{ skill.name }}<span v-if="skill.level" class="ml-1">({{ $enum('SkillLevelEnum', skill.level) }})</span>
+                </v-chip>
+              </div>
+            </v-card-text>
+          </v-card>
+
+          <!-- Work Experience -->
+          <v-card outlined class="grid-card span-full">
             <v-card-title class="pb-1 d-flex align-center">
               Berufserfahrung
               <v-spacer></v-spacer>
@@ -149,20 +150,25 @@
             <v-card-text class="pt-0 flex-grow-1">
               <div v-if="!workExperiences.length" class="text-caption grey--text">Noch keine Berufserfahrung hinterlegt</div>
               <div v-else>
-                <div v-for="(exp, index) in workExperiences" :key="exp.id || `exp-${index}`" :class="{'mt-3': index > 0}">
-                  <div class="font-weight-medium">{{ exp.position_title }}</div>
-                  <div class="text-caption grey--text">{{ exp.company_name }} · {{ formatEmploymentType(exp.employment_type) }}</div>
-                  <div class="text-caption">{{ formatDate(exp.start_date) }} – {{ exp.end_date ? formatDate(exp.end_date) : 'Aktuell' }}</div>
-                  <div v-if="exp.description" class="text-body-2 mt-1">{{ exp.description }}</div>
-                  <v-divider v-if="index < workExperiences.length - 1" class="mt-2"></v-divider>
-                </div>
+                <v-row dense>
+                  <v-col v-for="(exp, index) in workExperiences" :key="exp.id || `exp-${index}`" cols="12" sm="6" md="4">
+                    <div class="font-weight-medium">{{ exp.position_title }}</div>
+                    <div class="text-caption grey--text">{{ exp.company_name }} · {{ formatEmploymentType(exp.employment_type) }}</div>
+                    <div class="text-caption">{{ formatDate(exp.start_date) }} – {{ exp.end_date ? formatDate(exp.end_date) : 'Aktuell' }}</div>
+                    <div v-if="exp.description" class="text-body-2 mt-1">{{ exp.description }}</div>
+                  </v-col>
+                </v-row>
               </div>
             </v-card-text>
           </v-card>
 
-          <!-- Project History -->
-          <v-card outlined class="grid-card">
-            <v-card-title class="pb-1">Projekt Historie</v-card-title>
+          <!-- Project History (span full width for better visibility) -->
+          <v-card outlined class="grid-card span-full">
+            <v-card-title class="pb-1 d-flex align-center">
+              Projekt Historie
+              <v-spacer></v-spacer>
+              <v-chip small outlined color="cctGreen" v-if="projectHistory.length">{{ projectHistory.length }} Projekte</v-chip>
+            </v-card-title>
             <v-card-text class="pt-0 flex-grow-1">
               <v-simple-table dense>
                 <thead>
@@ -204,7 +210,7 @@
           </v-card>
 
           <!-- Panels (span full width) -->
-          <v-card outlined class="grid-card span-2">
+          <v-card outlined class="grid-card span-full">
             <v-card-text class="pa-0">
               <v-expansion-panels v-model="expandedPanels" multiple focusable accordion>
                 <v-expansion-panel v-if="canManagePMNotes">
@@ -647,10 +653,14 @@ export default class PmUserProfileView extends Vue {
   .profile-header h2 { font-size: 1.6rem; }
   .sections-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     grid-gap: 16px;
     align-items: stretch;
     margin-bottom: 1.5rem;
+    
+    @media (max-width: 959px) {
+      grid-template-columns: 1fr;
+    }
   }
   .sections-grid .grid-card {
     display: flex;
@@ -660,7 +670,7 @@ export default class PmUserProfileView extends Vue {
     display: flex;
     flex-direction: column;
   }
-  .sections-grid .span-2 {
+  .sections-grid .span-full {
     grid-column: 1 / -1;
   }
   .dense-table {
