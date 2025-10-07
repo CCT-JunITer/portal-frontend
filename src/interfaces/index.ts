@@ -440,7 +440,7 @@ export interface UserSkillUpdate {
 
 export interface ProjectHistoryItem {
     project_id: number;
-    project_name: string;
+    project_title: string;
     role: string;
     start_date: string;
     end_date: string | null;

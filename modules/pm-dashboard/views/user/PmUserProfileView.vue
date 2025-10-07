@@ -273,7 +273,7 @@ import { Component, Vue, Watch } from 'vue-property-decorator';
 import { format, formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { readRouteUser, readHasAnyPermission } from '@/store/main/getters';
-import { dispatchGetPMNotes, dispatchCreatePMNote, dispatchUpdatePMNote, dispatchDeletePMNote } from '@/store/main/actions';
+import { dispatchGetPMNotes, dispatchCreatePMNote, dispatchUpdatePMNote, dispatchDeletePMNote, dispatchGetOneUser } from '@/store/main/actions';
 import { IUserProfile, PMNote } from '@/interfaces';
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 
@@ -382,7 +382,7 @@ export default class PmUserProfileView extends Vue {
     // Use project_history from backend
     return this.profile?.project_history?.map((p, index) => ({
       id: `${p.project_id}-${index}`,
-      name: p.project_name,
+      name: p.project_title,
       role: p.role,
       status: p.end_date ? 'abgeschlossen' : 'aktiv',
       period: this.composePeriod(p.start_date, p.end_date),
@@ -441,6 +441,10 @@ export default class PmUserProfileView extends Vue {
   }
 
   async mounted() {
+    // Load detailed user data on mount
+    if (this.routeUserId && +this.routeUserId) {
+      await dispatchGetOneUser(this.$store, { userId: +this.routeUserId });
+    }
     this.loading = false;
     if (this.canManagePMNotes && this.routeUserId) {
       await this.loadPMNotes();
@@ -545,6 +549,10 @@ export default class PmUserProfileView extends Vue {
   @Watch('$route.params.id')
   async onUserIdChange() {
     this.loading = true;
+    // Load detailed user data when route changes
+    if (this.routeUserId && +this.routeUserId) {
+      await dispatchGetOneUser(this.$store, { userId: +this.routeUserId });
+    }
     this.loading = false;
     if (this.canManagePMNotes && this.routeUserId) {
       await this.loadPMNotes();
