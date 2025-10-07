@@ -15,9 +15,11 @@
           <v-col cols="12" md="6">
             <v-card outlined class="h-100 d-flex flex-column">
               <v-card-text class="pb-0 d-flex align-start">
-                <v-avatar size="96" class="mr-5 elevation-2">
-                  <v-img :src="profile.profile_picture || defaultAvatar" />
-                </v-avatar>
+                <employee-profile-picture 
+                  size="96" 
+                  :employee="profile"
+                  class="mr-5 elevation-2">
+                </employee-profile-picture>
                 <div class="flex-grow-1">
                   <div class="d-flex align-center flex-wrap">
                     <h2 class="font-weight-medium mr-3 mb-1">{{ profile.full_name || 'Unbekannt' }}</h2>
@@ -278,13 +280,15 @@ import { de } from 'date-fns/locale';
 import { readRouteUser, readHasAnyPermission } from '@/store/main/getters';
 import { dispatchGetPMNotes, dispatchCreatePMNote, dispatchUpdatePMNote, dispatchDeletePMNote } from '@/store/main/actions';
 import { IUserProfile, PMNote } from '@/interfaces';
+import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 
-@Component({})
+@Component({
+  components: { EmployeeProfilePicture }
+})
 export default class PmUserProfileView extends Vue {
   // STATE
   private loading = true;
   private lastUpdated: Date = new Date();
-  private defaultAvatar: string = require('@/assets/logo.png');
 
   // PM Notes state
   private pmNotes: PMNote[] = [];
@@ -570,6 +574,5 @@ export default class PmUserProfileView extends Vue {
     .value { font-size: 0.85rem; }
   }
   .stat-value { font-weight: 600; font-size: 1.05rem; }
-  .v-avatar { background: white; }
 }
 </style>
