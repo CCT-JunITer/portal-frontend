@@ -42,6 +42,28 @@ export interface IUserProfile {
     admin_comment?: string;
 
     user_streaks?: UserStreak[];
+    total_external_bt?: number;
+
+    mp_completion_target_date?: string | null;
+    target_utilization?: number | null;
+    utilization?: number | null;
+    last_active_at?: string | null;
+
+    amount_applications?: number;
+    amount_positions_filled?: number;
+    amount_projects_realized?: number;
+    amount_projects_closed?: number;
+    active_projects_count?: number;
+
+    project_history?: ProjectHistoryItem[];
+    work_experiences?: WorkExperience[];
+    user_skills?: UserSkill[];
+
+    // Additional fields
+    generation?: string | null;
+    is_passive?: boolean;
+    passive_to?: string | null;
+    availability_weekdays?: string[] | null;
 }
 
 export interface IUserProfileUpdate {
@@ -76,6 +98,12 @@ export interface IUserProfileUpdate {
     features?: string[];
 
     admin_comment?: string;
+
+    mp_completion_target_date?: string | null;
+    target_utilization?: number | null;
+    utilization?: number | null;
+    last_active_at?: string | null;
+    availability_weekdays?: string[] | null;
 }
 
 export interface IUserProfileCreate extends IUserProfileUpdate {
@@ -343,4 +371,95 @@ export interface UserStreak {
     streak_length: number;
     streak_start: string;
     streak_end: string;
+}
+
+export enum EmploymentType {
+    INTERNSHIP = 'internship',
+    WORKING_STUDENT = 'working_student',
+    FULL_TIME = 'full_time',
+    PART_TIME = 'part_time',
+    FREELANCE = 'freelance',
+    VOLUNTEER = 'volunteer'
+}
+
+export interface WorkExperience {
+    id: number;
+    user_id: number;
+    company_name: string;
+    position_title: string;
+    description: string | null;
+    start_date: string;
+    end_date: string | null;
+    employment_type: EmploymentType | string;
+}
+
+export interface WorkExperienceCreate {
+    company_name: string;
+    position_title: string;
+    description?: string | null;
+    start_date: string;
+    end_date?: string | null;
+    employment_type: EmploymentType | string;
+}
+
+export interface WorkExperienceUpdate {
+    company_name?: string;
+    position_title?: string;
+    description?: string | null;
+    start_date?: string;
+    end_date?: string | null;
+    employment_type?: EmploymentType | string;
+}
+
+export enum SkillLevel {
+    BEGINNER = 'beginner',
+    INTERMEDIATE = 'intermediate',
+    ADVANCED = 'advanced',
+    EXPERT = 'expert'
+}
+
+export interface UserSkill {
+    id: number;
+    user_id: number;
+    skill_name: string;
+    skill_level: SkillLevel | string;
+    category: string | null;
+}
+
+export interface UserSkillCreate {
+    skill_name: string;
+    skill_level: SkillLevel | string;
+    category?: string | null;
+}
+
+export interface UserSkillUpdate {
+    skill_name?: string;
+    skill_level?: SkillLevel | string;
+    category?: string | null;
+}
+
+export interface ProjectHistoryItem {
+    project_id: number;
+    project_name: string;
+    role: string;
+    start_date: string;
+    end_date: string | null;
+}
+
+export interface PMNote {
+    id: number;
+    user_id: number;
+    author_id: number;
+    content: string;
+    created_at: string;
+    updated_at: string;
+    author?: IUserProfile;
+}
+
+export interface PMNoteCreate {
+    content: string;
+}
+
+export interface PMNoteUpdate {
+    content?: string;
 }

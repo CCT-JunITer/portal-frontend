@@ -181,6 +181,15 @@
         </v-list-item>
       </v-list-group>
 
+      <v-list-item to="/main/pm-dashboard" color="cctOrange" v-if="isProjektmanager">
+        <v-list-item-icon>
+          <v-icon>mdi-chart-gantt</v-icon>
+        </v-list-item-icon>
+        <v-list-item-content>
+          <v-list-item-title>PM Dashboard</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+
       <v-list-item to="/main/admin/dashboard" color="cctOrange" v-if="hasAdminAccess">
         <v-list-item-icon>
           <v-icon>mdi-wizard-hat</v-icon>
@@ -339,6 +348,7 @@ import {
   readDashboardShowDrawer,
   readHasAdminAccess,
   readHasAnyPermission,
+  readIsProjektmanager,
   readUserProfile
 } from '@/store/main/getters';
 import {
@@ -364,6 +374,10 @@ export default class NavigationDrawer extends Vue {
 
   public get hasAdminAccess() {
     return readHasAdminAccess(this.$store);
+  }
+
+  public get isProjektmanager() {
+    return readIsProjektmanager(this.$store);
   }
 
   public get userProfile() {

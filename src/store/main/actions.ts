@@ -1,7 +1,7 @@
 import { removeLocalUserStatus, saveLocalUserStatus, getLocalUserStatus, copyTextToClipboard } from './../../utils';
 import { api } from '@/api';
 import { 
-  IUserProfileCreate, IUserProfileUpdate, IUserSettings, LabelledFile, RequestCreate } from '@/interfaces';
+  IUserProfileCreate, IUserProfileUpdate, IUserSettings, LabelledFile, RequestCreate, WorkExperienceCreate, WorkExperienceUpdate, UserSkillCreate, UserSkillUpdate, PMNoteCreate, PMNoteUpdate } from '@/interfaces';
 import router from '@/router';
 import { getLocalToken, removeLocalToken, saveLocalToken } from '@/utils';
 import { AxiosError } from 'axios';
@@ -300,6 +300,76 @@ export const actions = {
     await dispatchUpdateUserProfile(context, {
       features: newFeatures
     })
+  },
+
+  async actionGetWorkExperiences(context: MainContext) {
+    return await apiCall(context, api.getWorkExperiences);
+  },
+  async actionCreateWorkExperience(context: MainContext, payload: WorkExperienceCreate) {
+    const response = await apiCallNotify(context, token => api.createWorkExperience(token, payload), { 
+      successText: 'Berufserfahrung hinzugefügt' 
+    });
+    await dispatchGetUserProfile(context);
+    return response.data;
+  },
+  async actionUpdateWorkExperience(context: MainContext, payload: { id: number; data: WorkExperienceUpdate }) {
+    const response = await apiCallNotify(context, token => api.updateWorkExperience(token, payload.id, payload.data), {
+      successText: 'Berufserfahrung aktualisiert'
+    });
+    await dispatchGetUserProfile(context);
+    return response.data;
+  },
+  async actionDeleteWorkExperience(context: MainContext, id: number) {
+    await apiCallNotify(context, token => api.deleteWorkExperience(token, id), {
+      successText: 'Berufserfahrung gelöscht'
+    });
+    await dispatchGetUserProfile(context);
+  },
+
+  async actionGetUserSkills(context: MainContext) {
+    return await apiCall(context, api.getUserSkills);
+  },
+  async actionCreateUserSkill(context: MainContext, payload: UserSkillCreate) {
+    const response = await apiCallNotify(context, token => api.createUserSkill(token, payload), {
+      successText: 'Fähigkeit hinzugefügt'
+    });
+    await dispatchGetUserProfile(context);
+    return response.data;
+  },
+  async actionUpdateUserSkill(context: MainContext, payload: { id: number; data: UserSkillUpdate }) {
+    const response = await apiCallNotify(context, token => api.updateUserSkill(token, payload.id, payload.data), {
+      successText: 'Fähigkeit aktualisiert'
+    });
+    await dispatchGetUserProfile(context);
+    return response.data;
+  },
+  async actionDeleteUserSkill(context: MainContext, id: number) {
+    await apiCallNotify(context, token => api.deleteUserSkill(token, id), {
+      successText: 'Fähigkeit gelöscht'
+    });
+    await dispatchGetUserProfile(context);
+  },
+
+  // PM Notes actions
+  async actionGetPMNotes(context: MainContext, userId: number) {
+    return await apiCall(context, token => api.getPMNotes(token, userId));
+  },
+  async actionCreatePMNote(context: MainContext, payload: { userId: number; data: PMNoteCreate }) {
+    const response = await apiCallNotify(context, token => api.createPMNote(token, payload.userId, payload.data), {
+      successText: 'Notiz hinzugefügt'
+    });
+    return response.data;
+  },
+  async actionUpdatePMNote(context: MainContext, payload: { userId: number; noteId: number; data: PMNoteUpdate }) {
+    const response = await apiCallNotify(context, token => api.updatePMNote(token, payload.userId, payload.noteId, payload.data), {
+      successText: 'Notiz aktualisiert'
+    });
+    return response.data;
+  },
+  async actionDeletePMNote(context: MainContext, payload: { userId: number; noteId: number }) {
+    await apiCallNotify(context, token => api.deletePMNote(token, payload.userId, payload.noteId), {
+      successText: 'Notiz gelöscht'
+    });
   }
 };
 
@@ -340,3 +410,18 @@ export const dispatchAddRequestMe = dispatch(actions.actionAddRequestMe);
 export const dispatchGetGroups = dispatch(actions.actionGetGroups); 
 export const dispatchSetPrimaryGroupMe = dispatch(actions.actionSetPrimaryGroupMe)
 export const dispatchToggleFeatureFlag = dispatch(actions.actionToggleFeatureFlag);
+
+export const dispatchGetWorkExperiences = dispatch(actions.actionGetWorkExperiences);
+export const dispatchCreateWorkExperience = dispatch(actions.actionCreateWorkExperience);
+export const dispatchUpdateWorkExperience = dispatch(actions.actionUpdateWorkExperience);
+export const dispatchDeleteWorkExperience = dispatch(actions.actionDeleteWorkExperience);
+
+export const dispatchGetUserSkills = dispatch(actions.actionGetUserSkills);
+export const dispatchCreateUserSkill = dispatch(actions.actionCreateUserSkill);
+export const dispatchUpdateUserSkill = dispatch(actions.actionUpdateUserSkill);
+export const dispatchDeleteUserSkill = dispatch(actions.actionDeleteUserSkill);
+
+export const dispatchGetPMNotes = dispatch(actions.actionGetPMNotes);
+export const dispatchCreatePMNote = dispatch(actions.actionCreatePMNote);
+export const dispatchUpdatePMNote = dispatch(actions.actionUpdatePMNote);
+export const dispatchDeletePMNote = dispatch(actions.actionDeletePMNote);

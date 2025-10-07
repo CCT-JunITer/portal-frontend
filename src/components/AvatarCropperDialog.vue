@@ -39,8 +39,8 @@ import { commitAddNotification } from '@/store/main/mutations';
   components: {Cropper, CircleStencil}
 })
 export default class AvatarCropperDialog extends Vue {
-  @Prop()
-  private inputAvatar: Blob | null = null;
+  @Prop({ default: null })
+  private inputAvatar!: Blob | null;
   private compressedInputAvatar: string | null = null;
   private compressedBlob?: Blob;
   private croppedAvatar: Blob | null = null;
@@ -80,7 +80,7 @@ export default class AvatarCropperDialog extends Vue {
   }
 
   @Emit()
-  public avatar(e) {
+  public avatar() {
     return this.croppedAvatar;
   }
 

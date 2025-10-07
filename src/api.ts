@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {apiUrl} from '@/env';
-import { IEvent, IEventCreate, IUserProfile, IUserProfileCreate, IUserProfileUpdate, UserType, RequestCreate, UserInvite, IEventApplicationCreate, IEventApplicationUpdate, IFinanceRequestCreate, IFinanceRequestUpdate, IFinanceRequest, Group, GroupUpdate, IUserSettings, IEventApplication, VersionedFolder, IDocumentCreate, IDocument, LabelledFile } from './interfaces';
+import { IEvent, IEventCreate, IUserProfile, IUserProfileCreate, IUserProfileUpdate, UserType, RequestCreate, UserInvite, IEventApplicationCreate, IEventApplicationUpdate, IFinanceRequestCreate, IFinanceRequestUpdate, IFinanceRequest, Group, GroupUpdate, IUserSettings, IEventApplication, VersionedFolder, IDocumentCreate, IDocument, LabelledFile, WorkExperience, WorkExperienceCreate, WorkExperienceUpdate, UserSkill, UserSkillCreate, UserSkillUpdate, PMNote, PMNoteCreate, PMNoteUpdate } from './interfaces';
 import {dataURItoBlob} from '@/utils';
 
 export function authHeaders(token: string, headers = {}) {
@@ -280,5 +280,45 @@ export const api = {
   },
   async updateParticipants(token: string, eventId: number, totp: number) {
     return axios.put(`${apiUrl}/api/v1/tracking/event/${eventId}`, { totp }, authHeaders(token));
+  },
+
+  async getWorkExperiences(token: string) {
+    return axios.get<WorkExperience[]>(`${apiUrl}/api/v1/users/me/work-experiences`, authHeaders(token));
+  },
+  async createWorkExperience(token: string, data: WorkExperienceCreate) {
+    return axios.post<WorkExperience>(`${apiUrl}/api/v1/users/me/work-experiences`, data, authHeaders(token));
+  },
+  async updateWorkExperience(token: string, id: number, data: WorkExperienceUpdate) {
+    return axios.put<WorkExperience>(`${apiUrl}/api/v1/users/me/work-experiences/${id}`, data, authHeaders(token));
+  },
+  async deleteWorkExperience(token: string, id: number) {
+    return axios.delete(`${apiUrl}/api/v1/users/me/work-experiences/${id}`, authHeaders(token));
+  },
+
+  async getUserSkills(token: string) {
+    return axios.get<UserSkill[]>(`${apiUrl}/api/v1/users/me/skills`, authHeaders(token));
+  },
+  async createUserSkill(token: string, data: UserSkillCreate) {
+    return axios.post<UserSkill>(`${apiUrl}/api/v1/users/me/skills`, data, authHeaders(token));
+  },
+  async updateUserSkill(token: string, id: number, data: UserSkillUpdate) {
+    return axios.put<UserSkill>(`${apiUrl}/api/v1/users/me/skills/${id}`, data, authHeaders(token));
+  },
+  async deleteUserSkill(token: string, id: number) {
+    return axios.delete(`${apiUrl}/api/v1/users/me/skills/${id}`, authHeaders(token));
+  },
+
+  // PM Notes endpoints
+  async getPMNotes(token: string, userId: number) {
+    return axios.get<PMNote[]>(`${apiUrl}/api/v1/users/${userId}/pm-notes`, authHeaders(token));
+  },
+  async createPMNote(token: string, userId: number, data: PMNoteCreate) {
+    return axios.post<PMNote>(`${apiUrl}/api/v1/users/${userId}/pm-notes`, data, authHeaders(token));
+  },
+  async updatePMNote(token: string, userId: number, noteId: number, data: PMNoteUpdate) {
+    return axios.put<PMNote>(`${apiUrl}/api/v1/users/${userId}/pm-notes/${noteId}`, data, authHeaders(token));
+  },
+  async deletePMNote(token: string, userId: number, noteId: number) {
+    return axios.delete(`${apiUrl}/api/v1/users/${userId}/pm-notes/${noteId}`, authHeaders(token));
   },
 };

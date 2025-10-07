@@ -121,7 +121,7 @@ export interface Project {
   parent_project?: Project;
 
   sub_projects?: Project[];
-  
+
   versioned_folder?: VersionedFolder;
   participants?: { [k: string]: ProjectUser[] };
   applications?: ProjectApplicationUser[];

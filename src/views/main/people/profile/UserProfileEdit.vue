@@ -221,9 +221,87 @@
             hint="(Format: https://www.linkedin.com/in/name)"
             :rules="[v => !v || $common.isLinkedIn(v) || 'Dies ist keine gültige LinkedIn-URL']"
           ></v-text-field>
+        </v-col>
+      </v-row>
 
+      <v-divider class="my-5"></v-divider>
 
+      <v-row>
+        <v-col cols="12" md="4" class="px-5">
+          <h4 class="text-h4 text--primary mb-3">Dashboard Einstellungen</h4>
+          <p class="text-body-2 text--secondary">
+            Diese Einstellungen werden im PM Dashboard verwendet
+          </p>
+        </v-col>
 
+        <v-col cols="12" md="8">
+          <v-slider
+            label="Aktuelle Auslastung (%)"
+            v-model="utilizationPercent"
+            class="input-lg"
+            :min="0"
+            :max="100"
+            :step="5"
+            thumb-label="always"
+            hint="Deine aktuelle Arbeitsauslastung"
+            persistent-hint
+          ></v-slider>
+
+          <v-slider
+            label="Zielauslastung (%)"
+            v-model="targetUtilizationPercent"
+            class="input-lg mt-6"
+            :min="0"
+            :max="100"
+            :step="5"
+            thumb-label="always"
+            hint="Deine angestrebte Arbeitsauslastung"
+            persistent-hint
+          ></v-slider>
+
+          <date-picker-menu
+            v-model="mpCompletionTargetDate"
+            defaultPicker="MONTH"
+            :pickerProps="{
+              min: new Date().toISOString().substr(0, 10),
+            }"
+          >
+            <template v-slot:activator="{on, attrs}">
+              <v-text-field
+                label="Mitgliedsportal Zieldatum (optional)"
+                class="input-lg mt-4"
+                v-bind="attrs"
+                v-on="on"
+                :rules="attrs.rules"
+                clearable
+                hint="Bis wann möchtest du dein Profil vervollständigen?"
+                persistent-hint
+              ></v-text-field>
+            </template>
+          </date-picker-menu>
+
+          <div class="mt-6">
+            <div class="text-subtitle-2 mb-2">Verfügbare Wochentage</div>
+            <div class="text-caption grey--text mb-3">Wähle die Tage aus, an denen du für Projekte verfügbar bist</div>
+            <v-chip-group
+              v-model="availabilityWeekdays"
+              column
+              multiple
+              active-class="primary--text"
+            >
+              <v-chip
+                v-for="day in weekdayOptions"
+                :key="day.value"
+                :value="day.value"
+                filter
+                outlined
+                label
+                class="mr-2 mb-2"
+              >
+                {{ day.text }}
+              </v-chip>
+            </v-chip-group>
+          </div>
           
         </v-col>
       </v-row>
@@ -334,6 +412,167 @@
 
       <v-row>
         <v-col cols="12" md="4" class="px-5">
+          <h4 class="text-h4 text--primary mb-3">Berufserfahrung</h4>
+          <p class="text-body-2 text--secondary">Füge deine bisherige Berufserfahrung hinzu</p>
+        </v-col>
+        <v-col cols="12" md="8">
+          <v-btn color="primary" outlined class="mb-4" @click="addWorkExperience">
+            <v-icon left>mdi-plus</v-icon>
+            Berufserfahrung hinzufügen
+          </v-btn>
+
+          <v-card v-for="(exp, index) in workExperiences" :key="'id' in exp && exp.id ? exp.id : `new-${index}`" outlined class="mb-3">
+            <v-card-text>
+              <v-row dense>
+                <v-col cols="12" md="6">
+                  <v-text-field
+                    label="Unternehmen"
+                    v-model="exp.company_name"
+                    :rules="[$common.required]"
+                    required
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="12" md="6">
+                  <v-text-field
+                    label="Position"
+                    v-model="exp.position_title"
+                    :rules="[$common.required]"
+                    required
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="12">
+                  <v-textarea
+                    label="Beschreibung (optional)"
+                    v-model="exp.description"
+                    rows="2"
+                    auto-grow
+                  ></v-textarea>
+                </v-col>
+                <v-col cols="12" md="6">
+                  <date-picker-menu
+                    v-model="exp.start_date"
+                    defaultPicker="MONTH"
+                    :pickerProps="{
+                      min: '1950-01-01',
+                      max: new Date().toISOString().substr(0, 10),
+                    }"
+                  >
+                    <template v-slot:activator="{on, attrs}">
+                      <v-text-field
+                        label="Startdatum"
+                        v-bind="attrs"
+                        v-on="on"
+                        :rules="[$common.required,...attrs.rules]"
+                        required
+                      ></v-text-field>
+                    </template>
+                  </date-picker-menu>
+                </v-col>
+                <v-col cols="12" md="6">
+                  <date-picker-menu
+                    v-model="exp.end_date"
+                    defaultPicker="MONTH"
+                    :pickerProps="{
+                      min: '1950-01-01',
+                      max: new Date().toISOString().substr(0, 10),
+                    }"
+                  >
+                    <template v-slot:activator="{on, attrs}">
+                      <v-text-field
+                        label="Enddatum (leer lassen falls aktuell)"
+                        v-bind="attrs"
+                        v-on="on"
+                        :rules="attrs.rules"
+                        clearable
+                      ></v-text-field>
+                    </template>
+                  </date-picker-menu>
+                </v-col>
+                <v-col cols="12">
+                  <v-select
+                    label="Beschäftigungsart"
+                    v-model="exp.employment_type"
+                    :items="employmentTypes"
+                    :rules="[$common.required]"
+                    required
+                  ></v-select>
+                </v-col>
+              </v-row>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn text color="error" @click="removeWorkExperience(index)">
+                <v-icon left>mdi-delete</v-icon>
+                Entfernen
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+
+          <div v-if="!workExperiences.length" class="text-caption grey--text">
+            Noch keine Berufserfahrung hinzugefügt
+          </div>
+        </v-col>
+      </v-row>
+
+      <v-divider class="my-5"></v-divider>
+
+      <v-row>
+        <v-col cols="12" md="4" class="px-5">
+          <h4 class="text-h4 text--primary mb-3">Fähigkeiten</h4>
+          <p class="text-body-2 text--secondary">Füge deine Fähigkeiten und Kenntnisse hinzu</p>
+        </v-col>
+        <v-col cols="12" md="8">
+          <v-btn color="primary" outlined class="mb-4" @click="addSkill">
+            <v-icon left>mdi-plus</v-icon>
+            Fähigkeit hinzufügen
+          </v-btn>
+
+          <v-row dense>
+            <v-col v-for="(skill, index) in userSkills" :key="'id' in skill && skill.id ? skill.id : `new-skill-${index}`" cols="12" sm="6">
+              <v-card outlined>
+                <v-card-text class="pb-0">
+                  <v-text-field
+                    label="Fähigkeit"
+                    v-model="skill.skill_name"
+                    :rules="[$common.required]"
+                    dense
+                    required
+                  ></v-text-field>
+                  <v-select
+                    label="Niveau"
+                    v-model="skill.skill_level"
+                    :items="skillLevels"
+                    :rules="[$common.required]"
+                    dense
+                    required
+                  ></v-select>
+                  <v-text-field
+                    label="Kategorie (optional)"
+                    v-model="skill.category"
+                    dense
+                    hint="z.B. Technisch, Sprachen, etc."
+                  ></v-text-field>
+                </v-card-text>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn icon small color="error" @click="removeSkill(index)">
+                    <v-icon small>mdi-delete</v-icon>
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-col>
+          </v-row>
+
+          <div v-if="!userSkills.length" class="text-caption grey--text">
+            Noch keine Fähigkeiten hinzugefügt
+          </div>
+        </v-col>
+      </v-row>
+
+      <v-divider class="my-5"></v-divider>
+
+      <v-row>
+        <v-col cols="12" md="4" class="px-5">
           <h4 class="text-h4 text--primary mb-3">Gruppen</h4>
           <p class="text-body-2 text--secondary">Gruppenzuweisung</p>
         </v-col>
@@ -375,9 +614,20 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { Group, IUserProfileUpdate, UserGroup } from '@/interfaces';
+import { Group, IUserProfileUpdate, UserGroup, WorkExperience, WorkExperienceCreate, UserSkill, UserSkillCreate, EmploymentType, SkillLevel } from '@/interfaces';
 import { readUserProfile } from '@/store/main/getters';
-import { dispatchRouteLoggedIn, dispatchSetPrimaryGroupMe, dispatchUpdateUserProfile, dispatchUploadFile } from '@/store/main/actions';
+import { 
+  dispatchRouteLoggedIn, 
+  dispatchSetPrimaryGroupMe, 
+  dispatchUpdateUserProfile, 
+  dispatchUploadFile,
+  dispatchCreateWorkExperience,
+  dispatchUpdateWorkExperience,
+  dispatchDeleteWorkExperience,
+  dispatchCreateUserSkill,
+  dispatchUpdateUserSkill,
+  dispatchDeleteUserSkill
+} from '@/store/main/actions';
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 import UploadButton from '@/components/UploadButton.vue';
 import VueTelInputVuetify from 'vue-tel-input-vuetify/lib/vue-tel-input-vuetify.vue';
@@ -416,6 +666,46 @@ export default class UserProfileEdit extends Vue {
   public iban = '';
   public bic = '';
   public bank = '';
+
+  public utilizationPercent = 0;
+  public targetUtilizationPercent = 75;
+  public mpCompletionTargetDate: string | null = null;
+
+  public availabilityWeekdays: string[] = [];
+
+  // Weekday options for availability
+  public weekdayOptions = [
+    { text: 'Montag', value: 'monday' },
+    { text: 'Dienstag', value: 'tuesday' },
+    { text: 'Mittwoch', value: 'wednesday' },
+    { text: 'Donnerstag', value: 'thursday' },
+    { text: 'Freitag', value: 'friday' },
+    { text: 'Samstag', value: 'saturday' },
+    { text: 'Sonntag', value: 'sunday' },
+  ];
+
+  public workExperiences: (WorkExperience | WorkExperienceCreate)[] = [];
+  public userSkills: (UserSkill | UserSkillCreate)[] = [];
+  public workExperiencesToDelete: number[] = [];
+  public skillsToDelete: number[] = [];
+
+  // Employment type options
+  public employmentTypes = [
+    { text: 'Praktikum', value: EmploymentType.INTERNSHIP },
+    { text: 'Werkstudent', value: EmploymentType.WORKING_STUDENT },
+    { text: 'Vollzeit', value: EmploymentType.FULL_TIME },
+    { text: 'Teilzeit', value: EmploymentType.PART_TIME },
+    { text: 'Freiberuflich', value: EmploymentType.FREELANCE },
+    { text: 'Ehrenamtlich', value: EmploymentType.VOLUNTEER },
+  ];
+
+  // Skill level options
+  public skillLevels = [
+    { text: 'Grundkenntnisse', value: SkillLevel.BEGINNER },
+    { text: 'Fortgeschritten', value: SkillLevel.INTERMEDIATE },
+    { text: 'Sehr gut', value: SkillLevel.ADVANCED },
+    { text: 'Experte', value: SkillLevel.EXPERT },
+  ];
 
   public async onFileChanged(files: File[]) {
     this.inputAvatar = files[0];
@@ -459,6 +749,16 @@ export default class UserProfileEdit extends Vue {
       this.bic = userProfile.bic;
       this.bank = userProfile.bank;
       this.contact = userProfile.contact;
+
+      this.utilizationPercent = userProfile.utilization ? userProfile.utilization * 100 : 0;
+      this.targetUtilizationPercent = userProfile.target_utilization ? userProfile.target_utilization * 100 : 75;
+      this.mpCompletionTargetDate = userProfile.mp_completion_target_date || null;
+      this.availabilityWeekdays = userProfile.availability_weekdays ? [...userProfile.availability_weekdays] : [];
+
+      this.workExperiences = userProfile.work_experiences ? [...userProfile.work_experiences] : [];
+      this.userSkills = userProfile.user_skills ? [...userProfile.user_skills] : [];
+      this.workExperiencesToDelete = [];
+      this.skillsToDelete = [];
     }
   }
 
@@ -492,6 +792,11 @@ export default class UserProfileEdit extends Vue {
           bank: this.bank,
           private_email: this.privateEmail,
           contact: this.contact,
+          utilization: this.utilizationPercent / 100,
+          target_utilization: this.targetUtilizationPercent / 100,
+          mp_completion_target_date: this.mpCompletionTargetDate,
+          availability_weekdays: this.availabilityWeekdays,
+          last_active_at: new Date().toISOString(),
         };
 
         if(this.avatar) {
@@ -506,6 +811,35 @@ export default class UserProfileEdit extends Vue {
           updatedProfile.profile_picture = '';
         }
         await dispatchUpdateUserProfile(this.$store, updatedProfile);
+
+        for (const exp of this.workExperiences) {
+          if ('id' in exp && exp.id) {
+            // Update existing
+            await dispatchUpdateWorkExperience(this.$store, { id: exp.id, data: exp });
+          } else {
+            // Create new
+            await dispatchCreateWorkExperience(this.$store, exp as WorkExperienceCreate);
+          }
+        }
+        // Delete removed work experiences
+        for (const id of this.workExperiencesToDelete) {
+          await dispatchDeleteWorkExperience(this.$store, id);
+        }
+
+        for (const skill of this.userSkills) {
+          if ('id' in skill && skill.id) {
+            // Update existing
+            await dispatchUpdateUserSkill(this.$store, { id: skill.id, data: skill });
+          } else {
+            // Create new
+            await dispatchCreateUserSkill(this.$store, skill as UserSkillCreate);
+          }
+        }
+        // Delete removed skills
+        for (const id of this.skillsToDelete) {
+          await dispatchDeleteUserSkill(this.$store, id);
+        }
+
         await dispatchRouteLoggedIn(this.$store);
       } catch (error) {
         // Error notification is already shown by apiCallNotify
@@ -530,6 +864,44 @@ export default class UserProfileEdit extends Vue {
     await dispatchSetPrimaryGroupMe(this.$store, group.id);
   }
 
+  public addWorkExperience() {
+    this.workExperiences.push({
+      company_name: '',
+      position_title: '',
+      description: null,
+      start_date: '',
+      end_date: null,
+      employment_type: EmploymentType.FULL_TIME,
+    });
+  }
+
+  public removeWorkExperience(index: number) {
+    const exp = this.workExperiences[index];
+    // If it has an ID, mark for deletion
+    if ('id' in exp && exp.id) {
+      this.workExperiencesToDelete.push(exp.id);
+    }
+    // Remove from list
+    this.workExperiences.splice(index, 1);
+  }
+
+  public addSkill() {
+    this.userSkills.push({
+      skill_name: '',
+      skill_level: SkillLevel.INTERMEDIATE,
+      category: null,
+    });
+  }
+
+  public removeSkill(index: number) {
+    const skill = this.userSkills[index];
+    // If it has an ID, mark for deletion
+    if ('id' in skill && skill.id) {
+      this.skillsToDelete.push(skill.id);
+    }
+    // Remove from list
+    this.userSkills.splice(index, 1);
+  }
 }
 
 

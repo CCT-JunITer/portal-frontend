@@ -40,6 +40,25 @@ export const getters = {
     return (
       state.userProfile && state.userProfile.permissions.find(p => p.indexOf('admin') !== -1 || p.indexOf('*') !== -1));
   },
+  isProjektmanager: (state: MainState) => {
+    const user = state.userProfile;
+    if (!user) {
+      return false;
+    }
+    // Check if user has admin access
+    const hasAdmin = user.permissions.find(p => p.indexOf('admin') !== -1 || p.indexOf('*') !== -1);
+    if (hasAdmin) {
+      return true;
+    }
+    // Check if user has Projektmanager as their ressort
+    if (user.ressort === 'Projektmanager') {
+      return true;
+    }
+    // Also check active_groups for ressort type with name 'Projektmanager'
+    return user.active_groups?.some(group => 
+      group.type === 'ressort' && group.name === 'Projektmanager'
+    ) || false;
+  },
   hasAnyPermission: (state: MainState) => (permissions: string[]) => {
     const user = state.userProfile;
     if (!user) {
@@ -68,6 +87,7 @@ const {read} = getStoreAccessors<MainState, State>('');
 export const readDashboardMiniDrawer = read(getters.dashboardMiniDrawer);
 export const readDashboardShowDrawer = read(getters.dashboardShowDrawer);
 export const readHasAdminAccess = read(getters.hasAdminAccess);
+export const readIsProjektmanager = read(getters.isProjektmanager);
 export const readHasAnyPermission = read(getters.hasAnyPermission);
 export const readToolbarColor = read(getters.toolbarColor);
 export const readIsLoggedIn = read(getters.isLoggedIn);
