@@ -360,11 +360,6 @@ export default class PmUserProfileView extends Vue {
     ];
   }
 
-  get placeholderAvailability() {
-    // Return actual availability weekdays from profile, or empty array
-    return this.profile?.availability_weekdays || [];
-  }
-
   get availabilityWeekdaysFormatted(): string[] {
     const weekdays = this.profile?.availability_weekdays || [];
     return weekdays.map(day => this.weekdayMap[day] || day);
