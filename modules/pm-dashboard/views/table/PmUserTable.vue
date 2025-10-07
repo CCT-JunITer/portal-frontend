@@ -5,13 +5,13 @@
         class="mt-md-15 mx-5"
         rounded
         elevation="3"
-        width="500"
+        :width="$vuetify.breakpoint.mdAndUp ? '900' : '100%'"
       >
         <v-text-field
           v-model="searchText"
           class="search-bar"
           clearable
-          label="Mitglieder suchen"
+          label="Mitglieder suchen (Name, Skills, Ressort...)"
           hide-details
           color="cctGreen"
           full-width
@@ -26,6 +26,7 @@
         <div class="select-wrapper px-2">
           <v-select
             v-model="category"
+            @change="onCategoryChange"
             :menu-props="{ offsetY: true, bottom: true }"
             solo
             flat
@@ -37,20 +38,152 @@
         </div>
       </v-toolbar>
     </div>
-    <div>
+
+    <!-- Advanced Filters -->
+    <v-card class="mx-5 mb-5" outlined>
+      <v-card-text class="pb-2">
+        <v-row dense>
+          <v-col cols="12" md="3">
+            <v-select
+              v-model="filterRessort"
+              :items="ressortOptions"
+              label="Ressort"
+              clearable
+              dense
+              outlined
+              hide-details
+              multiple
+              chips
+              small-chips
+            ></v-select>
+          </v-col>
+          <v-col cols="12" md="3">
+            <v-select
+              v-model="filterMemberstatus"
+              :items="memberstatusOptions"
+              label="Mitgliedsstatus"
+              clearable
+              dense
+              outlined
+              hide-details
+              multiple
+              chips
+              small-chips
+            ></v-select>
+          </v-col>
+          <v-col cols="12" md="2">
+            <v-select
+              v-model="filterAvailability"
+              :items="availabilityOptions"
+              label="Auslastung"
+              clearable
+              dense
+              outlined
+              hide-details
+            ></v-select>
+          </v-col>
+          <v-col cols="12" md="2">
+            <v-checkbox
+              v-model="hidePassive"
+              label="Passive ausblenden"
+              dense
+              hide-details
+              class="mt-0"
+            ></v-checkbox>
+          </v-col>
+          <v-col cols="12" md="2" class="d-flex align-center">
+            <v-btn small text @click="clearFilters">
+              <v-icon small left>mdi-filter-remove</v-icon>
+              Filter zurücksetzen
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card-text>
+    </v-card>
+
+    <div class="px-5">
       <v-data-table 
         :headers="headers" 
-        :items="users" 
-        :search="searchText" 
+        :items="filteredUsers" 
+        :search="searchText"
+        :custom-filter="customFilter"
         multi-sort
+        :items-per-page="25"
+        :footer-props="{
+          'items-per-page-options': [10, 25, 50, 100, -1]
+        }"
+        class="elevation-2"
       >
+        <template v-slot:item.full_name="{ item }">
+          <div class="d-flex align-center">
+            <employee-profile-picture :employee="item" size="32" class="mr-2" />
+            <span class="font-weight-medium">{{ item.full_name }}</span>
+          </div>
+        </template>
+
+        <template v-slot:item.utilization="{ item }">
+          <div class="d-flex align-center" style="min-width: 120px;">
+            <v-progress-linear
+              :value="(item.utilization || 0) * 100"
+              :color="utilizationColor(item.utilization)"
+              height="8"
+              rounded
+              class="mr-2"
+              style="max-width: 80px;"
+            />
+            <span class="text-caption">{{ ((item.utilization || 0) * 100).toFixed(0) }}%</span>
+          </div>
+        </template>
+
+        <template v-slot:item.skills="{ item }">
+          <div class="d-flex flex-wrap" style="max-width: 300px;">
+            <v-chip
+              v-for="skill in getTopSkills(item)"
+              :key="skill.name"
+              x-small
+              class="mr-1 mb-1"
+              :color="skillLevelColor(skill.level)"
+              dark
+            >
+              {{ skill.name }}
+            </v-chip>
+            <span v-if="(item.user_skills?.length || 0) > 3" class="text-caption grey--text ml-1">
+              +{{ (item.user_skills?.length || 0) - 3 }}
+            </span>
+          </div>
+        </template>
+
+        <template v-slot:item.is_passive="{ item }">
+          <v-chip
+            x-small
+            :color="item.is_passive ? 'cctOrange' : 'green'"
+            dark
+          >
+            {{ item.is_passive ? 'Ja' : 'Nein' }}
+          </v-chip>
+        </template>
+
+        <template v-slot:item.availability_weekdays="{ item }">
+          <div v-if="item.availability_weekdays && item.availability_weekdays.length" class="text-caption">
+            {{ formatWeekdays(item.availability_weekdays) }}
+          </div>
+          <span v-else class="text-caption grey--text">—</span>
+        </template>
+
+        <template v-slot:item.active_projects_count="{ item }">
+          <v-chip x-small :color="item.active_projects_count > 0 ? 'cctBlue' : 'grey'" dark>
+            {{ item.active_projects_count || 0 }}
+          </v-chip>
+        </template>
+
         <template v-slot:item.custom_details="{ item }">
           <v-btn
             color="cctGrey"
             :to="{ name: 'pm-user-detail', params: { id: item.id } }"
             dark
+            small
           >
-            <v-icon>
+            <v-icon small>
               mdi-text
             </v-icon>
           </v-btn>
@@ -63,32 +196,71 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import Backdrop from '@/components/Backdrop.vue';
+import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 import { IUserProfile, UserType } from '@/interfaces';
 import { dispatchGetUsers } from '@/store/main/actions';
 import { readUsers } from '@/store/main/getters';
-import { readProjects } from '@modules/projects/store/getters';
-import { dispatchGetProjects } from '@modules/projects/store/actions';
 
 @Component({
-  components: { Backdrop }
+  components: { Backdrop, EmployeeProfilePicture }
 })
 export default class PmUserTable extends Vue {
-  public userBtMap: Record<number, number> = {};
-  public userProjectsMap: Record<number, number> = {};
-  public userApplicationsMap: Record<number, number> = {};
+  // Filter state
+  private filterRessort: string[] = [];
+  private filterMemberstatus: string[] = [];
+  private filterAvailability: string | null = null;
+  private hidePassive = true;
 
   get users() {
-    const users = readUsers(this.$store);
-    return users.map(user => ({
-      ...user,
-      total_external_bt: this.userBtMap[user.id] || 0,
-      amount_projects_closed: this.userProjectsMap[user.id] || 0,
-      amount_applications: this.userApplicationsMap[user.id] || 0,
-    }));
+    return readUsers(this.$store);
   }
 
-  get projects() {
-    return readProjects(this.$store)('all') || [];
+  get filteredUsers() {
+    let filtered = this.users;
+
+    // Filter by category (similar to SearchView logic)
+    if (this.category === 'consultants') {
+      // Filter for consultant-level members (Consultant, Senior Consultant)
+      filtered = filtered.filter(u => 
+        u.memberstatus === 'Consultant' || u.memberstatus === 'Senior Consultant'
+      );
+    } else if (this.category === 'trainees') {
+      // Filter for trainee-level members
+      filtered = filtered.filter(u => 
+        u.memberstatus === 'Trainee' || u.memberstatus === 'Junior Consultant'
+      );
+    }
+    // 'all' shows everyone
+
+    // Filter by ressort
+    if (this.filterRessort.length > 0) {
+      filtered = filtered.filter(u => this.filterRessort.includes(u.ressort));
+    }
+
+    // Filter by memberstatus
+    if (this.filterMemberstatus.length > 0) {
+      filtered = filtered.filter(u => this.filterMemberstatus.includes(u.memberstatus));
+    }
+
+    // Filter by availability/utilization
+    if (this.filterAvailability) {
+      filtered = filtered.filter(u => {
+        const util = u.utilization || 0;
+        switch (this.filterAvailability) {
+        case 'available': return util < 0.8;
+        case 'busy': return util >= 0.8 && util < 1.0;
+        case 'full': return util >= 1.0;
+        default: return true;
+        }
+      });
+    }
+
+    // Hide passive members
+    if (this.hidePassive) {
+      filtered = filtered.filter(u => !u.is_passive);
+    }
+
+    return filtered;
   }
 
   get searchText() {
@@ -117,45 +289,66 @@ export default class PmUserTable extends Vue {
     this.$router.replace({ query: { ...this.$route.query, category } });
   }
 
-  public headers: { text: string; value: keyof IUserProfile | string; sortable?: boolean }[] = [
+  get ressortOptions() {
+    const ressorts = new Set(this.users.map(u => u.ressort).filter(Boolean));
+    return Array.from(ressorts).sort();
+  }
+
+  get memberstatusOptions() {
+    const statuses = new Set(this.users.map(u => u.memberstatus).filter(Boolean));
+    return Array.from(statuses).sort();
+  }
+
+  private availabilityOptions = [
+    { value: 'available', text: 'Verfügbar (< 80%)' },
+    { value: 'busy', text: 'Ausgelastet (80-100%)' },
+    { value: 'full', text: 'Voll ausgelastet (≥ 100%)' }
+  ];
+
+  public headers: { text: string; value: keyof IUserProfile | string; sortable?: boolean; width?: string }[] = [
     {
       text: 'Name',
       value: 'full_name',
+      width: '200px'
+    },
+    {
+      text: 'Auslastung',
+      value: 'utilization',
+      width: '140px'
+    },
+    {
+      text: 'Skills',
+      value: 'skills',
+      sortable: false,
+      width: '250px'
     },
     {
       text: 'Ressort',
       value: 'ressort',
     },
     {
-      text: 'Mitgliedsstatus',
+      text: 'Status',
       value: 'memberstatus',
     },
     {
-      text: 'Höchste Projektposition',
+      text: 'Höchste Position',
       value: 'highest_project_position',
     },
     {
-      text: 'Anzahl Projektbewerbungen',
-      value: 'amount_applications',
+      text: 'Aktive Projekte',
+      value: 'active_projects_count',
     },
     {
-      text: 'Projekte abgeschlossen',
-      value: 'amount_projects_closed',
+      text: 'Projekte realisiert',
+      value: 'amount_projects_realized',
     },
     {
-      text: 'externe BT',
-      value: 'total_external_bt',
+      text: 'Verfügbare Tage',
+      value: 'availability_weekdays',
+      sortable: false,
     },
     {
-      text: 'Studiengang',
-      value: 'major',
-    },
-    {
-      text: 'Hochschulgrad des Studiums',
-      value: 'studylevel',
-    },
-    {
-      text: 'Ist passiv',
+      text: 'Passiv',
       value: 'is_passive',
     },
     {
@@ -170,52 +363,122 @@ export default class PmUserTable extends Vue {
   }
 
   private async loadData() {
-    if (!this.projects || !this.projects.length) {
-      await dispatchGetProjects(this.$store, 'all');
-      await dispatchGetUsers(this.$store);
-    }
-
-    this.calculateUserMetrics();
+    await dispatchGetUsers(this.$store);
   }
 
-  private calculateUserMetrics() {
-    const users = this.users;
-    const projects = this.projects;
-    const userBtMap: Record<number, number> = {};
+  public async onCategoryChange() {
+    await dispatchGetUsers(this.$store);
+  }
 
-    projects.forEach(project => {
-      // Calculate BT amounts and project counts for external projects
-      if (project.type === 'external' && project.participants?.committee) {
-        project.participants.committee.forEach(participant => {
-          const userId = participant.participant.id;
-          
-          // Accumulate BT amounts
-          if (project.bt_amount_actual) {
-            userBtMap[userId] = (userBtMap[userId] || 0) + project.bt_amount_actual;
-          }
-          
-          // Count completed projects
-          this.userProjectsMap[userId] = (this.userProjectsMap[userId] || 0) + 1;
-        });
-      }
+  private clearFilters() {
+    this.filterRessort = [];
+    this.filterMemberstatus = [];
+    this.filterAvailability = null;
+    this.hidePassive = true;
+  }
 
-      // Count applications
-      if (project.applications) {
-        project.applications.forEach(application => {
-          const userId = application.participant_id;
-          this.userApplicationsMap[userId] = (this.userApplicationsMap[userId] || 0) + 1;
-        });
-      }
-    });
+  private customFilter(value: unknown, search: string | null, item: IUserProfile) {
+    if (!search) return true;
+    
+    const searchLower = search.toLowerCase();
+    
+    // Search in basic fields
+    const basicFields = [
+      item.full_name,
+      item.email,
+      item.ressort,
+      item.memberstatus,
+      item.major,
+      item.studylevel,
+      item.highest_project_position
+    ].filter(Boolean).join(' ').toLowerCase();
+    
+    if (basicFields.includes(searchLower)) return true;
+    
+    // Search in skills
+    if (item.user_skills) {
+      const skillsText = item.user_skills.map(s => s.skill_name).join(' ').toLowerCase();
+      if (skillsText.includes(searchLower)) return true;
+    }
+    
+    return false;
+  }
 
-    this.userBtMap = userBtMap;
+  private getTopSkills(user: IUserProfile) {
+    if (!user.user_skills || user.user_skills.length === 0) return [];
+    
+    // Sort by level priority and take top 3
+    const levelPriority: Record<string, number> = {
+      'expert': 4,
+      'advanced': 3,
+      'intermediate': 2,
+      'beginner': 1
+    };
+    
+    return user.user_skills
+      .slice()
+      .sort((a, b) => {
+        const aPriority = levelPriority[a.skill_level?.toLowerCase() || ''] || 0;
+        const bPriority = levelPriority[b.skill_level?.toLowerCase() || ''] || 0;
+        return bPriority - aPriority;
+      })
+      .slice(0, 3)
+      .map(s => ({ name: s.skill_name, level: s.skill_level }));
+  }
 
-    // Combine projects and applications count
-    users.forEach(user => {
-      const projectCount = this.userProjectsMap[user.id] || 0;
-      const applicationCount = this.userApplicationsMap[user.id] || 0;
-      this.userApplicationsMap[user.id] = projectCount + applicationCount;
-    });
+  private skillLevelColor(level?: string) {
+    if (!level) return 'grey darken-1';
+    // Match the colors from PmUserProfileView for consistency
+    switch (level.toLowerCase()) {
+    case 'expert': return 'deep-purple darken-1';
+    case 'advanced': return 'indigo darken-1';
+    case 'intermediate': return 'blue darken-1';
+    case 'beginner': return 'cyan darken-1';
+    default: return 'grey darken-1';
+    }
+  }
+
+  private utilizationColor(utilization?: number | null) {
+    if (!utilization) return 'grey';
+    if (utilization < 0.5) return 'green';
+    if (utilization < 0.8) return 'light-green';
+    if (utilization < 1.0) return 'orange';
+    return 'red';
+  }
+
+  private formatWeekdays(weekdays: string[]) {
+    const weekdayMap: Record<string, string> = {
+      'monday': 'Mo',
+      'tuesday': 'Di',
+      'wednesday': 'Mi',
+      'thursday': 'Do',
+      'friday': 'Fr',
+      'saturday': 'Sa',
+      'sunday': 'So',
+    };
+    return weekdays.map(d => weekdayMap[d] || d).join(', ');
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.search-bar {
+  ::v-deep .v-input__control {
+    min-height: 40px;
+  }
+}
+
+.select-wrapper {
+  min-width: 150px;
+}
+
+::v-deep .v-data-table {
+  th {
+    white-space: nowrap;
+  }
+  
+  td {
+    padding: 8px 12px !important;
+  }
+}
+</style>
