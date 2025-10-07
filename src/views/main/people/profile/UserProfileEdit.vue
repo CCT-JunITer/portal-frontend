@@ -259,27 +259,6 @@
             persistent-hint
           ></v-slider>
 
-          <date-picker-menu
-            v-model="mpCompletionTargetDate"
-            defaultPicker="MONTH"
-            :pickerProps="{
-              min: new Date().toISOString().substr(0, 10),
-            }"
-          >
-            <template v-slot:activator="{on, attrs}">
-              <v-text-field
-                label="Mitgliedsportal Zieldatum (optional)"
-                class="input-lg mt-4"
-                v-bind="attrs"
-                v-on="on"
-                :rules="attrs.rules"
-                clearable
-                hint="Bis wann möchtest du dein Profil vervollständigen?"
-                persistent-hint
-              ></v-text-field>
-            </template>
-          </date-picker-menu>
-
           <div class="mt-6">
             <div class="text-subtitle-2 mb-2">Verfügbare Wochentage</div>
             <div class="text-caption grey--text mb-3">Wähle die Tage aus, an denen du für Projekte verfügbar bist</div>
@@ -669,7 +648,6 @@ export default class UserProfileEdit extends Vue {
 
   public utilizationPercent = 0;
   public targetUtilizationPercent = 75;
-  public mpCompletionTargetDate: string | null = null;
 
   public availabilityWeekdays: string[] = [];
 
@@ -752,7 +730,6 @@ export default class UserProfileEdit extends Vue {
 
       this.utilizationPercent = userProfile.utilization ? userProfile.utilization * 100 : 0;
       this.targetUtilizationPercent = userProfile.target_utilization ? userProfile.target_utilization * 100 : 75;
-      this.mpCompletionTargetDate = userProfile.mp_completion_target_date || null;
       this.availabilityWeekdays = userProfile.availability_weekdays ? [...userProfile.availability_weekdays] : [];
 
       this.workExperiences = userProfile.work_experiences ? [...userProfile.work_experiences] : [];
@@ -794,7 +771,6 @@ export default class UserProfileEdit extends Vue {
           contact: this.contact,
           utilization: this.utilizationPercent / 100,
           target_utilization: this.targetUtilizationPercent / 100,
-          mp_completion_target_date: this.mpCompletionTargetDate,
           availability_weekdays: this.availabilityWeekdays,
           last_active_at: new Date().toISOString(),
         };

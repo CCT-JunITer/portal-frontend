@@ -44,7 +44,6 @@ export interface IUserProfile {
     user_streaks?: UserStreak[];
     total_external_bt?: number;
 
-    mp_completion_target_date?: string | null;
     target_utilization?: number | null;
     utilization?: number | null;
     last_active_at?: string | null;
@@ -99,7 +98,6 @@ export interface IUserProfileUpdate {
 
     admin_comment?: string;
 
-    mp_completion_target_date?: string | null;
     target_utilization?: number | null;
     utilization?: number | null;
     last_active_at?: string | null;
