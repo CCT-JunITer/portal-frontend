@@ -145,7 +145,7 @@
               :color="skillLevelColor(skill.level)"
               dark
             >
-              {{ skill.name }}
+              {{ skill.name }}<span v-if="skill.level" class="ml-1">({{ $enum('SkillLevelEnum', skill.level) }})</span>
             </v-chip>
             <span v-if="(item.user_skills?.length || 0) > 3" class="text-caption grey--text ml-1">
               +{{ (item.user_skills?.length || 0) - 3 }}

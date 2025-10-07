@@ -97,7 +97,7 @@
               <div v-if="!skills.length" class="text-caption grey--text">Noch keine Skills hinterlegt – Platzhalter</div>
               <div v-else class="d-flex flex-wrap">
                 <v-chip v-for="skill in skills" :key="skill.name" class="mr-1 mb-1" :color="skillColor(skill.level)" small label dark>
-                  {{ skill.name }}<span v-if="skill.level" class="ml-1">({{ skill.level }})</span>
+                  {{ skill.name }}<span v-if="skill.level" class="ml-1">({{ $enum('SkillLevelEnum', skill.level) }})</span>
                 </v-chip>
               </div>
             </v-card-text>
@@ -157,7 +157,7 @@
                   </tr>
                   <tr v-for="p in projectHistory" :key="p.id">
                     <td>{{ p.name }}</td>
-                    <td>{{ p.role }}</td>
+                    <td>{{ $enum('ProjectRoleEnum', p.role) }}</td>
                     <td>{{ p.status }}</td>
                     <td>{{ p.period }}</td>
                   </tr>
