@@ -442,6 +442,8 @@ export interface ProjectHistoryItem {
     role: string;
     start_date: string;
     end_date: string | null;
+    project_status?: string; // 'running' | 'completed' | 'aborted' | 'rejected'
+    project_type?: string; // 'external' | 'internal' | 'membership_project' | 'staffing'
 }
 
 export interface PMNote {

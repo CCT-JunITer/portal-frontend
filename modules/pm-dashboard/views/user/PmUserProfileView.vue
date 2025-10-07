@@ -146,6 +146,7 @@
                 <thead>
                   <tr>
                     <th class="text-left">Projekt</th>
+                    <th class="text-left">Typ</th>
                     <th class="text-left">Rolle</th>
                     <th class="text-left">Status</th>
                     <th class="text-left">Zeitraum</th>
@@ -153,7 +154,7 @@
                 </thead>
                 <tbody>
                   <tr v-if="!projectHistory.length">
-                    <td colspan="4" class="text-caption grey--text">Keine Projekte hinterlegt – Platzhalter</td>
+                    <td colspan="5" class="text-caption grey--text">Keine Projekte hinterlegt – Platzhalter</td>
                   </tr>
                   <tr 
                     v-for="p in projectHistory" 
@@ -162,8 +163,17 @@
                     class="clickable-row"
                   >
                     <td>{{ p.name }}</td>
+                    <td>
+                      <v-chip x-small :color="p.typeColor" dark label>
+                        {{ p.type }}
+                      </v-chip>
+                    </td>
                     <td>{{ $enum('ProjectRoleEnum', p.role) }}</td>
-                    <td>{{ p.status }}</td>
+                    <td>
+                      <v-chip x-small :color="p.statusColor" dark label>
+                        {{ p.status }}
+                      </v-chip>
+                    </td>
                     <td>{{ p.period }}</td>
                   </tr>
                 </tbody>
@@ -389,14 +399,17 @@ export default class PmUserProfileView extends Vue {
     return this.profile?.work_experiences || [];
   }
 
-  get projectHistory(): { id: string | number; projectId: number; name: string; role: string; status: string; period: string }[] {
+  get projectHistory(): { id: string | number; projectId: number; name: string; type: string; typeColor: string; role: string; status: string; statusColor: string; period: string }[] {
     // Use project_history from backend
     return this.profile?.project_history?.map((p, index) => ({
       id: `${p.project_id}-${index}`,
       projectId: p.project_id,
       name: p.project_title,
+      type: this.getProjectTypeLabel(p.project_type),
+      typeColor: this.getProjectTypeColor(p.project_type),
       role: p.role,
-      status: p.end_date ? 'abgeschlossen' : 'aktiv',
+      status: this.getProjectStatusLabel(p.project_status, p.project_type),
+      statusColor: this.getProjectStatusColor(p.project_status, p.project_type),
       period: this.composePeriod(p.start_date, p.end_date),
     })) || [];
   }
@@ -450,6 +463,58 @@ export default class PmUserProfileView extends Vue {
       'volunteer': 'Ehrenamtlich',
     };
     return typeMap[type] || type;
+  }
+
+  private getProjectStatusLabel(status?: string, type?: string): string {
+    // Check for internal projects first (MP/ISP)
+    if (type === 'internal' || type === 'membership_project') {
+      return 'MP/ISP';
+    }
+    
+    // Then check status
+    const statusMap: Record<string, string> = {
+      'running': 'Laufend',
+      'completed': 'Abgeschlossen',
+      'aborted': 'Abgebrochen',
+      'rejected': 'Abgelehnt',
+    };
+    return status ? (statusMap[status] || status) : '—';
+  }
+
+  private getProjectStatusColor(status?: string, type?: string): string {
+    // Internal projects (MP/ISP) - use purple
+    if (type === 'internal' || type === 'membership_project') {
+      return 'cctPurple';
+    }
+    
+    // Status-based colors
+    const colorMap: Record<string, string> = {
+      'running': 'cctGreen',
+      'completed': 'cctBlue',
+      'aborted': 'cctOrange',
+      'rejected': 'red',
+    };
+    return status ? (colorMap[status] || 'grey') : 'grey';
+  }
+
+  private getProjectTypeLabel(type?: string): string {
+    const typeMap: Record<string, string> = {
+      'external': 'Extern',
+      'internal': 'Intern',
+      'membership_project': 'MP',
+      'staffing': 'Besetzung',
+    };
+    return type ? (typeMap[type] || type) : '—';
+  }
+
+  private getProjectTypeColor(type?: string): string {
+    const colorMap: Record<string, string> = {
+      'external': 'cctBlue',
+      'internal': 'cctPurple',
+      'membership_project': 'cctPurple',
+      'staffing': 'cctGrey',
+    };
+    return type ? (colorMap[type] || 'grey') : 'grey';
   }
 
   async mounted() {
