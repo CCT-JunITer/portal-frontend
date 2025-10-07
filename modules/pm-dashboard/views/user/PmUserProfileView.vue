@@ -38,9 +38,8 @@
                     <v-btn icon small @click="refresh(true)" :title="'Aktualisieren'">
                       <v-icon small>mdi-refresh</v-icon>
                     </v-btn>
-                    <!-- Placeholder actions -->
-                    <v-btn icon small disabled :title="'Notiz hinzufügen (folgt)'">
-                      <v-icon small color="grey lighten-1">mdi-note-edit-outline</v-icon>
+                    <v-btn v-if="canManagePMNotes" icon small @click="scrollToNotes" :title="'Notiz hinzufügen'">
+                      <v-icon small>mdi-note-edit-outline</v-icon>
                     </v-btn>
                   </div>
                 </div>
@@ -202,6 +201,7 @@
                       <v-card outlined class="mb-3">
                         <v-card-text>
                           <v-textarea
+                            ref="noteTextarea"
                             v-model="newNoteContent"
                             label="Neue Notiz hinzufügen"
                             rows="3"
@@ -527,6 +527,24 @@ export default class PmUserProfileView extends Vue {
     } catch (error) {
       console.error('Failed to delete note:', error);
     }
+  }
+
+  scrollToNotes() {
+    // Scroll to bottom of page
+    this.$nextTick(() => {
+      window.scrollTo({
+        top: document.documentElement.scrollHeight,
+        behavior: 'smooth'
+      });
+      
+      // Focus the textarea after a short delay to ensure scrolling completes
+      setTimeout(() => {
+        const textarea = this.$refs.noteTextarea as Vue & { focus: () => void };
+        if (textarea && textarea.focus) {
+          textarea.focus();
+        }
+      }, 500);
+    });
   }
 
   @Watch('$route.params.id')
