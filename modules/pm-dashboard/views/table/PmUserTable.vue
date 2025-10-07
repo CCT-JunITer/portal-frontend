@@ -11,7 +11,7 @@
           v-model="searchText"
           class="search-bar"
           clearable
-          label="Mitglieder suchen (Name, Skills, Ressort...)"
+          label="Mitglieder suchen (Name, Ressort, Studiengang...)"
           hide-details
           color="cctGreen"
           full-width
@@ -43,7 +43,7 @@
     <v-card class="mx-5 mb-5" outlined>
       <v-card-text class="pb-2">
         <v-row dense>
-          <v-col cols="12" md="3">
+          <v-col cols="12" md="4">
             <v-select
               v-model="filterRessort"
               :items="ressortOptions"
@@ -57,7 +57,7 @@
               small-chips
             ></v-select>
           </v-col>
-          <v-col cols="12" md="3">
+          <v-col cols="12" md="4">
             <v-select
               v-model="filterMemberstatus"
               :items="memberstatusOptions"
@@ -69,17 +69,6 @@
               multiple
               chips
               small-chips
-            ></v-select>
-          </v-col>
-          <v-col cols="12" md="2">
-            <v-select
-              v-model="filterAvailability"
-              :items="availabilityOptions"
-              label="Auslastung"
-              clearable
-              dense
-              outlined
-              hide-details
             ></v-select>
           </v-col>
           <v-col cols="12" md="2">
@@ -121,38 +110,6 @@
           </div>
         </template>
 
-        <template v-slot:item.utilization="{ item }">
-          <div class="d-flex align-center" style="min-width: 120px;">
-            <v-progress-linear
-              :value="(item.utilization || 0) * 100"
-              :color="utilizationColor(item.utilization)"
-              height="8"
-              rounded
-              class="mr-2"
-              style="max-width: 80px;"
-            />
-            <span class="text-caption">{{ ((item.utilization || 0) * 100).toFixed(0) }}%</span>
-          </div>
-        </template>
-
-        <template v-slot:item.skills="{ item }">
-          <div class="d-flex flex-wrap" style="max-width: 300px;">
-            <v-chip
-              v-for="skill in getTopSkills(item)"
-              :key="skill.name"
-              x-small
-              class="mr-1 mb-1"
-              :color="skillLevelColor(skill.level)"
-              dark
-            >
-              {{ skill.name }}<span v-if="skill.level" class="ml-1">({{ $enum('SkillLevelEnum', skill.level) }})</span>
-            </v-chip>
-            <span v-if="(item.user_skills?.length || 0) > 3" class="text-caption grey--text ml-1">
-              +{{ (item.user_skills?.length || 0) - 3 }}
-            </span>
-          </div>
-        </template>
-
         <template v-slot:item.is_passive="{ item }">
           <v-chip
             x-small
@@ -168,12 +125,6 @@
             {{ formatWeekdays(item.availability_weekdays) }}
           </div>
           <span v-else class="text-caption grey--text">—</span>
-        </template>
-
-        <template v-slot:item.active_projects_count="{ item }">
-          <v-chip x-small :color="item.active_projects_count > 0 ? 'cctBlue' : 'grey'" dark>
-            {{ item.active_projects_count || 0 }}
-          </v-chip>
         </template>
 
         <template v-slot:item.custom_details="{ item }">
@@ -208,7 +159,6 @@ export default class PmUserTable extends Vue {
   // Filter state
   private filterRessort: string[] = [];
   private filterMemberstatus: string[] = [];
-  private filterAvailability: string | null = null;
   private hidePassive = true;
 
   get users() {
@@ -240,19 +190,6 @@ export default class PmUserTable extends Vue {
     // Filter by memberstatus
     if (this.filterMemberstatus.length > 0) {
       filtered = filtered.filter(u => this.filterMemberstatus.includes(u.memberstatus));
-    }
-
-    // Filter by availability/utilization
-    if (this.filterAvailability) {
-      filtered = filtered.filter(u => {
-        const util = u.utilization || 0;
-        switch (this.filterAvailability) {
-        case 'available': return util < 0.8;
-        case 'busy': return util >= 0.8 && util < 1.0;
-        case 'full': return util >= 1.0;
-        default: return true;
-        }
-      });
     }
 
     // Hide passive members
@@ -299,28 +236,11 @@ export default class PmUserTable extends Vue {
     return Array.from(statuses).sort();
   }
 
-  private availabilityOptions = [
-    { value: 'available', text: 'Verfügbar (< 80%)' },
-    { value: 'busy', text: 'Ausgelastet (80-100%)' },
-    { value: 'full', text: 'Voll ausgelastet (≥ 100%)' }
-  ];
-
   public headers: { text: string; value: keyof IUserProfile | string; sortable?: boolean; width?: string }[] = [
     {
       text: 'Name',
       value: 'full_name',
       width: '200px'
-    },
-    {
-      text: 'Auslastung',
-      value: 'utilization',
-      width: '140px'
-    },
-    {
-      text: 'Skills',
-      value: 'skills',
-      sortable: false,
-      width: '250px'
     },
     {
       text: 'Ressort',
@@ -331,16 +251,12 @@ export default class PmUserTable extends Vue {
       value: 'memberstatus',
     },
     {
-      text: 'Höchste Position',
-      value: 'highest_project_position',
+      text: 'Studiengang',
+      value: 'major',
     },
     {
-      text: 'Aktive Projekte',
-      value: 'active_projects_count',
-    },
-    {
-      text: 'Projekte realisiert',
-      value: 'amount_projects_realized',
+      text: 'Hochschulgrad',
+      value: 'studylevel',
     },
     {
       text: 'Verfügbare Tage',
@@ -373,7 +289,6 @@ export default class PmUserTable extends Vue {
   private clearFilters() {
     this.filterRessort = [];
     this.filterMemberstatus = [];
-    this.filterAvailability = null;
     this.hidePassive = true;
   }
 
@@ -390,60 +305,11 @@ export default class PmUserTable extends Vue {
       item.memberstatus,
       item.major,
       item.studylevel,
-      item.highest_project_position
     ].filter(Boolean).join(' ').toLowerCase();
     
     if (basicFields.includes(searchLower)) return true;
     
-    // Search in skills
-    if (item.user_skills) {
-      const skillsText = item.user_skills.map(s => s.skill_name).join(' ').toLowerCase();
-      if (skillsText.includes(searchLower)) return true;
-    }
-    
     return false;
-  }
-
-  private getTopSkills(user: IUserProfile) {
-    if (!user.user_skills || user.user_skills.length === 0) return [];
-    
-    // Sort by level priority and take top 3
-    const levelPriority: Record<string, number> = {
-      'expert': 4,
-      'advanced': 3,
-      'intermediate': 2,
-      'beginner': 1
-    };
-    
-    return user.user_skills
-      .slice()
-      .sort((a, b) => {
-        const aPriority = levelPriority[a.skill_level?.toLowerCase() || ''] || 0;
-        const bPriority = levelPriority[b.skill_level?.toLowerCase() || ''] || 0;
-        return bPriority - aPriority;
-      })
-      .slice(0, 3)
-      .map(s => ({ name: s.skill_name, level: s.skill_level }));
-  }
-
-  private skillLevelColor(level?: string) {
-    if (!level) return 'grey darken-1';
-    // Match the colors from PmUserProfileView for consistency
-    switch (level.toLowerCase()) {
-    case 'expert': return 'deep-purple darken-1';
-    case 'advanced': return 'indigo darken-1';
-    case 'intermediate': return 'blue darken-1';
-    case 'beginner': return 'cyan darken-1';
-    default: return 'grey darken-1';
-    }
-  }
-
-  private utilizationColor(utilization?: number | null) {
-    if (!utilization) return 'grey';
-    if (utilization < 0.5) return 'green';
-    if (utilization < 0.8) return 'light-green';
-    if (utilization < 1.0) return 'orange';
-    return 'red';
   }
 
   private formatWeekdays(weekdays: string[]) {
