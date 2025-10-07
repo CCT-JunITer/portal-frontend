@@ -1,10 +1,32 @@
 <template>
-  <v-card v-bind="$attrs" v-on="$listeners" v-if="project">
+  <v-card 
+    v-bind="$attrs" 
+    v-on="$listeners" 
+    v-if="project"
+    :class="{ 
+      'rejected-project': isUserProfile && project.status === 'rejected',
+      'aborted-project': isUserProfile && project.status === 'aborted',
+      'completed-project': isUserProfile && project.status === 'completed',
+      'running-project': isUserProfile && project.status === 'running'
+    }"
+  >
     <v-card-text>
       <slot name="prepend"></slot>
-      <p class="text-h5 text--primary">
-        {{ project.title }}
-      </p>
+      <div class="d-flex align-center">
+        <p class="text-h5 text--primary mb-0">
+          {{ project.title }}
+        </p>
+        <v-chip
+          v-if="isUserProfile"
+          class="ml-2"
+          :color="statusChipColor"
+          outlined
+          small
+        >
+          <v-icon small left>{{ statusIcon }}</v-icon>
+          {{ statusText }}
+        </v-chip>
+      </div>
       <span class="text-overline purple--text">
         {{ $enum('ProjectTypeEnum', project.type) }}
       </span>
@@ -79,9 +101,62 @@ export default class ProjectCard extends Vue {
   @Prop()
   public project!: Project;
 
+  @Prop({ default: false })
+  public isUserProfile!: boolean;
+
+  get statusChipColor() {
+    const statusColors = {
+      running: 'primary',
+      completed: 'cctGreen',
+      aborted: 'cctOrange',
+      rejected: 'error'
+    };
+    return statusColors[this.project.status] || 'grey';
+  }
+
+  get statusIcon() {
+    const statusIcons = {
+      running: 'mdi-play-circle',
+      completed: 'mdi-check-circle',
+      aborted: 'mdi-stop-circle',
+      rejected: 'mdi-close-circle'
+    };
+    return statusIcons[this.project.status] || 'mdi-help-circle';
+  }
+
+  get statusText() {
+    const statusTexts = {
+      running: 'Laufend',
+      completed: 'Abgeschlossen',
+      aborted: 'Abgebrochen',
+      rejected: 'Abgelehnt'
+    };
+    return statusTexts[this.project.status] || this.project.status;
+  }
+
 }
 </script>
 
 <style lang="scss">
+.rejected-project {
+  opacity: 0.7;
+  border-left: 4px solid var(--v-error-base) !important;
+  background-color: rgba(244, 67, 54, 0.05);
+}
 
+.aborted-project {
+  opacity: 0.75;
+  border-left: 4px solid var(--v-cctOrange-base) !important;
+  background-color: rgba(255, 100, 0, 0.05);
+}
+
+.completed-project {
+  border-left: 4px solid var(--v-cctGreen-base) !important;
+  background-color: rgba(62, 138, 131, 0.05);
+}
+
+.running-project {
+  border-left: 4px solid var(--v-primary-base) !important;
+  background-color: rgba(29, 69, 124, 0.05);
+}
 </style>

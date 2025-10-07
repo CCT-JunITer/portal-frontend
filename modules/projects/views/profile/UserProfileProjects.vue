@@ -45,7 +45,7 @@
               {{ project.bt_amount_actual ? $common.decimal2Text(project.bt_amount_actual) + ' BT' : $common.decimal2Text(project.bt_amount_expected) + ' BT (soll)'}}
             </span>
           </template>
-          <project-card :project="project">
+          <project-card :project="project" :is-user-profile="true">
             <template v-slot:prepend>
               <div>
                 <span 
