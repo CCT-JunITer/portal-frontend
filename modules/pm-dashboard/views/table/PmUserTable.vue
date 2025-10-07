@@ -64,8 +64,8 @@
 import { Component, Vue } from 'vue-property-decorator';
 import Backdrop from '@/components/Backdrop.vue';
 import { IUserProfile, UserType } from '@/interfaces';
-import { dispatchGetAdminUsers } from '@/store/admin/actions';
-import { readAdminUsers } from '@/store/admin/getters';
+import { dispatchGetUsers } from '@/store/main/actions';
+import { readUsers } from '@/store/main/getters';
 import { readProjects } from '@modules/projects/store/getters';
 import { dispatchGetProjects } from '@modules/projects/store/actions';
 
@@ -78,7 +78,7 @@ export default class PmUserTable extends Vue {
   public userApplicationsMap: Record<number, number> = {};
 
   get users() {
-    const users = readAdminUsers(this.$store);
+    const users = readUsers(this.$store);
     return users.map(user => ({
       ...user,
       total_external_bt: this.userBtMap[user.id] || 0,
@@ -172,7 +172,7 @@ export default class PmUserTable extends Vue {
   private async loadData() {
     if (!this.projects || !this.projects.length) {
       await dispatchGetProjects(this.$store, 'all');
-      await dispatchGetAdminUsers(this.$store);
+      await dispatchGetUsers(this.$store);
     }
 
     this.calculateUserMetrics();
