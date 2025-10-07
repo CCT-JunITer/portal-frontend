@@ -12,7 +12,7 @@
       <template v-else>
         <!-- HEADER / PRIMARY INFO -->
         <v-row dense class="profile-header mb-6" align="stretch">
-          <v-col cols="12" md="6">
+          <v-col cols="12" md="4">
             <v-card outlined class="h-100 d-flex flex-column">
               <v-card-text class="pb-0 d-flex align-start">
                 <employee-profile-picture 
@@ -53,7 +53,7 @@
           </v-col>
 
           <!-- QUICK STATS -->
-          <v-col cols="12" md="6">
+          <v-col cols="12" md="4">
             <v-card outlined class="h-100">
               <v-card-title class="pb-1">Kurzüberblick</v-card-title>
               <v-card-text class="pt-0">
@@ -64,6 +64,28 @@
                     <div v-if="stat.hint" class="text-caption grey--text mt-1">{{ stat.hint }}</div>
                   </v-col>
                 </v-row>
+              </v-card-text>
+            </v-card>
+          </v-col>
+
+          <!-- AVAILABILITY -->
+          <v-col cols="12" md="4">
+            <v-card outlined class="h-100">
+              <v-card-title class="pb-1">Verfügbarkeit</v-card-title>
+              <v-card-text class="pt-0 flex-grow-1 d-flex flex-column">
+                <div class="mb-2">Aktuelle Auslastung</div>
+                <v-progress-linear :value="(profile.utilization || 0) * 100" color="cctGreen" height="14" rounded>
+                  <template v-slot:default>
+                    <strong class="white--text text-caption">{{ ((profile.utilization || 0) * 100).toFixed(0) }}%</strong>
+                  </template>
+                </v-progress-linear>
+                <div class="text-caption grey--text mt-2">Zielauslastung: {{ profile.target_utilization ? (profile.target_utilization * 100).toFixed(0) : '—' }}%</div>
+                <v-divider class="my-3" />
+                <div class="text-caption grey--text mb-1">Verfügbare Wochentage</div>
+                <div v-if="!availabilityWeekdaysFormatted.length" class="text-caption grey--text">Keine Verfügbarkeit hinterlegt</div>
+                <div v-else class="d-flex flex-wrap">
+                  <v-chip small v-for="day in availabilityWeekdaysFormatted" :key="day" class="mr-1 mb-1" color="cctGreen lighten-4" label>{{ day }}</v-chip>
+                </div>
               </v-card-text>
             </v-card>
           </v-col>
@@ -178,26 +200,6 @@
                   </tr>
                 </tbody>
               </v-simple-table>
-            </v-card-text>
-          </v-card>
-
-          <!-- Availability -->
-          <v-card outlined class="grid-card">
-            <v-card-title class="pb-1">Verfügbarkeit</v-card-title>
-            <v-card-text class="pt-0 flex-grow-1 d-flex flex-column">
-              <div class="mb-2">Aktuelle Auslastung</div>
-              <v-progress-linear :value="(profile.utilization || 0) * 100" color="cctGreen" height="14" rounded>
-                <template v-slot:default>
-                  <strong class="white--text text-caption">{{ ((profile.utilization || 0) * 100).toFixed(0) }}%</strong>
-                </template>
-              </v-progress-linear>
-              <div class="text-caption grey--text mt-2">Zielauslastung: {{ profile.target_utilization ? (profile.target_utilization * 100).toFixed(0) : '—' }}%</div>
-              <v-divider class="my-3" />
-              <div class="text-caption grey--text mb-1">Verfügbare Wochentage</div>
-              <div v-if="!availabilityWeekdaysFormatted.length" class="text-caption grey--text">Keine Verfügbarkeit hinterlegt</div>
-              <div v-else class="d-flex flex-wrap">
-                <v-chip small v-for="day in availabilityWeekdaysFormatted" :key="day" class="mr-1 mb-1" color="cctGreen lighten-4" label>{{ day }}</v-chip>
-              </div>
             </v-card-text>
           </v-card>
 
