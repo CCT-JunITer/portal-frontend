@@ -43,7 +43,7 @@
     <v-card class="mx-5 mb-5" outlined>
       <v-card-text class="pb-2">
         <v-row dense>
-          <v-col cols="12" md="4">
+          <v-col cols="12" md="3">
             <v-select
               v-model="filterRessort"
               :items="ressortOptions"
@@ -57,7 +57,7 @@
               small-chips
             ></v-select>
           </v-col>
-          <v-col cols="12" md="4">
+          <v-col cols="12" md="3">
             <v-select
               v-model="filterMemberstatus"
               :items="memberstatusOptions"
@@ -71,10 +71,19 @@
               small-chips
             ></v-select>
           </v-col>
-          <v-col cols="12" md="2">
+          <v-col cols="6" md="2">
             <v-checkbox
               v-model="hidePassive"
               label="Passive ausblenden"
+              dense
+              hide-details
+              class="mt-0"
+            ></v-checkbox>
+          </v-col>
+          <v-col cols="6" md="2">
+            <v-checkbox
+              v-model="hideAlumni"
+              label="Alumni ausblenden"
               dense
               hide-details
               class="mt-0"
@@ -160,6 +169,7 @@ export default class PmUserTable extends Vue {
   private filterRessort: string[] = [];
   private filterMemberstatus: string[] = [];
   private hidePassive = true;
+  private hideAlumni = true;
 
   get users() {
     return readUsers(this.$store);
@@ -195,6 +205,11 @@ export default class PmUserTable extends Vue {
     // Hide passive members
     if (this.hidePassive) {
       filtered = filtered.filter(u => !u.is_passive);
+    }
+
+    // Hide alumni
+    if (this.hideAlumni) {
+      filtered = filtered.filter(u => !u.is_alumni);
     }
 
     return filtered;
@@ -290,6 +305,7 @@ export default class PmUserTable extends Vue {
     this.filterRessort = [];
     this.filterMemberstatus = [];
     this.hidePassive = true;
+    this.hideAlumni = true;
   }
 
   private customFilter(value: unknown, search: string | null, item: IUserProfile) {
