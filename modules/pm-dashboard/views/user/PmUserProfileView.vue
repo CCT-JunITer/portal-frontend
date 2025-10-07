@@ -35,6 +35,9 @@
                     <v-btn v-if="profile.phonenumber" :href="`tel:${profile.phonenumber}`" icon small :title="'Anrufen'">
                       <v-icon small>mdi-phone</v-icon>
                     </v-btn>
+                    <v-btn icon small @click="refresh" :title="'Aktualisieren'">
+                      <v-icon small>mdi-refresh</v-icon>
+                    </v-btn>
                     <v-btn v-if="canManagePMNotes" icon small @click="scrollToNotes" :title="'Notiz hinzufügen'">
                       <v-icon small>mdi-note-edit-outline</v-icon>
                     </v-btn>
@@ -43,6 +46,8 @@
               </v-card-text>
               <v-card-actions class="pt-0">
                 <div class="text-caption grey--text">ID: {{ profile.id }}</div>
+                <v-spacer></v-spacer>
+                <div class="text-caption grey--text">Zuletzt aktualisiert: {{ relativeDate(lastUpdated) }}</div>
               </v-card-actions>
             </v-card>
           </v-col>
@@ -283,6 +288,7 @@ import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture
 export default class PmUserProfileView extends Vue {
   // STATE
   private loading = true;
+  private lastUpdated: Date = new Date();
 
   // PM Notes state
   private pmNotes: PMNote[] = [];
@@ -441,10 +447,16 @@ export default class PmUserProfileView extends Vue {
   }
 
   async mounted() {
-    // Load detailed user data on mount
+    await this.refresh();
+  }
+
+  async refresh() {
+    this.loading = true;
+    // Load detailed user data
     if (this.routeUserId && +this.routeUserId) {
       await dispatchGetOneUser(this.$store, { userId: +this.routeUserId });
     }
+    this.lastUpdated = new Date();
     this.loading = false;
     if (this.canManagePMNotes && this.routeUserId) {
       await this.loadPMNotes();
@@ -548,15 +560,7 @@ export default class PmUserProfileView extends Vue {
 
   @Watch('$route.params.id')
   async onUserIdChange() {
-    this.loading = true;
-    // Load detailed user data when route changes
-    if (this.routeUserId && +this.routeUserId) {
-      await dispatchGetOneUser(this.$store, { userId: +this.routeUserId });
-    }
-    this.loading = false;
-    if (this.canManagePMNotes && this.routeUserId) {
-      await this.loadPMNotes();
-    }
+    await this.refresh();
   }
 }
 </script>
