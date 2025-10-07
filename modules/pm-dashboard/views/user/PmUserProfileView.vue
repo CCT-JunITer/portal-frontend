@@ -189,7 +189,7 @@
           <!-- Panels (span full width) -->
           <v-card outlined class="grid-card span-2">
             <v-card-text class="pa-0">
-              <v-expansion-panels multiple focusable accordion>
+              <v-expansion-panels v-model="expandedPanels" multiple focusable accordion>
                 <v-expansion-panel v-if="canManagePMNotes">
                   <v-expansion-panel-header>Interne Notizen (nur PM)</v-expansion-panel-header>
                   <v-expansion-panel-content>
@@ -296,6 +296,7 @@ export default class PmUserProfileView extends Vue {
   private newNoteContent = '';
   private editingNoteId: number | null = null;
   private editNoteContent = '';
+  private expandedPanels: number[] = [];
 
   // Weekday mapping
   private weekdayMap: Record<string, string> = {
@@ -530,20 +531,29 @@ export default class PmUserProfileView extends Vue {
   }
 
   scrollToNotes() {
-    // Scroll to bottom of page
+    // First, ensure the expansion panel is opened (index 0 since it's the first/only panel)
+    if (!this.expandedPanels.includes(0)) {
+      this.expandedPanels.push(0);
+    }
+    
+    // Wait for the panel to expand, then scroll and focus
     this.$nextTick(() => {
-      window.scrollTo({
-        top: document.documentElement.scrollHeight,
-        behavior: 'smooth'
-      });
-      
-      // Focus the textarea after a short delay to ensure scrolling completes
+      // Small delay to ensure panel animation completes
       setTimeout(() => {
-        const textarea = this.$refs.noteTextarea as Vue & { focus: () => void };
-        if (textarea && textarea.focus) {
-          textarea.focus();
-        }
-      }, 500);
+        // Scroll to bottom of page
+        window.scrollTo({
+          top: document.documentElement.scrollHeight,
+          behavior: 'smooth'
+        });
+        
+        // Focus the textarea after scrolling completes
+        setTimeout(() => {
+          const textarea = this.$refs.noteTextarea as Vue & { focus: () => void };
+          if (textarea && textarea.focus) {
+            textarea.focus();
+          }
+        }, 500);
+      }, 300);
     });
   }
 
