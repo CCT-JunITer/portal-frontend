@@ -241,7 +241,8 @@ export default class UserProfileRessortChange extends Vue {
     'Get Togethers',
     'Persönliche Kontaktaufnahme',
     'Alumni Networking 4.0 Gruppe LinkedIn',
-    'Facebook Gruppe'
+    'Facebook Gruppe',
+    'Slack Gastzugang',
   ]
 
 
