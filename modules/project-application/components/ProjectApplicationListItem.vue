@@ -12,6 +12,16 @@
       <v-list-item-subtitle><v-chip small>{{ $enum('ProjectApplicationStatusEnum', projectApplication.status) }}</v-chip></v-list-item-subtitle>
     </v-list-item-content>
     <v-list-item-action>
+      <v-btn
+        v-if="isProjektmanager"
+        icon
+        small
+        color="cctOrange"
+        :to="{ name: 'pm-user-detail', params: { id: projectApplication.participant.id.toString() } }"
+        title="PM-Profil anzeigen"
+      >
+        <v-icon small>mdi-account-details</v-icon>
+      </v-btn>
       <slot name="actions"></slot>
     </v-list-item-action>
   </v-list-item>
@@ -21,6 +31,7 @@
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import { ProjectApplication } from '../types'
+import { readIsProjektmanager } from '@/store/main/getters'
 
 @Component({
   components: { EmployeeProfilePicture }
@@ -29,6 +40,10 @@ export default class ProjectApplicationListItem extends Vue {
 
   @Prop()
   public projectApplication!: ProjectApplication;
+
+  public get isProjektmanager() {
+    return readIsProjektmanager(this.$store);
+  }
 
 }
 </script>
