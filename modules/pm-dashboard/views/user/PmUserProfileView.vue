@@ -321,7 +321,7 @@ export default class PmUserProfileView extends Vue {
   private editNoteContent = '';
   private expandedPanels: number[] = [];
 
-  // Weekday mapping
+  // Weekday mapping (no backend enum available, hardcoded like in UserProfileEdit.vue)
   private weekdayMap: Record<string, string> = {
     'monday': 'Mo',
     'tuesday': 'Di',
@@ -462,15 +462,7 @@ export default class PmUserProfileView extends Vue {
   }
 
   private formatEmploymentType(type: string) {
-    const typeMap: Record<string, string> = {
-      'internship': 'Praktikum',
-      'working_student': 'Werkstudent',
-      'full_time': 'Vollzeit',
-      'part_time': 'Teilzeit',
-      'freelance': 'Freiberuflich',
-      'volunteer': 'Ehrenamtlich',
-    };
-    return typeMap[type] || type;
+    return this.$enum('EmploymentTypeEnum', type) || type;
   }
 
   private getProjectStatusLabel(status?: string, type?: string): string {
@@ -479,14 +471,8 @@ export default class PmUserProfileView extends Vue {
       return 'MP/ISP';
     }
     
-    // Then check status
-    const statusMap: Record<string, string> = {
-      'running': 'Laufend',
-      'completed': 'Abgeschlossen',
-      'aborted': 'Abgebrochen',
-      'rejected': 'Abgelehnt',
-    };
-    return status ? (statusMap[status] || status) : '—';
+    // Use backend enum for status labels
+    return status ? (this.$enum('ProjectStatusEnum', status) || status) : '—';
   }
 
   private getProjectStatusColor(status?: string, type?: string): string {
@@ -506,13 +492,7 @@ export default class PmUserProfileView extends Vue {
   }
 
   private getProjectTypeLabel(type?: string): string {
-    const typeMap: Record<string, string> = {
-      'external': 'Extern',
-      'internal': 'Intern',
-      'membership_project': 'MP',
-      'staffing': 'Besetzung',
-    };
-    return type ? (typeMap[type] || type) : '—';
+    return type ? (this.$enum('ProjectTypeEnum', type) || type) : '—';
   }
 
   private getProjectTypeColor(type?: string): string {
