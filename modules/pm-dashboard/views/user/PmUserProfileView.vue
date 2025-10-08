@@ -379,7 +379,7 @@ export default class PmUserProfileView extends Vue {
       { label: 'Universität', value: this.profile?.university || '—' },
       { label: 'Hochschulgrad', value: this.profile?.studylevel || '—' },
       { label: 'Geburtstag', value: this.formatDate(this.profile?.birthdate) },
-      { label: 'Alter (ca.)', value: this.estimateAge(this.profile?.birthdate) },
+      { label: 'Alter', value: this.estimateAge(this.profile?.birthdate) },
     ];
   }
 
