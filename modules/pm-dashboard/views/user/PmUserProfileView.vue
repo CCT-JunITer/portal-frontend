@@ -14,7 +14,7 @@
         <v-row dense class="profile-header mb-6" align="stretch">
           <v-col cols="12" md="4">
             <v-card outlined class="h-100 d-flex flex-column">
-              <v-card-text class="pb-0 d-flex align-start">
+              <v-card-text class="d-flex align-start">
                 <employee-profile-picture 
                   size="96" 
                   :employee="profile"
@@ -44,11 +44,6 @@
                   </div>
                 </div>
               </v-card-text>
-              <v-card-actions class="pt-0">
-                <div class="text-caption grey--text">ID: {{ profile.id }}</div>
-                <v-spacer></v-spacer>
-                <div class="text-caption grey--text">Zuletzt aktualisiert: {{ relativeDate(lastUpdated) }}</div>
-              </v-card-actions>
             </v-card>
           </v-col>
 
@@ -131,7 +126,7 @@
               <v-chip small outlined color="cctGreen" v-if="skills.length">{{ skills.length }} Skills</v-chip>
             </v-card-title>
             <v-card-text class="pt-0 flex-grow-1">
-              <div v-if="!skills.length" class="text-caption grey--text">Noch keine Skills hinterlegt – Platzhalter</div>
+              <div v-if="!skills.length" class="text-caption grey--text">Noch keine Skills hinterlegt</div>
               <div v-else class="d-flex flex-wrap">
                 <v-chip v-for="skill in skills" :key="skill.name" class="mr-1 mb-1" :color="skillColor(skill.level)" small label dark>
                   {{ skill.name }}<span v-if="skill.level" class="ml-1">({{ $enum('SkillLevelEnum', skill.level) }})</span>
@@ -202,7 +197,7 @@
                   </v-chip>
                 </template>
                 <template #no-data>
-                  <div class="text-caption grey--text py-4">Keine Projekte hinterlegt – Platzhalter</div>
+                  <div class="text-caption grey--text py-4">Keine Projekte hinterlegt</div>
                 </template>
               </v-data-table>
             </v-card-text>
