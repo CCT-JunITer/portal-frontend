@@ -185,6 +185,15 @@
           <file-manager v-model="event.files" :folder="event.versioned_folder" :multiple="true" :labels="fileLabels"></file-manager>
         </v-form>
         <v-card-actions>
+          <v-alert
+            v-if="showValidationError"
+            type="error"
+            dense
+            outlined
+            class="mb-0 mr-3 flex-grow-1"
+          >
+            Bitte überprüfen Sie Ihre Eingaben. Einige Pflichtfelder sind nicht korrekt ausgefüllt.
+          </v-alert>
           <v-spacer></v-spacer>
           <v-btn @click="cancel" outlined color="cctOrange">Abbrechen</v-btn>
 
@@ -241,6 +250,7 @@ export default class AdminViewEvent extends Vue {
 
   public time_menu = false;
   public valid = false;
+  public showValidationError = false;
   public event: Partial<IEventCreate> = {}
   public subtype: null | {type: string; topics?: string[]} = null;
   public allday = false;
@@ -318,6 +328,7 @@ export default class AdminViewEvent extends Vue {
   }
 
   public async submit() {
+    this.showValidationError = false;
     if ((this.$refs.form as HTMLFormElement).validate()) {
       try {
         const new_event = {
@@ -338,6 +349,8 @@ export default class AdminViewEvent extends Vue {
         // Error notification is already shown by apiCallNotify
         console.error('Failed to save event:', error);
       }
+    } else {
+      this.showValidationError = true;
     }
   }
 

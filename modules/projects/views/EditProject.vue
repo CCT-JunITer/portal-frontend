@@ -787,6 +787,15 @@
       <v-divider class="my-5"></v-divider>
 
       <v-card-actions>
+        <v-alert
+          v-if="showValidationError"
+          type="error"
+          dense
+          outlined
+          class="mb-0 mr-3 flex-grow-1"
+        >
+          Bitte überprüfen Sie Ihre Eingaben. Einige Pflichtfelder sind nicht korrekt ausgefüllt.
+        </v-alert>
         <v-spacer></v-spacer>
         <v-btn @click="cancel" outlined color="cctOrange">Abbrechen</v-btn>
 
@@ -852,6 +861,7 @@ export default class EditProject extends Vue {
     return FILE_LABELS;
   }
   public valid = true;
+  public showValidationError = false;
   public project: Partial<ProjectCreation> = {
     participants: {},
     applications: {},
@@ -970,6 +980,7 @@ export default class EditProject extends Vue {
   }
 
   public async submit() {
+    this.showValidationError = false;
     if ((this.$refs.form as HTMLFormElement).validate()) {
       try {
         const newProject = this.newProject;
@@ -984,6 +995,8 @@ export default class EditProject extends Vue {
         // Error notification is already shown by apiCallNotify
         console.error('Failed to save project:', error);
       }
+    } else {
+      this.showValidationError = true;
     }
   }
 

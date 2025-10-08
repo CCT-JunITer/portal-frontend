@@ -217,6 +217,15 @@
         </v-col>
       </v-row>
       <v-card-actions>
+        <v-alert
+          v-if="showValidationError"
+          type="error"
+          dense
+          outlined
+          class="mb-0 mr-3 flex-grow-1"
+        >
+          Bitte überprüfen Sie Ihre Eingaben. Einige Pflichtfelder sind nicht korrekt ausgefüllt.
+        </v-alert>
         <v-spacer></v-spacer>
         <v-btn @click="$router.back()" raised>Abbrechen</v-btn>
         <v-btn
@@ -246,6 +255,7 @@ import { Vue, Component } from 'vue-property-decorator'
 export default class UserProfileSettings extends Vue {
 
   public valid = false;
+  public showValidationError = false;
   public codeSignatureOpen = false;
 
   public name = '';
@@ -254,6 +264,7 @@ export default class UserProfileSettings extends Vue {
   public tel = '';
 
   public async submit() {
+    this.showValidationError = false;
     if ((this.$refs.form as HTMLFormElement).validate()) {
       try {
         await dispatchUpdateUserSettingsMe(this.$store, this.userSettings!);
@@ -261,6 +272,8 @@ export default class UserProfileSettings extends Vue {
         // Error notification is already shown by apiCallNotify
         console.error('Failed to update user settings:', error);
       }
+    } else {
+      this.showValidationError = true;
     }
   }
 

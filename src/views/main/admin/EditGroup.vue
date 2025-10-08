@@ -115,6 +115,15 @@
         </v-col>
       </v-row>
       <v-card-actions>
+        <v-alert
+          v-if="showValidationError"
+          type="error"
+          dense
+          outlined
+          class="mb-0 mr-3 flex-grow-1"
+        >
+          Bitte überprüfen Sie Ihre Eingaben. Einige Pflichtfelder sind nicht korrekt ausgefüllt.
+        </v-alert>
         <v-spacer></v-spacer>
         <v-btn @click="$router.back()" raised>Abbrechen</v-btn>
         <v-btn
@@ -145,6 +154,7 @@ import UserGroupAddDialog from './UserGroupAddDialog.vue';
 export default class EditGroup extends Vue {
 
   public valid = false;
+  public showValidationError = false;
   public search = '';
 
   public name = '';
@@ -166,6 +176,7 @@ export default class EditGroup extends Vue {
   }
 
   public async submit() {
+    this.showValidationError = false;
     if ((this.$refs.form as HTMLFormElement).validate()) {
       try {
         const updatedGroup: GroupCreate = {
@@ -185,6 +196,8 @@ export default class EditGroup extends Vue {
         // Error notification is already shown by apiCallNotify
         console.error('Failed to save group:', error);
       }
+    } else {
+      this.showValidationError = true;
     }
   }
 

@@ -173,6 +173,15 @@
             </v-select>
 
             <v-card-actions>
+              <v-alert
+                v-if="showValidationError"
+                type="error"
+                dense
+                outlined
+                class="mb-0 mr-3 flex-grow-1"
+              >
+                Bitte überprüfen Sie Ihre Eingaben. Einige Pflichtfelder sind nicht korrekt ausgefüllt.
+              </v-alert>
               <v-spacer></v-spacer>
               <v-btn color="primary" @click="submit">
                 Absenden
@@ -230,6 +239,7 @@ export default class UserProfileRessortChange extends Vue {
   public privateEmail = '';
   public highestProjectPosition = '';
   public valid = false;
+  public showValidationError = false;
   public street = '';
   public postcode = '';
   public city = '';
@@ -248,6 +258,7 @@ export default class UserProfileRessortChange extends Vue {
 
   public async submit() {
 
+    this.showValidationError = false;
     if ((this.$refs.form as HTMLFormElement).validate()) {
       //
       const requestCreate: RequestCreate = {
@@ -278,6 +289,8 @@ export default class UserProfileRessortChange extends Vue {
       await dispatchAddRequestMe(this.$store, requestCreate);
       await dispatchUpdateUserProfile(this.$store, updatedProfile);
       this.$router.push('/main/people/profile/requests');
+    } else {
+      this.showValidationError = true;
     }
   }
 

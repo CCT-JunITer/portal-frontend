@@ -43,6 +43,15 @@
           </v-text-field>
         </v-form>
         <v-card-actions>
+          <v-alert
+            v-if="showValidationError"
+            type="error"
+            dense
+            outlined
+            class="mb-0 mr-3 flex-grow-1"
+          >
+            Bitte überprüfen Sie Ihre Eingaben. Einige Pflichtfelder sind nicht korrekt ausgefüllt.
+          </v-alert>
           <v-spacer></v-spacer>
           <v-btn @click="$router.back()">abbrechen</v-btn>
           <v-btn @click="submit" color="cctGreen" class="white--text" :disabled="!valid">
@@ -64,10 +73,12 @@ import { Vue, Component, Prop } from 'vue-property-decorator'
 export default class UserProfileEditPassword extends Vue {
 
   public valid = false;
+  public showValidationError = false;
   public password1 = '';
   public password2 = '';
 
   public async submit() {
+    this.showValidationError = false;
     if ((this.$refs.form as HTMLFormElement).validate()) {
       try {
         const updateProfile: IUserProfileUpdate = { password: this.password1 };
@@ -78,6 +89,8 @@ export default class UserProfileEditPassword extends Vue {
         // Error notification is already shown by apiCallNotify
         console.error('Failed to update password:', error);
       }
+    } else {
+      this.showValidationError = true;
     }
   }
 }

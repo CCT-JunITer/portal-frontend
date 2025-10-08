@@ -29,6 +29,15 @@
             </v-textarea>
 
             <v-card-actions>
+              <v-alert
+                v-if="showValidationError"
+                type="error"
+                dense
+                outlined
+                class="mb-0 mr-3 flex-grow-1"
+              >
+                Bitte überprüfen Sie Ihre Eingaben. Einige Pflichtfelder sind nicht korrekt ausgefüllt.
+              </v-alert>
               <v-spacer></v-spacer>
               <v-btn color="primary" @click="submit">
                 Absenden
@@ -66,12 +75,14 @@ import { Vue, Component, Prop } from 'vue-property-decorator'
 export default class UserProfileRessortChange extends Vue {
 
   public valid = false;
+  public showValidationError = false;
   public memberstatus: Group | null = null;
   public description = '';
 
 
   public async submit() {
 
+    this.showValidationError = false;
     if ((this.$refs.form as HTMLFormElement).validate()) {
       const dontKeep = this.currentMemberstatusGroups.map(group => {
         return {
@@ -96,6 +107,8 @@ export default class UserProfileRessortChange extends Vue {
 
       await dispatchAddRequestMe(this.$store, requestCreate);
       this.$router.push('/main/people/profile/requests');
+    } else {
+      this.showValidationError = true;
     }
   }
 

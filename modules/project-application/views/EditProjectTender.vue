@@ -289,6 +289,15 @@
       
       
       <v-card-actions>
+        <v-alert
+          v-if="showValidationError"
+          type="error"
+          dense
+          outlined
+          class="mb-0 mr-3 flex-grow-1"
+        >
+          Bitte überprüfen Sie Ihre Eingaben. Einige Pflichtfelder sind nicht korrekt ausgefüllt.
+        </v-alert>
         <v-spacer></v-spacer>
         <v-btn @click="cancel" outlined color="cctOrange">Abbrechen</v-btn>
 
@@ -330,6 +339,7 @@ import Draggable from 'vuedraggable';
 export default class EditProjectTender extends Vue {
 
   public valid = true;
+  public showValidationError = false;
   public projectTender: Partial<ProjectTenderCreation> = {
     draft:false,
     needed_project_roles_counts: {},
@@ -423,6 +433,7 @@ export default class EditProjectTender extends Vue {
   }
 
   public async submit() {
+    this.showValidationError = false;
     if ((this.$refs.form as HTMLFormElement).validate()) {
       try {
         const newProjectTender = this.newProjectTender;
@@ -437,6 +448,8 @@ export default class EditProjectTender extends Vue {
         // Error notification is already shown by apiCallNotify
         console.error('Failed to save project tender:', error);
       }
+    } else {
+      this.showValidationError = true;
     }
   }
 
