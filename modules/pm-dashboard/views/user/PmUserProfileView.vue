@@ -170,42 +170,41 @@
               <v-chip small outlined color="cctGreen" v-if="projectHistory.length">{{ projectHistory.length }} Projekte</v-chip>
             </v-card-title>
             <v-card-text class="pt-0 flex-grow-1">
-              <v-simple-table dense>
-                <thead>
-                  <tr>
-                    <th class="text-left">Projekt</th>
-                    <th class="text-left">Typ</th>
-                    <th class="text-left">Rolle</th>
-                    <th class="text-left">Status</th>
-                    <th class="text-left">Zeitraum</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-if="!projectHistory.length">
-                    <td colspan="5" class="text-caption grey--text">Keine Projekte hinterlegt – Platzhalter</td>
-                  </tr>
-                  <tr 
-                    v-for="p in projectHistory" 
-                    :key="p.id"
-                    @click="navigateToProject(p.projectId)"
-                    class="clickable-row"
+              <v-data-table
+                :headers="projectHistoryHeaders"
+                :items="projectHistory"
+                :items-per-page="10"
+                :footer-props="{
+                  'items-per-page-options': [5, 10, 25, -1]
+                }"
+                dense
+                class="project-history-table"
+              >
+                <template #item.name="{ item }">
+                  <span 
+                    @click="navigateToProject(item.projectId)"
+                    class="clickable-name"
                   >
-                    <td>{{ p.name }}</td>
-                    <td>
-                      <v-chip x-small :color="p.typeColor" dark label>
-                        {{ p.type }}
-                      </v-chip>
-                    </td>
-                    <td>{{ $enum('ProjectRoleEnum', p.role) }}</td>
-                    <td>
-                      <v-chip x-small :color="p.statusColor" dark label>
-                        {{ p.status }}
-                      </v-chip>
-                    </td>
-                    <td>{{ p.period }}</td>
-                  </tr>
-                </tbody>
-              </v-simple-table>
+                    {{ item.name }}
+                  </span>
+                </template>
+                <template #item.typeSortValue="{ item }">
+                  <v-chip x-small :color="item.typeColor" dark label>
+                    {{ item.type }}
+                  </v-chip>
+                </template>
+                <template #item.roleSortValue="{ item }">
+                  {{ $enum('ProjectRoleEnum', item.role) }}
+                </template>
+                <template #item.statusSortValue="{ item }">
+                  <v-chip x-small :color="item.statusColor" dark label>
+                    {{ item.status }}
+                  </v-chip>
+                </template>
+                <template #no-data>
+                  <div class="text-caption grey--text py-4">Keine Projekte hinterlegt – Platzhalter</div>
+                </template>
+              </v-data-table>
             </v-card-text>
           </v-card>
 
@@ -407,7 +406,7 @@ export default class PmUserProfileView extends Vue {
     return this.profile?.work_experiences || [];
   }
 
-  get projectHistory(): { id: string | number; projectId: number; name: string; type: string; typeColor: string; role: string; status: string; statusColor: string; period: string }[] {
+  get projectHistory(): { id: string | number; projectId: number; name: string; type: string; typeColor: string; typeSortValue: number; role: string; roleSortValue: number; status: string; statusColor: string; statusSortValue: number; period: string }[] {
     // Use project_history from backend
     return this.profile?.project_history?.map((p, index) => ({
       id: `${p.project_id}-${index}`,
@@ -415,11 +414,47 @@ export default class PmUserProfileView extends Vue {
       name: p.project_title,
       type: this.getProjectTypeLabel(p.project_type),
       typeColor: this.getProjectTypeColor(p.project_type),
+      typeSortValue: this.getProjectTypeSortValue(p.project_type),
       role: p.role,
+      roleSortValue: this.getProjectRoleSortValue(p.role),
       status: this.getProjectStatusLabel(p.project_status, p.project_type),
       statusColor: this.getProjectStatusColor(p.project_status, p.project_type),
+      statusSortValue: this.getProjectStatusSortValue(p.project_status, p.project_type),
       period: this.composePeriod(p.start_date, p.end_date),
     })) || [];
+  }
+
+  get projectHistoryHeaders() {
+    return [
+      {
+        text: 'Projekt',
+        value: 'name',
+        sortable: true,
+      },
+      {
+        text: 'Typ',
+        value: 'typeSortValue',
+        sortable: true,
+        sort: (a: number, b: number) => a - b,
+      },
+      {
+        text: 'Rolle',
+        value: 'roleSortValue',
+        sortable: true,
+        sort: (a: number, b: number) => a - b,
+      },
+      {
+        text: 'Status',
+        value: 'statusSortValue',
+        sortable: true,
+        sort: (a: number, b: number) => a - b,
+      },
+      {
+        text: 'Zeitraum',
+        value: 'period',
+        sortable: true,
+      },
+    ];
   }
 
   // ---- METHODS ----
@@ -503,6 +538,45 @@ export default class PmUserProfileView extends Vue {
       'staffing': 'cctGrey',
     };
     return type ? (colorMap[type] || 'grey') : 'grey';
+  }
+
+  private getProjectTypeSortValue(type?: string): number {
+    // external (1) > internal/membership_project (2) > staffing (3)
+    const sortMap: Record<string, number> = {
+      'external': 1,
+      'internal': 2,
+      'membership_project': 2,
+      'staffing': 3,
+    };
+    return type ? (sortMap[type] || 99) : 99;
+  }
+
+  private getProjectRoleSortValue(role?: string): number {
+    // committee (1) > leader (2) > controller (3) > expert (4) > worker (5)
+    const sortMap: Record<string, number> = {
+      'committee': 1,
+      'leader': 2,
+      'controller': 3,
+      'expert': 4,
+      'worker': 5,
+    };
+    return role ? (sortMap[role] || 99) : 99;
+  }
+
+  private getProjectStatusSortValue(status?: string, type?: string): number {
+    // Internal projects (MP/ISP) always come first (0)
+    if (type === 'internal' || type === 'membership_project') {
+      return 0;
+    }
+    
+    // running (1) > completed (2) > aborted (3) > rejected (4)
+    const sortMap: Record<string, number> = {
+      'running': 1,
+      'completed': 2,
+      'aborted': 3,
+      'rejected': 4,
+    };
+    return status ? (sortMap[status] || 99) : 99;
   }
 
   async mounted() {
@@ -667,6 +741,22 @@ export default class PmUserProfileView extends Vue {
     transition: background-color 0.2s ease;
     
     &:hover {
+      background-color: rgba(0, 0, 0, 0.04);
+    }
+  }
+
+  .clickable-name {
+    cursor: pointer;
+    color: #1976d2;
+    text-decoration: none;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .project-history-table {
+    ::v-deep tbody tr:hover {
       background-color: rgba(0, 0, 0, 0.04);
     }
   }

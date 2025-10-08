@@ -251,7 +251,7 @@ export default class PmUserTable extends Vue {
     return Array.from(statuses).sort();
   }
 
-  public headers: { text: string; value: keyof IUserProfile | string; sortable?: boolean; width?: string }[] = [
+  public headers: { text: string; value: keyof IUserProfile | string; sortable?: boolean; width?: string; sort?: (a: string, b: string) => number }[] = [
     {
       text: 'Name',
       value: 'full_name',
@@ -260,10 +260,29 @@ export default class PmUserTable extends Vue {
     {
       text: 'Ressort',
       value: 'ressort',
+      sort: (a: string, b: string) => {
+        // Alphabetical sorting for ressort
+        if (!a && !b) return 0;
+        if (!a) return 1;
+        if (!b) return -1;
+        return a.localeCompare(b);
+      }
     },
     {
       text: 'Status',
       value: 'memberstatus',
+      sort: (a: string, b: string) => {
+        // Hierarchical order: Senior Consultant > Consultant > Junior Consultant > Trainee
+        const statusOrder: Record<string, number> = {
+          'Senior Consultant': 1,
+          'Consultant': 2,
+          'Junior Consultant': 3,
+          'Trainee': 4,
+        };
+        const aValue = statusOrder[a] || 99;
+        const bValue = statusOrder[b] || 99;
+        return aValue - bValue;
+      }
     },
     {
       text: 'Studiengang',
