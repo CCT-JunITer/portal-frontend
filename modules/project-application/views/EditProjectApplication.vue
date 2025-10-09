@@ -110,7 +110,8 @@
           :fromDate="projectTender.project_start_date_expected"
           :toDate="projectTender.project_end_date_expected"
           :offerNeeded="projectTender.offer_needed"
-          v-model="projectApplication.available_time"
+          :value="projectApplication.available_time"
+          @input="onAvailableTimeChange"
           outlined
         >
         </project-available-time>
@@ -206,7 +207,14 @@ export default class EditProjectApplication extends Vue {
       this.projectApplication = {
         ...this.editProjectApplication,
         answered_questions: newAnsweredQuestions,
+        available_time: this.editProjectApplication.available_time || {},
       };
+    }
+  }
+
+  public onAvailableTimeChange(value: { [key: string]: string | number }) {
+    if (this.projectApplication) {
+      this.$set(this.projectApplication, 'available_time', value);
     }
   }
 

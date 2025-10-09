@@ -1,5 +1,5 @@
 <template>
-  <v-card class="project-available-time" v-bind="$attrs" v-on="$listeners">
+  <v-card class="project-available-time" v-bind="$attrs">
     <v-card-title>
       Verfügbarkeit
     </v-card-title>
@@ -22,7 +22,7 @@
             <v-combobox
               :items="btValues"
               :value="getTimeSlotAt(week.value) || 0"
-              @input="setTimeSlotAt(week.value, $event.value)"
+              @input="setTimeSlotAt(week.value, typeof $event === 'object' && $event !== null ? $event.value : $event)"
               dense
               persistent-hint
               outlined
@@ -33,7 +33,7 @@
             </v-combobox>
           </template>
           <div class="list-item-content text-overline" v-else>
-            {{ $common.decimal2Text(getTimeSlotAt(week.value) || 0, 1) }} BT
+            {{ $common.decimal2Text(Number(getTimeSlotAt(week.value) || 0), 1) }} BT
           </div>
         </div>
       </div>
@@ -42,7 +42,8 @@
       Anmerkung zu Zeitangaben
       <v-textarea
         placeholder="Hier antworten"
-        v-model= "textarea"
+        :value="getRemarksValue()"
+        @input="setRemarksValue"
         filled
         outlined
         dense
@@ -52,15 +53,13 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
+import { Vue, Component, Prop } from 'vue-property-decorator'
 import { weeksArray } from '../util';
 
 @Component({})
 export default class ProjectAvailableTime extends Vue {
 
   public btValues = new Array(16).fill(0).map((_, i) => ({ value: (i)/2, text: `${this.$common.decimal2Text((i)/2)}`}));
-  public localValue = {};
-  public textarea = '';
 
   @Prop()
   public fromDate!: string;
@@ -74,19 +73,24 @@ export default class ProjectAvailableTime extends Vue {
   @Prop({ default: false})
   public readonly readonly!: boolean;
 
-  @Watch('textarea')
-  public onTextareaChange(newValue: string) {
-    this.setTimeSlotAt('Anmerkungen', newValue);
-  }
+  @Prop({ default: () => ({}) })
+  public value!: { [key: string]: string | number };
 
   public getTimeSlotAt(key: string) {
-    return this.localValue[key];
+    return this.value[key];
   }
 
-  public setTimeSlotAt(key: string, value: string) {
-    this.localValue[key] = value;
-    console.log(this.localValue);
-    this.$emit('input', this.localValue);
+  public setTimeSlotAt(key: string, value: string | number) {
+    const updated = { ...this.value, [key]: value };
+    this.$emit('input', updated);
+  }
+
+  public getRemarksValue(): string {
+    return String(this.value['Anmerkungen'] || '');
+  }
+
+  public setRemarksValue(value: string) {
+    this.setTimeSlotAt('Anmerkungen', value);
   }
 
   public get weeks() {
@@ -109,7 +113,7 @@ export default class ProjectAvailableTime extends Vue {
 }
 
 .list-item-content {
-  text-wrap: nowrap;
+  white-space: nowrap;
   padding: 0;
   justify-content: flex-end;
 }
