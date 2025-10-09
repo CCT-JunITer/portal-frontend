@@ -7,6 +7,7 @@ const defaultState: ProjectApplicationState = {
   projectTenders: null,
   projectApplications: null,
   projectApplicationsFor: {},
+  ownProjectApplicationByTender: {},
   projectCasts: null,
   projectCastsFor: {},
 };

@@ -4,7 +4,7 @@ import { getStoreAccessors } from 'typesafe-vuex';
 import { ActionContext } from 'vuex';
 import { ProjectApplicationState } from './state';
 import { api } from '../api';
-import { commitSetProjectTenders, commitSetProjectTender, commitSetProjectApplication, commitSetProjectApplicationsFor, commitSetProjectCast, commitSetProjectCastsFor } from './mutations';
+import { commitSetProjectTenders, commitSetProjectTender, commitSetProjectApplication, commitSetProjectApplicationsFor, commitSetProjectCast, commitSetProjectCastsFor, commitSetOwnProjectApplicationByTender } from './mutations';
 import { ProjectApplicationCreate, ProjectCastCreate, ProjectTenderCreate } from '../types';
 
 type MainContext = ActionContext<ProjectApplicationState, State>;
@@ -47,6 +47,17 @@ export const actions = {
     const response = await apiCall(context, (token) => api.getProjectApplicationsFor(token, id));
     commitSetProjectApplicationsFor(context, { projectTenderId: id, projectApplications: response.data });
   },
+  async actionGetOwnProjectApplicationByTender(context: MainContext, projectTenderId: number) {
+    try {
+      const response = await apiCall(context, (token) => api.getOwnProjectApplicationByTender(token, projectTenderId));
+      commitSetOwnProjectApplicationByTender(context, { projectTenderId, projectApplication: response.data });
+      return response.data;
+    } catch (error) {
+      // If 404, user hasn't applied yet
+      commitSetOwnProjectApplicationByTender(context, { projectTenderId, projectApplication: null });
+      return null;
+    }
+  },
 
   // project cast
   async actionCreateProjectCast(context: MainContext, payload: ProjectCastCreate) {
@@ -81,6 +92,7 @@ export const dispatchUpdateProjectApplication = dispatch(actions.actionUpdatePro
 export const dispatchUpdateProjectTender = dispatch(actions.actionUpdateProjectTender);
 export const dispatchCreateProjectTender = dispatch(actions.actionCreateProjectTender);
 export const dispatchGetProjectApplicationsFor = dispatch(actions.actionGetProjectApplicationsFor);
+export const dispatchGetOwnProjectApplicationByTender = dispatch(actions.actionGetOwnProjectApplicationByTender);
 
 export const dispatchCreateProjectCast = dispatch(actions.actionCreateProjectCast);
 export const dispatchUpdateProjectCast = dispatch(actions.actionUpdateProjectCast);

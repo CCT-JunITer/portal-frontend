@@ -30,6 +30,9 @@ export const api = {
   async getProjectApplicationsFor(token: string, id: number) {
     return axios.get<ProjectApplication[]>(`${apiUrl}/api/v1/project-tender/applications/${id}`, authHeaders(token));
   },
+  async getOwnProjectApplicationByTender(token: string, projectTenderId: number) {
+    return axios.get<ProjectApplication>(`${apiUrl}/api/v1/project-application/by-tender/${projectTenderId}`, authHeaders(token));
+  },
 
   async createProjectCast(token: string, payload: ProjectCastCreate) {
     return axios.post<ProjectCast>(`${apiUrl}/api/v1/project-cast/`, payload, authHeaders(token));

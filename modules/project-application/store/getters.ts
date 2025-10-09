@@ -18,6 +18,9 @@ export const getters = {
   routeProjectApplicationsFor: (state: ProjectApplicationState) => (projectTenderId: number) => {
     return state.projectApplicationsFor[projectTenderId] || null;
   },
+  ownProjectApplicationByTender: (state: ProjectApplicationState) => (projectTenderId: number) => {
+    return state.ownProjectApplicationByTender[projectTenderId] || null;
+  },
   oneProjectTender: (state: ProjectApplicationState) => (id: number) => state.projectTenders?.find(project => project?.id === id),
   routeProjectCast: (state: ProjectApplicationState) => (route: Route) => {
     const id = route.params.id;
@@ -37,6 +40,7 @@ export const readProjectTenders = read(getters.projectTenders);
 export const readRouteProjectTender = read(getters.routeProjectTender);
 export const readRouteProjectApplication = read(getters.routeProjectApplication);
 export const readRouteProjectApplicationsFor = read(getters.routeProjectApplicationsFor);
+export const readOwnProjectApplicationByTender = read(getters.ownProjectApplicationByTender);
 export const readRouteProjectCast = read(getters.routeProjectCast);
 export const readOneProjectTender = read(getters.oneProjectTender);
 export const readRouteProjectCastsFor = read(getters.routeProjectCastsFor);

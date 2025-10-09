@@ -18,6 +18,9 @@ export const mutations = {
   setProjectApplicationsFor(state: ProjectApplicationState, payload: { projectTenderId: number, projectApplications: ProjectApplication[] }) {
     state.projectApplicationsFor = {...state.projectApplicationsFor, [payload.projectTenderId]: payload.projectApplications };
   },
+  setOwnProjectApplicationByTender(state: ProjectApplicationState, payload: { projectTenderId: number, projectApplication: ProjectApplication | null }) {
+    state.ownProjectApplicationByTender = {...state.ownProjectApplicationByTender, [payload.projectTenderId]: payload.projectApplication };
+  },
   setProjectCast(state: ProjectApplicationState, payload: ProjectCast) {
     state.projectCasts = replace(state.projectCasts, payload);
   },
@@ -32,5 +35,6 @@ export const commitSetProjectTenders = commit(mutations.setProjectTenders);
 export const commitSetProjectTender = commit(mutations.setProjectTender);
 export const commitSetProjectApplication = commit(mutations.setProjectApplication);
 export const commitSetProjectApplicationsFor = commit(mutations.setProjectApplicationsFor);
+export const commitSetOwnProjectApplicationByTender = commit(mutations.setOwnProjectApplicationByTender);
 export const commitSetProjectCast = commit(mutations.setProjectCast);
 export const commitSetProjectCastsFor = commit(mutations.setProjectCastsFor);

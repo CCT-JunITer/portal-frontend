@@ -8,7 +8,10 @@
         <v-btn outlined color="cctGreen" class="ma-2" :to="{ name: 'project-tender-edit', params: { id: `${projectTender.id}`} }" v-if="hasTenderPermission()">
           Bearbeiten          
         </v-btn>
-        <v-btn depressed color="cctBlue" dark class="ma-2" large @click="createApplication()" v-if="!projectTender.is_deadline_passed">
+        <v-btn v-if="ownApplication" depressed color="cctBlue" dark class="ma-2" large :to="{ name: 'project-application-edit', params: { id: `${ownApplication.id}`} }">
+          Bewerbung bearbeiten
+        </v-btn>
+        <v-btn v-else-if="!projectTender.is_deadline_passed" depressed color="cctBlue" dark class="ma-2" large @click="createApplication()">
           Bewerben
         </v-btn>
       </template>
@@ -57,10 +60,10 @@
 
 <script lang="ts">
 import UserChip from '@/components/user-chip/UserChip.vue';
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
+import { Vue, Component, Watch } from 'vue-property-decorator'
 import { Route } from 'vue-router';
-import { dispatchCreateProjectApplication, dispatchCreateProjectCast, dispatchGetProjectApplicationsFor, dispatchGetProjectTender } from '../store/actions';
-import { readRouteProjectApplicationsFor, readRouteProjectTender } from '../store/getters'
+import { dispatchCreateProjectApplication, dispatchCreateProjectCast, dispatchGetProjectApplicationsFor, dispatchGetProjectTender, dispatchGetOwnProjectApplicationByTender } from '../store/actions';
+import { readRouteProjectApplicationsFor, readRouteProjectTender, readOwnProjectApplicationByTender } from '../store/getters'
 import ViewComponent from '@/components/editor/ViewComponent.vue';
 import ProjectApplicationListItem from '../components/ProjectApplicationListItem.vue';
 import { ProjectApplication } from '../types';
@@ -108,11 +111,16 @@ export default class ProjectApplicationDetails extends Vue {
     return readRouteProjectApplicationsFor(this.$store)(+this.$route.params?.id);
   }
 
+  public get ownApplication() {
+    return readOwnProjectApplicationByTender(this.$store)(+this.$route.params?.id);
+  }
+
   @Watch('$route', { immediate: true })
   public async onRouteChange(newRoute?: Route, oldRoute?: Route) {
     if (newRoute?.params?.id && newRoute?.params?.id !== oldRoute?.params?.id) {
       dispatchGetProjectTender(this.$store, +newRoute.params.id);
       this.hasApplicationPermission() && dispatchGetProjectApplicationsFor(this.$store, +newRoute.params.id);
+      dispatchGetOwnProjectApplicationByTender(this.$store, +newRoute.params.id);
     }
   }
 
