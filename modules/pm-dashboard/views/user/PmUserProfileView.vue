@@ -352,7 +352,8 @@ export default class PmUserProfileView extends Vue {
       { label: 'Bewerbungen', value: this.profile?.amount_applications ?? '—', hint: 'Gesamt' },
       { label: 'Positionen besetzt', value: this.profile?.amount_positions_filled ?? '—' },
       { label: 'Höchste Rolle', value: this.profile?.highest_project_position || '—' },
-      { label: 'Externe BT', value: this.profile?.total_external_bt ?? '—' },
+      { label: 'BT beigetragen', value: this.profile?.total_bt_contributed ?? '—', hint: 'Eigener Anteil' },
+      { label: 'Projektvolumen', value: this.profile?.total_external_bt ?? '—', hint: 'Gesamt ext. BT' },
       { label: 'Aktive Projekte', value: this.profile?.active_projects_count ?? '—' },
       { label: 'Projekte realisiert', value: this.profile?.amount_projects_realized ?? '—' },
     ];

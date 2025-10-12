@@ -43,6 +43,7 @@ export interface IUserProfile {
 
     user_streaks?: UserStreak[];
     total_external_bt?: number;
+    total_bt_contributed?: number;
 
     target_utilization?: number | null;
     utilization?: number | null;
