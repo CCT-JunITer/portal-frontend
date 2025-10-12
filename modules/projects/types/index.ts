@@ -25,6 +25,7 @@ export type ProjectReferenceStatusEnum = 'basis' | 'default' | 'extended' | 'con
 export interface ProjectUser {
   participant: IUserProfile;
   role: ProjectRoleEnum;
+  bt_amount?: number; // BT amount contributed by this participant
 }
 
 export interface ProjectApplicationUser {
@@ -35,6 +36,7 @@ export interface ProjectApplicationUser {
 export interface ProjectCreate {
   participant_ids: { [k: string]: number[] };
   applications_ids: { [k: string]: number[] };
+  participant_bt_amounts?: { [participantId: number]: number }; // BT amounts per participant
   parent_project_id?: number;
   project_tender_id?: number;
 

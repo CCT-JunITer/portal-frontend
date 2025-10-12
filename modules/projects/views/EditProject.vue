@@ -41,7 +41,7 @@
             v-model="project.subtype"
             prepend-icon="mdi-animation"
             class="input-lg"
-            :items="getAutocompleteItems('subtype').filter(subtype => !subtype.trim().startsWith('old'))"
+            :items="(getAutocompleteItems('subtype') || []).filter(subtype => !subtype.trim().startsWith('old'))"
             :search-input.sync="searchSubType"
             label="Projektart"
             dense
@@ -197,7 +197,7 @@
       <v-row>
         <v-col cols="12" md="4" class="px-5">
           <h4 class="text-h4 text--primary mb-3">Projektteam</h4>
-          <p class="text-body-2 text--secondary"></p>
+          <p class="text-body-2 text--secondary">Gib für jedes Mitglied die geleisteten BT an</p>
         </v-col>
 
         <v-col cols="12" md="8" class="px-5">
@@ -205,16 +205,48 @@
           <div
             v-for="role in $enums('ProjectRoleEnum')"
             :key="role.value"
+            class="role-section mb-6"
           >
-            <user-select 
-              multiple
-              class="input-lg"
-              prepend-icon="mdi-school"
-              filled
-              :label="role.text"
-              :value="(project.participants && project.participants[role.value]) || []"
-              @input="val => ensureParticipants(role.value, val)"
-            ></user-select>
+            <v-card outlined class="pa-4">
+              <user-select 
+                multiple
+                class="input-lg"
+                prepend-icon="mdi-school"
+                filled
+                :label="role.text"
+                :value="(project.participants && project.participants[role.value]) || []"
+                @input="val => ensureParticipants(role.value, val)"
+              ></user-select>
+
+              <!-- BT inputs for each participant in this role -->
+              <div 
+                class="ml-8 mt-3"
+                v-if="project.participants && project.participants[role.value]?.length > 0"
+              >
+                <div class="text-caption text--secondary mb-2">BT-Angaben für {{ role.text }}:</div>
+                <div
+                  v-for="participantId in ((project.participants && project.participants[role.value]) || [])"
+                  :key="participantId"
+                  class="d-flex align-center mb-2"
+                >
+                  <user-chip
+                    :user="userProfiles.find(u => u.id === participantId)"
+                    class="mr-3"
+                    style="min-width: 200px;"
+                  ></user-chip>
+                  <v-text-field
+                    v-model="participantBtAmounts[participantId]"
+                    label="Geleistete BT"
+                    suffix="BT"
+                    dense
+                    outlined
+                    hide-details
+                    style="max-width: 200px;"
+                    :rules="[$common.isDecimal]"
+                  ></v-text-field>
+                </div>
+              </div>
+            </v-card>
 
           </div>
         </v-col>
@@ -847,9 +879,10 @@ import { dispatchGetProjectApplicationsFor, dispatchGetProjectTenders } from '@m
 import { readProjectTenders, readRouteProjectApplicationsFor } from '@modules/project-application/store/getters';
 import ProjectApplicationListItem from '@modules/project-application/components/ProjectApplicationListItem.vue';
 import EditorComponent from '@/components/editor/EditorComponent.vue';
+import UserChip from '@/components/user-chip/UserChip.vue';
 
 @Component({
-  components: { DatePickerMenu, DateTimePickerMenu, FileManager, UserSelect, ConsentDialog, ProjectCalculation, ProjectSelect, ProjectApplicationListItem, EditorComponent },
+  components: { DatePickerMenu, DateTimePickerMenu, FileManager, UserSelect, ConsentDialog, ProjectCalculation, ProjectSelect, ProjectApplicationListItem, EditorComponent, UserChip },
 })
 export default class EditProject extends Vue {
 
@@ -866,6 +899,9 @@ export default class EditProject extends Vue {
     participants: {},
     applications: {},
   }
+  
+  // Store BT amounts per participant: { [userId]: btAmount }
+  public participantBtAmounts: { [key: number]: string } = {};
 
   public searchSubType = '';
   public searchCustomerName = '';
@@ -961,10 +997,20 @@ export default class EditProject extends Vue {
   }
 
   public get newProject() {
+    // Convert participant BT amounts from string to number
+    const participantBtAmounts: { [key: number]: number } = {};
+    Object.entries(this.participantBtAmounts).forEach(([userId, btAmount]) => {
+      const converted = this.$common.text2Decimal(btAmount);
+      if (converted !== undefined && converted !== null) {
+        participantBtAmounts[+userId] = converted;
+      }
+    });
+
     const newProject: ProjectCreate = {
       ...this.project as ProjectCreation,
       participant_ids: this.project.participants || {},
       applications_ids: this.project.applications || {},
+      participant_bt_amounts: participantBtAmounts,
       bt_amount_expected: this.$common.text2Decimal(this.project.bt_amount_expected), // Anzahl BT(soll)
       bt_amount_actual: this.$common.text2Decimal(this.project.bt_amount_actual), // Anzahl BT(ist)
       bt_rate: this.$common.text2Decimal(this.project.bt_rate),
@@ -1012,6 +1058,15 @@ export default class EditProject extends Vue {
   public reset() {
     if (this.editProject) {
       this.project = this.convertToProjectCreation(this.editProject); 
+      // Populate BT amounts from existing project
+      this.participantBtAmounts = {};
+      Object.values(this.editProject.participants || {}).forEach(projectUsers => {
+        projectUsers.forEach(pu => {
+          if (pu.bt_amount !== undefined && pu.bt_amount !== null) {
+            this.participantBtAmounts[pu.participant.id] = this.$common.decimal2Text(pu.bt_amount);
+          }
+        });
+      });
     }
   }
 
@@ -1087,13 +1142,13 @@ export default class EditProject extends Vue {
     if (!this.project.applications) {
       this.project.applications = {} as Record<string, number[]>;
     }
-    (this.project.applications as Record<string, number[]>)[role] = val;
+    this.$set(this.project.applications as Record<string, number[]>, role, val);
   }
   ensureParticipants(role: string, val: number[]) {
     if (!this.project.participants) {
       this.project.participants = {} as Record<string, number[]>;
     }
-    (this.project.participants as Record<string, number[]>)[role] = val;
+    this.$set(this.project.participants as Record<string, number[]>, role, val);
   }
 
   // Access potentially missing backend-provided folder without TS cast in template

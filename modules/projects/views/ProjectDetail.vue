@@ -103,16 +103,29 @@
         <v-col cols="12" md="8" class="px-5">
           <v-card outlined>
             <v-list dense>
-              <div v-for="([role, projectUsers], index) in Object.entries(project.participants)" :key="role">
+              <div v-for="([role, projectUsers], index) in Object.entries(project.participants || {})" :key="role">
                 <v-divider v-if="index !== 0" inset></v-divider>
                 <v-subheader>{{$enum('ProjectRoleEnum', role)}}</v-subheader>
-                <user-list-item 
+                <v-list-item
                   v-for="projectUser in projectUsers"
                   :key="projectUser.participant.id"
-                  :user="projectUser.participant"
                   dense
                 >
-                </user-list-item>
+                  <v-list-item-avatar>
+                    <v-img :src="projectUser.participant.profile_picture"></v-img>
+                  </v-list-item-avatar>
+                  <v-list-item-content>
+                    <v-list-item-title>{{ projectUser.participant.full_name }}</v-list-item-title>
+                    <v-list-item-subtitle v-if="projectUser.bt_amount">
+                      {{ $common.decimal2Text(projectUser.bt_amount) }} BT geleistet
+                    </v-list-item-subtitle>
+                  </v-list-item-content>
+                  <v-list-item-action v-if="projectUser.bt_amount">
+                    <v-chip small outlined color="cctBlue">
+                      {{ $common.decimal2Text(projectUser.bt_amount) }} BT
+                    </v-chip>
+                  </v-list-item-action>
+                </v-list-item>
               </div>
             </v-list>
           </v-card>

@@ -68,15 +68,29 @@
 
         <v-card-text>      
           {{ project.description }}
-          <div v-for="[role, projectUsers] in Object.entries(project.participants)" :key="role">
+          <div v-for="[role, projectUsers] in Object.entries(project.participants || {})" :key="role">
             <div class="text-overline">{{$enum('ProjectRoleEnum', role)}}</div>
-            <user-chip
-              v-for="projectUser in projectUsers"
-              :key="projectUser.participant.id"
-              :user="projectUser.participant"
-              small
-            >
-            </user-chip>
+            <div class="d-flex flex-wrap align-center">
+              <div
+                v-for="projectUser in projectUsers"
+                :key="projectUser.participant.id"
+                class="mr-2 mb-2 d-flex align-center"
+              >
+                <user-chip
+                  :user="projectUser.participant"
+                  small
+                  class="mr-1"
+                ></user-chip>
+                <v-chip
+                  v-if="projectUser.bt_amount"
+                  x-small
+                  color="cctBlue"
+                  outlined
+                >
+                  {{ $common.decimal2Text(projectUser.bt_amount) }} BT
+                </v-chip>
+              </div>
+            </div>
           </div>
 
           
