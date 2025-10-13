@@ -324,7 +324,7 @@ export default class UserProfileSettings extends Vue {
     | <a style="font-family: Calibri, sans-serif; color: #757070; text-decoration: underline;" href="https://www.linkedin.com/company/company-consulting-team">LinkedIn</a>
     </p><p style="margin: 1em 0; font-size: 11px;">Registergericht: Amtsgericht Berlin Charlottenburg
     <br /> Registernummer: VR 14304 B<br /> Vertretungsberechtigter Vorstand gemäß § 26 BGB:
-    <br /> Alexander Fridrich, Trinh Tuong Vy Nguyen, Paul Geis, Vincent Augstein
+    <br /> Robert Hofmann, Jonas Schmieder, Hans Salamanca, Neven Elliesen
     <p style="margin: 8px 0; font-size: 11px;">Das Company Consulting Team ist Mitglied
     <br /> des Bundesverband Deutscher Studentischer Unternehmensberatungen e.V. <a style="color: #757070; font-family: Calibri, sans-serif; text-decoration: none;" href="http://www.bdsu.de">(www.bdsu.de)</a>
     <br /> und des Junior Enterprise Europe Netzwerks <a style="color: #757070; font-family: Calibri, sans-serif; text-decoration: none;" href="https://juniorenterprises.eu/">(www.juniorenterprises.eu)</a>
