@@ -1059,14 +1059,17 @@ export default class EditProject extends Vue {
     if (this.editProject) {
       this.project = this.convertToProjectCreation(this.editProject); 
       // Populate BT amounts from existing project
-      this.participantBtAmounts = {};
+      const newBtAmounts: { [key: number]: string } = {};
       Object.values(this.editProject.participants || {}).forEach(projectUsers => {
         projectUsers.forEach(pu => {
           if (pu.bt_amount !== undefined && pu.bt_amount !== null) {
-            this.participantBtAmounts[pu.participant.id] = this.$common.decimal2Text(pu.bt_amount);
+            newBtAmounts[pu.participant.id] = this.$common.decimal2Text(pu.bt_amount);
+          } else {
+            newBtAmounts[pu.participant.id] = '';
           }
         });
       });
+      this.participantBtAmounts = newBtAmounts;
     }
   }
 
@@ -1149,6 +1152,14 @@ export default class EditProject extends Vue {
       this.project.participants = {} as Record<string, number[]>;
     }
     this.$set(this.project.participants as Record<string, number[]>, role, val);
+    
+    // Ensure all participant IDs have reactive entries in participantBtAmounts
+    val.forEach(participantId => {
+      if (!(participantId in this.participantBtAmounts)) {
+        // Use $set to make the new property reactive
+        this.$set(this.participantBtAmounts, participantId, '');
+      }
+    });
   }
 
   // Access potentially missing backend-provided folder without TS cast in template
