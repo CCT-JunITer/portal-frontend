@@ -42,6 +42,7 @@
             <div v-else class="text-center py-3">
               <v-icon color="cctGreen" size="40">mdi-trophy</v-icon>
               <div class="text-subtitle-2 font-weight-bold mt-2">Höchster Status erreicht!</div>
+              <div class="text-caption text--secondary">Teile dein Wissen und werde zur Legende!</div>
             </div>
           </v-card-text>
 
