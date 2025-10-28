@@ -9,7 +9,7 @@
 
     <v-row>
       <!-- Current Status & Next Steps -->
-            <!-- Main Content Area -->
+      <!-- Main Content Area -->
       <v-col cols="12">
         <!-- Status Overview Card -->
         <v-card elevation="2" class="mb-4">

@@ -143,7 +143,6 @@
 </template>
 
 <script>
-// @ts-nocheck
 import { dispatchGetInklEvents } from '@/store/event/actions';
 import { DateTime } from 'luxon';
 
