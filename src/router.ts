@@ -44,14 +44,26 @@ export default new Router({
           path: 'main',
           name: 'main',
           component: () => import(/* webpackChunkName: "main" */ './views/main/Main.vue'),
-          redirect: 'main/people',
+          redirect: 'main/homepage', // main/people
           meta: {
             title: 'Dashboard' 
           },
           children: [
             {
-              path: 'welcome',
+              path: 'welcome',  // old homepage/landingpage
               component: () => import('./views/main/Welcome.vue'),
+            },
+            {
+              path: 'homepage',
+              component: () => import('./views/main/Homepage.vue'),
+            },
+            {
+              path: 'member-progression',
+              component: () => import('./views/main/MemberProgression.vue'),
+            },
+            {
+              path: 'events-overview',
+              component: () => import('./views/main/EventsOverview.vue'),
             },
             {
               path: 'admin',

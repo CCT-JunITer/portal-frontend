@@ -63,6 +63,15 @@ export const actions = {
     const response = await apiCallNotify(context, token => api.updateEventApplication(token, payload.application_id, payload.application), { successText: 'Anmeldung erfolgreich bearbeitet' });
     await dispatchGetEventApplications(context, response.data.event_id);
   },
+  async getInklEvents(context: MainContext) {
+    const response = await apiCall(context, token => api.getInklAll(token));
+    return response.data;
+  },
+
+  async nextInklEvents(context: MainContext, url: string) {
+    const response = await apiCall(context, token => api.getInklNext(token, url));
+    return response?.data;
+  }
 };
 
 const { dispatch } = getStoreAccessors<EventState | any, State>('');
@@ -77,3 +86,5 @@ export const dispatchUpdateEvent = dispatch(actions.actionUpdateEvent);
 export const dispatchGetEventApplications = dispatch(actions.actionGetEventApplications); 
 export const dispatchCreateEventApplication = dispatch(actions.actionCreateEventApplication); 
 export const dispatchUpdateEventApplication = dispatch(actions.actionUpdateEventApplication); 
+export const dispatchGetInklEvents = dispatch(actions.getInklEvents);
+export const dispatchNextInklEvents = dispatch(actions.nextInklEvents);

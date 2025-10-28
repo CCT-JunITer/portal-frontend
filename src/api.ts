@@ -321,4 +321,13 @@ export const api = {
   async deletePMNote(token: string, userId: number, noteId: number) {
     return axios.delete(`${apiUrl}/api/v1/users/${userId}/pm-notes/${noteId}`, authHeaders(token));
   },
+
+  // All-Inkl Calendar endpoints can be added here
+  async getInklAll(token: string) {
+    return axios.get(`${apiUrl}/api/v1/calendar/inkl/all`, authHeaders(token));
+  },
+
+  async getInklNext(token: string, url: string) {
+    return axios.get(`${apiUrl}/api/v1/calendar/inkl/next`, { ...authHeaders(token), params: { url } });
+  }
 };
