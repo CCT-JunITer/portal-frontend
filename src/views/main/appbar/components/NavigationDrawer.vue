@@ -208,14 +208,14 @@
         </v-list-item-content>
       </v-list-item>
 
-      <v-list-item :to="calendarURL" color="purple">
+      <!-- <v-list-item :to="calendarURL" color="purple">
         <v-list-item-icon>
           <v-icon>mdi-calendar</v-icon>
         </v-list-item-icon>
         <v-list-item-content>
           <v-list-item-title>Kalender</v-list-item-title>
         </v-list-item-content>
-      </v-list-item>
+      </v-list-item> -->
 
       <v-list-item :to="towernutzungURL" color="purple">
         <v-list-item-icon>
