@@ -334,7 +334,7 @@ export default class HomeStatsWidget extends Vue {
 .metric-icon {
   width: 46px;
   height: 46px;
-  border-radius: 14px;
+  border-radius: 46px;
   background: rgba(56, 142, 60, 0.12);
   display: flex;
   align-items: center;
