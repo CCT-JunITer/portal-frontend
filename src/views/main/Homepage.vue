@@ -443,7 +443,7 @@ export default class Homepage extends Vue {
       { id: 'people', title: 'Mitgliedersuche', subtitle: 'Apps', icon: 'people', color: 'cctBlue', to: '/main/people' },
       { id: 'people-streaks', title: 'Streak Leaderboard', subtitle: 'Apps', icon: 'mdi-fire', color: 'cctOrange', to: '/main/people/streaks' },
       { id: 'project-tender', title: 'Projektausschreibungen', subtitle: 'Apps', icon: 'mdi-account', color: 'cctPurple', to: '/main/project-tender' },
-      { id: 'trainings', title: 'Wissensvermittlung', subtitle: 'Apps', icon: 'mdi-school', color: 'cctOrange', to: '/main/trainings' },
+      { id: 'trainings', title: 'Trainings', subtitle: 'Apps', icon: 'mdi-school', color: 'cctOrange', to: '/main/trainings' },
       { id: 'wms-projects', title: 'Projektdokumentation', subtitle: 'Apps', icon: 'mdi-account-tie', color: 'cctPurple', to: '/main/wms/projects' },
       { id: 'wms-meetings', title: 'CCT-Sitzungen', subtitle: 'Apps', icon: 'mdi-human-male-board', color: 'cctGreen', to: '/main/wms/meetings' },
       { id: 'templates', title: 'Vorlagen', subtitle: 'Apps', icon: 'mdi-file-powerpoint', color: 'grey darken-2', to: '/main/wms/documents/templates' },

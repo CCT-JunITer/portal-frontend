@@ -66,7 +66,7 @@
           <v-icon>mdi-school</v-icon>
         </v-list-item-icon>
         <v-list-item-content>
-          <v-list-item-title>Wissenvermittlung</v-list-item-title>
+          <v-list-item-title>Trainings</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
 

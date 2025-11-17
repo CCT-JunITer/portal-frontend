@@ -25,7 +25,7 @@
             :rules="[$common.required]"            
           ></v-text-field>
           <v-select
-            :label="type === 'meeting' ? 'Meetingart': 'Schulungsart'"
+            :label="type === 'meeting' ? 'Meetingart': 'Trainingsart'"
             v-model ="subtype"
             class="input-lg"
             required
