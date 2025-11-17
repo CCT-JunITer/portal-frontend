@@ -114,7 +114,7 @@ export default class HomeStatsWidget extends Vue {
       this.statistics = stats;
     } catch (error) {
       console.error('Fehler beim Laden der Statistiken:', error);
-      this.errorMessage = 'Statistiken konnten nicht geladen werden.';
+      this.errorMessage = 'Statistiken konnten nicht geladen werden';
       this.statistics = [];
     } finally {
       this.loading = false;
@@ -127,7 +127,7 @@ export default class HomeStatsWidget extends Vue {
     const user = readUserProfile(this.$store);
 
     if (!user?.id) {
-      return { label, value: '–', hint: 'Kein Benutzerprofil geladen.', icon };
+      return { label, value: '–', hint: 'Kein Benutzerprofil geladen', icon };
     }
 
     try {
@@ -135,7 +135,7 @@ export default class HomeStatsWidget extends Vue {
       const events = readEvents(this.$store)('meeting');
 
       if (!Array.isArray(events) || !events.length) {
-        return { label, value: '–', hint: 'Keine Donnerstagssitzungen gefunden.', icon };
+        return { label, value: '–', hint: 'Keine Donnerstagssitzungen gefunden', icon };
       }
 
       const meetingEvents = events
@@ -165,12 +165,12 @@ export default class HomeStatsWidget extends Vue {
       // Keep the different values of 12 and 18 because they are intentional
       const value = `${quota.toFixed(2)} %`;
       const hintBase = 'Gezählt über die letzten 12 Donnerstagssitzungen';
-      const hint = threshold === null ? hintBase : `${hintBase} • Grenzwert ${threshold}%`;
+      const hint = threshold === null ? hintBase : `${hintBase}`; // • Grenzwert ${threshold}%
 
       return { label, value, hint, numericValue: quota, shouldHighlight, icon };
     } catch (error) {
       console.error('Fehler beim Laden der DoSi-Anwesenheit:', error);
-      return { label, value: '–', hint: 'DoSi-Anwesenheit konnte nicht geladen werden.', icon };
+      return { label, value: '–', hint: 'DoSi-Anwesenheit konnte nicht geladen werden', icon };
     }
   }
 
@@ -199,7 +199,7 @@ export default class HomeStatsWidget extends Vue {
         return {
           label,
           value: '0',
-          hint: 'Keine Ausschreibungen mit Deadline in den letzten 4 Monaten.',
+          hint: 'Abgeschlossene Bewerbungen in den letzten 4 Monaten', //Keine Ausschreibungen mit Deadline in den letzten 4 Monaten
           numericValue: 0,
           shouldHighlight: false,
           icon,
@@ -223,7 +223,7 @@ export default class HomeStatsWidget extends Vue {
       };
     } catch (error) {
       console.error('Fehler beim Laden der Projektbewerbungen:', error);
-      return { label, value: '–', hint: 'Projektbewerbungen konnten nicht geladen werden.', icon };
+      return { label, value: '–', hint: 'Projektbewerbungen konnten nicht geladen werden', icon };
     }
   }
 
@@ -233,7 +233,7 @@ export default class HomeStatsWidget extends Vue {
     const user = readUserProfile(this.$store);
 
     if (!user?.id) {
-      return { label, value: '–', hint: 'Kein Benutzerprofil geladen.', icon };
+      return { label, value: '–', hint: 'Kein Benutzerprofil geladen', icon };
     }
 
     try {
@@ -270,7 +270,7 @@ export default class HomeStatsWidget extends Vue {
       };
     } catch (error) {
       console.error('Fehler beim Laden der Projektbesetzungen:', error);
-      return { label, value: '–', hint: 'Projektbesetzungen konnten nicht geladen werden.', icon };
+      return { label, value: '–', hint: 'Projektbesetzungen konnten nicht geladen werden', icon };
     }
   }
 
