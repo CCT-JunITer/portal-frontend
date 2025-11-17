@@ -1,12 +1,12 @@
 <template>
   <div class="root">
-    <!-- Loading state -->
-    <div v-if="loading" class="fallback-container">
+    <!-- Loading overlay -->
+    <div v-if="loading" class="loading-overlay">
       <LoadingCCT></LoadingCCT>
     </div>
 
     <!-- Error state -->
-    <div v-else-if="error" class="fallback-container">
+    <div v-else-if="error" class="error-container">
       <v-card max-width="600" class="mx-auto">
         <v-card-title class="error-title">
           <v-icon large color="error" class="mr-2">mdi-alert-circle</v-icon>
@@ -35,15 +35,15 @@
       </v-card>
     </div>
 
-    <!-- Iframe -->
     <iframe 
-      v-else
+      v-show="!loading && !error"
       ref="towerIframe"
       src="https://tower.cct-ev.de/" 
       width="100%" 
       height="100%" 
       frameBorder="0"
       @load="onIframeLoad"
+      @error="onIframeError"
     ></iframe>
   </div>
 </template>
@@ -58,12 +58,11 @@ import LoadingCCT from '@/components/loading-cct/LoadingCCT.vue'
 export default class TowerAnwesenheit extends Vue {
   private loading = true
   private error = false
-  private timeoutId: number | null = null
-  private contentCheckId: number | null = null
+  private loadTimeout: number | null = null
 
   mounted() {
-    // Set a timeout to detect if iframe doesn't load
-    this.timeoutId = window.setTimeout(() => {
+    // Set timeout to show error if iframe doesn't load in time
+    this.loadTimeout = window.setTimeout(() => {
       if (this.loading) {
         this.loading = false
         this.error = true
@@ -72,73 +71,46 @@ export default class TowerAnwesenheit extends Vue {
   }
 
   beforeDestroy() {
-    if (this.timeoutId) {
-      window.clearTimeout(this.timeoutId)
-    }
-    if (this.contentCheckId) {
-      window.clearTimeout(this.contentCheckId)
+    if (this.loadTimeout) {
+      window.clearTimeout(this.loadTimeout)
     }
   }
 
   onIframeLoad() {
-    if (this.timeoutId) {
-      window.clearTimeout(this.timeoutId)
+    // Clear timeout since iframe loaded
+    if (this.loadTimeout) {
+      window.clearTimeout(this.loadTimeout)
     }
     
-    // Check if iframe body is empty
-    try {
-      const iframe = this.$refs.towerIframe as HTMLIFrameElement
-      if (iframe && iframe.contentDocument) {
-        const body = iframe.contentDocument.body
-        
-        // Check if body exists and has meaningful content
-        if (!body || body.children.length === 0 || body.textContent?.trim() === '') {
-          // Body is empty, show error
-          this.loading = false
-          this.error = true
-          return
-        }
-        
-        // Additional delayed check - sometimes content loads after the initial load event
-        this.contentCheckId = window.setTimeout(() => {
-          try {
-            const currentBody = iframe.contentDocument?.body
-            if (!currentBody || currentBody.children.length === 0 || currentBody.textContent?.trim() === '') {
-              this.loading = false
-              this.error = true
-            }
-          } catch (e) {
-            // Ignore errors on delayed check
-          }
-        }, 2000) // Check again after 2 seconds
-      }
-    } catch (e) {
-      // Cross-origin restriction - can't access iframe content
-      // We'll assume it loaded successfully if we got the load event
-      console.warn('Cannot access iframe content (cross-origin):', e)
+    // Small delay to ensure content is visible
+    setTimeout(() => {
+      this.loading = false
+      this.error = false
+    }, 500)
+  }
+
+  onIframeError() {
+    // Clear timeout and show error
+    if (this.loadTimeout) {
+      window.clearTimeout(this.loadTimeout)
     }
-    
     this.loading = false
-    this.error = false
+    this.error = true
   }
 
   reload() {
     this.loading = true
     this.error = false
     
-    // Clear any existing timeouts
-    if (this.contentCheckId) {
-      window.clearTimeout(this.contentCheckId)
-    }
-    
-    this.timeoutId = window.setTimeout(() => {
+    // Set new timeout
+    this.loadTimeout = window.setTimeout(() => {
       if (this.loading) {
         this.loading = false
         this.error = true
       }
     }, 10000)
     
-    // Reload iframe by resetting the src
+    // Reload iframe
     const iframe = this.$refs.towerIframe as HTMLIFrameElement
     if (iframe) {
       const currentSrc = iframe.src
@@ -153,32 +125,22 @@ export default class TowerAnwesenheit extends Vue {
 
 <style scoped lang="scss">
 .root {
+  position: relative;
   display: flex;
   flex-direction: row;
   height: 100%;
 }
 
-.fallback-container {
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  height: 100%;
-  padding: 24px;
-}
-
-.error-title {
-  color: var(--v-cctBlue-base);
-  font-weight: 500;
-}
-
-.error-reasons {
-  color: var(--v-cctGrey-base);
-  font-size: 0.9rem;
-  line-height: 1.6;
-  
-  li {
-    margin-bottom: 8px;
-  }
+  background-color: white;
+  z-index: 10;
 }
 </style>
