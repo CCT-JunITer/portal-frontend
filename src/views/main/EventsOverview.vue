@@ -144,7 +144,7 @@
 
 <script>
 import { dispatchGetInklEvents } from '@/store/event/actions';
-import { DateTime } from 'luxon';
+import { format } from '@/common';
 
 export default {
   name: 'EventsOverview',
@@ -159,27 +159,30 @@ export default {
     groupedEvents() {
       if (!this.events || this.events.length === 0) return [];
 
-      const today = DateTime.local().startOf('day');
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
       const groups = {};
 
       this.events.forEach((event) => {
-        const startDT = DateTime.fromISO(event.start);
-        const endDT = DateTime.fromISO(event.end);
-        const dateKey = startDT.toFormat('yyyy-LL-dd');
+        const startDT = new Date(event.start);
+        const endDT = new Date(event.end);
+        const dateKey = format(startDT, 'yyyy-MM-dd');
 
         if (!groups[dateKey]) {
-          const isToday = startDT.hasSame(today, 'day');
-          const isTomorrow = startDT.hasSame(today.plus({ days: 1 }), 'day');
+          const isToday = startDT.toDateString() === today.toDateString();
+          const tomorrow = new Date(today);
+          tomorrow.setDate(today.getDate() + 1);
+          const isTomorrow = startDT.toDateString() === tomorrow.toDateString();
 
           let label;
           if (isToday) label = 'Heute';
           else if (isTomorrow) label = 'Morgen';
-          else label = startDT.toFormat('dd. MMMM yyyy', { locale: 'de' });
+          else label = format(startDT, 'dd. MMMM yyyy');
 
           groups[dateKey] = {
             dateKey,
             label,
-            weekday: startDT.toFormat('cccc', { locale: 'de' }),
+            weekday: startDT.toLocaleDateString('de-DE', { weekday: 'long' }),
             isToday,
             isTomorrow,
             date: startDT,
@@ -188,27 +191,21 @@ export default {
         }
 
         const isAllDay = event.all_day === true;
-        const isMultiDay = !startDT.hasSame(endDT, 'day');
+        const isMultiDay = startDT.toDateString() !== endDT.toDateString();
         let timeDisplay;
 
         if (isAllDay && isMultiDay) {
           // All-day event spanning multiple days
-          timeDisplay = `${startDT.toFormat('dd.MM')} - ${endDT.toFormat(
-            'dd.MM'
-          )}`;
+          timeDisplay = `${format(startDT, 'dd.MM')} - ${format(endDT, 'dd.MM')}`;
         } else if (isAllDay) {
           // Single-day all-day event
           timeDisplay = 'Ganztägig';
         } else if (isMultiDay) {
           // Regular multi-day event with specific times
-          timeDisplay = `${startDT.toFormat('dd.MM HH:mm')} - ${endDT.toFormat(
-            'dd.MM HH:mm'
-          )}`;
+          timeDisplay = `${format(startDT, 'dd.MM HH:mm')} - ${format(endDT, 'dd.MM HH:mm')}`;
         } else {
           // Regular single-day event
-          timeDisplay = `${startDT.toFormat('HH:mm')} - ${endDT.toFormat(
-            'HH:mm'
-          )}`;
+          timeDisplay = `${format(startDT, 'HH:mm')} - ${format(endDT, 'HH:mm')}`;
         }
 
         groups[dateKey].events.push({
@@ -223,7 +220,7 @@ export default {
 
       // Sort groups by date and events within groups by time
       return Object.values(groups)
-        .sort((a, b) => a.date.toMillis() - b.date.toMillis())
+        .sort((a, b) => a.date.getTime() - b.date.getTime())
         .map((group) => ({
           ...group,
           events: group.events.sort((a, b) => {
@@ -231,7 +228,7 @@ export default {
             if (a.isAllDay && !b.isAllDay) return -1;
             if (!a.isAllDay && b.isAllDay) return 1;
             // Then sort by start time
-            return a.startDT.toMillis() - b.startDT.toMillis();
+            return a.startDT.getTime() - b.startDT.getTime();
           }),
         }));
     },

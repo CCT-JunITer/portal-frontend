@@ -64,7 +64,6 @@ import { dispatchGetProjectsFor } from '@modules/projects/store/actions';
 import { readProjectsForUser } from '@modules/projects/store/getters';
 import { dispatchGetProjectTenders, dispatchGetOwnProjectApplicationByTender } from '@modules/project-application/store/actions';
 import { readProjectTenders } from '@modules/project-application/store/getters';
-import { DateTime } from 'luxon';
 
 interface StatisticItem {
   label: string;
@@ -185,13 +184,14 @@ export default class HomeStatsWidget extends Vue {
     try {
       await dispatchGetProjectTenders(this.$store);
       const tenders = readProjectTenders(this.$store) || [];
-      const now = DateTime.now();
-      const fourMonthsAgo = now.minus({ months: 4 });
+      const now = new Date();
+      const fourMonthsAgo = new Date();
+      fourMonthsAgo.setMonth(now.getMonth() - 4);
 
       const recentTenderIds = tenders
         .filter(tender => {
-          const deadline = DateTime.fromISO(tender.date_deadline);
-          return deadline.isValid && deadline >= fourMonthsAgo && deadline <= now;
+          const deadline = new Date(tender.date_deadline);
+          return !isNaN(deadline.getTime()) && deadline >= fourMonthsAgo && deadline <= now;
         })
         .map(tender => tender.id);
 
@@ -239,7 +239,8 @@ export default class HomeStatsWidget extends Vue {
     try {
       await dispatchGetProjectsFor(this.$store, user.id);
       const projects = readProjectsForUser(this.$store)(user.id) || [];
-      const fourMonthsAgo = DateTime.now().minus({ months: 4 });
+      const fourMonthsAgo = new Date();
+      fourMonthsAgo.setMonth(fourMonthsAgo.getMonth() - 4);
 
       const recentCount = projects.filter(project => {
         const relevantDateStr =
@@ -253,8 +254,8 @@ export default class HomeStatsWidget extends Vue {
           return false;
         }
 
-        const dt = DateTime.fromISO(relevantDateStr);
-        return dt.isValid && dt >= fourMonthsAgo;
+        const dt = new Date(relevantDateStr);
+        return !isNaN(dt.getTime()) && dt >= fourMonthsAgo;
       }).length;
 
       const value = `${recentCount}`;

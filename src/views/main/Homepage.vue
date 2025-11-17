@@ -277,8 +277,7 @@
 import { Vue, Component } from 'vue-property-decorator';
 import { readUserProfile } from '@/store/main/getters';
 import { dispatchGetInklEvents } from '@/store/event/actions';
-import { MEMBERSTATUS } from '@/common';
-import { DateTime } from 'luxon';
+import { MEMBERSTATUS, format } from '@/common';
 import HomeStatsWidget from '@/views/main/stats/HomeStatsWidget.vue';
 
 interface CalendarEvent {
@@ -389,28 +388,28 @@ export default class Homepage extends Vue {
   }
 
   get upcomingEvents(): CalendarEvent[] {
-    const now = DateTime.local();
+    const now = new Date();
     return this.inklEvents
       .filter((event) => {
-        const startDT = DateTime.fromISO(event.start);
-        return startDT.isValid && startDT >= now;
+        const startDT = new Date(event.start);
+        return !isNaN(startDT.getTime()) && startDT >= now;
       })
       .sort((a, b) => {
-        const aStart = DateTime.fromISO(a.start);
-        const bStart = DateTime.fromISO(b.start);
-        return aStart.toMillis() - bStart.toMillis();
+        const aStart = new Date(a.start);
+        const bStart = new Date(b.start);
+        return aStart.getTime() - bStart.getTime();
       })
       .slice(0, 3);
   }
 
   formatEventDateTime(dateStr: string, isAllDay: boolean): string {
-    const dt = DateTime.fromISO(dateStr);
-    if (!dt.isValid) return dateStr;
+    const dt = new Date(dateStr);
+    if (isNaN(dt.getTime())) return dateStr;
     
     if (isAllDay) {
-      return dt.toFormat('dd.MM.yyyy', { locale: 'de' });
+      return format(dt, 'dd.MM.yyyy');
     }
-    return dt.toFormat('dd.MM.yyyy, HH:mm', { locale: 'de' });
+    return format(dt, 'dd.MM.yyyy, HH:mm');
   }
 
   getEventIcon(event: CalendarEvent): string {
