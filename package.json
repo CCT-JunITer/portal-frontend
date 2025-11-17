@@ -23,7 +23,6 @@
     "ical.js": "^2.2.1",
     "jszip": "^2.6.0",
     "jwt-decode": "^3.1.2",
-    "luxon": "^3.7.2",
     "qrcode.vue": "^1.7.0",
     "swapy": "^1.0.5",
     "tiptap-vuetify": "^2.24.0",
