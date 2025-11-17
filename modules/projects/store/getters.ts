@@ -7,6 +7,7 @@ import { ProjectTypeEnum } from '../types';
 export const getters = {
   autocompleteValues: (state: ProjectsState) => (property: string) => state.autocompleteValues[property],
   projects: (state: ProjectsState) => (project_type: ProjectTypeEnum | 'all') => project_type === 'all' ? state.allProjects : state.projects[project_type],
+  projectsForUser: (state: ProjectsState) => (userId: number) => state.projectParticipants[userId] || [],
   routeProject: (state: ProjectsState) => (route: Route) => {
     const id = route.params.id;
     const numberId = parseInt(id);
@@ -28,6 +29,7 @@ const {read} = getStoreAccessors<ProjectsState, State>('');
 
 export const readAutocompleteValues = read(getters.autocompleteValues);
 export const readProjects = read(getters.projects);
+export const readProjectsForUser = read(getters.projectsForUser);
 export const readRouteProject = read(getters.routeProject);
 export const readProjectsForRoute = read(getters.projectsForRoute);
 export const readOneProject = read(getters.oneProject);
