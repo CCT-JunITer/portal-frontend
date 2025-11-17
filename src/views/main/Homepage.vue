@@ -150,30 +150,7 @@
         </v-card>
       </v-col>
 
-      <v-col cols="12" md="6" lg="4" class="d-flex">
-        <v-card elevation="2" class="widget-card flex-grow-1 d-flex flex-column">
-          <v-card-title class="cctGreen white--text">
-            <v-icon left color="white">mdi-chart-line</v-icon>
-            Deine Statistiken
-          </v-card-title>
-          <v-card-text class="flex-grow-1">
-            <div class="text-center py-5">
-              <v-icon size="64" color="grey lighten-2">mdi-hammer-wrench</v-icon>
-              <div class="text-h6 grey--text mt-3">Work in Progress</div>
-              <div class="text-caption text--secondary mt-2">
-                Statistiken kommen bald
-              </div>
-            </div>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn text color="cctGreen">
-              Details
-              <v-icon right small>mdi-chevron-right</v-icon>
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-col>
+      <home-stats-widget />
     </v-row>
 
     <!-- Quick Access Section -->
@@ -302,6 +279,7 @@ import { readUserProfile } from '@/store/main/getters';
 import { dispatchGetInklEvents } from '@/store/event/actions';
 import { MEMBERSTATUS } from '@/common';
 import { DateTime } from 'luxon';
+import HomeStatsWidget from '@/views/main/stats/HomeStatsWidget.vue';
 
 interface CalendarEvent {
   summary: string;
@@ -335,7 +313,11 @@ interface MemberStatusIcons {
 const QUICK_ACCESS_STORAGE_KEY = 'homepage_quick_access_items';
 const DEFAULT_QUICK_ACCESS_IDS = ['people', 'calendar', 'wms-projects', 'trainings', 'finance-request', 'templates'];
 
-@Component
+@Component({
+  components: {
+    HomeStatsWidget,
+  },
+})
 export default class Homepage extends Vue {
   showQuickAccessDialog = false;
   tempSelectedIds: string[] = [];
@@ -614,4 +596,5 @@ export default class Homepage extends Vue {
     }
   }
 }
+
 </style>
