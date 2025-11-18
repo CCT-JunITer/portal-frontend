@@ -140,7 +140,7 @@ export default class HomeStatsWidget extends Vue {
       const meetingEvents = events
         .filter(event => event.subtype === 'Donnerstagssitzung')
         .sort((a, b) => new Date(b.date_from).getTime() - new Date(a.date_from).getTime())
-        .slice(0, 18);
+        .slice(0, 12);
 
       let attended = 0;
 
@@ -161,7 +161,6 @@ export default class HomeStatsWidget extends Vue {
       const threshold = this.getDoSiThreshold(user.memberstatus);
       const shouldHighlight = threshold === null ? true : quota >= threshold;
 
-      // Keep the different values of 12 and 18 because they are intentional
       const value = `${quota.toFixed(2)} %`;
       const hintBase = 'Gezählt über die letzten 12 Donnerstagssitzungen';
       const hint = threshold === null ? hintBase : `${hintBase}`; // • Grenzwert ${threshold}%
