@@ -157,7 +157,7 @@ export default class HomeStatsWidget extends Vue {
           console.error(`Fehler beim Laden der Meeting-Details (${meeting.id}):`, error);
         }
       }
-      const quota = (attended / 18) * 100;
+      const quota = (attended / 12) * 100;
       const threshold = this.getDoSiThreshold(user.memberstatus);
       const shouldHighlight = threshold === null ? true : quota >= threshold;
 
@@ -185,13 +185,13 @@ export default class HomeStatsWidget extends Vue {
       await dispatchGetProjectTenders(this.$store);
       const tenders = readProjectTenders(this.$store) || [];
       const now = new Date();
-      const fourMonthsAgo = new Date();
-      fourMonthsAgo.setMonth(now.getMonth() - 4);
+      const threeMonthsAgo = new Date();
+      threeMonthsAgo.setMonth(now.getMonth() - 3);
 
       const recentTenderIds = tenders
         .filter(tender => {
           const deadline = new Date(tender.date_deadline);
-          return !isNaN(deadline.getTime()) && deadline >= fourMonthsAgo && deadline <= now;
+          return !isNaN(deadline.getTime()) && deadline >= threeMonthsAgo && deadline <= now;
         })
         .map(tender => tender.id);
 
@@ -199,7 +199,7 @@ export default class HomeStatsWidget extends Vue {
         return {
           label,
           value: '0',
-          hint: 'Abgeschlossene Bewerbungen in den letzten 4 Monaten', //Keine Ausschreibungen mit Deadline in den letzten 4 Monaten
+          hint: 'Abgeschlossene Bewerbungen in den letzten 3 Monaten', //Keine Ausschreibungen mit Deadline in den letzten 3 Monaten
           numericValue: 0,
           shouldHighlight: false,
           icon,
@@ -211,7 +211,7 @@ export default class HomeStatsWidget extends Vue {
       );
 
       const completedCount = applications.filter(app => app?.status === 'completed').length;
-      const hint = 'Abgeschlossene Bewerbungen in den letzten 4 Monaten';
+      const hint = 'Abgeschlossene Bewerbungen in den letzten 3 Monaten';
 
       return {
         label,
@@ -239,8 +239,8 @@ export default class HomeStatsWidget extends Vue {
     try {
       await dispatchGetProjectsFor(this.$store, user.id);
       const projects = readProjectsForUser(this.$store)(user.id) || [];
-      const fourMonthsAgo = new Date();
-      fourMonthsAgo.setMonth(fourMonthsAgo.getMonth() - 4);
+      const threeMonthsAgo = new Date();
+      threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
 
       const recentCount = projects.filter(project => {
         const relevantDateStr =
@@ -255,11 +255,11 @@ export default class HomeStatsWidget extends Vue {
         }
 
         const dt = new Date(relevantDateStr);
-        return !isNaN(dt.getTime()) && dt >= fourMonthsAgo;
+        return !isNaN(dt.getTime()) && dt >= threeMonthsAgo;
       }).length;
 
       const value = `${recentCount}`;
-      const hint = 'Projekte in den letzten 4 Monaten';
+      const hint = 'Projekte in den letzten 3 Monaten';
 
       return {
         label,
