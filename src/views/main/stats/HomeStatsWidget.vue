@@ -227,7 +227,7 @@ export default class HomeStatsWidget extends Vue {
   }
 
   private async fetchProjectAppointments(): Promise<StatisticItem> {
-    const label = 'Projektbesetzung';
+    const label = 'Projektbesetzungen';
     const icon = 'mdi-briefcase-check-outline';
     const user = readUserProfile(this.$store);
 
