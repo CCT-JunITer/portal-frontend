@@ -229,7 +229,7 @@
 import { Vue, Component, Watch} from 'vue-property-decorator';
 import VueTelInputVuetify from 'vue-tel-input-vuetify/lib/vue-tel-input-vuetify.vue';
 import { dispatchGetUsers } from '@/store/main/actions';
-import { readUsers,} from '@/store/main/getters';
+import { readUsers, readUserProfile } from '@/store/main/getters';
 import { IEvent, IEventCreate, IEventType } from '@/interfaces';
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 import UploadButton from '@/components/UploadButton.vue';
@@ -254,6 +254,7 @@ export default class AdminViewEvent extends Vue {
   public event: Partial<IEventCreate> = {}
   public subtype: null | {type: string; topics?: string[]} = null;
   public allday = false;
+  public autoRessortTitleApplied = false;
 
   public get type() {
     return (this.$route.meta?.event_type || this.event?.type || 'training') as IEventType;
@@ -291,6 +292,14 @@ export default class AdminViewEvent extends Vue {
     return readUsers(this.$store);
   }
 
+  get currentUserProfile() {
+    return readUserProfile(this.$store);
+  }
+
+  get userRessort(): string {
+    return (this.currentUserProfile?.ressort || '').trim();
+  }
+
   @Watch('$route', {immediate: true})
   public async onRouteChange(newRoute?: Route, oldRoute?: Route) {
     // reset sub-type
@@ -298,6 +307,34 @@ export default class AdminViewEvent extends Vue {
     if (newRoute?.params.id !== oldRoute?.params.id) {
       await dispatchGetOneEvent(this.$store, +this.$route.params.id)
       this.reset();
+    }
+  }
+
+  @Watch('subtype')
+  onSubtypeChange(newSubtype: { type: string; topics?: string[] } | null) {
+    if (!newSubtype || newSubtype.type !== 'Ressortsitzung') {
+      this.autoRessortTitleApplied = false;
+      return;
+    }
+
+    const shouldOverrideTitle =
+      !this.editEvent?.id || !this.event.title || this.autoRessortTitleApplied;
+
+    if (!shouldOverrideTitle) {
+      return;
+    }
+
+    this.event.title = this.buildRessortMeetingTitle();
+    this.autoRessortTitleApplied = true;
+  }
+
+  @Watch('event.title')
+  onTitleChange(newTitle?: string) {
+    if (!newTitle) {
+      return;
+    }
+    if (newTitle !== this.buildRessortMeetingTitle()) {
+      this.autoRessortTitleApplied = false;
     }
   }
 
@@ -331,6 +368,7 @@ export default class AdminViewEvent extends Vue {
     this.showValidationError = false;
     if ((this.$refs.form as HTMLFormElement).validate()) {
       try {
+        this.ensureRessortTitleConsistency();
         const new_event = {
           ...this.event,
           timed: !this.allday,
@@ -360,6 +398,22 @@ export default class AdminViewEvent extends Vue {
   get isDonnerstagssitzung() {
     return (this.subtype?.type || this.event.subtype) === 'Donnerstagssitzung';
   }
+  private ensureRessortTitleConsistency() {
+    if (this.subtype?.type !== 'Ressortsitzung') {
+      return;
+    }
+
+    if (!this.event.title || this.autoRessortTitleApplied) {
+      this.event.title = this.buildRessortMeetingTitle();
+      this.autoRessortTitleApplied = true;
+    }
+  }
+
+  private buildRessortMeetingTitle(): string {
+    const ressort = this.userRessort || 'Ressort';
+    return `${ressort} Sitzung`;
+  }
+
   public reset() {
     if(this.editEvent) {
       this.event = {
@@ -373,6 +427,8 @@ export default class AdminViewEvent extends Vue {
         this.subtype = (this.event.type === 'meeting' ? this.$common.MEETINGMAPPING : this.$common.SCHULUNGSMAPPING).find(o => o.type === this.event?.subtype) || { type: this.event.subtype, topics: [] };
         
       }
+      this.autoRessortTitleApplied =
+        this.subtype?.type === 'Ressortsitzung' && this.event.title === this.buildRessortMeetingTitle();
 
     }
   }
