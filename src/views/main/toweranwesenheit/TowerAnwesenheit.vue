@@ -38,7 +38,7 @@
     <iframe 
       v-show="!loading && !error"
       ref="towerIframe"
-      src="https://tower.cct-ev.de/" 
+      src="https://tower.cct-ev.de/?show_device_names=41893a8b3a0ecb05a7f3f5f6689be70e" 
       width="100%" 
       height="100%" 
       frameBorder="0"
