@@ -164,6 +164,7 @@ export interface IEvent {
     files: string;
     leaders: IUserProfile[];
     participants: IUserProfile[];
+    non_participants?: IUserProfile[];
     applications: IEventApplication[];
     last_updated_id: number;
     last_updated_by: IUserProfile;
@@ -192,6 +193,7 @@ export interface IEventCreate {
     files: string;
     leader_ids: number[];
     participant_ids: number[];
+    non_participant_ids?: number[];
     last_updated_id: number;
     author_id: number;
     protocol_id: number;

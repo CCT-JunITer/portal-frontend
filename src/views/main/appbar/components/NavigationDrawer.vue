@@ -84,12 +84,20 @@
             <v-list-item-title>Projektdokumentation</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item to="/main/wms/meetings" color="cctGreen" class="ml-2">
+        <v-list-item to="/main/wms/meetings" color="cctGreen" class="ml-2" exact>
           <v-list-item-icon>
             <v-icon>mdi-human-male-board</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title>CCT-Sitzungen</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item to="/main/wms/meetings/ressortsitzungen" color="cctGreen" class="ml-2" exact>
+          <v-list-item-icon>
+            <v-icon>mdi-account-group-outline</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Ressort-Sitzungen</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
         <v-list-item to="/main/wms/documents/templates" class="ml-2">

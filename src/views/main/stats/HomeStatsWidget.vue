@@ -188,8 +188,12 @@ export default class HomeStatsWidget extends Vue {
           await dispatchGetOneEvent(this.$store, meeting.id);
           const detailedEvent = readOneEvent(this.$store)(meeting.id);
           const participants = detailedEvent?.participants || [];
+          const nonParticipants = detailedEvent?.non_participants || [];
 
-          if (participants.some(participant => participant.id === user.id)) {
+          const isCounted = participants.some(participant => participant.id === user.id) ||
+            nonParticipants.some(member => member.id === user.id);
+
+          if (isCounted) {
             attended += 1;
           }
         } catch (error) {

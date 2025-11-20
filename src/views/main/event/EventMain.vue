@@ -3,14 +3,14 @@
   <div>
     <v-toolbar flat :class="`elevation-2`">
       <v-toolbar-title>
-        {{ this.typeName }}
+        {{ displayTypeLabel }}
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn color="cctOrange" style="color: white" :to="{name: 'event-create-' + type}">
         <v-icon left>
           mdi-school
         </v-icon>
-        Neues {{ this.typeName }}
+        Neues {{ displayTypeLabel }}
       </v-btn>
     </v-toolbar>
     <div class="px-1">
@@ -19,7 +19,7 @@
         <template v-slot:top>
           <v-toolbar flat>
             <v-toolbar-title>
-              Kommende {{ typeName }}s
+              Kommende {{ displayTypeLabelPlural }}
             </v-toolbar-title>
           </v-toolbar>
         </template>
@@ -28,7 +28,7 @@
         <template v-slot:top>
           <v-toolbar flat>
             <v-toolbar-title>
-              Vergangene {{ typeName }}s
+              Vergangene {{ displayTypeLabelPlural }}
             </v-toolbar-title>
           </v-toolbar>
         </template>
@@ -121,6 +121,14 @@ export default class EventMain extends Vue {
     }[this.type];
   }
 
+  public get displayTypeLabel(): string {
+    return this.typeName;
+  }
+
+  public get displayTypeLabelPlural(): string {
+    return (this.$route.meta?.event_label_plural as string) || `${this.displayTypeLabel}s`;
+  }
+
   today = new Date();
 
   dialog_register = false
@@ -135,17 +143,39 @@ export default class EventMain extends Vue {
 
 
   get futureEvents() {
-    if(!this.events) {
+    const events = this.filteredEvents;
+    if(!events) {
       return null;
     }
-    return this.events.filter(event => isAfter(new Date(event.date_from), this.today))
+    return events.filter(event => isAfter(new Date(event.date_from), this.today));
   }
 
   get pastEvents() {
-    if(!this.events) {
+    const events = this.filteredEvents;
+    if(!events) {
       return null;
     }
-    return this.events.filter(event => isAfter(this.today, new Date(event.date_from)))
+    return events.filter(event => isAfter(this.today, new Date(event.date_from)));
+  }
+  
+  get filteredEvents() {
+    if (!this.events) {
+      return null;
+    }
+
+    const includeSubtypes = this.includeSubtypes;
+    const excludeSubtypes = this.excludeSubtypes;
+
+    return this.events.filter(event => {
+      const subtype = (event.subtype || '').trim().toLowerCase();
+      if (includeSubtypes.length) {
+        return includeSubtypes.includes(subtype);
+      }
+      if (excludeSubtypes.length) {
+        return !excludeSubtypes.includes(subtype);
+      }
+      return true;
+    });
   }
   
   get userProfile() {
@@ -157,6 +187,25 @@ export default class EventMain extends Vue {
   }
   get events() {
     return readEvents(this.$store)(this.type);
+  }
+
+  private get includeSubtypes(): string[] {
+    const raw = (this.$route.meta?.includeSubtypes as string[]) || [];
+    return this.normalizeSubtypeList(raw);
+  }
+
+  private get excludeSubtypes(): string[] {
+    const raw = (this.$route.meta?.excludeSubtypes as string[]) || [];
+    return this.normalizeSubtypeList(raw);
+  }
+
+  private normalizeSubtypeList(list: string[]): string[] {
+    if (!Array.isArray(list)) {
+      return [];
+    }
+    return list
+      .filter(Boolean)
+      .map(subtype => subtype.toLowerCase());
   }
   public async mounted() {
     await dispatchGetEvents(this.$store, this.$route.meta?.event_type);

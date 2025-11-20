@@ -44,7 +44,7 @@ export const SCHULUNGSMAPPING = [
 export const MEETINGMAPPING = [
   { type: 'Donnerstagssitzung' },
   { type: 'Mitgliederversammlung'},
-  { type: 'Ressortsitzung' },
+  { type: 'Ressortsitzung', topics: RESSORTS },
 ];
 
 export const KOSTENART = [

@@ -181,6 +181,21 @@
             }"
           >
           </user-select>
+
+          <user-select
+            v-if="canManageNonParticipants"
+            v-model="event.non_participant_ids"
+            multiple
+            class="input-lg"
+            prepend-icon="mdi-account-off-outline"
+            filled
+            label="Abgemeldete Personen"
+            :userChipProps="{
+              color: 'grey darken-1',
+              dark: true,
+            }"
+          >
+          </user-select>
           
           <file-manager v-model="event.files" :folder="event.versioned_folder" :multiple="true" :labels="fileLabels"></file-manager>
         </v-form>
@@ -229,7 +244,7 @@
 import { Vue, Component, Watch} from 'vue-property-decorator';
 import VueTelInputVuetify from 'vue-tel-input-vuetify/lib/vue-tel-input-vuetify.vue';
 import { dispatchGetUsers } from '@/store/main/actions';
-import { readUsers, readUserProfile } from '@/store/main/getters';
+import { readUsers, readUserProfile, readHasAdminAccess } from '@/store/main/getters';
 import { IEvent, IEventCreate, IEventType } from '@/interfaces';
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 import UploadButton from '@/components/UploadButton.vue';
@@ -251,7 +266,9 @@ export default class AdminViewEvent extends Vue {
   public time_menu = false;
   public valid = false;
   public showValidationError = false;
-  public event: Partial<IEventCreate> = {}
+  public event: Partial<IEventCreate> = {
+    non_participant_ids: [],
+  };
   public subtype: null | {type: string; topics?: string[]} = null;
   public allday = false;
   public autoRessortTitleApplied = false;
@@ -300,6 +317,56 @@ export default class AdminViewEvent extends Vue {
     return (this.currentUserProfile?.ressort || '').trim();
   }
 
+  get canManageNonParticipants(): boolean {
+    const user = this.currentUserProfile;
+    if (!user) {
+      return false;
+    }
+
+    const activeGroups = user.active_groups || [];
+    const activeGroupLabels = activeGroups.map(group => `${group.name || 'Unbenannt'} (${group.type || 'ohne Typ'})`);
+    console.log('[NonParticipants] Active groups:', activeGroupLabels);
+    console.log('[NonParticipants] User permissions:', user.permissions, user.full_name);
+
+    if (user.is_superuser) {
+      console.log('[NonParticipants] Access granted: user is superuser');
+      return true;
+    }
+
+    if (readHasAdminAccess(this.$store)) {
+      console.log('[NonParticipants] Access granted: admin permission');
+      return true;
+    }
+
+    const normalizedPermissions = (user.permissions || []).map(permission => permission.toLowerCase());
+    const hasBoardPermission = normalizedPermissions.some(permission => permission.includes('vorstand'));
+    const hasRessortleitungPermission = normalizedPermissions.some(permission => permission.includes('ressortleitung'));
+
+    if (hasBoardPermission || hasRessortleitungPermission) {
+      console.log('[NonParticipants] Access granted: matching permission');
+      return true;
+    }
+
+    const matchesGroup = activeGroups.some(group => {
+      const name = (group.name || '').toLowerCase();
+      const type = (group.type || '').toLowerCase();
+      return (
+        name.includes('vorstand') ||
+        name.includes('board') ||
+        name.includes('ressortleitung') ||
+        type.includes('ressortleitung')
+      );
+    });
+
+    if (matchesGroup) {
+      console.log('[NonParticipants] Access granted: matching active group');
+    } else {
+      console.log('[NonParticipants] Access denied');
+    }
+
+    return matchesGroup;
+  }
+
   @Watch('$route', {immediate: true})
   public async onRouteChange(newRoute?: Route, oldRoute?: Route) {
     // reset sub-type
@@ -321,11 +388,13 @@ export default class AdminViewEvent extends Vue {
       !this.editEvent?.id || !this.event.title || this.autoRessortTitleApplied;
 
     if (!shouldOverrideTitle) {
+      this.applyDefaultRessortTopic();
       return;
     }
 
     this.event.title = this.buildRessortMeetingTitle();
     this.autoRessortTitleApplied = true;
+    this.applyDefaultRessortTopic();
   }
 
   @Watch('event.title')
@@ -374,6 +443,7 @@ export default class AdminViewEvent extends Vue {
           timed: !this.allday,
           type: this.type,
           subtype: this.subtype && this.subtype.type,
+          non_participant_ids: this.event.non_participant_ids || [],
         } as IEventCreate;
 
         let event: IEvent | undefined;
@@ -414,6 +484,18 @@ export default class AdminViewEvent extends Vue {
     return `${ressort} Sitzung`;
   }
 
+  private applyDefaultRessortTopic(): void {
+    if (this.subtype?.type !== 'Ressortsitzung') {
+      return;
+    }
+
+    if (this.event.topic) {
+      return;
+    }
+
+    this.event.topic = this.userRessort || 'Ressort';
+  }
+
   public reset() {
     if(this.editEvent) {
       this.event = {
@@ -421,6 +503,7 @@ export default class AdminViewEvent extends Vue {
         participant_ids: this.editEvent.participants.map(u => u.id),
         leader_ids: this.editEvent.leaders.map(u => u.id),
       };
+      this.event.non_participant_ids = this.editEvent.non_participants?.map(u => u.id) || [];
       this.allday = !this.event.timed;
 
       if (this.event.subtype) {
@@ -429,6 +512,9 @@ export default class AdminViewEvent extends Vue {
       }
       this.autoRessortTitleApplied =
         this.subtype?.type === 'Ressortsitzung' && this.event.title === this.buildRessortMeetingTitle();
+      if (!this.event.topic) {
+        this.applyDefaultRessortTopic();
+      }
 
     }
   }
