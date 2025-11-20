@@ -60,10 +60,9 @@ import { Component, Vue } from 'vue-property-decorator';
 import { dispatchGetEvents, dispatchGetOneEvent } from '@/store/event/actions';
 import { readEvents, readOneEvent } from '@/store/event/getters';
 import { readUserProfile } from '@/store/main/getters';
-import { dispatchGetProjectsFor } from '@modules/projects/store/actions';
-import { readProjectsForUser } from '@modules/projects/store/getters';
 import { dispatchGetProjectTenders, dispatchGetOwnProjectApplicationByTender } from '@modules/project-application/store/actions';
 import { readProjectTenders } from '@modules/project-application/store/getters';
+import { ProjectHistoryItem } from '@/interfaces';
 
 interface StatisticItem {
   label: string;
@@ -72,6 +71,15 @@ interface StatisticItem {
   numericValue?: number;
   shouldHighlight?: boolean;
   icon?: string;
+}
+
+interface MeetingAttendanceOptions {
+  subtype: string;
+  label: string;
+  icon: string;
+  emptyHint: string;
+  hintBase: string;
+  limit?: number;
 }
 
 @Component
@@ -101,16 +109,24 @@ export default class HomeStatsWidget extends Vue {
     this.errorMessage = null;
 
     try {
-      const stats = await Promise.all([
+      const [doSi, ressortMeetings, projectApplications, projectAppointments] = await Promise.all([
         this.fetchDoSiAttendance(),
+        this.fetchRessortMeetingAttendance(),
         // this.fetchRessortAttendance(),
         this.fetchProjectApplications(),
         this.fetchProjectAppointments(),
-        // this.fetchWorkshopParticipation(),
         // this.fetchSurveyParticipation(),
       ]);
 
-      this.statistics = stats;
+      const workshopParticipation = await this.fetchWorkshopParticipation();
+
+      this.statistics = [
+        doSi,
+        ressortMeetings,
+        projectApplications,
+        projectAppointments,
+        workshopParticipation,
+      ];
     } catch (error) {
       console.error('Fehler beim Laden der Statistiken:', error);
       this.errorMessage = 'Statistiken konnten nicht geladen werden';
@@ -121,8 +137,27 @@ export default class HomeStatsWidget extends Vue {
   }
 
   private async fetchDoSiAttendance(): Promise<StatisticItem> {
-    const label = 'DoSi Anwesenheitsquote';
-    const icon = 'mdi-account-clock';
+    return this.fetchMeetingAttendance({
+      subtype: 'Donnerstagssitzung',
+      label: 'DoSi Anwesenheitsquote',
+      icon: 'mdi-account-clock',
+      emptyHint: 'Keine Donnerstagssitzungen gefunden',
+      hintBase: 'Gezählt über die letzten 12 Donnerstagssitzungen',
+    });
+  }
+
+  private async fetchRessortMeetingAttendance(): Promise<StatisticItem> {
+    return this.fetchMeetingAttendance({
+      subtype: 'Ressortsitzung',
+      label: 'Ressortsitzungsquote',
+      icon: 'mdi-account-group-outline',
+      emptyHint: 'Keine Ressortsitzungen gefunden',
+      hintBase: 'Gezählt über die letzten 12 Ressortsitzungen',
+    });
+  }
+
+  private async fetchMeetingAttendance(options: MeetingAttendanceOptions): Promise<StatisticItem> {
+    const { subtype, label, icon, emptyHint, hintBase, limit = 12 } = options;
     const user = readUserProfile(this.$store);
 
     if (!user?.id) {
@@ -134,13 +169,17 @@ export default class HomeStatsWidget extends Vue {
       const events = readEvents(this.$store)('meeting');
 
       if (!Array.isArray(events) || !events.length) {
-        return { label, value: '–', hint: 'Keine Donnerstagssitzungen gefunden', icon };
+        return { label, value: '–', hint: emptyHint, icon };
       }
 
       const meetingEvents = events
-        .filter(event => event.subtype === 'Donnerstagssitzung')
+        .filter(event => event.subtype === subtype)
         .sort((a, b) => new Date(b.date_from).getTime() - new Date(a.date_from).getTime())
-        .slice(0, 18);
+        .slice(0, limit);
+
+      if (!meetingEvents.length) {
+        return { label, value: '–', hint: emptyHint, icon };
+      }
 
       let attended = 0;
 
@@ -149,27 +188,30 @@ export default class HomeStatsWidget extends Vue {
           await dispatchGetOneEvent(this.$store, meeting.id);
           const detailedEvent = readOneEvent(this.$store)(meeting.id);
           const participants = detailedEvent?.participants || [];
+          const nonParticipants = detailedEvent?.non_participants || [];
 
-          if (participants.some(participant => participant.id === user.id)) {
+          const isCounted = participants.some(participant => participant.id === user.id) ||
+            nonParticipants.some(member => member.id === user.id);
+
+          if (isCounted) {
             attended += 1;
           }
         } catch (error) {
           console.error(`Fehler beim Laden der Meeting-Details (${meeting.id}):`, error);
         }
       }
-      const quota = (attended / 18) * 100;
+
+      const quota = (attended / limit) * 100;
       const threshold = this.getDoSiThreshold(user.memberstatus);
       const shouldHighlight = threshold === null ? true : quota >= threshold;
 
-      // Keep the different values of 12 and 18 because they are intentional
       const value = `${quota.toFixed(2)} %`;
-      const hintBase = 'Gezählt über die letzten 12 Donnerstagssitzungen';
-      const hint = threshold === null ? hintBase : `${hintBase}`; // • Grenzwert ${threshold}%
+      const hint = hintBase;
 
       return { label, value, hint, numericValue: quota, shouldHighlight, icon };
     } catch (error) {
-      console.error('Fehler beim Laden der DoSi-Anwesenheit:', error);
-      return { label, value: '–', hint: 'DoSi-Anwesenheit konnte nicht geladen werden', icon };
+      console.error(`Fehler beim Laden der ${subtype}-Anwesenheit:`, error);
+      return { label, value: '–', hint: `${label} konnte nicht geladen werden`, icon };
     }
   }
 
@@ -185,13 +227,13 @@ export default class HomeStatsWidget extends Vue {
       await dispatchGetProjectTenders(this.$store);
       const tenders = readProjectTenders(this.$store) || [];
       const now = new Date();
-      const fourMonthsAgo = new Date();
-      fourMonthsAgo.setMonth(now.getMonth() - 4);
+      const threeMonthsAgo = new Date();
+      threeMonthsAgo.setMonth(now.getMonth() - 3);
 
       const recentTenderIds = tenders
         .filter(tender => {
           const deadline = new Date(tender.date_deadline);
-          return !isNaN(deadline.getTime()) && deadline >= fourMonthsAgo && deadline <= now;
+          return !isNaN(deadline.getTime()) && deadline >= threeMonthsAgo && deadline <= now;
         })
         .map(tender => tender.id);
 
@@ -199,7 +241,7 @@ export default class HomeStatsWidget extends Vue {
         return {
           label,
           value: '0',
-          hint: 'Abgeschlossene Bewerbungen in den letzten 4 Monaten', //Keine Ausschreibungen mit Deadline in den letzten 4 Monaten
+          hint: 'Abgeschlossene Bewerbungen in den letzten 3 Monaten', //Keine Ausschreibungen mit Deadline in den letzten 3 Monaten
           numericValue: 0,
           shouldHighlight: false,
           icon,
@@ -211,7 +253,7 @@ export default class HomeStatsWidget extends Vue {
       );
 
       const completedCount = applications.filter(app => app?.status === 'completed').length;
-      const hint = 'Abgeschlossene Bewerbungen in den letzten 4 Monaten';
+      const hint = 'Abgeschlossene Bewerbungen in den letzten 3 Monaten';
 
       return {
         label,
@@ -228,55 +270,140 @@ export default class HomeStatsWidget extends Vue {
   }
 
   private async fetchProjectAppointments(): Promise<StatisticItem> {
-    const label = 'Projektbesetzung';
+    const label = 'Projektbesetzungen';
     const icon = 'mdi-briefcase-check-outline';
-    const user = readUserProfile(this.$store);
+    const profile = readUserProfile(this.$store);
+    const history = profile?.project_history;
+    const hint = 'Projekte in den letzten 3 Monaten';
 
-    if (!user?.id) {
-      return { label, value: '–', hint: 'Kein Benutzerprofil geladen', icon };
-    }
-
-    try {
-      await dispatchGetProjectsFor(this.$store, user.id);
-      const projects = readProjectsForUser(this.$store)(user.id) || [];
-      const fourMonthsAgo = new Date();
-      fourMonthsAgo.setMonth(fourMonthsAgo.getMonth() - 4);
-
-      const recentCount = projects.filter(project => {
-        const relevantDateStr =
-          project.project_end_date_actual ||
-          project.project_end_date_expected ||
-          project.project_start_date_actual ||
-          project.project_start_date_expected ||
-          project.acceptance_date;
-
-        if (!relevantDateStr) {
-          return false;
-        }
-
-        const dt = new Date(relevantDateStr);
-        return !isNaN(dt.getTime()) && dt >= fourMonthsAgo;
-      }).length;
-
-      const value = `${recentCount}`;
-      const hint = 'Projekte in den letzten 4 Monaten';
-
+    if (!history?.length) {
       return {
         label,
-        value,
+        value: '0',
         hint,
-        numericValue: recentCount,
-        shouldHighlight: recentCount >= 1,
+        numericValue: 0,
+        shouldHighlight: false,
         icon,
       };
-    } catch (error) {
-      console.error('Fehler beim Laden der Projektbesetzungen:', error);
-      return { label, value: '–', hint: 'Projektbesetzungen konnten nicht geladen werden', icon };
     }
+
+    const now = new Date();
+    const cutoff = new Date(now);
+    cutoff.setMonth(now.getMonth() - 3);
+
+    const recentCount = history.filter(project => this.isRecentProjectStaffing(project, cutoff)).length;
+
+    return {
+      label,
+      value: `${recentCount}`,
+      hint,
+      numericValue: recentCount,
+      shouldHighlight: recentCount >= 1,
+      icon,
+    };
+  }
+
+  private isRecentProjectStaffing(project: ProjectHistoryItem, cutoff: Date): boolean {
+    const role = (project.role || '').trim().toLowerCase();
+    if (role === 'committee') {
+      return false;
+    }
+
+    const dates = [project.start_date, project.end_date]
+      .map(dateStr => {
+        if (!dateStr) {
+          return null;
+        }
+        const parsed = new Date(dateStr);
+        return isNaN(parsed.getTime()) ? null : parsed;
+      })
+      .filter((date): date is Date => date !== null);
+
+    if (!dates.length) {
+      return false;
+    }
+
+    return dates.some(date => date >= cutoff);
   }
 
   private async fetchWorkshopParticipation(): Promise<StatisticItem> {
-    return { label: 'Workshopteilnahme', value: 'X' };
+    const label = 'Workshopteilnahmen';
+    const icon = 'mdi-school-outline';
+    const user = readUserProfile(this.$store);
+    const hint = 'Workshopteilnahmen in den letzten 3 Monaten';
+
+    if (!user?.id) {
+      return {
+        label,
+        value: '–',
+        hint: 'Kein Benutzerprofil geladen',
+        icon,
+        shouldHighlight: false,
+      };
+    }
+
+    try {
+      await dispatchGetEvents(this.$store, 'training');
+      const events = readEvents(this.$store)('training') || [];
+      const now = new Date();
+      const cutoff = new Date(now);
+      cutoff.setMonth(now.getMonth() - 3);
+
+      const workshopEvents = events.filter(event => {
+        const subtype = (event.subtype || '').trim().toLowerCase();
+        if (subtype !== 'workshop') {
+          return false;
+        }
+
+        const startDate = new Date(event.date_from);
+        return !isNaN(startDate.getTime()) && startDate >= cutoff && startDate <= now;
+      });
+
+      if (!workshopEvents.length) {
+        return {
+          label,
+          value: '0',
+          hint,
+          numericValue: 0,
+          shouldHighlight: false,
+          icon,
+        };
+      }
+
+      let attended = 0;
+
+      for (const workshop of workshopEvents) {
+        try {
+          await dispatchGetOneEvent(this.$store, workshop.id);
+          const detailedEvent = readOneEvent(this.$store)(workshop.id);
+          const participants = detailedEvent?.participants || [];
+
+          if (participants.some(participant => participant.id === user.id)) {
+            attended += 1;
+          }
+        } catch (error) {
+          console.error(`Fehler beim Laden des Workshops (${workshop.id}):`, error);
+        }
+      }
+
+      return {
+        label,
+        value: `${attended}`,
+        hint,
+        numericValue: attended,
+        shouldHighlight: attended >= 1,
+        icon,
+      };
+    } catch (error) {
+      console.error('Fehler beim Laden der Workshopteilnahmen:', error);
+      return {
+        label,
+        value: '–',
+        hint: 'Workshopteilnahmen konnten nicht geladen werden',
+        icon,
+        shouldHighlight: false,
+      };
+    }
   }
 
   private async fetchSurveyParticipation(): Promise<StatisticItem> {
@@ -316,15 +443,15 @@ export default class HomeStatsWidget extends Vue {
 .metric-list {
   display: flex;
   flex-direction: column;
-  margin-top: 12px;
-  gap: 4px;
+  margin-top: 8px;
+  gap: 2px;
 }
 
 .metric-row {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 16px 0;
+  gap: 12px;
+  padding: 12px 0;
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
@@ -332,10 +459,11 @@ export default class HomeStatsWidget extends Vue {
   border-bottom: none;
 }
 
+
 .metric-icon {
-  width: 46px;
-  height: 46px;
-  border-radius: 46px;
+  width: 40px;
+  height: 40px;
+  border-radius: 40px;
   background: rgba(56, 142, 60, 0.12);
   display: flex;
   align-items: center;
@@ -347,27 +475,27 @@ export default class HomeStatsWidget extends Vue {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .metric-label {
-  font-size: 0.95rem;
+  font-size: 0.88rem;
   font-weight: 600;
   color: rgba(0, 0, 0, 0.78);
 }
 
 .metric-hint {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: rgba(0, 0, 0, 0.6);
 }
 
 .metric-value {
-  min-width: 80px;
+  min-width: 70px;
   text-align: right;
 }
 
 .metric-value-text {
-  font-size: 1.2rem;
+  font-size: 1.05rem;
   font-weight: 700;
   color: var(--v-cctGreen-base);
 }

@@ -329,8 +329,24 @@ export default new Router({
                     {
                       meta: {
                         event_type: 'meeting',
+                        excludeSubtypes: ['Ressortsitzung'],
+                        event_label: 'CCT-Sitzung',
+                        event_label_plural: 'CCT-Sitzungen',
                       },
                       path: '',
+                      name: 'wms-meetings-cct',
+                      component: () => import(/* webpackChunkName: "admin-event" */ './views/main/event/EventMain.vue'),
+                    },
+                    {
+                      meta: {
+                        event_type: 'meeting',
+                        includeSubtypes: ['Ressortsitzung'],
+                        event_label: 'Ressortsitzung',
+                        event_label_plural: 'Ressortsitzungen',
+                        allowRessortFilter: true,
+                      },
+                      path: 'ressortsitzungen',
+                      name: 'wms-meetings-ressort',
                       component: () => import(/* webpackChunkName: "admin-event" */ './views/main/event/EventMain.vue'),
                     },
                   ]
