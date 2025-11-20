@@ -343,6 +343,7 @@ export default new Router({
                         includeSubtypes: ['Ressortsitzung'],
                         event_label: 'Ressortsitzung',
                         event_label_plural: 'Ressortsitzungen',
+                        allowRessortFilter: true,
                       },
                       path: 'ressortsitzungen',
                       name: 'wms-meetings-ressort',

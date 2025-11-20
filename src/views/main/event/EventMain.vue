@@ -5,6 +5,29 @@
       <v-toolbar-title>
         {{ displayTypeLabel }}
       </v-toolbar-title>
+      <div
+        v-if="canFilterByOwnRessort"
+        class="ressort-filter-wrapper mx-4"
+      >
+        <v-btn
+          x-small
+          class="ressort-filter-btn"
+          :color="onlyMyRessort ? undefined : 'cctOrange'"
+          :style="onlyMyRessort ? undefined : 'color: white'"
+          @click="setRessortFilter(false)"
+        >
+          Alle Ressorts
+        </v-btn>
+        <v-btn
+          x-small
+          class="ressort-filter-btn"
+          :color="onlyMyRessort ? 'cctOrange' : undefined"
+          :style="onlyMyRessort ? 'color: white' : undefined"
+          @click="setRessortFilter(true)"
+        >
+          Nur {{ ownRessortButtonLabel }}
+        </v-btn>
+      </div>
       <v-spacer></v-spacer>
       <v-btn color="cctOrange" style="color: white" :to="{name: 'event-create-' + type}">
         <v-icon left>
@@ -93,7 +116,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import { readEvents } from '@/store/event/getters';
 import { dispatchCreateEventApplication, dispatchGetEvents } from '@/store/event/actions';
 import { IEvent, IEventType } from '@/interfaces';
@@ -103,6 +126,7 @@ import { readUserProfile, readUsers } from '@/store/main/getters';
 import { isAfter } from 'date-fns';
 import FileManager from '@/components/file-manager/FileManager.vue';
 import EventTable from './EventTable.vue';
+import { th } from 'date-fns/locale';
 
 @Component({
   components: {EmployeeProfilePicture, FileManager, EventTable },
@@ -130,6 +154,8 @@ export default class EventMain extends Vue {
   }
 
   today = new Date();
+
+  onlyMyRessort = true;
 
   dialog_register = false
 
@@ -166,7 +192,7 @@ export default class EventMain extends Vue {
     const includeSubtypes = this.includeSubtypes;
     const excludeSubtypes = this.excludeSubtypes;
 
-    return this.events.filter(event => {
+    let filtered = this.events.filter(event => {
       const subtype = (event.subtype || '').trim().toLowerCase();
       if (includeSubtypes.length) {
         return includeSubtypes.includes(subtype);
@@ -176,10 +202,44 @@ export default class EventMain extends Vue {
       }
       return true;
     });
+
+    if (this.onlyMyRessort && this.canFilterByOwnRessort) {
+      const normalizedRessort = this.normalizedUserRessort;
+      filtered = filtered.filter(event => {
+        const topic = (event.topic || '').trim().toLowerCase();
+        return topic === normalizedRessort;
+      });
+    }
+
+    return filtered;
   }
   
   get userProfile() {
     return readUserProfile(this.$store);
+  }
+
+  get userRessort(): string {
+    return (this.userProfile?.ressort || '').trim();
+  }
+
+  get normalizedUserRessort(): string {
+    return this.userRessort.toLowerCase();
+  }
+
+  get ownRessortButtonLabel(): string {
+    return this.userRessort || 'mein Ressort';
+  }
+
+  get canFilterByOwnRessort(): boolean {
+    console.log('routeAllowsRessortFilter:', this.routeAllowsRessortFilter, 'userRessort:', this.userRessort);
+    return Boolean(this.routeAllowsRessortFilter && this.userRessort);
+  }
+
+  public setRessortFilter(onlyOwn: boolean): void {
+    if (onlyOwn === this.onlyMyRessort) {
+      return;
+    }
+    this.onlyMyRessort = onlyOwn;
   }
 
   get users() {
@@ -187,6 +247,15 @@ export default class EventMain extends Vue {
   }
   get events() {
     return readEvents(this.$store)(this.type);
+  }
+
+  get routeAllowsRessortFilter(): boolean {
+    return Boolean(this.$route.meta?.allowRessortFilter);
+  }
+
+  @Watch('$route', { immediate: true })
+  onRouteChanged() {
+    this.onlyMyRessort = true;
   }
 
   private get includeSubtypes(): string[] {
@@ -312,5 +381,12 @@ export default class EventMain extends Vue {
 .data-table-header {
   border-top-left-radius: 5px !important;
   border-top-right-radius: 5px !important;
+}
+
+.ressort-filter-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  filter:opacity(0.7)
 }
 </style>
