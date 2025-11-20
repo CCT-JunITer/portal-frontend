@@ -454,7 +454,7 @@ export default class Homepage extends Vue {
       { id: 'public-affairs', title: 'Öffentlichkeitsarbeit', subtitle: 'Apps', icon: 'mdi-earth', color: 'grey darken-2', to: '/main/wms/documents/public-affairs' },
       { id: 'quality-management', title: 'Quality Management', subtitle: 'Apps', icon: 'mdi-check-decagram', color: 'grey darken-2', to: '/main/wms/documents/quality-management' },
       { id: 'wms-boards', title: 'Vorstand', subtitle: 'Apps', icon: 'mdi-crown', color: 'cctOrange', to: '/main/wms/boards' },
-      { id: 'finance-request', title: 'Finanzanträge', subtitle: 'Apps', icon: 'mdi-cash', color: 'cctBlue', to: '/main/finance-request' },
+      { id: 'finance-request', title: 'Finanzanträge', subtitle: 'Apps', icon: 'mdi-cash', color: 'cctBlue', to: '/main/finance-requests'},
       { id: 'qmsa', title: 'QM Checker', subtitle: 'Apps', icon: 'mdi-check-decagram', color: 'grey darken-2', to: '/main/qmsa' },
       { id: 'calendar', title: 'Kalender', subtitle: 'Apps', icon: 'mdi-calendar', color: 'purple', to: this.calendarURL },
       { id: 'towernutzung', title: 'Towernutzung', subtitle: 'Apps', icon: 'mdi-chess-rook', color: 'purple', to: this.towernutzungURL },
