@@ -23,6 +23,7 @@ export const getters = {
       return { ...filteredFinanceRequests[0] };
     }
   },
+  adminArchivedFinanceRequests: (state: AdminState) => state.archivedFinanceRequests,
   
 };
 
@@ -36,3 +37,4 @@ export const readAdminOneGroup = read(getters.adminOneGroup);
 export const readAdminOneUser = read(getters.adminOneUser);
 export const readAdminFinanceRequests = read(getters.adminFinanceRequests);
 export const readAdminOneFinanceRequest = read(getters.adminOneFinanceRequest);
+export const readAdminArchivedFinanceRequests = read(getters.adminArchivedFinanceRequests);

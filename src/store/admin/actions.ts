@@ -5,7 +5,7 @@ import { State } from '../state';
 import { AdminState } from './state';
 import { getStoreAccessors } from 'typesafe-vuex';
 import { commitAddNotification, commitSetLoggedIn, commitSetLogInError, commitSetToken, commitSetUser, commitSetUserStatus } from '../main/mutations';
-import { commitSetAdminFinanceRequest, commitSetAdminFinanceRequests, commitSetAdminGroup, commitSetAdminGroups, commitSetAdminOneUser, commitSetAdminUsers, commitSetAlumniUsers, commitSetRequests } from './mutations';
+import { commitSetAdminFinanceRequest, commitSetAdminFinanceRequests, commitSetAdminGroup, commitSetAdminGroups, commitSetAdminOneUser, commitSetAdminUsers, commitSetAlumniUsers, commitSetRequests, commitSetAdminArchivedFinanceRequests } from './mutations';
 import { apiCall, apiCallNotify } from '../utils';
 import { saveLocalToken, saveLocalUserStatus } from '@/utils';
 import { dispatchGetUserProfile, dispatchRouteLoggedIn } from '../main/actions';
@@ -85,6 +85,10 @@ export const actions = {
     const response = await apiCall(context, api.getAllFinanceRequests);
     commitSetAdminFinanceRequests(context, response.data);
   },
+  async actionGetAdminArchivedFinanceRequests(context: MainContext) {
+    const response = await apiCall(context, api.getArchivedFinanceRequests);
+    commitSetAdminArchivedFinanceRequests(context, response.data);
+  },
   // TODO User ID?? 
   async actionCreateFinanceRequestAdmin(context: MainContext, payload: IFinanceRequestCreate) {
     const response = await apiCallNotify(context, token => api.createFinanceRequest(token, payload));
@@ -132,5 +136,6 @@ export const dispatchEditUserGroup = dispatch(actions.actionEditUserGroup);
 export const dispatchRemoveUserFromGroup = dispatch(actions.actionRemoveUserFromGroup);
 export const dispatchSetPrimaryGroup = dispatch(actions.actionSetPrimaryGroup);
 export const dispatchAdminFinanceRequests = dispatch(actions.actionGetFinanceRequestsAdmin);
+export const dispatchAdminArchivedFinanceRequests = dispatch(actions.actionGetAdminArchivedFinanceRequests);
 export const dispatchImpersonateUser = dispatch(actions.actionImpersonateUser);
 

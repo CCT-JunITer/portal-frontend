@@ -8,6 +8,7 @@ const defaultState: AdminState = {
   users: [],
   alumni: [],
   financeRequests: [],
+  archivedFinanceRequests: [],
   groups: [],
 };
 

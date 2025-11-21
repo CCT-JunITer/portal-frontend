@@ -226,6 +226,9 @@ export const api = {
   async getAllFinanceRequests(token: string) {
     return axios.get(`${apiUrl}/api/v1/finance/`, authHeaders(token));
   },
+  async getArchivedFinanceRequests(token: string) {
+    return axios.get(`${apiUrl}/api/v1/finance/archived`, authHeaders(token));
+  },
   async getMyFinanceRequests(token: string) {
     return axios.get(`${apiUrl}/api/v1/finance/me`, authHeaders(token));
   },

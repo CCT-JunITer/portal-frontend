@@ -150,8 +150,8 @@
 <script lang="ts">
 import AdminFinanceRequestCard from '@/components/request/AdminFinanceRequestCard.vue';
 import FileManager from '@/components/file-manager/FileManager.vue';
-import { dispatchAdminFinanceRequests } from '@/store/admin/actions';
-import { readAdminFinanceRequests } from '@/store/admin/getters';
+import { dispatchAdminArchivedFinanceRequests, dispatchAdminFinanceRequests } from '@/store/admin/actions';
+import { readAdminArchivedFinanceRequests, readAdminFinanceRequests } from '@/store/admin/getters';
 import { dispatchSaveAsCsv } from '@/store/main/actions';
 import { format, isAfter } from 'date-fns';
 import { Vue, Component } from 'vue-property-decorator';
@@ -180,7 +180,6 @@ export default class AdminFinanceRequests extends Vue {
  
   get openFinanceRequests() {
     return readAdminFinanceRequests(this.$store)
-      .filter(request => request.status !== 'file_accepted')
       .sort(function(a,b) {
         if(isAfter(new Date(a.date_last_update), new Date(b.date_last_update))) 
           return -1;
@@ -189,8 +188,7 @@ export default class AdminFinanceRequests extends Vue {
   }
 
   get archivedFinanceRequests() {
-    return readAdminFinanceRequests(this.$store)
-      .filter(request => request.status === 'file_accepted')
+    return readAdminArchivedFinanceRequests(this.$store)
       .sort(function(a,b) {
         if(isAfter(new Date(a.date_last_update), new Date(b.date_last_update))) 
           return -1;
@@ -199,7 +197,10 @@ export default class AdminFinanceRequests extends Vue {
   }
 
   async created() {
-    await dispatchAdminFinanceRequests(this.$store);
+    await Promise.all([
+      dispatchAdminFinanceRequests(this.$store),
+      dispatchAdminArchivedFinanceRequests(this.$store),
+    ]);
   }
 
   public async exportAsCsv() {

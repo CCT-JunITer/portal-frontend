@@ -29,6 +29,9 @@ export const mutations = {
   setAdminFinanceRequest(state: AdminState, payload: IFinanceRequest){
     state.financeRequests = state.financeRequests.map(financeRequest => financeRequest.id !== payload.id ? financeRequest : payload);
   },
+  setAdminArchivedFinanceRequests(state: AdminState, payload: IFinanceRequest[]){
+    state.archivedFinanceRequests = payload;
+  },
 };
 
 const { commit } = getStoreAccessors<AdminState, State>('');
@@ -41,3 +44,4 @@ export const commitSetAdminGroups = commit(mutations.setAdminGroups)
 export const commitSetAdminGroup = commit(mutations.setAdminGroup)
 export const commitSetAdminFinanceRequests = commit(mutations.setAdminFinanceRequests)
 export const commitSetAdminFinanceRequest = commit(mutations.setAdminFinanceRequest)
+export const commitSetAdminArchivedFinanceRequests = commit(mutations.setAdminArchivedFinanceRequests)

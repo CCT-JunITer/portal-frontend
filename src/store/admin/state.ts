@@ -6,4 +6,5 @@ export interface AdminState {
   alumni: IUserProfile[];
   groups: Group[];
   financeRequests: IFinanceRequest[];
+  archivedFinanceRequests: IFinanceRequest[];
 }
