@@ -42,6 +42,9 @@ export const api = {
   async updateMe(token: string, data: IUserProfileUpdate) {
     return axios.put<IUserProfile>(`${apiUrl}/api/v1/users/me`, data, authHeaders(token));
   },
+  async updateUserStatsMe(token: string) {
+    return axios.post<IUserProfile>(`${apiUrl}/api/v1/users/me/stats`, {}, authHeaders(token));
+  },
   async getAdminUsers(token: string, type: UserType) {
 
     // https://gitlab.cct-ev.de/juniter/pv-tool3/backend/-/issues/4

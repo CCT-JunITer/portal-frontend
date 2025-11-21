@@ -59,6 +59,14 @@ export interface IUserProfile {
     work_experiences?: WorkExperience[];
     user_skills?: UserSkill[];
 
+    // Statistics fields
+    dosi_attendance_quota?: number;
+    ressort_attendance_quota?: number;
+    project_applications_count?: number;
+    project_staffing_count?: number;
+    workshop_participation_count?: number;
+    last_stats_update?: string | null;
+
     // Additional fields
     generation?: string | null;
     is_passive?: boolean;
