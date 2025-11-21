@@ -9,7 +9,7 @@ export { debounce }
 export { formatInTimeZone, parseISO, de, utcToZonedTime };
 
 export const RESSORTS = [
-  'Kein Ressort', 'Juniter', 'Public Affairs', 'Human Resources', 'Quality Management', 'International Networks', 'Board', 'Vorstand', 'Projektmanager'
+  'Kein Ressort', 'Juniter', 'Human Resources', 'Quality Management', 'External Communications','International Networks', 'Board', 'Vorstand', 'Projektmanager', 'Public Affairs',
 ]
 
 export const FINANCE_REQUEST_STATUS = [

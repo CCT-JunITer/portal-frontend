@@ -78,6 +78,10 @@ export const actions = {
     const response = await apiCallNotify(context, token => api.updateMe(token, payload));
     commitSetUserProfile(context, response.data);
   },
+  async actionUpdateUserStatsMe(context: MainContext) {
+    const response = await apiCall(context, token => api.updateUserStatsMe(token));
+    commitSetUserProfile(context, response.data);
+  },
   async actionUpdateUserSettings(context: MainContext, payload: IUserSettings) {
     const response = await apiCallNotify(context, token => api.updateUserSettingsMe(token, payload));
     commitSetUserSettings(context, payload);
@@ -390,6 +394,7 @@ export const dispatchRemoveLogIn = dispatch(actions.actionRemoveLogIn);
 export const dispatchRouteLoggedIn = dispatch(actions.actionRouteLoggedIn);
 export const dispatchRouteLogOut = dispatch(actions.actionRouteLogOut);
 export const dispatchUpdateUserProfile = dispatch(actions.actionUpdateUserProfile);
+export const dispatchUpdateUserStatsMe = dispatch(actions.actionUpdateUserStatsMe);
 export const dispatchUploadFile = dispatch(actions.actionUploadFile);
 export const dispatchDownloadFile = dispatch(actions.actionDownloadFile);
 export const dispatchCreateVersionedFolder = dispatch(actions.actionCreateVersionedFolder);

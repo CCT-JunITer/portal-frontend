@@ -51,7 +51,7 @@ export const actions = {
     return response.data;
   },
   async actionCreateEvent(context: MainContext, payload: IEventCreate) {
-    const response = await apiCallNotify(context, token => api.createEvent(token, payload), { successText: 'Schulung erfolgreich angelegt' });
+    const response = await apiCallNotify(context, token => api.createEvent(token, payload), { successText: 'Event erfolgreich angelegt' });
     commitSetEvent(context, response.data);
     return response.data;
   },
