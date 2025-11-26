@@ -150,13 +150,7 @@
 
           <template v-slot:item.full_name="{ item }">
             <div class="d-flex align-center py-2">
-              <v-avatar size="36" class="mr-3">
-                <v-img
-                  v-if="item.profile_picture"
-                  :src="item.profile_picture"
-                ></v-img>
-                <v-icon v-else color="cctLightGrey">mdi-account-circle</v-icon>
-              </v-avatar>
+              <employee-profile-picture :employee="item" size="32" class="mr-4" />
               <div>
                 <div class="font-weight-medium">{{ item.full_name }}</div>
                 <div class="text-caption cctLightGrey--text">
@@ -269,8 +263,11 @@ import { Component, Vue } from 'vue-property-decorator';
 import { api } from '@/api';
 import { readToken } from '@/store/main/getters';
 import { IUserStatistics } from '@/interfaces';
+import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 
-@Component
+@Component({
+  components: { EmployeeProfilePicture },
+})
 export default class StatsDashboard extends Vue {
   users: IUserStatistics[] = [];
   loading = false;
