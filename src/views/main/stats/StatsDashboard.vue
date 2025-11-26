@@ -133,7 +133,7 @@
             'items-per-page-text': 'Zeilen pro Seite',
           }"
         >
-          <template v-slot:item.status="{ item }">
+          <template v-slot:item.is_activity_fulfilled="{ item }">
             <v-chip
               :color="item.is_activity_fulfilled ? 'cctGreen' : 'cctOrange'"
               dark
@@ -141,10 +141,10 @@
             >
               <v-icon left small>{{
                 item.is_activity_fulfilled
-                  ? "mdi-check-circle"
-                  : "mdi-alert-circle"
+                  ? 'mdi-check-circle'
+                  : 'mdi-alert-circle'
               }}</v-icon>
-              {{ item.is_activity_fulfilled ? "Aktiv" : "Passiv" }}
+              {{ item.is_activity_fulfilled ? 'Aktiv' : 'Passiv' }}
             </v-chip>
           </template>
 
@@ -278,7 +278,7 @@ export default class StatsDashboard extends Vue {
   filterMemberstatus: string | null = null;
 
   headers = [
-    { text: 'Status', value: 'status', sortable: true, class: 'text-no-wrap' },
+    { text: 'Status', value: 'is_activity_fulfilled', sortable: true, class: 'text-no-wrap' },
     { text: 'Name', value: 'full_name', sortable: true },
     {
       text: 'Memberstatus',
