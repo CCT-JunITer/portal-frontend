@@ -58,6 +58,15 @@ export default new Router({
               component: () => import('./views/main/Homepage.vue'),
             },
             {
+              path: 'stats-dashboard',
+              name: 'stats-dashboard',
+              component: () => import('./views/main/stats/StatsDashboard.vue'),
+              meta: {
+                title: 'Statistik Dashboard',
+                permissions: ['portal.users.vorstand.stats']
+              }
+            },
+            {
               path: 'member-progression',
               component: () => import('./views/main/MemberProgression.vue'),
             },
