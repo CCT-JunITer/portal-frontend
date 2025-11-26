@@ -137,11 +137,15 @@ export default class HomeStatsWidget extends Vue {
     const quota = user.dosi_attendance_quota || 0;
     const threshold = this.getDoSiThreshold(user.memberstatus);
     const shouldHighlight = threshold === null ? true : quota >= threshold;
+    const isTrainee = (user.memberstatus || '').trim().toLowerCase() === 'trainee';
+    const hint = isTrainee
+      ? 'Gezählt seit deinem Eintritt (max. 12 Sitzungen)'
+      : 'Gezählt über die letzten 12 Donnerstagssitzungen';
 
     return {
       label: 'DoSi Anwesenheitsquote',
       value: `${quota.toFixed(2)} %`,
-      hint: 'Gezählt über die letzten 12 Donnerstagssitzungen',
+      hint,
       numericValue: quota,
       shouldHighlight,
       icon: 'mdi-account-clock',
@@ -150,13 +154,17 @@ export default class HomeStatsWidget extends Vue {
 
   private getRessortAttendance(user: IUserProfile): StatisticItem {
     const quota = user.ressort_attendance_quota || 0;
-    const threshold = this.getRessortThreshold(user.memberstatus);
+    const threshold = this.getRessortThreshold(user.memberstatus, user.ressort);
     const shouldHighlight = threshold === null ? true : quota >= threshold;
+    const isTrainee = (user.memberstatus || '').trim().toLowerCase() === 'trainee';
+    const hint = isTrainee
+      ? 'Gezählt seit deinem Eintritt (max. 12 Sitzungen)'
+      : 'Gezählt über die letzten 12 Ressortsitzungen';
 
     return {
       label: 'Ressortsitzungsquote',
       value: `${quota.toFixed(2)} %`,
-      hint: 'Gezählt über die letzten 12 Ressortsitzungen',
+      hint,
       numericValue: quota,
       shouldHighlight,
       icon: 'mdi-account-group-outline',
@@ -167,7 +175,9 @@ export default class HomeStatsWidget extends Vue {
     const count = user.project_applications_count || 0;
     const staffingCount = user.project_staffing_count || 0;
     // Combined criterion: at least one application OR one staffing
-    const shouldHighlight = count >= 1 || staffingCount >= 1;
+    // Vorstand members have no requirement
+    const isVorstandMember = this.isUserInVorstand(user);
+    const shouldHighlight = isVorstandMember || count >= 1 || staffingCount >= 1;
 
     return {
       label: 'Projektbewerbungen',
@@ -183,7 +193,9 @@ export default class HomeStatsWidget extends Vue {
     const count = user.project_staffing_count || 0;
     const applicationsCount = user.project_applications_count || 0;
     // Combined criterion: at least one application OR one staffing
-    const shouldHighlight = count >= 1 || applicationsCount >= 1;
+    // Vorstand members have no requirement
+    const isVorstandMember = this.isUserInVorstand(user);
+    const shouldHighlight = isVorstandMember || count >= 1 || applicationsCount >= 1;
 
     return {
       label: 'Projektbesetzungen',
@@ -193,6 +205,13 @@ export default class HomeStatsWidget extends Vue {
       shouldHighlight,
       icon: 'mdi-briefcase-check-outline',
     };
+  }
+
+  private isUserInVorstand(user: IUserProfile): boolean {
+    if (!user.active_groups) return false;
+    return user.active_groups.some(
+      group => group.name?.toLowerCase() === 'vorstand' || group.type?.toLowerCase() === 'vorstand'
+    );
   }
 
   private getWorkshopParticipation(user: IUserProfile): StatisticItem {
@@ -229,7 +248,12 @@ export default class HomeStatsWidget extends Vue {
     return null;
   }
 
-  private getRessortThreshold(memberStatus?: string | null): number | null {
+  private getRessortThreshold(memberStatus?: string | null, ressort?: string | null): number | null {
+    // Projektmanagement has no Ressort attendance requirement
+    if (ressort && ressort.trim().toLowerCase() === 'projektmanagement') {
+      return null;
+    }
+
     if (!memberStatus) {
       return null;
     }

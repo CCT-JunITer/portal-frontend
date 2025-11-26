@@ -212,7 +212,7 @@
                 class="mr-1"
               >
                 {{
-                  item.applications_or_staffing_ok ? "mdi-check" : "mdi-close"
+                  item.applications_or_staffing_ok ? 'mdi-check' : 'mdi-close'
                 }}
               </v-icon>
               <span
@@ -225,7 +225,9 @@
                 {{ item.project_applications_count || 0 }} /
                 {{ item.project_staffing_count || 0 }}
               </span>
-              <span class="text-caption cctLightGrey--text ml-1">(mind. 1)</span>
+              <span class="text-caption cctLightGrey--text ml-1">{{
+                item.thresholds?.applications_or_staffing_required ? '(mind. 1)' : '(–)'
+              }}</span>
             </div>
           </template>
 
