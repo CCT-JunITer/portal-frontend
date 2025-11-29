@@ -59,6 +59,23 @@ export const getters = {
       group.type === 'ressort' && group.name === 'Projektmanager'
     ) || false;
   },
+  isVorstand: (state: MainState) => {
+    const user = state.userProfile;
+    if (!user) {
+      return false;
+    }
+    // Check if user has vorstand permission
+    const hasVorstandPermission = user.permissions.some(p => 
+      p.includes('vorstand') || p === '*'
+    );
+    if (hasVorstandPermission) {
+      return true;
+    }
+    // Check if user is in Vorstand group
+    return user.active_groups?.some(group => 
+      group.name?.toLowerCase() === 'vorstand' || group.type?.toLowerCase() === 'vorstand'
+    ) || false;
+  },
   hasAnyPermission: (state: MainState) => (permissions: string[]) => {
     const user = state.userProfile;
     if (!user) {
@@ -88,6 +105,7 @@ export const readDashboardMiniDrawer = read(getters.dashboardMiniDrawer);
 export const readDashboardShowDrawer = read(getters.dashboardShowDrawer);
 export const readHasAdminAccess = read(getters.hasAdminAccess);
 export const readIsProjektmanager = read(getters.isProjektmanager);
+export const readIsVorstand = read(getters.isVorstand);
 export const readHasAnyPermission = read(getters.hasAnyPermission);
 export const readToolbarColor = read(getters.toolbarColor);
 export const readIsLoggedIn = read(getters.isLoggedIn);

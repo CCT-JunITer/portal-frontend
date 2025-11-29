@@ -474,3 +474,39 @@ export interface PMNoteCreate {
 export interface PMNoteUpdate {
     content?: string;
 }
+
+export interface IUserStatistics {
+    id: number;
+    full_name: string | null;
+    first_name: string | null;
+    last_name: string | null;
+    profile_picture: string | null;
+    memberstatus: string | null;
+    ressort: string | null;
+    is_passive: boolean | null;
+    
+    // Statistics
+    dosi_attendance_quota: number | null;
+    ressort_attendance_quota: number | null;
+    project_applications_count: number | null;
+    project_staffing_count: number | null;
+    workshop_participation_count: number | null;
+    last_stats_update: string | null;
+    
+    // Fulfillment status
+    dosi_ok: boolean;
+    ressort_ok: boolean;
+    applications_or_staffing_ok: boolean;
+    has_application: boolean;
+    has_staffing: boolean;
+    workshop_ok: boolean;
+    is_activity_fulfilled: boolean;
+    
+    // Thresholds
+    thresholds: {
+        dosi: number;
+        ressort: number;
+        applications_or_staffing_required: boolean;
+        workshop: number;
+    } | null;
+}

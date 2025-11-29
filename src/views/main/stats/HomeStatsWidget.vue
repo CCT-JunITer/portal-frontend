@@ -51,13 +51,24 @@
         </div>
       </v-card-text>
 
+      <v-card-actions v-if="isVorstand">
+        <v-spacer></v-spacer>
+        <v-btn
+          text
+          color="cctGreen"
+          :to="{ name: 'stats-dashboard' }"
+        >
+          Alle Statistiken
+          <v-icon right small>mdi-chevron-right</v-icon>
+        </v-btn>
+      </v-card-actions>
     </v-card>
   </v-col>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { readUserProfile } from '@/store/main/getters';
+import { readUserProfile, readIsVorstand } from '@/store/main/getters';
 import { dispatchUpdateUserStatsMe } from '@/store/main/actions';
 import { IUserProfile } from '@/interfaces';
 
@@ -92,6 +103,10 @@ export default class HomeStatsWidget extends Vue {
     return this.errorMessage;
   }
 
+  get isVorstand(): boolean {
+    return readIsVorstand(this.$store);
+  }
+
   private async loadStatistics(): Promise<void> {
     this.loading = true;
     this.errorMessage = null;
@@ -122,11 +137,15 @@ export default class HomeStatsWidget extends Vue {
     const quota = user.dosi_attendance_quota || 0;
     const threshold = this.getDoSiThreshold(user.memberstatus);
     const shouldHighlight = threshold === null ? true : quota >= threshold;
+    const isTrainee = (user.memberstatus || '').trim().toLowerCase() === 'trainee';
+    const hint = isTrainee
+      ? 'Gezählt seit deinem Eintritt (max. 12 Sitzungen)'
+      : 'Gezählt über die letzten 12 Donnerstagssitzungen';
 
     return {
       label: 'DoSi Anwesenheitsquote',
       value: `${quota.toFixed(2)} %`,
-      hint: 'Gezählt über die letzten 12 Donnerstagssitzungen',
+      hint,
       numericValue: quota,
       shouldHighlight,
       icon: 'mdi-account-clock',
@@ -135,48 +154,77 @@ export default class HomeStatsWidget extends Vue {
 
   private getRessortAttendance(user: IUserProfile): StatisticItem {
     const quota = user.ressort_attendance_quota || 0;
+    const threshold = this.getRessortThreshold(user.memberstatus, user.ressort);
+    const shouldHighlight = threshold === null ? true : quota >= threshold;
+    const isTrainee = (user.memberstatus || '').trim().toLowerCase() === 'trainee';
+    const hint = isTrainee
+      ? 'Gezählt seit deinem Eintritt (max. 12 Sitzungen)'
+      : 'Gezählt über die letzten 12 Ressortsitzungen';
+
     return {
       label: 'Ressortsitzungsquote',
       value: `${quota.toFixed(2)} %`,
-      hint: 'Gezählt über die letzten 12 Ressortsitzungen',
+      hint,
       numericValue: quota,
-      shouldHighlight: true, // No threshold defined in original code
+      shouldHighlight,
       icon: 'mdi-account-group-outline',
     };
   }
 
   private getProjectApplications(user: IUserProfile): StatisticItem {
     const count = user.project_applications_count || 0;
+    const staffingCount = user.project_staffing_count || 0;
+    // Combined criterion: at least one application OR one staffing
+    // Vorstand members have no requirement
+    const isVorstandMember = this.isUserInVorstand(user);
+    const shouldHighlight = isVorstandMember || count >= 1 || staffingCount >= 1;
+
     return {
       label: 'Projektbewerbungen',
       value: `${count}`,
       hint: 'Abgeschlossene Bewerbungen in den letzten 3 Monaten',
       numericValue: count,
-      shouldHighlight: count >= 1,
+      shouldHighlight,
       icon: 'mdi-file-document-edit-outline',
     };
   }
 
   private getProjectAppointments(user: IUserProfile): StatisticItem {
     const count = user.project_staffing_count || 0;
+    const applicationsCount = user.project_applications_count || 0;
+    // Combined criterion: at least one application OR one staffing
+    // Vorstand members have no requirement
+    const isVorstandMember = this.isUserInVorstand(user);
+    const shouldHighlight = isVorstandMember || count >= 1 || applicationsCount >= 1;
+
     return {
       label: 'Projektbesetzungen',
       value: `${count}`,
       hint: 'Projekte in den letzten 3 Monaten',
       numericValue: count,
-      shouldHighlight: count >= 1,
+      shouldHighlight,
       icon: 'mdi-briefcase-check-outline',
     };
   }
 
+  private isUserInVorstand(user: IUserProfile): boolean {
+    if (!user.active_groups) return false;
+    return user.active_groups.some(
+      group => group.name?.toLowerCase() === 'vorstand' || group.type?.toLowerCase() === 'vorstand'
+    );
+  }
+
   private getWorkshopParticipation(user: IUserProfile): StatisticItem {
     const count = user.workshop_participation_count || 0;
+    const threshold = this.getWorkshopThreshold(user.memberstatus);
+    const shouldHighlight = threshold === null ? true : count >= threshold;
+
     return {
       label: 'Workshopteilnahmen',
       value: `${count}`,
       hint: 'Workshopteilnahmen in den letzten 3 Monaten',
       numericValue: count,
-      shouldHighlight: count >= 1,
+      shouldHighlight,
       icon: 'mdi-school-outline',
     };
   }
@@ -196,6 +244,42 @@ export default class HomeStatsWidget extends Vue {
       return 40;
     }
 
+    // Senior Consultant has no DoSi requirement
+    return null;
+  }
+
+  private getRessortThreshold(memberStatus?: string | null, ressort?: string | null): number | null {
+    // Projektmanagement has no Ressort attendance requirement
+    if (ressort && ressort.trim().toLowerCase() === 'projektmanagement') {
+      return null;
+    }
+
+    if (!memberStatus) {
+      return null;
+    }
+
+    const normalized = memberStatus.trim().toLowerCase();
+
+    if (normalized === 'trainee' || normalized === 'junior consultant') {
+      return 66;
+    }
+
+    // Consultant and Senior Consultant have no Ressort requirement
+    return null;
+  }
+
+  private getWorkshopThreshold(memberStatus?: string | null): number | null {
+    if (!memberStatus) {
+      return null;
+    }
+
+    const normalized = memberStatus.trim().toLowerCase();
+
+    if (normalized === 'trainee' || normalized === 'junior consultant') {
+      return 1;
+    }
+
+    // Consultant and Senior Consultant have no Workshop requirement
     return null;
   }
 }
