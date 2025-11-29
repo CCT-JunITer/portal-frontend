@@ -129,6 +129,8 @@ export default class TowerAnwesenheit extends Vue {
   display: flex;
   flex-direction: row;
   height: 100%;
+  align-items: center;
+  justify-content: center;
 }
 
 .loading-overlay {
@@ -142,14 +144,5 @@ export default class TowerAnwesenheit extends Vue {
   justify-content: center;
   background-color: white;
   z-index: 10;
-}
-
-.error-container {
-  height: 100%;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
 }
 </style>
