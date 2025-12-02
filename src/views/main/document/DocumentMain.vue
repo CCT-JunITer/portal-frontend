@@ -17,7 +17,12 @@
         :headers="headers"
         :items="documents || []"
         :loading="documents === null"
-        :items-per-page="5"
+        :items-per-page="itemsPerPage"
+        :footer-props="{
+          'items-per-page-options': [5, 10, 15, -1],
+          'items-per-page-text': 'Zeilen pro Seite'
+        }"
+        @update:items-per-page="saveItemsPerPage"
         class="elevation-1"
       >
         <template v-slot:item.title="{ item }">
@@ -77,11 +82,18 @@ import { Route } from 'vue-router';
 @Component({ components: { FileManager, EmployeeProfilePicture }})
 export default class DocumentMain extends Vue {
 
+  public itemsPerPage: number = parseInt(localStorage.getItem('DocumentsPerPage') || '5');
+
   @Watch('$route', {immediate: true})
   public async onRouteChange(newRoute?: Route, oldRoute?: Route) {
     if (newRoute?.params?.type !== oldRoute?.params?.type) {
       await dispatchGetDocuments(this.$store, this.type);
     }
+  }
+
+  public saveItemsPerPage(newItemsPerPage: number) {
+    this.itemsPerPage = newItemsPerPage;
+    localStorage.setItem('DocumentsPerPage', String(newItemsPerPage));
   }
 
   get documents() {

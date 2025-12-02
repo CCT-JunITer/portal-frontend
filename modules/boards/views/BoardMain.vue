@@ -17,7 +17,12 @@
         :headers="headers"
         :items="boards || []"
         :loading="boards === null"
-        :items-per-page="5"
+        :items-per-page="itemsPerPage"
+        :footer-props="{
+          'items-per-page-options': [5, 10, 15, -1],
+          'items-per-page-text': 'Zeilen pro Seite'
+        }"
+        @update:items-per-page="saveItemsPerPage"
         class="elevation-1"
       >
 
@@ -101,7 +106,14 @@ import { Vue, Component } from 'vue-property-decorator';
 
 export default class BoardMain extends Vue {
   
+  public itemsPerPage: number = parseInt(localStorage.getItem('BoardPerPage') || '5');
+
   public fileLabels = FILE_LABELS_TABLE;
+
+  public saveItemsPerPage(newItemsPerPage: number) {
+    this.itemsPerPage = newItemsPerPage;
+    localStorage.setItem('BoardPerPage', String(newItemsPerPage));
+  }
 
   get boards() {
     return readboards(this.$store);

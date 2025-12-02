@@ -168,10 +168,11 @@
               <v-data-table
                 :headers="projectHistoryHeaders"
                 :items="projectHistory"
-                :items-per-page="10"
+                :items-per-page="itemsPerPage"
                 :footer-props="{
                   'items-per-page-options': [5, 10, 25, -1]
                 }"
+                @update:items-per-page="saveItemsPerPage"
                 dense
                 class="project-history-table"
               >
@@ -325,6 +326,13 @@ export default class PmUserProfileView extends Vue {
     'saturday': 'Sa',
     'sunday': 'So',
   };
+
+  public itemsPerPage: number = parseInt(localStorage.getItem('ProjecthistoryPerPage') || '10');
+
+  public saveItemsPerPage(newItemsPerPage: number) {
+    this.itemsPerPage = newItemsPerPage;
+    localStorage.setItem('ProjecthistoryPerPage', String(newItemsPerPage));
+  }
 
   // ---- ROUTE / PROFILE ACCESS ----
   // Route parameter is defined as :id in pm-dashboard routes

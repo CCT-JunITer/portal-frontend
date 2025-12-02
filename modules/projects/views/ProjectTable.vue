@@ -6,6 +6,12 @@
       :items="displayItems || []"
       :loading="!displayItems"
       :mobile-breakpoint="0"
+      :items-per-page="itemsPerPage"
+      :footer-props="{
+        'items-per-page-options': [5, 10, 15, -1],
+        'items-per-page-text': 'Zeilen pro Seite'
+      }"
+      @update:items-per-page="saveItemsPerPage"
       sort-by="date_from"
       sort-desc
     >
@@ -109,9 +115,10 @@ import { Project } from '../types';
     UserChip,
     UserListItem,
   }
-})
-export default class ProjectTable extends Vue {
+}) export default class ProjectTable extends Vue {
 
+  public itemsPerPage: number = parseInt(localStorage.getItem('ProjecttablePerPage') || '5');
+  
   @Prop()
   public items!: Project[] | null;
 
@@ -124,6 +131,11 @@ export default class ProjectTable extends Vue {
         project_end_date_sort: project.project_end_date_actual || project.project_end_date_expected || '',
       }
     });
+  }
+
+  public saveItemsPerPage(newItemsPerPage: number) {
+    this.itemsPerPage = newItemsPerPage;
+    localStorage.setItem('ProjecttablePerPage', String(newItemsPerPage));
   }
 
   get userProfile() {

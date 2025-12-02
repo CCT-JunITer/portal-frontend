@@ -106,10 +106,11 @@
         :search="searchText"
         :custom-filter="customFilter"
         multi-sort
-        :items-per-page="25"
+        :items-per-page="itemsPerPage"
         :footer-props="{
           'items-per-page-options': [10, 25, 50, 100, -1]
         }"
+        @update:items-per-page="saveItemsPerPage"
         class="elevation-2"
       >
         <template v-slot:item.full_name="{ item }">
@@ -170,6 +171,13 @@ export default class PmUserTable extends Vue {
   private filterMemberstatus: string[] = [];
   private hidePassive = true;
   private hideAlumni = true;
+
+  public itemsPerPage: number = parseInt(localStorage.getItem('ProjecttablePerPage') || '25');
+
+  public saveItemsPerPage(newItemsPerPage: number) {
+    this.itemsPerPage = newItemsPerPage;
+    localStorage.setItem('ProjecttablePerPage', String(newItemsPerPage));
+  }
 
   get users() {
     return readUsers(this.$store);

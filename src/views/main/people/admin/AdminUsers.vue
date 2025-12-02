@@ -19,7 +19,13 @@
     <v-data-table 
       :headers="headers" 
       :items="users" 
-      :search="search" 
+      :search="search"
+      :items-per-page="itemsPerPage"
+      :footer-props="{
+        'items-per-page-options': [5, 10, 15, -1],
+        'items-per-page-text': 'Zeilen pro Seite'
+      }"
+      @update:items-per-page="saveItemsPerPage" 
       multi-sort
       show-expand
       dense
@@ -68,6 +74,14 @@ import { IUserProfile } from '@/interfaces';
 
 @Component
 export default class AdminUsers extends Vue {
+
+  public itemsPerPage: number = parseInt(localStorage.getItem('AdmintablePerPage') || '10');
+
+  public saveItemsPerPage(newItemsPerPage: number) {
+    this.itemsPerPage = newItemsPerPage;
+    localStorage.setItem('AdmintablePerPage', String(newItemsPerPage));
+  }
+
   public search = '';
   public headers: { text: string; value: keyof IUserProfile | string; sortable?: boolean }[] = [
     {

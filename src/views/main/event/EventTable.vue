@@ -13,6 +13,12 @@
       :items="items || []"
       :loading="!items"
       :mobile-breakpoint="0"
+      :items-per-page="itemsPerPage"
+      :footer-props="{
+        'items-per-page-options': [5, 10, 15, -1],
+        'items-per-page-text': 'Zeilen pro Seite'
+      }"
+      @update:items-per-page="saveItemsPerPage"
       fixed-header
       sort-by="date_from"
       sort-desc
@@ -125,6 +131,8 @@ import { Vue, Component, Prop } from 'vue-property-decorator'
 })
 export default class EventTable extends Vue {
 
+  public itemsPerPage: number = parseInt(localStorage.getItem('EventtablePerPage') || '5');
+  
   @Prop()
   public items!: IEvent[] | null;
 
@@ -133,6 +141,10 @@ export default class EventTable extends Vue {
 
   public displayUsersFor: IEvent | null = null;
 
+  public saveItemsPerPage(newItemsPerPage: number) {
+    this.itemsPerPage = newItemsPerPage;
+    localStorage.setItem('EventtablePerPage', String(newItemsPerPage));
+  }
 
   public async showUsers(event: IEvent) {
     await dispatchGetOneEvent(this.$store, event.id);
