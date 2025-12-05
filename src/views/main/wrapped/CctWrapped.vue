@@ -3,8 +3,8 @@
     <div class="wrapped-hero" :style="heroStyle">
       <div class="hero-content">
         <div class="eyebrow">CCT Wrapped</div>
-        <h1 class="display-2 font-weight-bold mb-2">{{ year }} Highlights</h1>
-        <div class="subtitle-1 mb-4">Das Beste aus unseren Projekten, Mitgliedern und Events – visuell und animiert.</div>
+        <h1 class="text-h3 font-weight-bold mb-2">{{ year }} Highlights</h1>
+        <div class="text-subtitle-1 mb-4">Das Beste aus unseren Projekten, Mitgliedern und Events – visuell und animiert.</div>
         <div class="d-flex align-center wrap-actions">
           <v-btn color="cctGreen" class="mr-3" @click="reload" :loading="loading" large>
             <v-icon left>mdi-refresh</v-icon>
@@ -173,9 +173,13 @@ export default class CctWrapped extends Vue {
     return new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 }).format(value ?? 0);
   }
 
+  private notifyError(message: string) {
+    (this as any).$notify?.({ type: 'error', text: message });
+  }
+
   async mounted() {
     if (!this.isVorstand) {
-      this.$notify?.({ type: 'error', text: 'Kein Zugriff. Diese Seite ist nur für den Vorstand sichtbar.' });
+      this.notifyError('Kein Zugriff. Diese Seite ist nur für den Vorstand sichtbar.');
       this.$router.replace({ path: '/main/homepage' });
       return;
     }
@@ -191,7 +195,7 @@ export default class CctWrapped extends Vue {
       this.data = response.data;
     } catch (err) {
       console.error('Failed to load wrapped', err);
-      this.$notify?.({ type: 'error', text: 'Wrapped konnte nicht geladen werden.' });
+      this.notifyError('Wrapped konnte nicht geladen werden.');
     } finally {
       this.loading = false;
     }
