@@ -67,6 +67,15 @@ export default new Router({
               }
             },
             {
+              path: 'wrapped',
+              name: 'cct-wrapped',
+              component: () => import('./views/main/wrapped/CctWrapped.vue'),
+              meta: {
+                title: 'CCT Wrapped',
+                permissions: ['portal.users.vorstand.stats']
+              }
+            },
+            {
               path: 'member-progression',
               component: () => import('./views/main/MemberProgression.vue'),
             },

@@ -1,5 +1,23 @@
 <template>
   <v-container fluid class="pa-4">
+    <v-alert
+      v-if="isVorstand"
+      dense
+      text
+      color="cctGreen"
+      class="mb-4 cct-wrapped-banner"
+      type="info"
+      @click="$router.push({ name: 'cct-wrapped' })"
+      style="cursor: pointer;"
+    >
+      <div class="d-flex align-center">
+        <v-icon left color="cctGreen">mdi-party-popper</v-icon>
+        <strong class="mr-2">CCT Wrapped</strong>
+        <span>Entdecke unsere Highlights {{ new Date().getFullYear() }}</span>
+        <v-spacer></v-spacer>
+        <v-btn text small color="cctGreen">Ansehen</v-btn>
+      </div>
+    </v-alert>
     <h2 class="text-h4 mb-4">Willkommen, {{ userName }}!</h2>
     
     <v-row>
@@ -275,7 +293,7 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
-import { readUserProfile } from '@/store/main/getters';
+import { readIsVorstand, readUserProfile } from '@/store/main/getters';
 import { dispatchGetInklEvents } from '@/store/event/actions';
 import { MEMBERSTATUS, format } from '@/common';
 import HomeStatsWidget from '@/views/main/stats/HomeStatsWidget.vue';
@@ -331,6 +349,10 @@ export default class Homepage extends Vue {
 
   get userProfile() {
     return readUserProfile(this.$store);
+  }
+
+  get isVorstand() {
+    return readIsVorstand(this.$store);
   }
 
   get userName() {

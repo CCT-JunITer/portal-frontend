@@ -516,3 +516,30 @@ export interface IUserStatisticsResponse {
     active_users: IUserStatistics[];
     paused_members: IUserStatistics[];
 }
+
+export interface IWrappedTopItem {
+    user_id?: number | null;
+    full_name?: string | null;
+    value: number;
+}
+
+export interface IWrappedProjectCounts {
+    total: number;
+    external: number;
+    internal: number;
+    membership_project: number;
+    staffing: number;
+}
+
+export interface IWrappedResponse {
+    year: number;
+    new_members: number;
+    completed_projects: IWrappedProjectCounts;
+    consultant_days: number;
+    top_dosi_attendee?: IWrappedTopItem | null;
+    workshops_count: number;
+    longest_dosi_streak?: IWrappedTopItem | null;
+    most_projects?: IWrappedTopItem | null;
+    most_finance_requests?: IWrappedTopItem | null;
+    revenue_projects: number;
+}

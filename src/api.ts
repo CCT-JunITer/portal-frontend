@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {apiUrl} from '@/env';
-import { IEvent, IEventCreate, IUserProfile, IUserProfileCreate, IUserProfileUpdate, UserType, RequestCreate, UserInvite, IEventApplicationCreate, IEventApplicationUpdate, IFinanceRequestCreate, IFinanceRequestUpdate, IFinanceRequest, Group, GroupUpdate, IUserSettings, IEventApplication, VersionedFolder, IDocumentCreate, IDocument, LabelledFile, WorkExperience, WorkExperienceCreate, WorkExperienceUpdate, UserSkill, UserSkillCreate, UserSkillUpdate, PMNote, PMNoteCreate, PMNoteUpdate, IUserStatistics, IUserStatisticsResponse } from './interfaces';
+import { IEvent, IEventCreate, IUserProfile, IUserProfileCreate, IUserProfileUpdate, UserType, RequestCreate, UserInvite, IEventApplicationCreate, IEventApplicationUpdate, IFinanceRequestCreate, IFinanceRequestUpdate, IFinanceRequest, Group, GroupUpdate, IUserSettings, IEventApplication, VersionedFolder, IDocumentCreate, IDocument, LabelledFile, WorkExperience, WorkExperienceCreate, WorkExperienceUpdate, UserSkill, UserSkillCreate, UserSkillUpdate, PMNote, PMNoteCreate, PMNoteUpdate, IUserStatistics, IUserStatisticsResponse, IWrappedResponse } from './interfaces';
 import {dataURItoBlob} from '@/utils';
 
 export function authHeaders(token: string, headers = {}) {
@@ -47,6 +47,9 @@ export const api = {
   },
   async getAllUserStatistics(token: string) {
     return axios.get<IUserStatisticsResponse>(`${apiUrl}/api/v1/users/stats/dashboard`, authHeaders(token));
+  },
+  async getWrapped(token: string, year: number) {
+    return axios.get<IWrappedResponse>(`${apiUrl}/api/v1/wrapped/wrapped`, { ...authHeaders(token), params: { year } });
   },
   async getAdminUsers(token: string, type: UserType) {
 
