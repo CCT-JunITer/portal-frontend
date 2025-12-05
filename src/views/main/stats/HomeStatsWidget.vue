@@ -139,8 +139,8 @@ export default class HomeStatsWidget extends Vue {
     const shouldHighlight = threshold === null ? true : quota >= threshold;
     const isTrainee = (user.memberstatus || '').trim().toLowerCase() === 'trainee';
     const hint = isTrainee
-      ? 'Gezählt seit deinem Eintritt (max. 12 Sitzungen)'
-      : 'Gezählt über die letzten 12 Donnerstagssitzungen';
+      ? 'Gezählt seit deinem Eintritt (max. 3 Monate)'
+      : 'Gezählt in den letzten 3 Monaten';
 
     return {
       label: 'DoSi Anwesenheitsquote',
@@ -158,8 +158,8 @@ export default class HomeStatsWidget extends Vue {
     const shouldHighlight = threshold === null ? true : quota >= threshold;
     const isTrainee = (user.memberstatus || '').trim().toLowerCase() === 'trainee';
     const hint = isTrainee
-      ? 'Gezählt seit deinem Eintritt (max. 12 Sitzungen)'
-      : 'Gezählt über die letzten 12 Ressortsitzungen';
+      ? 'Gezählt seit deinem Eintritt (max. 3 Monate)'
+      : 'Gezählt in den letzten 3 Monaten';
 
     return {
       label: 'Ressortsitzungsquote',
