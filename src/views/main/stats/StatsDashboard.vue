@@ -123,7 +123,7 @@
         <!-- Data Table -->
         <v-data-table
           :headers="headers"
-          :items="filteredUsers"
+          :items="filteredActiveUsers"
           :search="search"
           :items-per-page="-1"
           class="elevation-2"
@@ -253,6 +253,47 @@
             </v-btn>
           </template>
         </v-data-table>
+        <v-card class="mt-6">
+          <v-card-title class="paused-title">
+            Ruhende Mitgliedschaften ({{ pausedMembers.length }})
+          </v-card-title>
+          <v-divider></v-divider>
+          <v-data-table
+            :headers="pausedHeaders"
+            :items="pausedMembers"
+            :items-per-page="-1"
+            hide-default-footer
+            dense
+            class="paused-table"
+          >
+            <template v-slot:no-data>
+              <div class="text-center py-4 cctGrey--text">
+                Keine ruhenden Mitgliedschaften vorhanden.
+              </div>
+            </template>
+
+            <template v-slot:item.full_name="{ item }">
+              <div class="d-flex align-center py-2">
+                <employee-profile-picture :employee="item" size="28" class="mr-3" />
+                <span>{{ item.full_name }}</span>
+              </div>
+            </template>
+
+            <template v-slot:item.paused_since="{ item }">
+              {{ formatDate(item.paused_since) }}
+            </template>
+
+            <template v-slot:item.actions="{ item }">
+              <v-btn
+                icon
+                small
+                :to="{ name: 'profile', params: { id: item.id } }"
+              >
+                <v-icon small color="cctBlue">mdi-account-details</v-icon>
+              </v-btn>
+            </template>
+          </v-data-table>
+        </v-card>
       </div>
     </div>
   </div>
@@ -262,7 +303,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { api } from '@/api';
 import { readToken } from '@/store/main/getters';
-import { IUserStatistics } from '@/interfaces';
+import { IUserStatistics, IUserStatisticsResponse } from '@/interfaces';
 import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture.vue';
 
 @Component({
@@ -270,6 +311,7 @@ import EmployeeProfilePicture from '@/components/employee/EmployeeProfilePicture
 })
 export default class StatsDashboard extends Vue {
   users: IUserStatistics[] = [];
+  pausedMembers: IUserStatistics[] = [];
   loading = false;
   error: string | null = null;
   search = '';
@@ -312,6 +354,14 @@ export default class StatsDashboard extends Vue {
     { text: '', value: 'actions', sortable: false },
   ];
 
+  pausedHeaders = [
+    { text: 'Name', value: 'full_name', sortable: true },
+    { text: 'Ressort', value: 'ressort', sortable: true },
+    { text: 'Memberstatus', value: 'memberstatus', sortable: true },
+    { text: 'Ruhend seit', value: 'paused_since', sortable: true },
+    { text: '', value: 'actions', sortable: false },
+  ];
+
   statusOptions = [
     { text: 'Alle', value: null },
     { text: 'Aktiv', value: 'active' },
@@ -328,7 +378,7 @@ export default class StatsDashboard extends Vue {
     ];
   }
 
-  get filteredUsers() {
+  get filteredActiveUsers() {
     let result = this.users;
 
     if (this.filterStatus === 'active') {
@@ -381,7 +431,9 @@ export default class StatsDashboard extends Vue {
       }
 
       const response = await api.getAllUserStatistics(token);
-      this.users = response.data;
+      const payload = response.data as IUserStatisticsResponse;
+      this.users = payload.active_users;
+      this.pausedMembers = payload.paused_members;
     } catch (err: any) {
       console.error('Error loading statistics:', err);
       if (err.response?.status === 403) {
@@ -398,6 +450,11 @@ export default class StatsDashboard extends Vue {
   formatQuota(value: number | null): string {
     if (value === null || value === undefined) return '–';
     return `${value.toFixed(1)}%`;
+  }
+
+  formatDate(value: string | null): string {
+    if (!value) return '–';
+    return new Date(value).toLocaleDateString('de-DE');
   }
 }
 </script>
@@ -421,5 +478,11 @@ export default class StatsDashboard extends Vue {
   &--passive {
     border: 2px solid var(--v-cctOrange-base);
   }
+}
+
+
+.paused-title {
+  font-weight: 600;
+  color: var(--v-cctBlue-base);
 }
 </style>

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {apiUrl} from '@/env';
-import { IEvent, IEventCreate, IUserProfile, IUserProfileCreate, IUserProfileUpdate, UserType, RequestCreate, UserInvite, IEventApplicationCreate, IEventApplicationUpdate, IFinanceRequestCreate, IFinanceRequestUpdate, IFinanceRequest, Group, GroupUpdate, IUserSettings, IEventApplication, VersionedFolder, IDocumentCreate, IDocument, LabelledFile, WorkExperience, WorkExperienceCreate, WorkExperienceUpdate, UserSkill, UserSkillCreate, UserSkillUpdate, PMNote, PMNoteCreate, PMNoteUpdate, IUserStatistics } from './interfaces';
+import { IEvent, IEventCreate, IUserProfile, IUserProfileCreate, IUserProfileUpdate, UserType, RequestCreate, UserInvite, IEventApplicationCreate, IEventApplicationUpdate, IFinanceRequestCreate, IFinanceRequestUpdate, IFinanceRequest, Group, GroupUpdate, IUserSettings, IEventApplication, VersionedFolder, IDocumentCreate, IDocument, LabelledFile, WorkExperience, WorkExperienceCreate, WorkExperienceUpdate, UserSkill, UserSkillCreate, UserSkillUpdate, PMNote, PMNoteCreate, PMNoteUpdate, IUserStatistics, IUserStatisticsResponse } from './interfaces';
 import {dataURItoBlob} from '@/utils';
 
 export function authHeaders(token: string, headers = {}) {
@@ -46,7 +46,7 @@ export const api = {
     return axios.post<IUserProfile>(`${apiUrl}/api/v1/users/me/stats`, {}, authHeaders(token));
   },
   async getAllUserStatistics(token: string) {
-    return axios.get<IUserStatistics[]>(`${apiUrl}/api/v1/users/stats/dashboard`, authHeaders(token));
+    return axios.get<IUserStatisticsResponse>(`${apiUrl}/api/v1/users/stats/dashboard`, authHeaders(token));
   },
   async getAdminUsers(token: string, type: UserType) {
 

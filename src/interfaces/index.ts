@@ -492,6 +492,7 @@ export interface IUserStatistics {
     project_staffing_count: number | null;
     workshop_participation_count: number | null;
     last_stats_update: string | null;
+    paused_since: string | null;
     
     // Fulfillment status
     dosi_ok: boolean;
@@ -509,4 +510,9 @@ export interface IUserStatistics {
         applications_or_staffing_required: boolean;
         workshop: number;
     } | null;
+}
+
+export interface IUserStatisticsResponse {
+    active_users: IUserStatistics[];
+    paused_members: IUserStatistics[];
 }
