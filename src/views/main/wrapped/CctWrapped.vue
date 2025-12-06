@@ -4,48 +4,40 @@
       <div class="hero-content">
         <div class="eyebrow">CCT Wrapped</div>
         <h1 class="text-h3 font-weight-bold mb-2">{{ year }} Highlights</h1>
-        <div class="text-subtitle-1 mb-4">Das Beste aus unseren Projekten, Mitgliedern und Events – visuell und animiert.</div>
+        <div class="text-subtitle-1 mb-4">Das Beste aus unseren Projekten, Mitgliedern und Events.</div>
         <div class="d-flex align-center wrap-actions">
-          <v-btn color="cctGreen" class="mr-3" @click="reload" :loading="loading" large>
-            <v-icon left>mdi-refresh</v-icon>
+          <v-btn dark outlined class="mr-3 refresh-btn" @click="reload" :loading="loading">
+            <v-icon left small>mdi-refresh</v-icon>
             Aktualisieren
           </v-btn>
-          <div class="year-chip">Jahr {{ year }}</div>
+          <div class="year-chip">{{ year }}</div>
         </div>
-      </div>
-      <div class="hero-visual">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
       </div>
     </div>
 
     <div class="carousel-wrapper mt-8">
-      <v-card class="elevation-0 pa-4 carousel-shell">
-        <v-carousel
-          v-if="metricSlides.length"
-          v-model="activeSlide"
-          height="380"
-          hide-delimiter-background
-          show-arrows-on-hover
-          cycle
-          :interval="5200"
-        >
-          <v-carousel-item v-for="(slide, idx) in metricSlides" :key="slide.key">
-            <div class="carousel-card" :style="getSlideStyle(idx)">
-              <div class="carousel-inner">
-                <div class="badge">CCT Wrapped {{ year }}</div>
-                <div class="category">{{ slide.title }}</div>
-                <transition name="fade-up">
-                  <div class="value" :class="valueAnimation(idx)" :style="valueAnimStyle">{{ slide.value }}</div>
-                </transition>
-                <div class="subtitle">{{ slide.subtitle }}</div>
-              </div>
+      <v-carousel
+        v-if="metricSlides.length"
+        v-model="activeSlide"
+        height="360"
+        hide-delimiter-background
+        show-arrows-on-hover
+        cycle
+        :interval="5200"
+        class="carousel-full"
+      >
+        <v-carousel-item v-for="(slide, idx) in metricSlides" :key="slide.key">
+          <div class="carousel-card" :style="getSlideStyle(idx)">
+            <div class="carousel-inner">
+              <div class="badge">CCT Wrapped {{ year }}</div>
+              <div class="category">{{ slide.title }}</div>
+              <div class="value" :class="valueAnimation(idx)" :style="valueAnimStyle">{{ slide.value }}</div>
+              <div class="subtitle">{{ slide.subtitle }}</div>
             </div>
-          </v-carousel-item>
-        </v-carousel>
-        <div v-else class="text-center pa-6 text--secondary">Keine Daten</div>
-      </v-card>
+          </div>
+        </v-carousel-item>
+      </v-carousel>
+      <div v-else class="text-center pa-6 text--secondary">Keine Daten</div>
     </div>
 
     <div v-if="showGrid && gridCards.length" class="grid-wrapper mt-10">
@@ -77,12 +69,14 @@ export default class CctWrapped extends Vue {
   activeSlide = 0;
   showGrid = false;
   previousSlide = 0;
+
+  // CCT Blue (#214788) and CCT Purple (#713FBF) based gradients
   gradients = [
-    'linear-gradient(135deg, #ff7eb6 0%, #ffb347 100%)',
-    'linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%)',
-    'linear-gradient(135deg, #22c55e 0%, #a855f7 100%)',
-    'linear-gradient(135deg, #f97316 0%, #0ea5e9 100%)',
-    'linear-gradient(135deg, #ec4899 0%, #facc15 100%)',
+    'linear-gradient(135deg, #214788 0%, #713FBF 100%)',
+    'linear-gradient(135deg, #1a3a6e 0%, #5c32a0 100%)',
+    'linear-gradient(135deg, #2d5298 0%, #8a52d6 100%)',
+    'linear-gradient(135deg, #713FBF 0%, #214788 100%)',
+    'linear-gradient(135deg, #1e4070 0%, #6b3db5 100%)',
   ];
 
   get metricSlides() {
@@ -110,13 +104,7 @@ export default class CctWrapped extends Vue {
         key: 'consultant_days',
         title: 'Beratertage',
         value: `${this.formatNumber(Math.round(this.data.consultant_days || 0))} BT`,
-        subtitle: 'Alle Rollen außer Ausschuss',
-      },
-      {
-        key: 'workshops',
-        title: 'Workshops',
-        value: this.formatNumber(this.data.workshops_count || 0),
-        subtitle: 'Trainings & Workshops im Jahr',
+        subtitle: 'Abgeschlossene Projekte',
       },
     ];
 
@@ -161,7 +149,7 @@ export default class CctWrapped extends Vue {
 
   get heroStyle() {
     return {
-      background: 'linear-gradient(135deg, #e8f0ff 0%, #d7f2e9 60%, #ffe9d6 100%)',
+      background: 'linear-gradient(135deg, #214788 0%, #713FBF 100%)',
     };
   }
 
@@ -230,8 +218,7 @@ export default class CctWrapped extends Vue {
   }
 
   get gridCards() {
-    const slides = this.metricSlides;
-    return slides.map((s) => ({
+    return this.metricSlides.map((s) => ({
       key: s.key,
       title: s.title,
       value: s.value,
@@ -270,265 +257,247 @@ export default class CctWrapped extends Vue {
 
 <style scoped lang="scss">
 .wrapped-page {
-  background: #f6f8fb;
-  color: #0f172a;
+  background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%);
   min-height: 100vh;
+  padding-bottom: 48px;
 }
 
 .wrapped-hero {
   position: relative;
   overflow: hidden;
-  border-radius: 16px;
-  padding: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 240px;
-  box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+  border-radius: 4px;
+  padding: 40px 48px;
+  min-height: 180px;
+  box-shadow: 0 2px 16px rgba(33, 71, 136, 0.12);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
 }
 
 .hero-content .eyebrow {
   text-transform: uppercase;
-  letter-spacing: 1.5px;
-  font-size: 0.8rem;
-  opacity: 0.85;
+  letter-spacing: 2px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 8px;
+}
+
+.hero-content h1 {
+  color: #ffffff;
+}
+
+.hero-content .text-subtitle-1 {
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .wrap-actions {
   flex-wrap: wrap;
-}
-
-.hero-visual {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 45%;
-  pointer-events: none;
-}
-
-.orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(0px);
-  mix-blend-mode: screen;
-  opacity: 0.75;
-  animation: float 10s ease-in-out infinite;
-}
-
-.orb-1 {
-  width: 260px;
-  height: 260px;
-  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), rgba(77,153,255,0.25));
-  top: -40px;
-  right: -60px;
-}
-
-.orb-2 {
-  width: 200px;
-  height: 200px;
-  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.85), rgba(72,187,120,0.28));
-  top: 80px;
-  right: 80px;
-  animation-delay: 2s;
-}
-
-.orb-3 {
-  width: 140px;
-  height: 140px;
-  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.85), rgba(255,196,140,0.35));
-  bottom: -20px;
-  right: 20px;
-  animation-delay: 4s;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px); opacity: 0.7; }
-  50% { transform: translateY(-10px); opacity: 0.9; }
+  gap: 12px;
 }
 
 .year-chip {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  color: #0f172a;
-  padding: 10px 14px;
-  border-radius: 10px;
-  font-weight: 600;
-  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.95);
+  color: #214788;
+  padding: 8px 16px;
+  border-radius: 2px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-.carousel-shell {
-  background: transparent;
+.refresh-btn {
+  border-color: rgba(255, 255, 255, 0.7) !important;
+  color: #ffffff !important;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+  }
 }
 
 .carousel-wrapper {
-  max-width: 1100px;
-  margin: 0 auto;
+  width: 100%;
+}
+
+.carousel-full {
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 2px 16px rgba(33, 71, 136, 0.12);
 }
 
 .carousel-card {
-  min-height: 320px;
-  border-radius: 18px;
+  height: 100%;
+  border-radius: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #0b1021;
-  padding: 32px;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 20px 45px rgba(0,0,0,0.15);
+  padding: 56px 32px;
 }
 
 .carousel-inner {
   text-align: center;
-  color: #0b1021;
-  max-width: 640px;
+  max-width: 600px;
   width: 100%;
 }
 
 .badge {
   display: inline-block;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.82);
-  color: #0b1021;
-  font-weight: 700;
-  letter-spacing: 0.6px;
-  margin-bottom: 12px;
+  padding: 6px 14px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  margin-bottom: 20px;
   text-transform: uppercase;
-  font-size: 0.8rem;
+  font-size: 0.65rem;
 }
 
 .category {
-  font-size: 1.6rem;
-  font-weight: 800;
-  letter-spacing: 0.2px;
-  color: #0b1021;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.75);
+  text-transform: uppercase;
+  margin-bottom: 12px;
 }
 
 .value {
-  font-size: 3.4rem;
-  font-weight: 900;
-  margin: 10px 0;
+  font-size: 4.5rem;
+  font-weight: 300;
+  color: #ffffff;
+  margin: 20px 0;
+  line-height: 1;
+  letter-spacing: -2px;
   animation-fill-mode: both;
-  animation-duration: 1.3s;
+  animation-duration: 1s;
 }
 
 .subtitle {
-  font-size: 1.05rem;
-  color: #0b1021;
-  opacity: 0.9;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 400;
+  letter-spacing: 0.5px;
 }
 
-.fade-up-enter-active,
-.fade-up-leave-active {
-  transition: all 1.2s cubic-bezier(0.2, 0.9, 0.15, 1);
-}
-
-.fade-up-enter {
-  opacity: 0;
-  transform: translateY(34px);
-}
-
+/* Animations */
 .anim-rise-blur {
-  animation: rise-blur 1.35s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: rise-blur 1s ease-out;
 }
 
 .anim-scale-pop {
-  animation: scale-pop 1.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: scale-pop 1s ease-out;
 }
 
 .anim-flip-y {
-  animation: flip-y 1.4s cubic-bezier(0.25, 0.85, 0.4, 1.2);
+  animation: flip-y 1s ease-out;
 }
 
 .anim-slide-rotate {
-  animation: slide-rotate 1.3s cubic-bezier(0.25, 1, 0.3, 1);
+  animation: slide-rotate 1s ease-out;
 }
 
 .anim-bounce-soft {
-  animation: bounce-soft 1.45s cubic-bezier(0.2, 1, 0.22, 1);
+  animation: bounce-soft 1.2s ease-out;
 }
 
 .anim-tilt-in {
-  animation: tilt-in 1.2s cubic-bezier(0.2, 0.9, 0.2, 1.1);
+  animation: tilt-in 1s ease-out;
 }
 
 @keyframes rise-blur {
-  0% { opacity: 0; filter: blur(8px); transform: translateY(50px); }
-  40% { opacity: 1; filter: blur(2px); }
+  0% { opacity: 0; filter: blur(8px); transform: translateY(40px); }
   100% { opacity: 1; filter: blur(0); transform: translateY(0); }
 }
 
 @keyframes scale-pop {
-  0% { opacity: 0; transform: scale(0.6); }
-  60% { opacity: 1; transform: scale(1.05); }
-  100% { transform: scale(1); }
+  0% { opacity: 0; transform: scale(0.7); }
+  70% { transform: scale(1.05); }
+  100% { opacity: 1; transform: scale(1); }
 }
 
 @keyframes flip-y {
-  0% { opacity: 0; transform: rotateY(80deg) scale(0.8); }
-  50% { opacity: 1; }
-  100% { transform: rotateY(0deg) scale(1); }
+  0% { opacity: 0; transform: rotateY(90deg); }
+  100% { opacity: 1; transform: rotateY(0deg); }
 }
 
 @keyframes slide-rotate {
-  0% { opacity: 0; transform: translateY(60px) rotate(-6deg); }
-  70% { opacity: 1; }
-  100% { transform: translateY(0) rotate(0deg); }
+  0% { opacity: 0; transform: translateY(40px) rotate(-5deg); }
+  100% { opacity: 1; transform: translateY(0) rotate(0deg); }
 }
 
 @keyframes bounce-soft {
-  0% { opacity: 0; transform: translateY(50px) scale(0.9); }
-  60% { opacity: 1; transform: translateY(-10px) scale(1.02); }
-  85% { transform: translateY(6px) scale(0.99); }
-  100% { transform: translateY(0) scale(1); }
+  0% { opacity: 0; transform: translateY(40px); }
+  60% { transform: translateY(-8px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes tilt-in {
-  0% { opacity: 0; transform: translateY(40px) rotate(-4deg) scale(0.9); }
-  70% { opacity: 1; }
-  100% { transform: translateY(0) rotate(0deg) scale(1); }
+  0% { opacity: 0; transform: translateY(30px) rotate(-3deg); }
+  100% { opacity: 1; transform: translateY(0) rotate(0deg); }
 }
 
+/* Grid */
 .grid-wrapper {
   max-width: 1200px;
   margin: 0 auto;
 }
 
 .grid-title {
-  font-size: 1.4rem;
-  font-weight: 800;
-  margin-bottom: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
 }
 
 .grid-card {
   background: #ffffff;
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 12px 32px rgba(0,0,0,0.08);
-  border: 1px solid #e5e7eb;
+  border-radius: 2px;
+  padding: 28px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e2e8f0;
   height: 100%;
   display: flex;
   flex-direction: column;
   gap: 6px;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(33, 71, 136, 0.1);
+    border-color: #cbd5e1;
+  }
 }
 
 .grid-label {
-  font-size: 0.95rem;
-  color: #475569;
+  font-size: 0.7rem;
+  color: #64748b;
   text-transform: uppercase;
-  letter-spacing: 0.6px;
+  letter-spacing: 1.5px;
+  font-weight: 500;
+  margin-bottom: 4px;
 }
 
 .grid-value {
   font-size: 2rem;
-  font-weight: 900;
-  color: #0f172a;
+  font-weight: 300;
+  color: #1e293b;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
 }
 
 .grid-sub {
-  font-size: 0.95rem;
-  color: #64748b;
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin-top: 2px;
 }
 </style>

@@ -537,7 +537,6 @@ export interface IWrappedResponse {
     completed_projects: IWrappedProjectCounts;
     consultant_days: number;
     top_dosi_attendee?: IWrappedTopItem | null;
-    workshops_count: number;
     longest_dosi_streak?: IWrappedTopItem | null;
     most_projects?: IWrappedTopItem | null;
     most_finance_requests?: IWrappedTopItem | null;
