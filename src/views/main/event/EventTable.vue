@@ -43,7 +43,8 @@
       </template>
       <template v-slot:item.subtype="{ item }">
         <v-icon v-if="item.approved && item.type==='meeting'" color="cctGreen" small>mdi-check-decagram</v-icon>
-        {{ item.subtype }}
+        <span v-if="item.subtype.toLowerCase() ==='ressortsitzung'">{{ item.topic }}</span>
+        <span v-else>{{ item.subtype }}</span>
       </template>
       <template v-slot:item.external="{ item }">
         <span v-if="item.external === ''">Keine</span>
